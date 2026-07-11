@@ -62,6 +62,10 @@ def draw_displaced(
     rng = np.random.default_rng(seed)
     employed = persons["employment_income"].to_numpy() > 0
     exposure = persons["exposure"].to_numpy()
+    # JR16 normalises C-AIOE so the least-exposed sector scores 0 (and thus
+    # receives no eq 3.4 job losses); the raw standardised score is negative
+    # for low-exposure groups, which would corrupt the quota weights.
+    exposure = exposure - exposure[employed].min()
     weight = persons["weight"].to_numpy()
     group = persons["soc_major_group"].to_numpy()
 
@@ -82,6 +86,8 @@ def draw_displaced(
         members = np.flatnonzero(employed & (group == g))
         quota = raw[g] * scale
         p = exposure[members] * weight[members]
+        if quota <= 0 or p.sum() <= 0:
+            continue
         if scenario.youth_displacement_multiplier != 1.0:
             p = p * np.where(age[members] < 25, scenario.youth_displacement_multiplier, 1.0)
         p = p / p.sum()
