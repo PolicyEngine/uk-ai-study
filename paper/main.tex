@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
 \usepackage{natbib}
+\usepackage{graphicx}
 \bibliographystyle{apalike}
 
 \title{Artificial Intelligence and Income Inequality in the United Kingdom:\\
@@ -112,6 +113,54 @@ youth-tilted central scenario raises the 16--24 share of the displaced from
 inequality effects move little, because young workers' earnings and benefit
 entitlements are smaller than average. Poverty, however, rises slightly
 \emph{more} under the youth tilt (+3.42pp vs +3.25pp).
+
+\subsection{Full replication of the JR16 result set}
+
+We regenerate every result in the original report for the UK. The share of
+workers transitioning to unemployment rises monotonically from 0.6\% in the
+bottom decile of equivalised household disposable income to 8.5\% in the top
+decile (Ireland: 0.7\% to 5.3\%) --- AI displacement risk concentrates in
+high-income households, and more steeply in the UK. Wage gains for those who
+remain are flat across the distribution (2.5--2.7\%). The capital-return
+shock is a uniform $\approx$40\% increase per recipient, but 35\% of
+interest and dividend income sits in the top decile, so gains accrue at the
+very top. Market-income losses are progressive (from $-0.3$\% of disposable
+income in decile 1 to $-4.6$\% at the top), cushioned by rising benefit
+entitlement in the middle deciles and falling tax at the top.
+
+Across the full $11 \times 6$ scenario grid (0--10\% employment loss
+$\times$ 0--5\% wage increase, capital shock always on;
+Figures~\ref{fig:grid-disposable}--\ref{fig:grid-gini}), average household
+disposable income ranges from $+2.9$\% to $-9.2$\%, with a near-zero
+diagonal where wage gains offset displacement; net Exchequer revenue ranges
+from $+7.0$\% to $-17.6$\% of income tax and National Insurance receipts
+(Ireland: $+14$\% to $-25$\%); and the Gini index rises in \emph{every}
+scenario, from $+0.05$pp (capital shock only) to $+2.7$pp (Ireland: $+0.3$
+to $+1.2$pp). All three of the original report's takeaways hold for the UK:
+higher-income households are more affected in every scenario, potential
+losses exceed potential gains, and some scenarios leave average incomes
+unchanged while inequality still rises.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{../results/jr16/fig4_5_disposable_grid.png}
+\caption{Average change in household disposable income across AI adoption scenarios (UK analogue of JR16 Figure 4.5).}
+\label{fig:grid-disposable}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{../results/jr16/fig4_6_exchequer_grid.png}
+\caption{Change in net Exchequer revenue as a share of income tax and National Insurance receipts (UK analogue of JR16 Figure 4.6).}
+\label{fig:grid-exchequer}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{../results/jr16/fig4_7_gini_grid.png}
+\caption{Change in the Gini index of equivalised household disposable income, percentage points (UK analogue of JR16 Figure 4.7).}
+\label{fig:grid-gini}
+\end{figure}
 
 \section{Limitations}
 
