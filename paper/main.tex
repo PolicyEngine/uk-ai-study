@@ -1,0 +1,136 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage{natbib}
+\bibliographystyle{apalike}
+
+\title{Artificial Intelligence and Income Inequality in the United Kingdom:\\
+\large A replication of Doorley et al.\ (2026) with PolicyEngine UK\thanks{Draft v0.1. Code and aggregate results: \url{https://github.com/PolicyEngine/uk-ai-study}. FRS microdata via the UK Data Service (EUL); not redistributed.}}
+\author{Vahid Ahmadi}
+\date{July 2026 --- preliminary draft}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent We replicate for the United Kingdom the scenario framework of
+Doorley, O'Connor, O'Shea and Tuda (2026, ESRI/Department of Finance Report
+No.~16), which traces generative AI's labour-market effects through a
+tax-benefit microsimulation. Occupation-level AI exposure
+(complementarity-adjusted AIOE) is attached to Family Resources Survey
+adults; employment, wage and capital shocks follow the report's equations
+3.4 and 3.5; and fiscal and distributional outcomes are computed with
+PolicyEngine UK in place of SWITCH. In the central scenario (7\%
+displacement, +2.6\% wages, +0.4pp return to capital), the annual Exchequer
+cost is \pounds 41bn, the before-housing-costs poverty rate rises by
+3.3 percentage points, and the Gini of equivalised household net income
+rises by 0.019. We extend the framework along the age dimension: tilting
+within-occupation displacement toward workers aged 16--24, per recent
+seniority-biased evidence, raises the youth share of the displaced by
+roughly two-fifths while leaving aggregate effects nearly unchanged.
+\end{abstract}
+
+\section{Introduction}
+
+Doorley et al.\ (2026) ask how generative AI would affect income inequality
+in Ireland if it displaces some workers, raises the wages of those who
+remain, and raises returns to capital. Their answer runs occupation-level
+AI-exposure scores through stylised shock scenarios and the SWITCH
+tax-benefit model. We port the full pipeline to the UK: Family Resources
+Survey (FRS) microdata replaces SILC, SOC2020 occupations replace ISCO, and
+PolicyEngine UK --- an open-source tax-benefit microsimulation model ---
+replaces SWITCH. We add one substantive extension: an age dimension,
+motivated by evidence that generative AI's employment effects concentrate
+among junior workers \citep{kleinteeselink2025, hosseini2026,
+brynjolfsson2025}.
+
+\section{Data and method}
+
+\subsection{Exposure}
+
+Each FRS 2024--25 adult reports a SOC2020 major group (\texttt{adult.tab},
+UK Data Service). We attach the complementarity-adjusted AI Occupational
+Exposure score (C-AIOE) of \citet{pizzinelli2023} --- the \citet{felten2021}
+AIOE scaled by an O*NET-derived complementarity index $\theta$ --- using a
+UK SOC2020 crosswalk built from open-licensed sources (Felten et al.'s
+published scores, a reconstruction of $\theta$ from public O*NET 27.3
+following the IMF recipe, and ASHE 2025 employment weights for the
+major-group aggregation). Version 0.1 operates at the 1-digit major-group
+level; within-group exposure variation is deferred to a planned
+quantile-forest imputation from 4-digit LFS occupations.
+
+\subsection{Shocks}
+
+Following the report's equation~3.4, aggregate displacement equals the
+scenario rate times weighted employment; it is allocated across major groups
+in proportion to employment times mean C-AIOE and realised by weighted
+random draws within groups (probability proportional to individual exposure).
+Displaced workers receive zero employment income and unemployed status.
+Following equation~3.5, a wage pool equal to the scenario uplift times the
+surviving wage bill is distributed across survivors in proportion to
+$\theta$ times earnings. Interest and dividend income are scaled by the
+ratio of shocked to baseline capital returns ($1.405\%/1.005\% \approx
+1.398$). Scenario anchors: central 7\% displacement with +2.6\% wages
+\citep{briggs2023}; low 1\% employment-only \citep{acemoglu2025}; high 13\%
+\citep{brynjolfsson2025}. The youth-tilted variant multiplies the draw
+probability of workers aged 16--24 by $5.8/4.5 \approx 1.29$, the ratio of
+junior to total employment effects in \citet{kleinteeselink2025}, holding
+group totals fixed.
+
+\subsection{Microsimulation}
+
+Baseline and shocked PolicyEngine UK simulations (v2.89.2, simulation year
+2026) run on the same FRS dataset; the shocked run receives modified
+employment, interest and dividend income and employment status. We report
+the change in government balance (Exchequer cost), person-weighted poverty
+rates before and after housing costs, and the Gini of equivalised household
+net income, with breakdowns by baseline income decile and age band.
+
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{Scenario results, FRS 2024--25, simulation year 2026}
+\begin{tabular}{lrrrr}
+\toprule
+ & Displacement & Exchequer cost & $\Delta$ Poverty (BHC) & $\Delta$ Gini \\
+\midrule
+Low & 1\% & \pounds 6.5bn & +0.32pp & +0.003 \\
+Central & 7\% & \pounds 41.1bn & +3.25pp & +0.019 \\
+High & 13\% & \pounds 93.9bn & +7.02pp & +0.034 \\
+Central, youth-tilted & 7\% & \pounds 39.4bn & +3.42pp & +0.018 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Fiscal costs scale roughly linearly at \pounds 6--7bn per percentage point
+of displacement, on top of an always-on capital-shock component. The
+youth-tilted central scenario raises the 16--24 share of the displaced from
+3.2\% to 4.5\% --- a two-fifths increase --- while aggregate fiscal and
+inequality effects move little, because young workers' earnings and benefit
+entitlements are smaller than average. Poverty, however, rises slightly
+\emph{more} under the youth tilt (+3.42pp vs +3.25pp).
+
+\section{Limitations}
+
+Exposure is 1-digit only; weights are the uncalibrated FRS build; displaced
+workers are current-period unemployed rather than the report's long-term
+unemployed contract (benefit-exhaustion nuances are not expressible as
+PolicyEngine inputs); the self-employed sit outside all shocks, as in the
+original; and results reflect a single seeded draw per scenario. Each is
+addressed in the repository roadmap.
+
+\begin{thebibliography}{9}
+\bibitem[Acemoglu(2025)]{acemoglu2025} Acemoglu, D. (2025). The simple macroeconomics of AI. \emph{Economic Policy}, 40(121).
+\bibitem[Briggs \& Kodnani(2023)]{briggs2023} Briggs, J. \& Kodnani, D. (2023). The potentially large effects of artificial intelligence on economic growth. Goldman Sachs.
+\bibitem[Brynjolfsson et al.(2025)]{brynjolfsson2025} Brynjolfsson, E., Chandar, B. \& Chen, R. (2025). Canaries in the coal mine? Six facts about the recent employment effects of artificial intelligence.
+\bibitem[Doorley et al.(2026)]{doorley2026} Doorley, K., O'Connor, S., O'Shea, R. \& Tuda, D. (2026). \emph{Artificial intelligence and income inequality in Ireland}. ESRI/Department of Finance Report No.~16.
+\bibitem[Felten et al.(2021)]{felten2021} Felten, E., Raj, M. \& Seamans, R. (2021). Occupational, industry, and geographic exposure to artificial intelligence. \emph{Strategic Management Journal}, 42(12).
+\bibitem[Hosseini \& Lichtinger(2026)]{hosseini2026} Hosseini, S.M. \& Lichtinger, G. (2026). Generative AI as seniority-biased technological change. SSRN 5425555.
+\bibitem[Klein Teeselink(2025)]{kleinteeselink2025} Klein Teeselink, B. (2025). Generative AI and labor market outcomes: Evidence from the United Kingdom. SSRN 5516798.
+\bibitem[Pizzinelli et al.(2023)]{pizzinelli2023} Pizzinelli, C., Panton, A., Tavares, M., Cazzaniga, M. \& Li, L. (2023). Labor market exposure to AI: Cross-country differences and distributional implications. IMF WP/23/216.
+\end{thebibliography}
+
+\end{document}
