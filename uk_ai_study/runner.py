@@ -40,8 +40,10 @@ class ScenarioResult:
 
 
 def gini(values: np.ndarray, weights: np.ndarray) -> float:
+    # bottom-code at zero: negative incomes make the Gini exceed 1
+    values = np.clip(np.asarray(values, float), 0.0, None)
     order = np.argsort(values)
-    v, w = np.asarray(values, float)[order], np.asarray(weights, float)[order]
+    v, w = values[order], np.asarray(weights, float)[order]
     cw = np.cumsum(w)
     cv = np.cumsum(v * w)
     if cv[-1] == 0:
@@ -107,17 +109,33 @@ def run_scenario(
     displaced = shocked_table["displaced"].to_numpy()
     status = baseline.calculate("employment_status", period=period, map_to="person").values.astype(object)
     status[displaced] = "UNEMPLOYED"
+    status_applied = True
     try:
         shocked.set_input("employment_status", period, status)
-    except Exception:
-        pass
+    except Exception as exc:
+        status_applied = False
+        import warnings
+
+        warnings.warn(
+            f"employment_status set_input rejected ({exc}); displaced workers "
+            "carry zero employment income but retain baseline status."
+        )
 
     base, shock = _metrics(baseline, period), _metrics(shocked, period)
 
     weight = persons["weight"].to_numpy()
     age = persons["age"].to_numpy()
     income_delta = shock["hni"] - base["hni"]
-    deciles = pd.qcut(pd.Series(base["hni"]).rank(method="first"), 10, labels=False) + 1
+    # weighted deciles of baseline EQUIVALISED household disposable income
+    # (person-level, survey-weighted) — the JR16 convention
+    equiv = baseline.calculate(
+        "equiv_household_net_income", period=period, map_to="person"
+    ).values
+    order = np.argsort(equiv)
+    cum = np.cumsum(weight[order])
+    ranks = np.empty(len(equiv), dtype=float)
+    ranks[order] = cum / cum[-1]
+    deciles = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
     decile_change = {
         int(d): float(np.average(income_delta[deciles == d], weights=weight[deciles == d]))
         for d in range(1, 11)

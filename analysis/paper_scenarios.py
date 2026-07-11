@@ -48,6 +48,19 @@ def displaced_klein_teeselink(persons: pd.DataFrame) -> np.ndarray:
     return draw_displaced(persons, scenario, seed=SEED)
 
 
+def _matched_employed(persons: pd.DataFrame) -> np.ndarray:
+    """Employees with an observed SOC group (the analysable population)."""
+    return (persons["employment_income"].to_numpy() > 0) & np.isfinite(
+        persons["soc_major_group"].to_numpy()
+    )
+
+
+def _weighted_quantile(values, weights, q):
+    order = np.argsort(values)
+    cw = np.cumsum(weights[order])
+    return values[order][np.searchsorted(cw, q * cw[-1])]
+
+
 def _rate_within(persons, mask, rate, seed=SEED):
     """Displace `rate` of weighted employees inside `mask`, ∝ exposure."""
     rng = np.random.default_rng(seed)
@@ -60,25 +73,42 @@ def _rate_within(persons, mask, rate, seed=SEED):
     p = p / p.sum()
     chosen = rng.choice(eligible, size=len(eligible), replace=False, p=p)
     displaced = np.zeros(len(persons), dtype=bool)
-    displaced[chosen[np.cumsum(weight[chosen]) <= quota]] = True
+    cum = np.cumsum(weight[chosen])
+    displaced[chosen[cum <= quota]] = True
+    crossing = np.searchsorted(cum, quota)
+    if crossing < len(chosen) and cum[crossing] > quota:
+        shortfall = quota - (cum[crossing - 1] if crossing else 0.0)
+        if rng.random() < shortfall / weight[chosen[crossing]]:
+            displaced[chosen[crossing]] = True
     return displaced
 
 
-def displaced_hosseini_lichtinger(persons: pd.DataFrame) -> np.ndarray:
-    employed = persons["employment_income"].to_numpy() > 0
+#: Hosseini & Lichtinger: adopting firms cover ~16% of US employment; the
+#: unscaled 9% is therefore an at-adopter effect. The scaled variant
+#: (0.09 x 0.16) approximates the economy-wide junior effect.
+HL_ADOPTER_EMPLOYMENT_SHARE = 0.16
+
+
+def displaced_hosseini_lichtinger(persons: pd.DataFrame, scale: float = 1.0) -> np.ndarray:
+    matched = _matched_employed(persons)
     exposure = persons["exposure"].to_numpy()
-    median_exp = np.median(exposure[employed])
-    mask = employed & (persons["age"].to_numpy() < 30) & (exposure > median_exp)
-    return _rate_within(persons, mask, 0.09)
+    weight = persons["weight"].to_numpy()
+    median_exp = _weighted_quantile(exposure[matched], weight[matched], 0.5)
+    mask = matched & (persons["age"].to_numpy() < 30) & (exposure > median_exp)
+    return _rate_within(persons, mask, 0.09 * scale)
 
 
 def displaced_brynjolfsson(persons: pd.DataFrame) -> np.ndarray:
-    employed = persons["employment_income"].to_numpy() > 0
+    # Canaries fact 4: ~16% RELATIVE decline (Nov 2025 version; 13% in
+    # earlier drafts) for ages 22-25 in the top exposure quintiles. Treating
+    # it as an absolute displacement rate makes this an upper bound.
+    matched = _matched_employed(persons)
     exposure = persons["exposure"].to_numpy()
-    q80 = np.quantile(exposure[employed], 0.8)
+    weight = persons["weight"].to_numpy()
+    q80 = _weighted_quantile(exposure[matched], weight[matched], 0.8)
     age = persons["age"].to_numpy()
-    mask = employed & (age >= 22) & (age <= 25) & (exposure >= q80)
-    return _rate_within(persons, mask, 0.13)
+    mask = matched & (age >= 22) & (age <= 25) & (exposure >= q80)
+    return _rate_within(persons, mask, 0.16)
 
 
 def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
@@ -164,6 +194,10 @@ def main():
     for name, fn in [
         ("klein_teeselink_2025", displaced_klein_teeselink),
         ("hosseini_lichtinger_2026", displaced_hosseini_lichtinger),
+        (
+            "hosseini_lichtinger_2026_adopter_scaled",
+            lambda p: displaced_hosseini_lichtinger(p, scale=HL_ADOPTER_EMPLOYMENT_SHARE),
+        ),
         ("brynjolfsson_canaries_2025", displaced_brynjolfsson),
     ]:
         r = run(name, fn(persons), dataset, baseline, persons)

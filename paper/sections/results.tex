@@ -4,12 +4,12 @@
 \subsection{Employment, wage and capital income changes}
 \label{sec:results-employment}
 
-We begin with the first-round labour market effects of the central scenario, in which 7 per cent of exposed employment is displaced and surviving workers in exposed occupations receive a 2.6 per cent wage uplift. Figure~\ref{fig:transition} plots the share of workers in each equivalised disposable income decile who transition from employment to unemployment. The gradient is strongly increasing: only 0.4 per cent of workers in the bottom decile lose their job, rising to roughly 1.6 per cent in decile 4, 3.0 per cent in decile 7 and 5.1 per cent in the top decile. This reflects the occupational structure of AI exposure in the UK: the professional, associate-professional and administrative occupations most exposed to generative AI are concentrated in the upper half of the income distribution, whereas manual and personal-service occupations at the bottom are comparatively insulated. Displacement risk in this exercise is therefore a phenomenon of the top of the earnings ladder, not the bottom.
+We begin with the first-round labour market effects of the central scenario, in which 7 per cent of exposed employment is displaced and surviving workers in exposed occupations receive a 2.6 per cent wage uplift. Figure~\ref{fig:transition} plots the share of workers in each equivalised disposable income decile who transition from employment to unemployment. The gradient is strongly increasing: only 0.4 per cent of people in the bottom decile transition, rising steadily through the middle deciles to 5.0 per cent in the top decile. This reflects the occupational structure of AI exposure in the UK: the professional, associate-professional and administrative occupations most exposed to generative AI are concentrated in the upper half of the income distribution, whereas manual and personal-service occupations at the bottom are comparatively insulated. Displacement risk in this exercise is therefore a phenomenon of the top of the earnings ladder, not the bottom.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.85\textwidth]{../results/jr16/fig4_1_transition.png}
-\caption{Share of workers transitioning from employment to unemployment by equivalised disposable income decile, central scenario. Shaded bands show bootstrap confidence intervals.}
+\caption{Share of the population transitioning from employment to unemployment by equivalised disposable income decile, central scenario. Error bars show 95 per cent confidence intervals across 50 seeded displacement draws.}
 \label{fig:transition}
 \end{figure}
 
@@ -34,7 +34,7 @@ The third channel is capital income. Following the approach of \citet{doorley202
 \subsection{Income distribution}
 \label{sec:results-distribution}
 
-Figure~\ref{fig:decomp} decomposes the change in household income by decile into market income, benefits, and taxes and contributions, expressed relative to baseline disposable income. Market income losses are progressive in the literal sense: they are close to zero in the bottom three deciles and grow to around 2 per cent of income in deciles 8--10, mirroring the transition gradient in Figure~\ref{fig:transition}. The tax--benefit system then reshapes this pattern in two ways. In the middle deciles (4--8), automatic benefit entitlements---Universal Credit in particular---rise by 0.3--0.8 per cent of income as displaced earners qualify for means-tested support, cushioning a substantial part of the market income loss. At the top, the cushioning comes instead through the tax system: households in deciles 8--10 see their tax and National Insurance liabilities fall by 0.3--0.5 per cent of income as high marginal-rate earnings disappear. For the bottom deciles the tax--benefit system absorbs most of the (small) market income loss, so that disposable income at the very bottom is essentially unchanged; indeed in the central scenario mean household income in the bottom decile is marginally higher after the shock (a gain of about \pounds 15 per year), while the top decile loses roughly \pounds 7{,}100.
+Figure~\ref{fig:decomp} decomposes the change in household income by decile into market income, benefits, and taxes and contributions, expressed relative to baseline disposable income. Market income losses are progressive in the literal sense: they are near zero in the bottom two deciles and grow to around 2 per cent of income in deciles 7--10, mirroring the transition gradient in Figure~\ref{fig:transition}. The tax--benefit system then reshapes this pattern in two ways. Across the middle deciles, automatic benefit entitlements---Universal Credit in particular---rise by up to 0.7 per cent of income as displaced earners qualify for means-tested support, cushioning a substantial part of the market income loss. At the top, the cushioning comes instead through the tax system: households in deciles 7--10 see their tax and National Insurance liabilities fall by 0.2--0.6 per cent of income as high marginal-rate earnings disappear. Disposable income losses at the bottom of the distribution are well under 1 per cent of income, against 3--5 per cent in deciles 7--10.
 
 \begin{figure}[htbp]
 \centering
@@ -43,7 +43,7 @@ Figure~\ref{fig:decomp} decomposes the change in household income by decile into
 \label{fig:decomp}
 \end{figure}
 
-These UK results track the Irish findings of \citet{doorley2026} closely. In their central scenario the employment-to-unemployment transition rate rises from 0.7 per cent in the bottom decile to 5.3 per cent in the top; our UK gradient runs from 0.4 per cent to 5.1 per cent. In both countries the AI displacement shock is, unusually for a labour market shock, concentrated among high earners, and in both countries the fiscal system converts a steeply regressive-at-the-top market income shock into a much flatter disposable income profile.
+These UK results track the Irish findings of \citet{doorley2026} closely. In their central scenario the employment-to-unemployment transition rate rises from 0.7 per cent in the bottom decile to 5.3 per cent in the top; our UK gradient runs from 0.4 per cent to 5.0 per cent. In both countries the AI displacement shock is, unusually for a labour market shock, concentrated among high earners, and in both countries the fiscal system converts a steeply regressive-at-the-top market income shock into a much flatter disposable income profile.
 
 \subsection{Further scenarios}
 \label{sec:results-scenarios}
@@ -69,21 +69,21 @@ Figure~\ref{fig:gridrev} shows the corresponding fiscal picture. One measurement
 \label{fig:gridrev}
 \end{figure}
 
-Table~\ref{tab:presets} summarises the four preset scenarios. The annual exchequer cost ranges from \pounds 1.8 billion in the low scenario to \pounds 48.5 billion in the high scenario, with the central estimate at \pounds 17.9 billion---driven by lost income tax and National Insurance on displaced high earners together with higher benefit spending. Poverty (before housing costs) is essentially unchanged in the low scenario but rises by 1.84 percentage points in the central case and 4.17 points in the high case; the Gini coefficient rises by 0.2, 1.4 and 2.3 points respectively.
+Table~\ref{tab:presets} summarises the four preset scenarios. The annual exchequer cost ranges from \pounds 2.6 billion in the low scenario to \pounds 48.5 billion in the high scenario, with the central estimate at \pounds 18.6 billion---driven by lost income tax and National Insurance on displaced high earners together with higher benefit spending. Poverty (before housing costs) rises by 0.16 percentage points in the low scenario, 2.1 points in the central case and 4.1 points in the high case; the Gini coefficient rises by 0.2, 1.3 and 2.3 points respectively. Note that PolicyEngine's before-housing-costs poverty line is an \emph{absolute} threshold, so these poverty changes measure absolute impoverishment rather than movement relative to a shock-shifted median. Repeating the central scenario over twenty independent displacement draws gives a mean exchequer cost of \pounds 18.6 billion (standard deviation \pounds 1.7 billion, range \pounds 15.6--21.6 billion), a poverty increase of $+1.99 \pm 0.23$ percentage points, and a Gini increase of $+1.15 \pm 0.11$ points, so the qualitative conclusions are not artefacts of any single draw.
 
 \begin{table}[htbp]
 \centering
-\caption{Summary of preset scenarios}
+\caption{Summary of preset scenarios (single draw, seed 0)}
 \label{tab:presets}
 \begin{tabular}{lrrrr}
 \toprule
 Scenario & Displaced & Exchequer cost & $\Delta$ Poverty (BHC) & $\Delta$ Gini \\
  & (million) & (\pounds bn/yr) & (pp) & (pp) \\
 \midrule
-Low (1\% displacement, no wage gain) & 0.21 & 1.8 & +0.01 & +0.20 \\
-Central (7\%, 2.6\% wage gain) & 1.60 & 17.9 & +1.84 & +1.35 \\
-High (13\%, 2.6\% wage gain) & 2.98 & 48.5 & +4.17 & +2.31 \\
-Central, youth-tilted & 1.56 & 16.7 & +2.17 & +1.30 \\
+Low (1\% displacement, no wage gain) & 0.22 & 2.6 & +0.16 & +0.19 \\
+Central (7\%, 2.6\% wage gain) & 1.61 & 18.6 & +2.10 & +1.32 \\
+High (13\%, 2.6\% wage gain) & 2.98 & 48.5 & +4.12 & +2.29 \\
+Central, youth-tilted & 1.60 & 17.5 & +2.32 & +1.36 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -100,10 +100,40 @@ Figure~\ref{fig:gridgini} maps the change in the Gini coefficient of equivalised
 \label{fig:gridgini}
 \end{figure}
 
+\subsection{Robustness}
+\label{sec:results-robustness}
+
+Four checks probe the sensitivity of these findings. First, the choice of
+exposure index is immaterial: rerunning the central scenario with the DSIT
+AIOE mapping and with the \citet{eloundou2023} GPT-exposure beta in place of
+the C-AIOE leaves the top-to-bottom transition gradient essentially
+unchanged (top-decile transition shares of 4.9 and 4.7 per cent against 4.9
+under C-AIOE; bottom-decile shares of 0.3--0.4 per cent under all three)
+and moves the exchequer cost by less than \pounds 1.2 billion.
+
+Second, a uniform comparator in the spirit of \citet{doorley2026} isolates
+what the exposure gradient contributes: allocating the same aggregate
+displacement, wage and capital shocks uniformly across occupations yields a
+\emph{lower} exchequer cost (\pounds 14.2 billion against \pounds 18.6
+billion, because uniformly drawn displaced workers earn and therefore pay
+less tax) but a \emph{larger} poverty increase (+2.31 against +2.10 points)
+and a larger Gini rise (+1.46 against +1.32 points). The concentration of
+AI exposure among high earners thus makes the shock fiscally more expensive
+but distributionally less regressive than an occupation-neutral shock of
+the same size.
+
+Third, the occupational structure that drives everything is close to its
+administrative benchmark: the FRS employment shares across the nine SOC2020
+major groups differ from the ASHE 2025 jobs distribution by at most 1.6
+percentage points in any group.
+
+Fourth, Monte Carlo variation across displacement draws (reported with
+Table~\ref{tab:presets}) leaves all qualitative conclusions intact.
+
 \subsection{The age dimension and seniority-biased scenarios}
 \label{sec:results-age}
 
-We extend the Irish framework along a dimension it does not explore: the age incidence of displacement. Recent empirical work suggests that early-career workers bear a disproportionate share of AI-driven job loss \citep{brynjolfsson2025, hosseini2026}. In our central scenario, which allocates displacement purely by occupational exposure, workers aged 16--24 account for only 3.6 per cent of the displaced. The youth-tilted preset reweights displacement probabilities towards junior workers while holding the aggregate displacement rate at 7 per cent; this raises the 16--24 share to 4.2 per cent. The exchequer cost falls slightly (\pounds 16.7 billion against \pounds 17.9 billion, since younger displaced workers pay less tax), but poverty rises by more: +2.17 percentage points against +1.84, because young workers have thinner savings and benefit entitlements and are more likely to sit in households near the poverty line.
+We extend the Irish framework along a dimension it does not explore: the age incidence of displacement. Recent empirical work suggests that early-career workers bear a disproportionate share of AI-driven job loss \citep{brynjolfsson2025, hosseini2026}. In our central scenario, which allocates displacement purely by occupational exposure, workers aged 16--24 account for only 3.0 per cent of the displaced. The youth-tilted preset reweights displacement probabilities towards junior workers while holding the aggregate displacement rate at 7 per cent; this raises the 16--24 share to 4.8 per cent. The exchequer cost falls slightly (\pounds 17.5 billion against \pounds 18.6 billion, since younger displaced workers pay less tax), but poverty rises by more: +2.32 percentage points against +2.10, because young workers have thinner savings and benefit entitlements and are more likely to sit in households near the poverty line.
 
 Table~\ref{tab:papers} reports three scenarios anchored directly to headline estimates in the recent empirical literature, translated to the UK employment structure: the occupational displacement estimates of \citet{kleinteeselink2025}, the entry-level hiring contraction of \citet{hosseini2026}, and the early-career employment declines in AI-exposed occupations documented by \citet{brynjolfsson2025}.
 
@@ -116,11 +146,15 @@ Table~\ref{tab:papers} reports three scenarios anchored directly to headline est
 Scenario & Displaced & Exchequer cost & $\Delta$ Poverty (BHC) & $\Delta$ Gini \\
  & (million) & (\pounds bn/yr) & (pp) & (pp) \\
 \midrule
-\citet{kleinteeselink2025} & 1.01 & 20.4 & +1.62 & +0.73 \\
-\citet{hosseini2026} & 0.10 & 1.0 & +0.11 & +0.06 \\
-\citet{brynjolfsson2025} & 0.02 & 0.1 & +0.02 & +0.01 \\
+\citet{kleinteeselink2025}: $-4.5$\% economy-wide$^{a}$ & 1.03 & 20.6 & +1.75 & +0.75 \\
+\citet{hosseini2026}: $-9$\% juniors, at-adopter$^{a}$ & 0.10 & 1.0 & +0.11 & +0.06 \\
+\quad scaled by adopter employment share (16\%) & 0.02 & 0.1 & +0.03 & +0.01 \\
+\citet{brynjolfsson2025}: $-16$\% ages 22--25$^{a,b}$ & 0.02 & 0.1 & +0.02 & +0.01 \\
 \bottomrule
 \end{tabular}
+
+\vspace{2pt}
+{\footnotesize $^{a}$Source estimates are firm-conditional or relative declines; applying them economy-wide (or as absolute rates) makes these upper bounds. $^{b}$A \emph{relative} decline versus less-exposed groups in the November 2025 version of the paper (earlier drafts reported 13 per cent).}
 \end{table}
 
-Two lessons emerge. First, cohort-specific shocks are fiscally small. The \citet{hosseini2026} and \citet{brynjolfsson2025} scenarios, which confine displacement to entry-level and early-career workers, displace 0.1 million and 0.02 million workers respectively and cost the exchequer \pounds 1.0 billion and \pounds 0.1 billion a year---an order of magnitude or two below the broad-based scenarios---precisely because junior workers contribute little income tax and National Insurance. Only the economy-wide \citet{kleinteeselink2025} scenario, with just over one million displaced, generates fiscal and poverty effects comparable to our central preset. Second, seniority bias must be imposed; it cannot be derived from occupational exposure alone. Even under the youth-tilted preset, displacement rates by age remain highest for prime-age workers---5.0 per cent of employed 45--54-year-olds are displaced, twice the 2.5 per cent rate among 16--24-year-olds in the \citet{kleinteeselink2025} scenario---because young people in the UK are concentrated in low-exposure service occupations. If AI adoption in practice falls hardest on juniors, as the hiring-margin evidence suggests, that pattern operates through recruitment channels that exposure-based simulation frameworks such as ours, and \citet{doorley2026}, do not capture by construction.
+Two lessons emerge. First, cohort-specific shocks are fiscally small. The \citet{hosseini2026} and \citet{brynjolfsson2025} scenarios, which confine displacement to entry-level and early-career workers, displace 0.1 million and 0.02 million workers respectively and cost the exchequer \pounds 1.0 billion and \pounds 0.1 billion a year---an order of magnitude or two below the broad-based scenarios---precisely because junior workers contribute little income tax and National Insurance. Only the economy-wide \citet{kleinteeselink2025} scenario, with just over one million displaced, generates fiscal and poverty effects comparable to our central preset. Second, seniority bias must be imposed; it cannot be derived from occupational exposure alone. Even with the junior tilt, displacement rates by age remain highest for prime-age workers in the \citet{kleinteeselink2025} scenario---6.0 per cent of employed 35--44-year-olds are displaced, against 1.7 per cent of 16--24-year-olds---because young people in the UK are concentrated in low-exposure service occupations. If AI adoption in practice falls hardest on juniors, as the hiring-margin evidence suggests, that pattern operates through recruitment channels that exposure-based simulation frameworks such as ours, and \citet{doorley2026}, do not capture by construction.

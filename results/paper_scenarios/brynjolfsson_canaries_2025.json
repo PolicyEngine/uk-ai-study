@@ -1,25 +1,25 @@
 {
   "scenario": "brynjolfsson_canaries_2025",
-  "displaced_weighted_total": 15825.611328125,
-  "share_of_employed_displaced": 0.0006872456870041788,
-  "exchequer_cost_bn": 0.122863616,
+  "displaced_weighted_total": 20329.73828125,
+  "share_of_employed_displaced": 0.0008828426362015307,
+  "exchequer_cost_bn": 0.12337152,
   "poverty_change_bhc_pp": 0.02373038940944594,
-  "gini_change_pp": 0.009135005415827901,
+  "gini_change_pp": 0.011976341537733859,
   "age_bands": {
     "16-24": {
       "displaced_weighted": 10924.150390625,
       "displacement_rate_of_employed": 0.007400122471153736,
-      "mean_income_change": -112.41284942626953
+      "mean_income_change": -126.6733169555664
     },
     "25-34": {
-      "displaced_weighted": 4901.4609375,
-      "displacement_rate_of_employed": 0.0010251246858388186,
-      "mean_income_change": -26.410308837890625
+      "displaced_weighted": 9405.587890625,
+      "displacement_rate_of_employed": 0.001967148156836629,
+      "mean_income_change": -47.99505615234375
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -9.095539093017578
+      "mean_income_change": -13.020760536193848
     },
     "45-54": {
       "displaced_weighted": 0.0,
@@ -34,7 +34,7 @@
     "65-+": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": 0.0
+      "mean_income_change": -6.359860897064209
     }
   }
 }

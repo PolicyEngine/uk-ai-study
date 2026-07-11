@@ -1,0 +1,23 @@
+{
+  "c_aioe": {
+    "exchequer_cost_bn": 18.556,
+    "poverty_change_bhc_pp": 2.097,
+    "gini_change_pp": 1.322,
+    "transition_share_decile1_pct": 0.336,
+    "transition_share_decile10_pct": 4.878
+  },
+  "dsit_aioe": {
+    "exchequer_cost_bn": 18.105,
+    "poverty_change_bhc_pp": 1.951,
+    "gini_change_pp": 1.351,
+    "transition_share_decile1_pct": 0.319,
+    "transition_share_decile10_pct": 4.94
+  },
+  "eloundou_beta": {
+    "exchequer_cost_bn": 17.388,
+    "poverty_change_bhc_pp": 2.07,
+    "gini_change_pp": 1.352,
+    "transition_share_decile1_pct": 0.394,
+    "transition_share_decile10_pct": 4.691
+  }
+}

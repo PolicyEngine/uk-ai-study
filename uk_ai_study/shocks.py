@@ -69,8 +69,12 @@ def draw_displaced(
     weight = persons["weight"].to_numpy()
     group = persons["soc_major_group"].to_numpy()
 
-    total_quota = scenario.displacement_rate * float(weight[employed].sum())
-    groups = np.unique(group[employed & np.isfinite(group)])
+    # quota base = employees with an observed SOC group (the drawable
+    # population); using all employees would silently reallocate the
+    # unmatched share onto matched workers
+    matched = employed & np.isfinite(group)
+    total_quota = scenario.displacement_rate * float(weight[matched].sum())
+    groups = np.unique(group[matched])
     # group quotas proportional to employment x mean exposure
     emp_w = {g: float(weight[employed & (group == g)].sum()) for g in groups}
     exp_g = {
@@ -78,6 +82,10 @@ def draw_displaced(
         for g in groups
     }
     raw = {g: emp_w[g] * exp_g[g] for g in groups}
+    if sum(raw.values()) <= 0:
+        # degenerate case (uniform exposure): allocate by employment alone
+        raw = {g: emp_w[g] for g in groups}
+        exposure = np.ones_like(exposure)
     scale = total_quota / sum(raw.values())
     displaced = np.zeros(len(persons), dtype=bool)
 
@@ -91,11 +99,18 @@ def draw_displaced(
         if scenario.youth_displacement_multiplier != 1.0:
             p = p * np.where(age[members] < 25, scenario.youth_displacement_multiplier, 1.0)
         p = p / p.sum()
-        order = rng.permutation(len(members))
-        # draw members (weighted, without replacement) until the weighted quota fills
+        # draw members (weighted, without replacement) until the weighted
+        # quota fills; the quota-crossing person is included with probability
+        # equal to the remaining quota fraction, so the expected displaced
+        # weight equals the quota exactly
         chosen = rng.choice(members, size=len(members), replace=False, p=p)
         cum = np.cumsum(weight[chosen])
         displaced[chosen[cum <= quota]] = True
+        crossing = np.searchsorted(cum, quota)
+        if crossing < len(chosen) and cum[crossing] > quota:
+            shortfall = quota - (cum[crossing - 1] if crossing else 0.0)
+            if rng.random() < shortfall / weight[chosen[crossing]]:
+                displaced[chosen[crossing]] = True
     return displaced
 
 
@@ -116,14 +131,19 @@ def apply_shocks(
     employment = shocked["employment_income"].to_numpy(dtype=float)
     survivors = (employment > 0) & ~displaced
 
-    # eq 3.5: uplift pool = wage_uplift x surviving wage bill, distributed by theta
+    # eq 3.5: person-level % wage change = wage_uplift * theta_i / theta_bar,
+    # with theta_bar the earnings-weighted mean theta over the FULL baseline
+    # wage bill (deterministic across draws, as in JR16's sector calibration)
     theta = shocked["complementarity"].to_numpy(dtype=float)
     weight = shocked["weight"].to_numpy(dtype=float)
-    pool = scenario.wage_uplift * float((employment * weight)[survivors].sum())
-    share_base = (theta * employment * weight)[survivors]
+    baseline_workers = employment > 0
+    theta_bar = float(
+        (theta * employment * weight)[baseline_workers].sum()
+        / (employment * weight)[baseline_workers].sum()
+    )
     uplift = np.zeros_like(employment)
-    if share_base.sum() > 0:
-        uplift[survivors] = pool * (theta * employment)[survivors] / float(share_base.sum()) * 1.0
+    if theta_bar > 0:
+        uplift[survivors] = scenario.wage_uplift * (theta[survivors] / theta_bar) * employment[survivors]
     employment_shocked = np.where(displaced, 0.0, employment + uplift)
     shocked["employment_income"] = employment_shocked
 
