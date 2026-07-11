@@ -1,6 +1,6 @@
 # uk-ai-study
 
-**A UK replication of ESRI JR16 — Doorley, O'Connor, O'Shea & Tuda (2026), *Artificial intelligence and income inequality in Ireland* ([PDF](https://www.esri.ie/system/files/publications/JR16_0.pdf)) — using PolicyEngine UK in place of SWITCH.**
+**When the shock hits the top: the fiscal and distributional incidence of AI in the United Kingdom.** The UK pairs one of the most AI-exposed workforces in the advanced economies with a tax-benefit system designed to insure shocks at the bottom of the income distribution. This study traces AI's employment, wage and capital shocks through the full UK tax-benefit system with PolicyEngine UK, using the scenario architecture of Doorley, O'Connor, O'Shea & Tuda (2026), *Artificial intelligence and income inequality in Ireland*, ESRI/DoF Report 16 ([PDF](https://www.esri.ie/system/files/publications/JR16_0.pdf)).
 
 The study asks: if generative AI displaces some workers, raises the wages of
 the rest, and raises returns to capital, what happens to the Exchequer,
@@ -96,8 +96,9 @@ Results in `results/` are aggregates only.
 - Displaced workers are current-period unemployed; JR16's "9+ months
   unemployed, contributory benefits exhausted" contract is not fully
   expressible in PolicyEngine UK inputs.
-- Self-employed are outside all shocks (as in JR16). Single seeded draw per
-  scenario (seed=0); JR16 averages over draws.
+- Self-employed are outside all shocks (as in JR16). Decile figures average
+  50 seeded draws; the central preset is Monte-Carlo'd over 20 draws
+  (`analysis/robustness.py`); grid cells are single-draw (seed=0).
 
 ## References
 
