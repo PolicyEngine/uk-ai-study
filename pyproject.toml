@@ -1,0 +1,21 @@
+[project]
+name = "uk-ai-study"
+version = "0.1.0"
+description = "UK replication of ESRI JR16: AI exposure -> shock scenarios -> PolicyEngine UK microsimulation"
+requires-python = ">=3.13"
+dependencies = [
+    "policyengine-uk",
+    "huggingface_hub",
+    "pandas",
+    "numpy",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["uk_ai_study"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"uk_ai_study/data" = "uk_ai_study/data"
