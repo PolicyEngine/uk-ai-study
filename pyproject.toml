@@ -4,10 +4,11 @@ version = "0.1.0"
 description = "UK replication of ESRI JR16: AI exposure -> shock scenarios -> PolicyEngine UK microsimulation"
 requires-python = ">=3.13"
 dependencies = [
-    "policyengine-uk",
+    "policyengine-uk==2.89.2",
     "huggingface_hub",
     "pandas",
     "numpy",
+    "matplotlib",
 ]
 
 [build-system]

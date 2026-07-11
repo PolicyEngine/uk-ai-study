@@ -6,10 +6,14 @@ proportion to ``employment x mean C-AIOE`` of the group, then realised by
 weighted random draws within each group (probability proportional to
 individual exposure).
 
-Wage shock (eq 3.5): surviving workers receive a wage uplift whose aggregate
-equals ``wage_uplift x surviving wage bill``, distributed across persons in
-proportion to complementarity (theta) — AI complements, rather than
-substitutes for, high-theta occupations.
+Wage shock: surviving workers receive percentage uplifts proportional to
+complementarity (theta) — AI complements, rather than substitutes for,
+high-theta occupations. NOTE: the normalisation uses the EARNINGS-weighted
+mean theta over the full baseline wage bill, which targets an aggregate
+uplift of ~``wage_uplift x surviving wage bill``; JR16 eq 3.5 instead
+normalises by the EMPLOYMENT-weighted mean theta. See uk-ai-study#1
+(finding 5) — the two differ because theta and earnings are positively
+correlated.
 
 Capital shock: interest and dividend income scaled by the ratio of the
 shocked to the baseline return (JR16: 1.005% -> 1.405%, i.e. +0.4pp on the
@@ -36,11 +40,18 @@ class ShockScenario:
     youth_displacement_multiplier: float = 1.0  # >1 tilts draws toward ages 16-24
 
 
-#: Literature-anchored presets (overridable):
-#: central — Briggs & Kodnani (2023) 7% displacement; +2.6% wages is JR16's
-#:   adopted median wage-change estimate (JR16 fn.3, sec 3.2).
-#: low — Acemoglu (2025, Economic Policy 40(121)), employment-only per JR16 fn.8.
-#: high — Brynjolfsson, Chandar & Chen (2025), cohort-specific decline, upper bound.
+#: Scenario presets (overridable). The capital shock (+0.4pp on the return)
+#: is ON in every preset, as in all JR16 scenarios.
+#: central — 7% displacement / +2.6% wages: JR16's central calibration, which
+#:   converts Briggs & Kodnani (2023) task-exposure and productivity figures
+#:   into displacement and wage rates (JR16 sec 3.2).
+#: low — 1% displacement, no wage uplift. JR16 sec 3.2 attributes ~1% to
+#:   Acemoglu (2025), but his 0.9-1.1% is a ten-year GDP figure, not an
+#:   employment effect (uk-ai-study#1, finding 11) — read this as a
+#:   sensitivity case, not an evidence-anchored lower bound.
+#: high — Brynjolfsson, Chandar & Chen: 13% per early drafts; the Nov 2025
+#:   version reports 16%. Cohort-specific relative decline treated as an
+#:   economy-wide absolute rate — an upper bound in both respects.
 #: central_youth_tilted — central with Klein Teeselink (2025) junior/total
 #:   employment-effect ratio 5.8/4.5 as the youth multiplier.
 PRESETS = {
@@ -131,9 +142,11 @@ def apply_shocks(
     employment = shocked["employment_income"].to_numpy(dtype=float)
     survivors = (employment > 0) & ~displaced
 
-    # eq 3.5: person-level % wage change = wage_uplift * theta_i / theta_bar,
-    # with theta_bar the earnings-weighted mean theta over the FULL baseline
-    # wage bill (deterministic across draws, as in JR16's sector calibration)
+    # person-level % wage change = wage_uplift * theta_i / theta_bar, with
+    # theta_bar the earnings-weighted mean theta over the FULL baseline wage
+    # bill (deterministic across draws). This deviates from JR16 eq 3.5,
+    # which normalises by the EMPLOYMENT-weighted mean theta — see
+    # uk-ai-study#1 (finding 5) before changing either code or paper.
     theta = shocked["complementarity"].to_numpy(dtype=float)
     weight = shocked["weight"].to_numpy(dtype=float)
     baseline_workers = employment > 0
