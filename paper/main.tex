@@ -25,12 +25,14 @@ adults; employment, wage and capital shocks follow the report's equations
 3.4 and 3.5; and fiscal and distributional outcomes are computed with
 PolicyEngine UK in place of SWITCH. In the central scenario (7\%
 displacement, +2.6\% wages, +0.4pp return to capital), the annual Exchequer
-cost is \pounds 41bn, the before-housing-costs poverty rate rises by
-3.3 percentage points, and the Gini of equivalised household net income
-rises by 0.019. We extend the framework along the age dimension: tilting
+cost is \pounds 18bn, the before-housing-costs poverty rate rises by
+1.8 percentage points, and the Gini of equivalised household net income
+rises by 0.014. We extend the framework along the age dimension: tilting
 within-occupation displacement toward workers aged 16--24, per recent
 seniority-biased evidence, raises the youth share of the displaced by
-roughly two-fifths while leaving aggregate effects nearly unchanged.
+roughly one-sixth while leaving aggregate effects nearly unchanged; and we
+implement the employment findings of three recent seniority-biased studies
+as explicit scenarios.
 \end{abstract}
 
 \section{Introduction}
@@ -98,44 +100,44 @@ net income, with breakdowns by baseline income decile and age band.
 \toprule
  & Displacement & Exchequer cost & $\Delta$ Poverty (BHC) & $\Delta$ Gini \\
 \midrule
-Low & 1\% & \pounds 6.5bn & +0.32pp & +0.003 \\
-Central & 7\% & \pounds 41.1bn & +3.25pp & +0.019 \\
-High & 13\% & \pounds 93.9bn & +7.02pp & +0.034 \\
-Central, youth-tilted & 7\% & \pounds 39.4bn & +3.42pp & +0.018 \\
+Low & 1\% & \pounds 1.8bn & +0.01pp & +0.002 \\
+Central & 7\% & \pounds 17.9bn & +1.84pp & +0.014 \\
+High & 13\% & \pounds 48.5bn & +4.17pp & +0.023 \\
+Central, youth-tilted & 7\% & \pounds 16.7bn & +2.17pp & +0.013 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Fiscal costs scale roughly linearly at \pounds 6--7bn per percentage point
+Fiscal costs scale roughly linearly at \pounds 3--4bn per percentage point
 of displacement, on top of an always-on capital-shock component. The
 youth-tilted central scenario raises the 16--24 share of the displaced from
-3.2\% to 4.5\% --- a two-fifths increase --- while aggregate fiscal and
-inequality effects move little, because young workers' earnings and benefit
-entitlements are smaller than average. Poverty, however, rises slightly
-\emph{more} under the youth tilt (+3.42pp vs +3.25pp).
+3.6\% to 4.2\% while aggregate fiscal and inequality effects move little,
+because young workers' earnings and benefit entitlements are smaller than
+average. Poverty, however, rises \emph{more} under the youth tilt (+2.17pp
+vs +1.84pp).
 
 \subsection{Full replication of the JR16 result set}
 
 We regenerate every result in the original report for the UK. The share of
-workers transitioning to unemployment rises monotonically from 0.6\% in the
-bottom decile of equivalised household disposable income to 8.5\% in the top
-decile (Ireland: 0.7\% to 5.3\%) --- AI displacement risk concentrates in
-high-income households, and more steeply in the UK. Wage gains for those who
-remain are flat across the distribution (2.5--2.7\%). The capital-return
+the population transitioning to unemployment rises monotonically from 0.4\%
+in the bottom decile of equivalised household disposable income to 5.1\% in
+the top decile (Ireland: 0.7\% to 5.3\%) --- AI displacement risk
+concentrates in high-income households, as in Ireland. Wage gains for those
+who remain are flat across the distribution (2.5--2.7\%). The capital-return
 shock is a uniform $\approx$40\% increase per recipient, but 35\% of
 interest and dividend income sits in the top decile, so gains accrue at the
-very top. Market-income losses are progressive (from $-0.3$\% of disposable
-income in decile 1 to $-4.6$\% at the top), cushioned by rising benefit
+very top. Market-income losses are progressive (from $-0.1$\% of disposable
+income in decile 1 to $-2.1$\% at the top), cushioned by rising benefit
 entitlement in the middle deciles and falling tax at the top.
 
 Across the full $11 \times 6$ scenario grid (0--10\% employment loss
 $\times$ 0--5\% wage increase, capital shock always on;
 Figures~\ref{fig:grid-disposable}--\ref{fig:grid-gini}), average household
-disposable income ranges from $+2.9$\% to $-9.2$\%, with a near-zero
+disposable income ranges from $+2.9$\% to $-5.5$\%, with a near-zero
 diagonal where wage gains offset displacement; net Exchequer revenue ranges
-from $+7.0$\% to $-17.6$\% of income tax and National Insurance receipts
+from $+7.0$\% to $-10.2$\% of income tax and National Insurance receipts
 (Ireland: $+14$\% to $-25$\%); and the Gini index rises in \emph{every}
-scenario, from $+0.05$pp (capital shock only) to $+2.7$pp (Ireland: $+0.3$
+scenario, from $+0.05$pp (capital shock only) to $+1.9$pp (Ireland: $+0.3$
 to $+1.2$pp). All three of the original report's takeaways hold for the UK:
 higher-income households are more affected in every scenario, potential
 losses exceed potential gains, and some scenarios leave average incomes
@@ -161,6 +163,40 @@ unchanged while inequality still rises.
 \caption{Change in the Gini index of equivalised household disposable income, percentage points (UK analogue of JR16 Figure 4.7).}
 \label{fig:grid-gini}
 \end{figure}
+
+\subsection{Three seniority-biased studies as explicit scenarios}
+
+Beyond the JR16 grid, we implement the headline employment findings of
+three recent studies as displacement rules on the same microdata
+(employment shock only; no wage or capital shock):
+
+\begin{table}[h]
+\centering
+\caption{Paper-anchored displacement scenarios, UK}
+\begin{tabular}{lrrrr}
+\toprule
+ & Displaced & Exchequer cost & $\Delta$ Poverty & $\Delta$ Gini \\
+\midrule
+Klein Teeselink (2025): $-4.5$\% at exposed firms, & & & & \\
+\quad junior-tilted $5.8/4.5$ & 1.01m (4.4\%) & \pounds 20.4bn & +1.62pp & +0.73pp \\
+Hosseini \& Lichtinger (2026): $-9$\% under-30s & & & & \\
+\quad in above-median-exposure occupations & 0.10m (0.5\%) & \pounds 1.0bn & +0.11pp & +0.06pp \\
+Brynjolfsson et al.\ (2025): $-13$\% ages 22--25 & & & & \\
+\quad in top-quintile-exposure occupations & 0.02m (0.1\%) & \pounds 0.1bn & +0.02pp & +0.01pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two lessons follow. First, cohort-specific shocks --- taken literally ---
+are fiscally small: workers aged 22--25 in the most exposed occupations are
+few and earn less than average, so even a 13\% cohort displacement costs
+the Exchequer roughly \pounds 0.1bn, versus \pounds 20bn for the
+economy-wide Klein Teeselink shock. Second, occupational exposure does not
+by itself generate seniority bias: even with the junior tilt, the Klein
+Teeselink scenario displaces 5.0\% of employed 45--54-year-olds against
+2.5\% of employed 16--24-year-olds, because prime-age workers dominate
+high-C-AIOE occupations. Seniority-biased displacement must be imposed on
+top of occupational exposure, not derived from it.
 
 \section{Limitations}
 

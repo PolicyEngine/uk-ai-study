@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.12)  11 JUL 2026 12:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.12)  11 JUL 2026 12:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -394,38 +394,42 @@ e
 {/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
 al/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 [2]
-<../results/jr16/fig4_5_disposable_grid.png, id=94, 722.7pt x 361.35pt>
+<../results/jr16/fig4_5_disposable_grid.png, id=98, 722.7pt x 361.35pt>
 File: ../results/jr16/fig4_5_disposable_grid.png Graphic file (type png)
 <use ../results/jr16/fig4_5_disposable_grid.png>
 Package pdftex.def Info: ../results/jr16/fig4_5_disposable_grid.png  used on in
-put line 146.
+put line 148.
 (pdftex.def)             Requested size: 455.30013pt x 227.6517pt.
-<../results/jr16/fig4_6_exchequer_grid.png, id=96, 722.7pt x 361.35pt>
+<../results/jr16/fig4_6_exchequer_grid.png, id=100, 722.7pt x 361.35pt>
 File: ../results/jr16/fig4_6_exchequer_grid.png Graphic file (type png)
 <use ../results/jr16/fig4_6_exchequer_grid.png>
 Package pdftex.def Info: ../results/jr16/fig4_6_exchequer_grid.png  used on inp
-ut line 153.
+ut line 155.
 (pdftex.def)             Requested size: 455.30013pt x 227.6517pt.
-<../results/jr16/fig4_7_gini_grid.png, id=97, 722.7pt x 361.35pt>
+<../results/jr16/fig4_7_gini_grid.png, id=101, 722.7pt x 361.35pt>
 File: ../results/jr16/fig4_7_gini_grid.png Graphic file (type png)
 <use ../results/jr16/fig4_7_gini_grid.png>
 Package pdftex.def Info: ../results/jr16/fig4_7_gini_grid.png  used on input li
-ne 160.
+ne 162.
 (pdftex.def)             Requested size: 455.30013pt x 227.6517pt.
- [3] [4 <../results/jr16/fig4_5_disposable_grid.png> <../results/jr16/fig4_6_ex
-chequer_grid.png>] [5] [6 <../results/jr16/fig4_7_gini_grid.png>]
-(./main.aux)
+
+Overfull \hbox (62.50171pt too wide) in paragraph at lines 176--188
+ [][] 
+ []
+
+[3] [4 <../results/jr16/fig4_5_disposable_grid.png> <../results/jr16/fig4_6_exc
+hequer_grid.png>] [5] [6 <../results/jr16/fig4_7_gini_grid.png>] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 9C787DE0C395A4F35F4BEF06152873A9;989.
+(rerunfilecheck)             Checksum: DE4979F46A8D813AC0DE4EA9BBF558D9;1321.
  ) 
 Here is how much of TeX's memory you used:
- 9828 strings out of 476025
- 154244 string characters out of 5790017
- 1862388 words of memory out of 5000000
- 30133 multiletter control sequences out of 15000+600000
+ 9831 strings out of 476025
+ 154281 string characters out of 5790017
+ 1863388 words of memory out of 5000000
+ 30134 multiletter control sequences out of 15000+600000
  521754 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,9n,76p,314b,569s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,9n,76p,376b,442s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
@@ -441,10 +445,10 @@ live/2023/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texli
 ve/2023/texmf-dist/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive
 /2023/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2
 023/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
-Output written on main.pdf (6 pages, 399120 bytes).
+Output written on main.pdf (6 pages, 401344 bytes).
 PDF statistics:
- 194 PDF objects out of 1000 (max. 8388607)
- 148 compressed objects within 2 object streams
- 28 named destinations out of 1000 (max. 500000)
- 80 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 199 PDF objects out of 1000 (max. 8388607)
+ 153 compressed objects within 2 object streams
+ 30 named destinations out of 1000 (max. 500000)
+ 88 words of extra memory for PDF output out of 10000 (max. 10000000)
 
