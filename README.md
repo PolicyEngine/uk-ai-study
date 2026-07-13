@@ -36,16 +36,23 @@ they never enter the employment shock, which conditions on positive earnings.
 ### 2. Shocks (`uk_ai_study/shocks.py`)
 
 - **Employment (eq 3.4):** aggregate displaced = `displacement_rate ×
-  SOC-matched employees (weighted)` — employees without an observed SOC code
-  are outside the displacement draw; allocated across major groups ∝
-  `employment × mean C-AIOE`, realised by weighted random draws within each
-  group (probability ∝ individual exposure × survey weight). Displaced
-  workers get `employment_income = 0` and `employment_status = UNEMPLOYED`.
-- **Wage:** surviving workers get % uplifts ∝ θ, normalised by the
-  earnings-weighted mean θ of the full baseline wage bill (targeting an
-  aggregate ≈ `wage_uplift × surviving wage bill`). JR16 eq 3.5 normalises
-  by the employment-weighted mean θ instead — see
-  [#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), finding 5.
+  employees (weighted)`; employees without an observed SOC code form a
+  pseudo-group with mean-imputed exposure, so the displacement and
+  wage-uplift universes coincide. Quotas are allocated across major groups ∝
+  `employment × mean C-AIOE` and realised by random draws with uniform
+  ordering keys within each group (the survey weight enters only through
+  quota consumption, so inclusion probability does not depend on a record's
+  grossing weight — [#1](https://github.com/PolicyEngine/uk-ai-study/issues/1),
+  finding 6). Displaced workers are fully out of work:
+  `employment_income = 0`, `hours_worked = 0`, employee pension
+  contributions, salary sacrifice and statutory pay zeroed,
+  `employment_status = UNEMPLOYED` (the shared transition constructor
+  `build_shocked_simulation`, finding 4).
+- **Wage (eq 3.5):** surviving workers get % uplifts ∝ θ, normalised by the
+  employment-weighted mean θ over baseline workers (JR16-literal — the
+  estimand decision on
+  [#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), finding 5;
+  per-seed conservation tested in `tests/test_shocks.py`).
 - **Capital:** interest and dividend income scaled by
   `(1.005% + 0.4pp)/1.005% ≈ 1.398` (JR16's return-to-capital shock).
 
@@ -72,9 +79,11 @@ dataset; the shocked run receives the modified `employment_income`,
 
 - **Exchequer cost** — change in `gov_balance`
 - **Poverty** — BHC and AHC person-weighted rates
-- **Gini** — of equivalised household net income
+- **Gini** — of equivalised household disposable income (HBAI cash concept,
+  `equiv_hbai_household_net_income`, matching the poverty concept — #1,
+  finding 2)
 - **By baseline income decile** and **by age band** (16-24 … 65+) — mean
-  household-net-income change, plus each band's share of the displaced
+  HBAI-household-net-income change, plus each band's share of the displaced
 
 ## Reproduce
 
@@ -84,6 +93,8 @@ pip install -e .
 export HUGGING_FACE_TOKEN=hf_...   # needs access to policyengine/policyengine-uk-data
 python analysis/download_data.py    # FRS h5 + raw UKDA zip (adult.tab) -> data/
 python analysis/run_all.py          # all presets -> results/*.json
+bash analysis/regenerate_all.sh     # or: the FULL result set from empty results/
+python -m pytest tests/             # shock-mechanics unit tests
 ```
 
 Microdata is licensed (UKDS EUL) and never committed; `data/` is gitignored.
