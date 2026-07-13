@@ -1,35 +1,35 @@
 {
   "scenario": "hosseini_lichtinger_2026_adopter_scaled",
-  "displaced_weighted_total": 18358.236328125,
-  "share_of_employed_displaced": 0.0007972278399392962,
-  "exchequer_cost_bn": 0.145211392,
-  "poverty_change_bhc_pp": 0.03223750975955286,
-  "gini_change_pp": 0.014623654697132338,
+  "displaced_weighted_total": 17125.79296875,
+  "share_of_employed_displaced": 0.0007437075837515295,
+  "exchequer_cost_bn": 0.11706368,
+  "poverty_change_bhc_pp": 0.009112701188546124,
+  "gini_change_pp": 0.012160415207285169,
   "age_bands": {
     "16-24": {
-      "displaced_weighted": 5674.896484375,
-      "displacement_rate_of_employed": 0.0038442283403128386,
-      "mean_income_change": -56.342220306396484
+      "displaced_weighted": 10151.7255859375,
+      "displacement_rate_of_employed": 0.006876874715089798,
+      "mean_income_change": -120.08003997802734
     },
     "25-34": {
-      "displaced_weighted": 12683.337890625,
-      "displacement_rate_of_employed": 0.002652679104357958,
-      "mean_income_change": -37.525630950927734
+      "displaced_weighted": 6974.06689453125,
+      "displacement_rate_of_employed": 0.0014586035395041108,
+      "mean_income_change": -51.15005111694336
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -5.538081645965576
+      "mean_income_change": -12.714042663574219
     },
     "45-54": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -5.40434455871582
+      "mean_income_change": -34.66558074951172
     },
     "55-64": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -11.73630142211914
+      "mean_income_change": -10.024887084960938
     },
     "65-+": {
       "displaced_weighted": 0.0,
