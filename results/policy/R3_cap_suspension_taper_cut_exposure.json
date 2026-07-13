@@ -1,0 +1,62 @@
+{
+  "reform": "R3_cap_suspension_taper_cut",
+  "family": "exposure",
+  "gross_cost_bn": 4.676059136,
+  "poverty_change_bhc_pp": -0.4564306986903993,
+  "poverty_change_ahc_pp": -0.4524831480818836,
+  "gini_change_pp": -0.22755868585613293,
+  "cost_per_pp_bhc_bn": 10.24483924814139,
+  "cost_per_pp_ahc_bn": 10.334217209684452,
+  "decile_benefit_share_pct": {
+    "1": 10.333484649658203,
+    "2": 13.650847434997559,
+    "3": 16.645559310913086,
+    "4": 12.621386528015137,
+    "5": 13.834007263183594,
+    "6": 11.308206558227539,
+    "7": 10.610187530517578,
+    "8": 6.698953151702881,
+    "9": 2.849855899810791,
+    "10": 1.447509527206421
+  },
+  "decile_mean_gain_gbp": {
+    "1": 280.9344482421875,
+    "2": 370.9692077636719,
+    "3": 452.4823913574219,
+    "4": 343.0694885253906,
+    "5": 376.0643005371094,
+    "6": 307.3408508300781,
+    "7": 288.3796691894531,
+    "8": 182.0666961669922,
+    "9": 77.46430969238281,
+    "10": 39.34026336669922
+  },
+  "shocked_no_reform": {
+    "poverty_bhc": 0.1647736821441488,
+    "poverty_ahc": 0.20572743109526578,
+    "gini": 0.32006885434117716
+  },
+  "shocked_with_reform": {
+    "poverty_bhc": 0.16020937515724482,
+    "poverty_ahc": 0.20120259961444695,
+    "gini": 0.3177932674826158
+  },
+  "implementation": "PolicyEngine parameter reform on shocked sim",
+  "reform_parameters": {
+    "gov.dwp.universal_credit.means_test.reduction_rate": {
+      "2026-01-01.2026-12-31": 0.45
+    },
+    "gov.dwp.benefit_cap.single.in_london": {
+      "2026-01-01.2026-12-31": 16967000.0
+    },
+    "gov.dwp.benefit_cap.single.outside_london": {
+      "2026-01-01.2026-12-31": 14753000.0
+    },
+    "gov.dwp.benefit_cap.non_single.in_london": {
+      "2026-01-01.2026-12-31": 25323000.0
+    },
+    "gov.dwp.benefit_cap.non_single.outside_london": {
+      "2026-01-01.2026-12-31": 22020000.0
+    }
+  }
+}

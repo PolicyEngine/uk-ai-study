@@ -1,0 +1,59 @@
+{
+  "reform": "R2_uc_circuit_breaker",
+  "family": "exposure",
+  "gross_cost_bn": 5.820514304,
+  "poverty_change_bhc_pp": -0.6422086929431775,
+  "poverty_change_ahc_pp": -0.5587013607575408,
+  "gini_change_pp": -0.3091093595760652,
+  "cost_per_pp_bhc_bn": 9.063275486548104,
+  "cost_per_pp_ahc_bn": 10.417934719378504,
+  "decile_benefit_share_pct": {
+    "1": 11.828145027160645,
+    "2": 17.53000259399414,
+    "3": 17.922443389892578,
+    "4": 12.037363052368164,
+    "5": 11.710866928100586,
+    "6": 9.854326248168945,
+    "7": 8.615942001342773,
+    "8": 5.124145030975342,
+    "9": 3.4000771045684814,
+    "10": 1.9766896963119507
+  },
+  "decile_mean_gain_gbp": {
+    "1": 320.5229797363281,
+    "2": 474.8370056152344,
+    "3": 485.6068420410156,
+    "4": 326.12994384765625,
+    "5": 317.3127136230469,
+    "6": 266.954833984375,
+    "7": 233.41494750976562,
+    "8": 138.81272888183594,
+    "9": 92.11956024169922,
+    "10": 53.547428131103516
+  },
+  "shocked_no_reform": {
+    "poverty_bhc": 0.1647736821441488,
+    "poverty_ahc": 0.20572743109526578,
+    "gini": 0.32006885434117716
+  },
+  "shocked_with_reform": {
+    "poverty_bhc": 0.15835159521471703,
+    "poverty_ahc": 0.20014041748769038,
+    "gini": 0.3169777607454165
+  },
+  "implementation": "PolicyEngine parameter reform on shocked sim",
+  "reform_parameters": {
+    "gov.dwp.universal_credit.standard_allowance.amount.SINGLE_YOUNG": {
+      "2026-01-01.2026-12-31": 406.3
+    },
+    "gov.dwp.universal_credit.standard_allowance.amount.SINGLE_OLD": {
+      "2026-01-01.2026-12-31": 509.88
+    },
+    "gov.dwp.universal_credit.standard_allowance.amount.COUPLE_YOUNG": {
+      "2026-01-01.2026-12-31": 634.01
+    },
+    "gov.dwp.universal_credit.standard_allowance.amount.COUPLE_OLD": {
+      "2026-01-01.2026-12-31": 800.36
+    }
+  }
+}

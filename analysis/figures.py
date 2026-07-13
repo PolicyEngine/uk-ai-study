@@ -32,6 +32,7 @@ from figstyle import (
     RED,
     SINGLE,
     TWOPANEL,
+    VIOLET,
     YELLOW,
     apply_style,
     decile_ax,
@@ -204,6 +205,7 @@ FAMILY_STYLE = {
     "junior": ("Junior-concentrated", AQUA),
     "compression": ("Expertise compression", YELLOW),
     "uniform": ("Uniform", GREEN),
+    "measured": ("Measured (Klein Teeselink)", VIOLET),
 }
 
 
@@ -235,11 +237,16 @@ def incidence_families():
         y = fams[name]["poverty_change_bhc_pp"]
         axr.scatter(x, y, s=90, color=color, edgecolor="white", lw=1, zorder=3)
         dx, dy = (0.4, 0.012) if name != "junior" else (0.4, -0.03)
+        if name == "measured":
+            dx, dy = (-0.6, -0.02)
+            axr.annotate(label, (x, y), xytext=(x + dx, y + dy), fontsize=9,
+                         color=INK2, ha="right")
+            continue
         axr.annotate(label, (x, y), xytext=(x + dx, y + dy), fontsize=9,
                      color=INK2)
     axr.set_xlabel("Exchequer cost (£ billion per year)")
     axr.set_ylabel("Change in BHC poverty rate (pp)")
-    axr.set_xlim(12, 30)
+    axr.set_xlim(12, 35)
     axr.grid(axis="x", visible=True)
     axr.set_title("What it costs vs poverty impact")
 

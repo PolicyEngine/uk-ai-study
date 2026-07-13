@@ -1,0 +1,15 @@
+{
+  "method": "route B: SOC imputation on enhanced FRS 2023-24",
+  "period": 2025,
+  "scenario": "central",
+  "seed": 0,
+  "plain_frs_employees": 12800,
+  "plain_frs_employee_soc_observed_share": 0.996295160600835,
+  "imputation_tier_shares_weighted": {
+    "full_cell": 0.9940960987237989,
+    "age_gender_decile": 0.005555466612033415,
+    "age_gender": 0.0,
+    "marginal": 0.00034843466416771194
+  },
+  "enhanced_frs_employees": 53566
+}
