@@ -92,3 +92,8 @@ def save(fig, path):
     fig.tight_layout()
     fig.savefig(path, dpi=DPI)
     plt.close(fig)
+
+
+def legend_below(ax, ncol):
+    """Legend centred below the axes (house style: legends never sit on data)."""
+    ax.legend(ncol=ncol, loc="upper center", bbox_to_anchor=(0.5, -0.18))

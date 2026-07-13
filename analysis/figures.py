@@ -36,6 +36,7 @@ from figstyle import (
     apply_style,
     decile_ax,
     save,
+    legend_below,
 )
 
 JR16 = Path("results/jr16")
@@ -101,7 +102,7 @@ def fig4_4():
                width=wd * 0.92, label=label, color=color)
     ax.axhline(0, color=INK, lw=0.8)
     decile_ax(ax, "Change (% of baseline disposable income)")
-    ax.legend(ncol=2, loc="upper left")
+    legend_below(ax, ncol=len(comps))
     save(fig, JR16 / "fig4_4_decomposition.png")
 
 
@@ -226,7 +227,7 @@ def incidence_families():
                  markeredgewidth=1, label=label)
     decile_ax(axl, "Share transitioning to unemployment (%)")
     axl.set_ylim(bottom=0)
-    axl.legend(loc="upper left")
+    legend_below(axl, ncol=2)
     axl.set_title("Who is displaced, by income decile")
 
     for name, (label, color) in FAMILY_STYLE.items():

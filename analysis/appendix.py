@@ -26,7 +26,7 @@ import pandas as pd
 
 from figstyle import (
     AQUA, BLUE, GREEN, INK, INK2, LIGHT_BLUE, MUTED, RED, SINGLE, YELLOW,
-    apply_style, decile_ax, save,
+    apply_style, decile_ax, legend_below, save,
 )
 
 DATA = Path("data")
@@ -115,7 +115,7 @@ def _paired_decile_bars(x, y1, y2, label1, label2, color1, color2, title, fname)
     ax.axhline(0, color=INK, lw=0.8)
     decile_ax(ax, "Change in disposable income (%)")
     ax.set_title(title)
-    ax.legend(loc="lower left")
+    legend_below(ax, ncol=2)
     save(fig, OUT / fname)
 
 

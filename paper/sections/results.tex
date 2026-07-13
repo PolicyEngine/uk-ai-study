@@ -58,17 +58,21 @@ The scenario anchors deserve a note of caution. The central calibration converts
 \centering
 \caption{Summary of preset scenarios (single draw, seed 0)}
 \label{tab:presets}
+\small
 \begin{tabular}{lrrrr}
 \toprule
-Scenario & Displaced & Exchequer cost & $\Delta$ Poverty (BHC) & $\Delta$ Gini \\
- & (million) & (\pounds bn/yr) & (pp) & (pp) \\
+Scenario & Displaced & Exchequer & $\Delta$ Poverty & $\Delta$ Gini \\
+ & (million) & (\pounds bn/yr) & (BHC, pp) & (pp) \\
 \midrule
-Low (1\% displacement, no wage gain; sensitivity case) & 0.23 & 2.5 & +0.14 & +0.19 \\
-Central (7\%, 2.6\% wage gain) & 1.61 & 18.4 & +1.87 & +1.10 \\
-High (13\%, 2.6\% wage gain) & 3.00 & 46.7 & +3.80 & +1.83 \\
-Central, junior-concentrated incidence & 1.61 & 19.4 & +1.86 & +0.92 \\
+Low & 0.23 & 2.5 & +0.14 & +0.19 \\
+Central & 1.61 & 18.4 & +1.87 & +1.10 \\
+High & 3.00 & 46.7 & +3.80 & +1.83 \\
+Central, junior-concentrated & 1.61 & 19.4 & +1.86 & +0.92 \\
 \bottomrule
 \end{tabular}
+
+\vspace{0.4em}
+\parbox{0.92\textwidth}{\footnotesize\emph{Notes:} Low: 1 per cent displacement, no wage gain (sensitivity case). Central: 7 per cent displacement, 2.6 per cent wage gain. High: 13 per cent displacement, 2.6 per cent wage gain. Junior-concentrated: central shock with displacement draws tilted toward ages 16--24. The capital-return shock (+0.4pp) applies in every preset.}
 \end{table}
 
 None of this depends on the particular displacement draw. Repeating the central scenario over 20 independent draws gives a mean Exchequer cost of \pounds 18.0 billion (standard deviation \pounds 1.5 billion, range \pounds 15.8--21.1 billion), a poverty increase of $+1.80 \pm 0.11$ percentage points and a Gini increase of $+1.04 \pm 0.09$ points. Nor does it depend on the exposure index: rerunning the central scenario with the DSIT AIOE mapping or the GPT-exposure measure of \citet{eloundou2023} in place of the C-AIOE moves the Exchequer cost by less than \pounds 0.2 billion and leaves the transition gradient essentially unchanged (top-decile transition shares of 4.9 and 4.7 per cent against 4.7 under the C-AIOE; bottom-decile shares of 0.4--0.5 per cent under all three).
@@ -112,6 +116,7 @@ Everything so far conditions on exposure-proportional incidence. But the allocat
 \centering
 \caption{The same aggregate shock under four incidence families (central calibration, single draw, seed 0)}
 \label{tab:incidence}
+\small
 \begin{tabular}{lrrrrr}
 \toprule
 Incidence family & Displaced & Exchequer cost & $\Delta$ Poverty & $\Delta$ Poverty & $\Delta$ Gini \\
@@ -151,20 +156,21 @@ Table~\ref{tab:papers} pushes further, reporting three employment-only stress te
 \centering
 \caption{Paper-anchored displacement stress tests, UK translation (employment channel only, single draw, seed 0)}
 \label{tab:papers}
+\small
 \begin{tabular}{lrrrr}
 \toprule
-Scenario & Displaced & Exchequer cost & $\Delta$ Poverty (BHC) & $\Delta$ Gini \\
- & (million) & (\pounds bn/yr) & (pp) & (pp) \\
+Scenario & Displaced & Exchequer & $\Delta$ Poverty & $\Delta$ Gini \\
+ & (million) & (\pounds bn/yr) & (BHC, pp) & (pp) \\
 \midrule
-\citet{kleinteeselink2025}: $-4.5$\% of employees$^{a}$ & 1.03 & 22.5 & +1.30 & +0.42 \\
-\citet{hosseini2026}: juniors, at-adopter rate$^{a}$ & 0.10 & 1.3 & +0.11 & +0.04 \\
-\quad scaled by adopter employment share & 0.02 & 0.1 & +0.01 & +0.01 \\
-\citet{brynjolfsson2025}: early-career, exposed occupations$^{a,b}$ & 0.02 & 0.2 & +0.02 & +0.01 \\
+Klein Teeselink (2025)$^{a}$ & 1.03 & 22.5 & +1.30 & +0.42 \\
+Hosseini--Lichtinger (2026)$^{a}$ & 0.10 & 1.3 & +0.11 & +0.04 \\
+\quad adopter-share scaled & 0.02 & 0.1 & +0.01 & +0.01 \\
+Brynjolfsson et al.\ (2025a)$^{a,b}$ & 0.02 & 0.2 & +0.02 & +0.01 \\
 \bottomrule
 \end{tabular}
 
-\vspace{2pt}
-{\footnotesize $^{a}$Source estimates are firm-conditional or relative declines; transporting them economy-wide (or as absolute rates) makes these upper bounds. $^{b}$A \emph{relative} decline versus less-exposed groups in the source paper.}
+\vspace{0.4em}
+\parbox{0.92\textwidth}{\footnotesize\emph{Notes:} Klein Teeselink: $-4.5$ per cent of employees, junior-tilted draws. Hosseini--Lichtinger: 9 per cent of under-30s in above-median-exposure occupations (at-adopter rate); the scaled row multiplies by the adopter employment share. Brynjolfsson et al.: 16 per cent of ages 22--25 in top-quintile-exposure occupations. $^{a}$Source estimates are firm-conditional or relative declines; transporting them economy-wide (or as absolute rates) makes these upper bounds. $^{b}$A \emph{relative} decline versus less-exposed groups in the source paper.}
 \end{table}
 
 The lesson is that cohort-specific shocks are fiscally small. The \citet{hosseini2026} and \citet{brynjolfsson2025} stress tests, which confine displacement to entry-level and early-career workers, displace 0.10 million and 0.02 million workers and cost the Exchequer \pounds 1.3 billion and \pounds 0.2 billion a year respectively---one to two orders of magnitude below the broad-based scenarios---precisely because junior workers contribute little income tax and National Insurance. Only the economy-wide \citet{kleinteeselink2025} transport, with just over one million displaced, generates fiscal effects comparable to our central preset (\pounds 22.5 billion, poverty +1.30 points). If AI adoption in practice falls hardest on juniors through recruitment rather than dismissal, that operates through hiring channels that stock-based simulation frameworks such as ours do not capture by construction.
