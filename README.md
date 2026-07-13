@@ -36,23 +36,27 @@ they never enter the employment shock, which conditions on positive earnings.
 ### 2. Shocks (`uk_ai_study/shocks.py`)
 
 - **Employment (eq 3.4):** aggregate displaced = `displacement_rate ×
-  employed (weighted)`; allocated across major groups ∝ `employment × mean
-  C-AIOE`, realised by weighted random draws within each group (probability ∝
-  individual exposure × survey weight). Displaced workers get
-  `employment_income = 0` and `employment_status = UNEMPLOYED`.
-- **Wage (eq 3.5):** an uplift pool of `wage_uplift × surviving wage bill` is
-  distributed across surviving workers ∝ θ × earnings — AI complements
-  high-θ occupations.
+  SOC-matched employees (weighted)` — employees without an observed SOC code
+  are outside the displacement draw; allocated across major groups ∝
+  `employment × mean C-AIOE`, realised by weighted random draws within each
+  group (probability ∝ individual exposure × survey weight). Displaced
+  workers get `employment_income = 0` and `employment_status = UNEMPLOYED`.
+- **Wage:** surviving workers get % uplifts ∝ θ, normalised by the
+  earnings-weighted mean θ of the full baseline wage bill (targeting an
+  aggregate ≈ `wage_uplift × surviving wage bill`). JR16 eq 3.5 normalises
+  by the employment-weighted mean θ instead — see
+  [#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), finding 5.
 - **Capital:** interest and dividend income scaled by
   `(1.005% + 0.4pp)/1.005% ≈ 1.398` (JR16's return-to-capital shock).
 
-**Scenario presets** (all overridable literature anchors):
+**Scenario presets** (all overridable; the +0.4pp capital shock is on in
+every preset, as in all JR16 scenarios):
 
 | Preset | Displacement | Wage | Source |
 |---|---|---|---|
-| `central` | 7% | +2.6% | Briggs & Kodnani (2023); wage figure is JR16's adopted median (fn.3, §3.2) |
-| `low` | 1% | 0% | Acemoglu (2025, *Economic Policy* 40(121)), employment-only per JR16 fn.8 |
-| `high` | 13% | +2.6% | Brynjolfsson, Chandar & Chen (2025) — cohort-specific, upper bound |
+| `central` | 7% | +2.6% | JR16's central calibration (§3.2), converting Briggs & Kodnani (2023) task-exposure and productivity figures into displacement and wage rates |
+| `low` | 1% | 0% | Sensitivity case; JR16 §3.2 attributes ~1% to Acemoglu (2025), but his 0.9–1.1% is a ten-year GDP figure, not an employment effect ([#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), finding 11) |
+| `high` | 13% | +2.6% | Brynjolfsson, Chandar & Chen — 13% per early drafts (Nov 2025 version: 16%); cohort-specific relative decline treated as economy-wide absolute, upper bound |
 | `central_youth_tilted` | 7% | +2.6% | + Klein Teeselink (2025) junior/total ratio 5.8/4.5 tilting draws toward ages 16–24 |
 
 The `youth_displacement_multiplier` extends JR16 (which draws randomly within

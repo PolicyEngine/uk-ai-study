@@ -15,9 +15,11 @@ by age band (fiscal cost, poverty, Gini, displaced shares).
    in above-median-exposure occupations; no one 30+ is displaced.
 
 3. Brynjolfsson, Chandar & Chen (2025, "Canaries in the Coal Mine?") —
-   ~13% relative employment decline for workers aged 22-25 in the
-   most-exposed occupations. Implemented as displacement of 13% of
-   employees aged 22-25 in the top exposure quintile of occupations.
+   ~16% relative employment decline (Nov 2025 version; 13% in earlier
+   drafts) for workers aged 22-25 in the most-exposed occupations.
+   Implemented as displacement of 16% of employees aged 22-25 in the top
+   exposure quintile of occupations — treating a relative decline as an
+   absolute rate, so an upper bound.
 
 All three are employment-only scenarios (no wage or capital shock), so
 differences across them are driven purely by who is displaced.

@@ -220,6 +220,13 @@ def run_grid(dataset, baseline_sim, persons):
                     "unemployment_pct": u,
                     "wage_pct": w,
                     "avg_disposable_income_change_pct": 100 * (m["mean_hni"] / base["mean_hni"] - 1),
+                    # WARNING: baseline net_revenue (IT + NI - benefits incl.
+                    # state pension) is NEGATIVE, so this ratio is
+                    # sign-flipped and misleading; the paper instead reports
+                    # the change relative to gross IT+NI receipts (the
+                    # *_of_receipts column in the committed grid.csv, whose
+                    # generating revision is not yet committed — see
+                    # uk-ai-study#1, findings 8/9).
                     "net_revenue_change_pct": 100 * (m["net_revenue"] / base["net_revenue"] - 1),
                     "gini_change_pp": 100 * (m["gini"] - base["gini"]),
                 }

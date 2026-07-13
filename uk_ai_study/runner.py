@@ -109,11 +109,9 @@ def run_scenario(
     displaced = shocked_table["displaced"].to_numpy()
     status = baseline.calculate("employment_status", period=period, map_to="person").values.astype(object)
     status[displaced] = "UNEMPLOYED"
-    status_applied = True
     try:
         shocked.set_input("employment_status", period, status)
     except Exception as exc:
-        status_applied = False
         import warnings
 
         warnings.warn(
