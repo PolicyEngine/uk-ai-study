@@ -64,7 +64,7 @@ def exposure_sensitivity():
     from policyengine_uk import Microsimulation
     from policyengine_uk.data import UKSingleYearDataset
     from uk_ai_study.runner import AGE_BANDS, gini
-    from uk_ai_study.shocks import apply_shocks
+    from uk_ai_study.shocks import apply_shocks, build_shocked_simulation
 
     dataset = UKSingleYearDataset(file_path=str(H5))
     results = {}
@@ -88,13 +88,11 @@ def exposure_sensitivity():
         persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
 
         shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
-        sim = Microsimulation(dataset=dataset)
-        for col in ("employment_income", "savings_interest_income", "dividend_income"):
-            sim.set_input(col, 2026, shocked_table[col].to_numpy(dtype=float))
+        sim = build_shocked_simulation(dataset, baseline, shocked_table, 2026)
 
         def m(s):
             hw = s.calculate("household_weight", period=2026, map_to="household").values
-            eq = s.calculate("equiv_household_net_income", period=2026, map_to="household").values
+            eq = s.calculate("equiv_hbai_household_net_income", period=2026, map_to="household").values
             n = s.calculate("household_count_people", period=2026, map_to="household").values
             pw = s.calculate("person_weight", period=2026, map_to="person").values
             return {
@@ -105,7 +103,7 @@ def exposure_sensitivity():
 
         b, sh = m(baseline), m(sim)
         # decile gradient of displacement (top vs bottom decile share)
-        equiv = baseline.calculate("equiv_household_net_income", period=2026, map_to="person").values
+        equiv = baseline.calculate("equiv_hbai_household_net_income", period=2026, map_to="person").values
         w = persons["weight"].to_numpy()
         order = np.argsort(equiv)
         cw = np.cumsum(w[order]); ranks = np.empty(len(equiv)); ranks[order] = cw / cw[-1]
@@ -127,7 +125,7 @@ def uniform_comparator():
     from policyengine_uk import Microsimulation
     from policyengine_uk.data import UKSingleYearDataset
     from uk_ai_study.runner import gini
-    from uk_ai_study.shocks import apply_shocks
+    from uk_ai_study.shocks import apply_shocks, build_shocked_simulation
 
     dataset = UKSingleYearDataset(file_path=str(H5))
     baseline = Microsimulation(dataset=dataset)
@@ -148,13 +146,11 @@ def uniform_comparator():
     persons["complementarity"] = 1.0
 
     shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
-    sim = Microsimulation(dataset=dataset)
-    for col in ("employment_income", "savings_interest_income", "dividend_income"):
-        sim.set_input(col, 2026, shocked_table[col].to_numpy(dtype=float))
+    sim = build_shocked_simulation(dataset, baseline, shocked_table, 2026)
 
     def m(s):
         hw = s.calculate("household_weight", period=2026, map_to="household").values
-        eq = s.calculate("equiv_household_net_income", period=2026, map_to="household").values
+        eq = s.calculate("equiv_hbai_household_net_income", period=2026, map_to="household").values
         n = s.calculate("household_count_people", period=2026, map_to="household").values
         pw = s.calculate("person_weight", period=2026, map_to="person").values
         return {

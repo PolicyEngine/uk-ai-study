@@ -16,7 +16,7 @@ from policyengine_uk import Microsimulation
 from policyengine_uk.data import UKSingleYearDataset
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.shocks import PRESETS, apply_shocks
+from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
 
 def main():
@@ -70,11 +70,9 @@ def main():
     res["female_share_of_employment"] = float(w[emp & female].sum() / w[emp].sum())
 
     st = apply_shocks(persons, PRESETS["central"], seed=0)
-    sim = Microsimulation(dataset=ds)
-    for col in ("employment_income", "savings_interest_income", "dividend_income"):
-        sim.set_input(col, P, st[col].to_numpy(dtype=float))
-    hni_b = base.calculate("household_net_income", period=P, map_to="person").values
-    hni_s = sim.calculate("household_net_income", period=P, map_to="person").values
+    sim = build_shocked_simulation(ds, base, st, P)
+    hni_b = base.calculate("hbai_household_net_income", period=P, map_to="person").values
+    hni_s = sim.calculate("hbai_household_net_income", period=P, map_to="person").values
     for label, m in [("female", female), ("male", ~female)]:
         res[f"{label}_income_change_pct"] = float(
             100 * ((hni_s - hni_b)[m] * w[m]).sum() / (hni_b[m] * w[m]).sum()

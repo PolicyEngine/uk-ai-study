@@ -71,7 +71,10 @@ def _rate_within(persons, mask, rate, seed=SEED):
     quota = rate * float(weight[eligible].sum())
     exposure = persons["exposure"].to_numpy()
     exposure = exposure - exposure[mask].min() + 1e-9
-    p = exposure[eligible] * weight[eligible]
+    # ordering ∝ exposure only: multiplying by the survey weight as well
+    # would double-count it, since the quota is consumed in weight units
+    # (#1, finding 6)
+    p = exposure[eligible]
     p = p / p.sum()
     chosen = rng.choice(eligible, size=len(eligible), replace=False, p=p)
     displaced = np.zeros(len(persons), dtype=bool)
@@ -114,18 +117,21 @@ def displaced_brynjolfsson(persons: pd.DataFrame) -> np.ndarray:
 
 
 def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
-    from policyengine_uk import Microsimulation
+    from uk_ai_study.shocks import build_shocked_simulation
 
     employment = persons["employment_income"].to_numpy(dtype=float)
-    shocked_emp = np.where(displaced, 0.0, employment)
-
-    sim = Microsimulation(dataset=dataset)
-    sim.set_input("employment_income", PERIOD, shocked_emp)
+    shocked_table = persons.copy()
+    shocked_table["displaced"] = displaced
+    shocked_table["employment_income"] = np.where(displaced, 0.0, employment)
+    for col in ("savings_interest_income", "dividend_income"):
+        if col not in shocked_table.columns:
+            shocked_table[col] = baseline_sim.calculate(col, period=PERIOD, map_to="person").values
+    sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
 
     def metrics(s):
         pw = s.calculate("person_weight", period=PERIOD, map_to="person").values
         hw = s.calculate("household_weight", period=PERIOD, map_to="household").values
-        eq = s.calculate("equiv_household_net_income", period=PERIOD, map_to="household").values
+        eq = s.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
         npeople = s.calculate("household_count_people", period=PERIOD, map_to="household").values
         return {
             "gov_balance": float(
@@ -134,7 +140,7 @@ def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
             "poverty_bhc": float(np.average(
                 s.calculate("in_poverty_bhc", period=PERIOD, map_to="person").values, weights=pw)),
             "gini": gini(eq, hw * npeople),
-            "hni": s.calculate("household_net_income", period=PERIOD, map_to="person").values,
+            "hni": s.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values,
         }
 
     base, shock = metrics(baseline_sim), metrics(sim)

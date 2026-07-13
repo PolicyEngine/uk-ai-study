@@ -6,14 +6,10 @@ proportion to ``employment x mean C-AIOE`` of the group, then realised by
 weighted random draws within each group (probability proportional to
 individual exposure).
 
-Wage shock: surviving workers receive percentage uplifts proportional to
-complementarity (theta) — AI complements, rather than substitutes for,
-high-theta occupations. NOTE: the normalisation uses the EARNINGS-weighted
-mean theta over the full baseline wage bill, which targets an aggregate
-uplift of ~``wage_uplift x surviving wage bill``; JR16 eq 3.5 instead
-normalises by the EMPLOYMENT-weighted mean theta. See uk-ai-study#1
-(finding 5) — the two differ because theta and earnings are positively
-correlated.
+Wage shock (eq 3.5): surviving workers receive percentage uplifts
+proportional to complementarity (theta), normalised by the
+EMPLOYMENT-weighted mean theta over baseline workers — JR16-literal, per the
+estimand decision on uk-ai-study#1 (finding 5).
 
 Capital shock: interest and dividend income scaled by the ratio of the
 shocked to the baseline return (JR16: 1.005% -> 1.405%, i.e. +0.4pp on the
@@ -78,14 +74,16 @@ def draw_displaced(
     # for low-exposure groups, which would corrupt the quota weights.
     exposure = exposure - exposure[employed].min()
     weight = persons["weight"].to_numpy()
-    group = persons["soc_major_group"].to_numpy()
-
-    # quota base = employees with an observed SOC group (the drawable
-    # population); using all employees would silently reallocate the
-    # unmatched share onto matched workers
-    matched = employed & np.isfinite(group)
-    total_quota = scenario.displacement_rate * float(weight[matched].sum())
-    groups = np.unique(group[matched])
+    # Employees without an observed SOC code form their own pseudo-group
+    # (carrying their mean-imputed exposure), so the displacement universe is
+    # ALL employees and matches the wage-uplift universe (#1, finding 7).
+    group = np.where(
+        np.isfinite(persons["soc_major_group"].to_numpy()),
+        persons["soc_major_group"].to_numpy(),
+        -1.0,
+    )
+    total_quota = scenario.displacement_rate * float(weight[employed].sum())
+    groups = np.unique(group[employed])
     # group quotas proportional to employment x mean exposure
     emp_w = {g: float(weight[employed & (group == g)].sum()) for g in groups}
     exp_g = {
@@ -104,9 +102,14 @@ def draw_displaced(
     for g in groups:
         members = np.flatnonzero(employed & (group == g))
         quota = raw[g] * scale
-        p = exposure[members] * weight[members]
-        if quota <= 0 or p.sum() <= 0:
+        if quota <= 0:
             continue
+        # uniform ordering keys within group: exposure is constant within a
+        # 1-digit group, and weighting the ordering as well as the quota
+        # consumption would double-count the survey weight, making a
+        # represented person's risk depend on their record's grossing
+        # weight (#1, finding 6)
+        p = np.ones(len(members))
         if scenario.youth_displacement_multiplier != 1.0:
             p = p * np.where(age[members] < 25, scenario.youth_displacement_multiplier, 1.0)
         p = p / p.sum()
@@ -142,17 +145,15 @@ def apply_shocks(
     employment = shocked["employment_income"].to_numpy(dtype=float)
     survivors = (employment > 0) & ~displaced
 
-    # person-level % wage change = wage_uplift * theta_i / theta_bar, with
-    # theta_bar the earnings-weighted mean theta over the FULL baseline wage
-    # bill (deterministic across draws). This deviates from JR16 eq 3.5,
-    # which normalises by the EMPLOYMENT-weighted mean theta — see
-    # uk-ai-study#1 (finding 5) before changing either code or paper.
+    # eq 3.5: person-level % wage change = wage_uplift * theta_i / theta_bar,
+    # with theta_bar the EMPLOYMENT-weighted mean theta over baseline workers
+    # (JR16-literal; deterministic across draws) — estimand decision on
+    # uk-ai-study#1, finding 5
     theta = shocked["complementarity"].to_numpy(dtype=float)
     weight = shocked["weight"].to_numpy(dtype=float)
     baseline_workers = employment > 0
     theta_bar = float(
-        (theta * employment * weight)[baseline_workers].sum()
-        / (employment * weight)[baseline_workers].sum()
+        (theta * weight)[baseline_workers].sum() / weight[baseline_workers].sum()
     )
     uplift = np.zeros_like(employment)
     if theta_bar > 0:
@@ -164,3 +165,52 @@ def apply_shocks(
     for column in ("savings_interest_income", "dividend_income"):
         shocked[column] = shocked[column].to_numpy(dtype=float) * capital_factor
     return shocked
+
+
+#: The transition contract (#1, finding 4 / decision 2): "displaced" means
+#: fully out of work. Besides employment_income = 0, these person-level
+#: inputs are zeroed so displaced workers do not remain in_work (hours > 0
+#: keeps UC childcare, tax-free childcare and extended childcare paying),
+#: do not keep deducting pension contributions from zero earnings, and do
+#: not draw statutory pay.
+TRANSITION_ZEROED_VARIABLES = (
+    "hours_worked",
+    "employee_pension_contributions",
+    "pension_contributions_via_salary_sacrifice",
+    "statutory_maternity_pay",
+    "statutory_paternity_pay",
+    "statutory_sick_pay",
+)
+
+SHOCKED_INCOME_VARIABLES = (
+    "employment_income",
+    "savings_interest_income",
+    "dividend_income",
+)
+
+
+def build_shocked_simulation(dataset, baseline_sim, shocked_table, period):
+    """One shared constructor for the shocked simulation (every pipeline).
+
+    Sets the shocked income inputs from ``shocked_table`` and applies the
+    full displacement transition to displaced persons.
+    """
+    from policyengine_uk import Microsimulation
+
+    sim = Microsimulation(dataset=dataset)
+    for column in SHOCKED_INCOME_VARIABLES:
+        sim.set_input(column, period, shocked_table[column].to_numpy(dtype=float))
+    displaced = shocked_table["displaced"].to_numpy()
+    for var in TRANSITION_ZEROED_VARIABLES:
+        values = baseline_sim.calculate(var, period=period, map_to="person").values.astype(float)
+        values[displaced] = 0.0
+        sim.set_input(var, period, values)
+    status = baseline_sim.calculate("employment_status", period=period, map_to="person").values.astype(object)
+    status[displaced] = "UNEMPLOYED"
+    try:
+        sim.set_input("employment_status", period, status)
+    except Exception as exc:
+        import warnings
+
+        warnings.warn(f"employment_status set_input rejected ({exc}).")
+    return sim

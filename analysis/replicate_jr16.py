@@ -34,7 +34,13 @@ import numpy as np
 import pandas as pd
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.shocks import PRESETS, ShockScenario, apply_shocks, draw_displaced
+from uk_ai_study.shocks import (
+    PRESETS,
+    ShockScenario,
+    apply_shocks,
+    build_shocked_simulation,
+    draw_displaced,
+)
 from uk_ai_study.runner import gini
 
 DATA = Path("data")
@@ -72,9 +78,9 @@ def build_person_table():
     persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
     persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
 
-    # deciles of equivalised household disposable income (person-level,
-    # weighted), fixed at baseline as in JR16
-    equiv = calc("equiv_household_net_income")
+    # deciles of equivalised household disposable income (HBAI concept,
+    # person-level, weighted), fixed at baseline as in JR16 — #1, finding 2
+    equiv = calc("equiv_hbai_household_net_income")
     order = np.argsort(equiv)
     cw = np.cumsum(persons["weight"].to_numpy()[order])
     ranks = np.empty(len(equiv), dtype=float)
@@ -135,75 +141,112 @@ def figs_4_1_to_4_3(persons):
     pd.DataFrame(rows).to_csv(OUT / "fig4_3_capital_by_decile.csv", index=False)
 
 
-def _decile_frame(sim, persons, period=PERIOD):
+def _household_frame(sim, period=PERIOD):
+    """Component totals per HOUSEHOLD (person components aggregated up), so
+    every column shares one weighting base — #1, finding 3."""
+
     def calc(v):
-        return sim.calculate(v, period=period, map_to="person").values
+        return sim.calculate(v, period=period, map_to="household").values
 
     return pd.DataFrame(
         {
             "market": calc("employment_income") + calc("self_employment_income")
             + calc("private_pension_income") + calc("savings_interest_income")
             + calc("dividend_income"),
-            "benefits": calc("household_benefits"),
+            "benefits": calc("hbai_benefits"),
             "tax": calc("income_tax") + calc("national_insurance"),
-            "disposable": calc("household_net_income"),
+            "disposable": calc("hbai_household_net_income"),
         }
     )
 
 
+def _household_deciles(sim, period=PERIOD):
+    """Person-representative deciles at household level: households ranked by
+    baseline equivalised HBAI income, weighted by household_weight x people."""
+    equiv = sim.calculate("equiv_hbai_household_net_income", period=period, map_to="household").values
+    hw = sim.calculate("household_weight", period=period, map_to="household").values
+    n = sim.calculate("household_count_people", period=period, map_to="household").values
+    w = hw * n
+    order = np.argsort(equiv)
+    cw = np.cumsum(w[order])
+    ranks = np.empty(len(equiv), dtype=float)
+    ranks[order] = cw / cw[-1]
+    return np.clip(np.ceil(ranks * 10).astype(int), 1, 10), hw
+
+
 def fig_4_4(dataset, baseline_sim, persons):
-    from policyengine_uk import Microsimulation
-
     shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
-    shocked_sim = Microsimulation(dataset=dataset)
-    for col in ("employment_income", "savings_interest_income", "dividend_income"):
-        shocked_sim.set_input(col, PERIOD, shocked_table[col].to_numpy(dtype=float))
+    shocked_sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
 
-    base, shock = _decile_frame(baseline_sim, persons), _decile_frame(shocked_sim, persons)
-    weight = persons["weight"].to_numpy()
-    deciles = persons["decile"].to_numpy()
+    base, shock = _household_frame(baseline_sim), _household_frame(shocked_sim)
+    deciles, hw = _household_deciles(baseline_sim)
     rows = []
     for d in range(1, 11):
         m = deciles == d
-        disp_base = (base["disposable"][m] * weight[m]).sum()
-        rows.append(
-            {
-                "decile": d,
-                "market_income": ((shock["market"] - base["market"])[m] * weight[m]).sum() / disp_base,
-                "benefits": ((shock["benefits"] - base["benefits"])[m] * weight[m]).sum() / disp_base,
-                "tax_and_contributions": -((shock["tax"] - base["tax"])[m] * weight[m]).sum() / disp_base,
-                "disposable_income": ((shock["disposable"] - base["disposable"])[m] * weight[m]).sum() / disp_base,
-            }
+        disp_base = (base["disposable"][m] * hw[m]).sum()
+        row = {
+            "decile": d,
+            "market_income": ((shock["market"] - base["market"])[m] * hw[m]).sum() / disp_base,
+            "benefits": ((shock["benefits"] - base["benefits"])[m] * hw[m]).sum() / disp_base,
+            "tax_and_contributions": -((shock["tax"] - base["tax"])[m] * hw[m]).sum() / disp_base,
+            "disposable_income": ((shock["disposable"] - base["disposable"])[m] * hw[m]).sum() / disp_base,
+        }
+        # explicit residual (perimeter items outside the three components:
+        # e.g. council tax, pension deductions inside the HBAI concept)
+        row["residual"] = row["disposable_income"] - (
+            row["market_income"] + row["benefits"] + row["tax_and_contributions"]
         )
-    pd.DataFrame(rows).to_csv(OUT / "fig4_4_decomposition.csv", index=False)
+        rows.append(row)
+    out = pd.DataFrame(rows)
+    # additivity: components + residual must equal disposable by construction
+    gap = (out["market_income"] + out["benefits"] + out["tax_and_contributions"]
+           + out["residual"] - out["disposable_income"]).abs().max()
+    assert gap < 1e-12, f"decomposition not additive (max gap {gap})"
+    out.to_csv(OUT / "fig4_4_decomposition.csv", index=False)
+    print("fig 4.4 residual by decile (pp of baseline disposable):",
+          (100 * out["residual"]).round(2).tolist())
 
 
-def run_grid(dataset, baseline_sim, persons):
-    from policyengine_uk import Microsimulation
+GRID_COLUMNS = [
+    "unemployment_pct",
+    "wage_pct",
+    "avg_disposable_income_change_pct",
+    "net_revenue_change_bn",
+    "net_revenue_change_pct_of_receipts",
+    "gini_change_pp",
+]
 
+
+def run_grid(dataset, baseline_sim, persons, resume: bool = False):
     def hh_metrics(sim):
         hw = sim.calculate("household_weight", period=PERIOD, map_to="household").values
-        hn = sim.calculate("household_net_income", period=PERIOD, map_to="household").values
-        eq = sim.calculate("equiv_household_net_income", period=PERIOD, map_to="household").values
+        hn = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values
+        eq = sim.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
         np_ = sim.calculate("household_count_people", period=PERIOD, map_to="household").values
         pw = sim.calculate("person_weight", period=PERIOD, map_to="person").values
-        it = sim.calculate("income_tax", period=PERIOD, map_to="person").values
-        ni = sim.calculate("national_insurance", period=PERIOD, map_to="person").values
-        bh = sim.calculate("household_benefits", period=PERIOD, map_to="household").values
-        net_rev = (it * pw).sum() + (ni * pw).sum() - (bh * hw).sum()
+        it = (sim.calculate("income_tax", period=PERIOD, map_to="person").values * pw).sum()
+        ni = (sim.calculate("national_insurance", period=PERIOD, map_to="person").values * pw).sum()
+        bh = (sim.calculate("household_benefits", period=PERIOD, map_to="household").values * hw).sum()
         return {
             "mean_hni": float(np.average(hn, weights=hw)),
             "gini": gini(eq, hw * np_),
-            "net_revenue": float(net_rev),
+            "net_revenue": float(it + ni - bh),
+            "receipts": float(it + ni),
         }
 
     base = hh_metrics(baseline_sim)
     out_path = OUT / "grid.csv"
+    # resume is opt-in and fingerprint-aware: a stale-schema CSV is never
+    # silently reused (#1, finding 8)
     done = set()
-    if out_path.exists():
+    rows = []
+    if resume and out_path.exists():
         prev = pd.read_csv(out_path)
-        done = set(zip(prev["unemployment_pct"], prev["wage_pct"]))
-    rows = [] if not done else pd.read_csv(out_path).to_dict("records")
+        if list(prev.columns) == GRID_COLUMNS:
+            done = set(zip(prev["unemployment_pct"], prev["wage_pct"]))
+            rows = prev.to_dict("records")
+        else:
+            print("existing grid.csv has a different schema; recomputing all cells")
 
     for u in range(0, 11):
         for w in range(0, 6):
@@ -211,27 +254,24 @@ def run_grid(dataset, baseline_sim, persons):
                 continue
             scenario = ShockScenario(f"u{u}_w{w}", u / 100, w / 100)
             shocked_table = apply_shocks(persons, scenario, seed=0)
-            sim = Microsimulation(dataset=dataset)
-            for col in ("employment_income", "savings_interest_income", "dividend_income"):
-                sim.set_input(col, PERIOD, shocked_table[col].to_numpy(dtype=float))
+            sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
             m = hh_metrics(sim)
+            delta_rev = m["net_revenue"] - base["net_revenue"]
             rows.append(
                 {
                     "unemployment_pct": u,
                     "wage_pct": w,
                     "avg_disposable_income_change_pct": 100 * (m["mean_hni"] / base["mean_hni"] - 1),
-                    # WARNING: baseline net_revenue (IT + NI - benefits incl.
-                    # state pension) is NEGATIVE, so this ratio is
-                    # sign-flipped and misleading; the paper instead reports
-                    # the change relative to gross IT+NI receipts (the
-                    # *_of_receipts column in the committed grid.csv, whose
-                    # generating revision is not yet committed — see
-                    # uk-ai-study#1, findings 8/9).
-                    "net_revenue_change_pct": 100 * (m["net_revenue"] / base["net_revenue"] - 1),
+                    # change in net revenue (IT + NI - household benefits) in
+                    # £bn, and re-expressed against gross IT+NI receipts; the
+                    # % change against the (negative) net base was sign-flipped
+                    # and is no longer written — #1, findings 8/9
+                    "net_revenue_change_bn": delta_rev / 1e9,
+                    "net_revenue_change_pct_of_receipts": 100 * delta_rev / base["receipts"],
                     "gini_change_pp": 100 * (m["gini"] - base["gini"]),
                 }
             )
-            pd.DataFrame(rows).to_csv(out_path, index=False)
+            pd.DataFrame(rows)[GRID_COLUMNS].to_csv(out_path, index=False)
             print(f"u={u} w={w} done", flush=True)
 
 
@@ -244,7 +284,7 @@ def main():
         fig_4_4(dataset, baseline_sim, persons)
         print("figs 4.1-4.4 written")
     elif mode == "grid":
-        run_grid(dataset, baseline_sim, persons)
+        run_grid(dataset, baseline_sim, persons, resume="--resume" in sys.argv)
         print("grid complete")
 
 

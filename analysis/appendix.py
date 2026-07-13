@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.shocks import PRESETS, ShockScenario, apply_shocks
+from uk_ai_study.shocks import PRESETS, ShockScenario, apply_shocks, build_shocked_simulation
 
 DATA = Path("data")
 OUT = Path("results/appendix")
@@ -68,7 +68,7 @@ def setup():
     persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
     persons["exposure_raw"] = e
 
-    equiv = calc("equiv_household_net_income")
+    equiv = calc("equiv_hbai_household_net_income")
     w = persons["weight"].to_numpy()
     order = np.argsort(equiv)
     cw = np.cumsum(w[order])
@@ -98,24 +98,40 @@ def fast(dataset, baseline, persons):
     dec = persons["decile"].to_numpy()
 
     # --- B.1-B.5 baseline distributions (weighted aggregates, GBP bn/yr)
+    # Built at HOUSEHOLD level: broadcasting household totals to persons and
+    # person-weight-summing counts each household once per member (#1,
+    # finding 3 — the £683bn benefits / £3.3tn disposable artefact).
+    def hcalc(v):
+        return baseline.calculate(v, period=PERIOD, map_to="household").values
+
+    hw = hcalc("household_weight")
+    equiv_h = hcalc("equiv_hbai_household_net_income")
+    n_h = hcalc("household_count_people")
+    order_h = np.argsort(equiv_h)
+    cw_h = np.cumsum((hw * n_h)[order_h])
+    ranks_h = np.empty(len(equiv_h))
+    ranks_h[order_h] = cw_h / cw_h[-1]
+    dec_h = np.clip(np.ceil(ranks_h * 10).astype(int), 1, 10)
+
     comps = {
         "b1_market_income_less_capital": (
-            persons["employment_income"] + persons["self_employment_income"]
-            + persons["private_pension_income"], NAVY,
+            hcalc("employment_income") + hcalc("self_employment_income")
+            + hcalc("private_pension_income"), NAVY,
             "Aggregate market income less capital income"),
         "b2_capital_income": (
-            persons["savings_interest_income"] + persons["dividend_income"], GOLD,
+            hcalc("savings_interest_income") + hcalc("dividend_income"), GOLD,
             "Aggregate capital income (interest + dividends)"),
-        "b3_benefits": (persons["household_benefits"], BLUE, "Aggregate benefits"),
+        "b3_benefits": (hcalc("hbai_benefits"), BLUE, "Aggregate benefits (HBAI)"),
         "b4_tax_and_ni": (
-            persons["income_tax"] + persons["national_insurance"], GREEN,
+            hcalc("income_tax") + hcalc("national_insurance"), GREEN,
             "Aggregate income tax and National Insurance"),
         "b5_disposable_income": (
-            persons["household_net_income"], NAVY, "Aggregate disposable income"),
+            hcalc("hbai_household_net_income"), NAVY,
+            "Aggregate disposable income (HBAI)"),
     }
     rows = {}
     for name, (series, color, title) in comps.items():
-        agg = np.array([float((series.to_numpy() * w)[dec == d].sum()) / 1e9 for d in range(1, 11)])
+        agg = np.array([float((series * hw)[dec_h == d].sum()) / 1e9 for d in range(1, 11)])
         rows[name] = agg
         bar_by_decile(agg, title + " — UK baseline, 2026", "£ billion per year",
                       f"{name}.png", color=color)
@@ -182,11 +198,9 @@ def fast(dataset, baseline, persons):
 
     def decile_change(persons_variant, label):
         shocked_table = apply_shocks(persons_variant, PRESETS["central"], seed=0)
-        sim = Microsimulation(dataset=dataset)
-        for col in ("employment_income", "savings_interest_income", "dividend_income"):
-            sim.set_input(col, PERIOD, shocked_table[col].to_numpy(dtype=float))
-        hni_b = baseline.calculate("household_net_income", period=PERIOD, map_to="person").values
-        hni_s = sim.calculate("household_net_income", period=PERIOD, map_to="person").values
+        sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+        hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
+        hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         out = []
         for d in range(1, 11):
             m = dec == d
@@ -246,14 +260,12 @@ def decomp_ci(dataset, baseline, persons, n_draws=20):
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
-    hni_b = baseline.calculate("household_net_income", period=PERIOD, map_to="person").values
+    hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
     draws = np.zeros((n_draws, 10))
     for s in range(n_draws):
         shocked_table = apply_shocks(persons, PRESETS["central"], seed=s)
-        sim = Microsimulation(dataset=dataset)
-        for col in ("employment_income", "savings_interest_income", "dividend_income"):
-            sim.set_input(col, PERIOD, shocked_table[col].to_numpy(dtype=float))
-        hni_s = sim.calculate("household_net_income", period=PERIOD, map_to="person").values
+        sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+        hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         for d in range(1, 11):
             m = dec == d
             draws[s, d - 1] = 100 * float(((hni_s - hni_b)[m] * w[m]).sum()) / float((hni_b[m] * w[m]).sum())
@@ -273,13 +285,13 @@ def grids(dataset, baseline, persons):
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
-    hni_b = baseline.calculate("household_net_income", period=PERIOD, map_to="person").values
+    hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
     hw = baseline.calculate("household_weight", period=PERIOD, map_to="household").values
-    eq_b = baseline.calculate("equiv_household_net_income", period=PERIOD, map_to="household").values
+    eq_b = baseline.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
     nppl = baseline.calculate("household_count_people", period=PERIOD, map_to="household").values
     gini_b = gini(eq_b, hw * nppl)
     mean_b = float(np.average(
-        baseline.calculate("household_net_income", period=PERIOD, map_to="household").values, weights=hw))
+        baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values, weights=hw))
 
     rows = []
     for u in range(0, 11):
@@ -289,12 +301,10 @@ def grids(dataset, baseline, persons):
                     f"u{u}w{wg}c{int(capital)}", u / 100, wg / 100,
                     capital_return_increase=0.004 if capital else 0.0)
                 shocked_table = apply_shocks(persons, scenario, seed=0)
-                sim = Microsimulation(dataset=dataset)
-                for col in ("employment_income", "savings_interest_income", "dividend_income"):
-                    sim.set_input(col, PERIOD, shocked_table[col].to_numpy(dtype=float))
-                hni_s = sim.calculate("household_net_income", period=PERIOD, map_to="person").values
-                eq_s = sim.calculate("equiv_household_net_income", period=PERIOD, map_to="household").values
-                hh_s = sim.calculate("household_net_income", period=PERIOD, map_to="household").values
+                sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+                hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
+                eq_s = sim.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
+                hh_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values
                 rec = {
                     "unemployment_pct": u, "wage_pct": wg, "capital_shock": capital,
                     "avg_disposable_income_change_pct": 100 * (float(np.average(hh_s, weights=hw)) / mean_b - 1),

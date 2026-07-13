@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.shocks import PRESETS, ShockScenario, apply_shocks
+from uk_ai_study.shocks import PRESETS, ShockScenario, apply_shocks, build_shocked_simulation
 
 AGE_BANDS = ((16, 24), (25, 34), (35, 44), (45, 54), (55, 64), (65, 200))
 
@@ -60,8 +60,12 @@ def _person_table(sim, period: int) -> pd.DataFrame:
 
 
 def _metrics(sim, period: int) -> dict:
+    # income concept: HBAI cash disposable income throughout (Gini, deciles,
+    # changes), matching the in_poverty_* concept — #1, finding 2. The broad
+    # household_net_income (in-kind benefits, indirect taxes) is used only
+    # inside gov_balance.
     hh_w = sim.calculate("household_weight", period=period, map_to="household").values
-    equiv = sim.calculate("equiv_household_net_income", period=period, map_to="household").values
+    equiv = sim.calculate("equiv_hbai_household_net_income", period=period, map_to="household").values
     hh_count = sim.calculate("household_count_people", period=period, map_to="household").values
     return {
         "gov_balance": float((sim.calculate("gov_balance", period=period, map_to="household").values * hh_w).sum()),
@@ -74,7 +78,7 @@ def _metrics(sim, period: int) -> dict:
             weights=sim.calculate("person_weight", period=period, map_to="person").values,
         )),
         "gini": gini(equiv, hh_w * hh_count),
-        "hni": sim.calculate("household_net_income", period=period, map_to="person").values,
+        "hni": sim.calculate("hbai_household_net_income", period=period, map_to="person").values,
     }
 
 
@@ -103,21 +107,8 @@ def run_scenario(
 
     shocked_table = apply_shocks(persons, scenario, seed=seed)
 
-    shocked = Microsimulation(dataset=dataset)
-    for column in ("employment_income", "savings_interest_income", "dividend_income"):
-        shocked.set_input(column, period, shocked_table[column].to_numpy(dtype=float))
+    shocked = build_shocked_simulation(dataset, baseline, shocked_table, period)
     displaced = shocked_table["displaced"].to_numpy()
-    status = baseline.calculate("employment_status", period=period, map_to="person").values.astype(object)
-    status[displaced] = "UNEMPLOYED"
-    try:
-        shocked.set_input("employment_status", period, status)
-    except Exception as exc:
-        import warnings
-
-        warnings.warn(
-            f"employment_status set_input rejected ({exc}); displaced workers "
-            "carry zero employment income but retain baseline status."
-        )
 
     base, shock = _metrics(baseline, period), _metrics(shocked, period)
 
@@ -125,9 +116,9 @@ def run_scenario(
     age = persons["age"].to_numpy()
     income_delta = shock["hni"] - base["hni"]
     # weighted deciles of baseline EQUIVALISED household disposable income
-    # (person-level, survey-weighted) — the JR16 convention
+    # (HBAI concept, person-level, survey-weighted) — the JR16 convention
     equiv = baseline.calculate(
-        "equiv_household_net_income", period=period, map_to="person"
+        "equiv_hbai_household_net_income", period=period, map_to="person"
     ).values
     order = np.argsort(equiv)
     cum = np.cumsum(weight[order])

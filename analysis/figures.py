@@ -85,45 +85,26 @@ def fig4_4():
         ("benefits", "Benefits", "#4a90c4"),
         ("tax_and_contributions", "Tax & contributions", "#4a7d4a"),
     ]
+    if "residual" in d.columns:
+        comps.append(("residual", "Other (residual)", "#9a9a9a"))
+        wd = 0.16
     for k, (col, label, color) in enumerate(comps):
-        ax.bar(d["decile"] + (k - 1.5) * wd, 100 * d[col], width=wd, label=label, color=color)
+        ax.bar(d["decile"] + (k - (len(comps) - 1) / 2) * wd, 100 * d[col], width=wd, label=label, color=color)
     ax.axhline(0, color="black", lw=0.6)
     ax.set_xlabel("Decile of equivalised household disposable income")
     ax.set_ylabel("% of baseline disposable income")
     ax.set_xticks(range(1, 11))
-    ax.legend(fontsize=8, ncol=4)
+    ax.legend(fontsize=8, ncol=len(comps))
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
     fig.savefig(JR16 / "fig4_4_decomposition.png", dpi=150)
     plt.close(fig)
 
 
-def add_grid_revenue_columns(data_dir: Path, period: int, force: bool = False):
-    """Add net_revenue_change_bn / _pct_of_receipts to grid.csv.
-
-    Re-expresses runner's net_revenue_change_pct (whose base, IT + NI -
-    household_benefits, is NEGATIVE and therefore sign-flipped) as a £bn
-    change and as a share of gross IT+NI receipts — the numbers the paper
-    quotes. See uk-ai-study#1, findings 8/9.
-    """
-    g = pd.read_csv(JR16 / "grid.csv")
-    if not force and "net_revenue_change_pct_of_receipts" in g.columns:
-        return g
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
-
-    ds = UKSingleYearDataset(file_path=str(data_dir / "frs_2024_25.h5"))
-    sim = Microsimulation(dataset=ds)
-    pw = sim.calculate("person_weight", period=period, map_to="person").values
-    hw = sim.calculate("household_weight", period=period, map_to="household").values
-    it = (sim.calculate("income_tax", period=period, map_to="person").values * pw).sum()
-    ni = (sim.calculate("national_insurance", period=period, map_to="person").values * pw).sum()
-    bh = (sim.calculate("household_benefits", period=period, map_to="household").values * hw).sum()
-    base = it + ni - bh
-    g["net_revenue_change_bn"] = g["net_revenue_change_pct"] / 100 * base / 1e9
-    g["net_revenue_change_pct_of_receipts"] = 100 * (g["net_revenue_change_bn"] * 1e9) / (it + ni)
-    g.to_csv(JR16 / "grid.csv", index=False)
-    return g
+def load_grid():
+    """run_grid now writes net_revenue_change_bn / _pct_of_receipts directly
+    (see replicate_jr16.py); this remains only as the read point."""
+    return pd.read_csv(JR16 / "grid.csv")
 
 
 def grid_heatmaps(g):
@@ -207,17 +188,13 @@ def b9_b11():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", default="data")
-    parser.add_argument("--period", type=int, default=2026)
-    parser.add_argument("--recompute-revenue", action="store_true")
-    args = parser.parse_args()
+    parser.parse_args()
 
     fig4_1()
     fig4_2()
     fig4_3()
     fig4_4()
-    g = add_grid_revenue_columns(Path(args.data_dir), args.period, force=args.recompute_revenue)
-    grid_heatmaps(g)
+    grid_heatmaps(load_grid())
     decomposition_ci()
     b9_b11()
     print("figures written to results/jr16 and results/appendix")
