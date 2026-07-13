@@ -171,6 +171,87 @@ leaves the decile profile essentially unchanged.
 \label{fig:b8}
 \end{figure}
 
+\subsection{Full exposure-index sensitivity}
+\label{app:index-sensitivity}
+
+Figure~\ref{fig:b8} compared decile profiles under two indices; here we
+rerun the entire central scenario under five: the C-AIOE (our central
+measure), the unadjusted \citet{felten2021} AIOE, the \citet{eloundou2023}
+GPT-exposure beta, and the two indices from the UK government's DSIT
+exposure assessment (all-AI and large-language-model variants). The
+comparison matters because the published literature disagrees sharply on
+\emph{levels}: estimates of the share of employment ``highly exposed'' to
+AI range from a few per cent to well over half depending on the index and
+threshold chosen, so any result that survived under only one index would
+be fragile. Our quota mechanism holds the aggregate displacement rate at
+7~per cent, so the indices differ only in \emph{where} the same aggregate
+shock lands across occupation groups.
+
+Table~\ref{tab:indexsens} and Figure~\ref{fig:indexsens} report the
+outcomes. The exchequer cost spans \pounds 17.6--18.6~billion (the largest
+deviation from the C-AIOE figure is $-4.3$ per cent, under the DSIT LLM
+index), the Gini change spans $+1.05$ to $+1.10$ points, and the
+before-housing-costs poverty change spans $+1.85$ to $+1.90$ points. The
+decile-10 transition share exceeds the decile-1 share by a factor of 8.9
+to 11.3 across indices. All three qualitative conclusions of the
+paper---the Gini rises, the displacement-transition gradient rises with
+income, and the fiscal cost is within 20 per cent of the central
+estimate---hold under every index, essentially because all five rank
+SOC major groups similarly: clerical and professional work is most
+exposed under each, and the quota fixes the aggregate.
+
+\begin{table}[htbp]
+\centering
+\caption{Central scenario under five exposure indices}
+\label{tab:indexsens}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Index & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Gini (pp) & D1 share (\%) & D10 share (\%) \\
+\midrule
+C-AIOE (central) & 18.4 & 1.87 & 1.10 & 0.53 & 4.67 \\
+Felten AIOE & 18.6 & 1.86 & 1.09 & 0.53 & 4.70 \\
+Eloundou beta & 18.4 & 1.90 & 1.09 & 0.47 & 4.74 \\
+DSIT AIOE & 18.6 & 1.86 & 1.05 & 0.43 & 4.86 \\
+DSIT LLM & 17.6 & 1.85 & 1.09 & 0.51 & 4.68 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\parbox{\textwidth}{\footnotesize Single draw, seed 0, 2026. D1 and D10
+shares are the percentages of persons in the bottom and top baseline
+income deciles whose household is pushed down at least one decile by
+displacement. Aggregate displacement is held at 7 per cent by the quota
+mechanism under every index.}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.9\textwidth]{../results/robustness/index_sensitivity.png}
+\caption{Headline outcomes of the central scenario under five exposure indices.}
+\label{fig:indexsens}
+\end{figure}
+
+\subsection{Data appendix: constituency-level occupation imputation}
+\label{app:geo-imputation}
+
+The constituency results use PolicyEngine's 650-constituency weight
+matrix, which indexes the enhanced FRS 2023--24 dataset (53,566 employee
+records); on that dataset the serial-number join to observed SOC major
+group is invalid, so occupation had to be imputed. We drew each enhanced
+record's SOC major group from the survey-weighted occupation distribution
+of the plain FRS 2024--25 (12,800 employees, 99.6 per cent with observed
+SOC) within cells defined by age band $\times$ gender $\times$ region
+$\times$ individual-earnings decile, at seed~0. On a weighted basis 99.4
+per cent of employees were imputed from the full four-way cell, 0.6 per
+cent from an age--gender--decile fallback and 0.03 per cent from the
+marginal distribution. As stressed in the main text, occupation is
+therefore imputed rather than observed at the constituency level:
+cross-constituency variation reflects demographic and earnings
+composition (plus one seed-0 draw), not directly measured local
+occupation mixes, and the enhanced-dataset results are not directly
+comparable to the plain-FRS poverty numbers elsewhere in the paper.
+
 \subsection{The scenario grid by decile, and without the capital shock}
 
 Figure~\ref{fig:b9} facets the full 66-cell scenario grid by baseline
