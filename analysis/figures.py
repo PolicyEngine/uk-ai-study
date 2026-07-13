@@ -1,19 +1,12 @@
-"""Render the main-text (fig 4.1-4.7) and grid appendix (B.9, B.11,
-decomposition CI) figures from the committed CSVs, and add the revenue
-columns to grid.csv that the paper quotes.
+"""Render the main-text (fig 4.1-4.7), grid appendix (B.9, B.11,
+decomposition CI) and incidence-family figures from the committed
+CSVs/JSONs. No simulations are run here — presentation only.
 
-Recovered from the original generating session (these were run as ad hoc
-snippets and never committed — see uk-ai-study#1, finding 8).
-
-Usage: python analysis/figures.py [--data-dir DATA] [--period 2026]
-
-The bar/heatmap figures only need the CSVs under results/. The grid revenue
-columns (net_revenue_change_bn, net_revenue_change_pct_of_receipts) need a
-baseline PolicyEngine simulation; they are recomputed only if missing from
-results/jr16/grid.csv, or always with --recompute-revenue.
+Usage: python analysis/figures.py
 """
 
 import argparse
+import json
 from pathlib import Path
 
 import numpy as np
@@ -23,172 +16,239 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from figstyle import (
+    AQUA,
+    BLUE,
+    DECILE_AXIS,
+    DIVERGING,
+    DPI,
+    FACETS,
+    GREEN,
+    HEATMAP,
+    INK,
+    INK2,
+    LIGHT_BLUE,
+    MUTED,
+    RED,
+    SINGLE,
+    TWOPANEL,
+    YELLOW,
+    apply_style,
+    decile_ax,
+    save,
+)
+
 JR16 = Path("results/jr16")
 APPENDIX = Path("results/appendix")
-NAVY = "#1f3557"
+INCIDENCE = Path("results/incidence")
+
+
+def _bar_labels(ax, xs, ys, fmt="{:.1f}", pad_frac=0.02):
+    span = max(abs(min(min(ys), 0)), max(ys)) or 1.0
+    for x, y in zip(xs, ys):
+        ax.text(x, y + span * pad_frac, fmt.format(y), ha="center",
+                va="bottom", fontsize=8, color=INK2)
 
 
 def fig4_1():
     d = pd.read_csv(JR16 / "fig4_1_transition_by_decile.csv")
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    err = [d["share_transitioning"] - d["ci_low"], d["ci_high"] - d["share_transitioning"]]
-    ax.bar(d["decile"], 100 * d["share_transitioning"], yerr=[100 * e for e in err], capsize=3, color=NAVY)
-    for x, y in zip(d["decile"], d["share_transitioning"]):
-        ax.text(x, 100 * y + 0.2, f"{100*y:.1f}%", ha="center", fontsize=8)
-    ax.set_xlabel("Decile of equivalised household disposable income")
-    ax.set_ylabel("% transitioning to unemployment")
-    ax.set_xticks(range(1, 11))
-    ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout()
-    fig.savefig(JR16 / "fig4_1_transition.png", dpi=150)
-    plt.close(fig)
+    fig, ax = plt.subplots(figsize=SINGLE)
+    y = 100 * d["share_transitioning"]
+    err = [100 * (d["share_transitioning"] - d["ci_low"]),
+           100 * (d["ci_high"] - d["share_transitioning"])]
+    ax.bar(d["decile"], y, yerr=err, capsize=3, color=BLUE,
+           error_kw={"ecolor": INK2, "lw": 1})
+    _bar_labels(ax, d["decile"], y, fmt="{:.1f}", pad_frac=0.04)
+    decile_ax(ax, "Share transitioning to unemployment (%)")
+    save(fig, JR16 / "fig4_1_transition.png")
 
 
 def fig4_2():
     d = pd.read_csv(JR16 / "fig4_2_wage_gain_by_decile.csv")
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    ax.bar(d["decile"], 100 * d["pct_change_employment_income"], color=NAVY)
-    for x, y in zip(d["decile"], d["pct_change_employment_income"]):
-        ax.text(x, 100 * y + 0.03, f"{100*y:.2f}%", ha="center", fontsize=8)
-    ax.set_xlabel("Decile of equivalised household disposable income")
-    ax.set_ylabel("% change in employment income\n(non-transitioning population)")
-    ax.set_xticks(range(1, 11))
+    fig, ax = plt.subplots(figsize=SINGLE)
+    y = 100 * d["pct_change_employment_income"]
+    ax.bar(d["decile"], y, color=BLUE)
+    _bar_labels(ax, d["decile"], y, fmt="{:.2f}")
+    decile_ax(ax, "Change in employment income (%)\nnon-transitioning population")
     ax.set_ylim(0, 3.2)
-    ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout()
-    fig.savefig(JR16 / "fig4_2_wages.png", dpi=150)
-    plt.close(fig)
+    save(fig, JR16 / "fig4_2_wages.png")
 
 
 def fig4_3():
     d = pd.read_csv(JR16 / "fig4_3_capital_by_decile.csv")
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    ax.bar(d["decile"], 100 * d["share_of_all_capital_income"], color="#e8a33d")
-    for x, y in zip(d["decile"], d["share_of_all_capital_income"]):
-        ax.text(x, 100 * y + 0.6, f"{100*y:.1f}%", ha="center", fontsize=8)
-    ax.set_xlabel("Decile of equivalised household disposable income")
-    ax.set_ylabel("Share of all interest + dividend income (%)")
-    ax.set_xticks(range(1, 11))
-    ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout()
-    fig.savefig(JR16 / "fig4_3_capital.png", dpi=150)
-    plt.close(fig)
+    fig, ax = plt.subplots(figsize=SINGLE)
+    y = 100 * d["share_of_all_capital_income"]
+    ax.bar(d["decile"], y, color=YELLOW)
+    _bar_labels(ax, d["decile"], y)
+    decile_ax(ax, "Share of all interest and dividend income (%)")
+    save(fig, JR16 / "fig4_3_capital.png")
 
 
 def fig4_4():
     d = pd.read_csv(JR16 / "fig4_4_decomposition.csv")
-    fig, ax = plt.subplots(figsize=(9, 4.5))
-    wd = 0.2
     comps = [
-        ("disposable_income", "Disposable income", "#1f3557"),
-        ("market_income", "Market income", "#b03a3a"),
-        ("benefits", "Benefits", "#4a90c4"),
-        ("tax_and_contributions", "Tax & contributions", "#4a7d4a"),
+        ("disposable_income", "Disposable income", BLUE),
+        ("market_income", "Market income", RED),
+        ("benefits", "Benefits", AQUA),
+        ("tax_and_contributions", "Tax & contributions", YELLOW),
     ]
     if "residual" in d.columns:
-        comps.append(("residual", "Other (residual)", "#9a9a9a"))
-        wd = 0.16
+        comps.append(("residual", "Other (residual)", MUTED))
+    wd = 0.8 / len(comps)
+    fig, ax = plt.subplots(figsize=(9, 4.5))
     for k, (col, label, color) in enumerate(comps):
-        ax.bar(d["decile"] + (k - (len(comps) - 1) / 2) * wd, 100 * d[col], width=wd, label=label, color=color)
-    ax.axhline(0, color="black", lw=0.6)
-    ax.set_xlabel("Decile of equivalised household disposable income")
-    ax.set_ylabel("% of baseline disposable income")
-    ax.set_xticks(range(1, 11))
-    ax.legend(fontsize=8, ncol=len(comps))
-    ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout()
-    fig.savefig(JR16 / "fig4_4_decomposition.png", dpi=150)
-    plt.close(fig)
+        ax.bar(d["decile"] + (k - (len(comps) - 1) / 2) * wd, 100 * d[col],
+               width=wd * 0.92, label=label, color=color)
+    ax.axhline(0, color=INK, lw=0.8)
+    decile_ax(ax, "Change (% of baseline disposable income)")
+    ax.legend(ncol=2, loc="upper left")
+    save(fig, JR16 / "fig4_4_decomposition.png")
 
 
 def load_grid():
-    """run_grid now writes net_revenue_change_bn / _pct_of_receipts directly
+    """run_grid writes net_revenue_change_bn / _pct_of_receipts directly
     (see replicate_jr16.py); this remains only as the read point."""
     return pd.read_csv(JR16 / "grid.csv")
 
 
-def grid_heatmaps(g):
-    for col, title, fname in [
-        ("avg_disposable_income_change_pct", "Avg change in household disposable income (%)", "fig4_5_disposable_grid.png"),
-        ("net_revenue_change_pct_of_receipts", "Change in net Exchequer revenue (% of income tax + NI receipts)", "fig4_6_exchequer_grid.png"),
-        ("gini_change_pp", "Change in Gini index (pp)", "fig4_7_gini_grid.png"),
-    ]:
-        piv = g.pivot(index="wage_pct", columns="unemployment_pct", values=col).sort_index(ascending=False)
-        lim = np.abs(piv.values).max()
-        fig, ax = plt.subplots(figsize=(10, 5))
-        im = ax.imshow(piv.values, cmap="RdBu_r", vmin=-lim, vmax=lim, aspect="auto")
-        ax.set_xticks(range(11), piv.columns)
-        ax.set_yticks(range(6), piv.index)
-        ax.set_xlabel("Unemployment scenario (% increase)")
-        ax.set_ylabel("Wage scenario (% increase)")
-        ax.set_title(title + " — UK")
+def _heatmap(ax, piv, lim, annotate=True):
+    im = ax.imshow(piv.values, cmap=DIVERGING, vmin=-lim, vmax=lim, aspect="auto")
+    if annotate:
         for i in range(piv.shape[0]):
             for j in range(piv.shape[1]):
-                ax.text(j, i, f"{piv.values[i,j]:.1f}", ha="center", va="center", fontsize=7)
+                v = piv.values[i, j]
+                dark = abs(v) > 0.62 * lim
+                ax.text(j, i, f"{v:.1f}", ha="center", va="center",
+                        fontsize=7.5, color="white" if dark else INK)
+    ax.grid(visible=False)
+    return im
+
+
+def grid_heatmaps(g):
+    for col, title, fname in [
+        ("avg_disposable_income_change_pct",
+         "Average change in household disposable income (%)",
+         "fig4_5_disposable_grid.png"),
+        ("net_revenue_change_pct_of_receipts",
+         "Change in net Exchequer revenue (% of income tax + NI receipts)",
+         "fig4_6_exchequer_grid.png"),
+        ("gini_change_pp", "Change in Gini index (pp)", "fig4_7_gini_grid.png"),
+    ]:
+        piv = g.pivot(index="wage_pct", columns="unemployment_pct",
+                      values=col).sort_index(ascending=False)
+        lim = np.abs(piv.values).max()
+        fig, ax = plt.subplots(figsize=HEATMAP)
+        im = _heatmap(ax, piv, lim)
+        ax.set_xticks(range(len(piv.columns)), piv.columns)
+        ax.set_yticks(range(len(piv.index)), piv.index)
+        ax.set_xlabel("Displacement scenario (% of employees)")
+        ax.set_ylabel("Wage scenario (% increase)")
+        ax.set_title(title)
         fig.colorbar(im, ax=ax, shrink=0.8)
-        fig.tight_layout()
-        fig.savefig(JR16 / fname, dpi=150)
-        plt.close(fig)
+        save(fig, JR16 / fname)
 
 
 def decomposition_ci():
     d = pd.read_csv(APPENDIX / "decomposition_ci.csv")
-    fig, ax = plt.subplots(figsize=(8, 4.2))
-    err = [d["disposable_change_pct"] - d["ci_low"], d["ci_high"] - d["disposable_change_pct"]]
-    ax.bar(d["decile"], d["disposable_change_pct"], yerr=err, capsize=3, color=NAVY)
-    ax.axhline(0, color="black", lw=0.6)
-    ax.set_xlabel("Decile of equivalised household disposable income")
-    ax.set_ylabel("% change in disposable income")
-    ax.set_title("Disposable income change by decile, central scenario (mean of 20 draws, 95% CI)", fontsize=10)
-    ax.set_xticks(range(1, 11))
-    ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout()
-    fig.savefig(APPENDIX / "decomposition_ci.png", dpi=150)
-    plt.close(fig)
+    fig, ax = plt.subplots(figsize=SINGLE)
+    err = [d["disposable_change_pct"] - d["ci_low"],
+           d["ci_high"] - d["disposable_change_pct"]]
+    ax.bar(d["decile"], d["disposable_change_pct"], yerr=err, capsize=3,
+           color=BLUE, error_kw={"ecolor": INK2, "lw": 1})
+    ax.axhline(0, color=INK, lw=0.8)
+    decile_ax(ax, "Change in disposable income (%)")
+    ax.set_title("Central scenario, mean of 20 draws with 95% CI")
+    save(fig, APPENDIX / "decomposition_ci.png")
 
 
 def b9_b11():
     g = pd.read_csv(APPENDIX / "grid_deciles_capital.csv")
 
     gc = g[g["capital_shock"] == True]  # noqa: E712
-    fig, axes = plt.subplots(2, 5, figsize=(16, 6), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 5, figsize=FACETS, sharex=True, sharey=True)
     lim = max(abs(gc[f"decile{d}_change_pct"]).max() for d in range(1, 11))
     for d in range(1, 11):
         ax = axes[(d - 1) // 5][(d - 1) % 5]
-        piv = gc.pivot(index="wage_pct", columns="unemployment_pct", values=f"decile{d}_change_pct").sort_index(ascending=False)
-        im = ax.imshow(piv.values, cmap="RdBu_r", vmin=-lim, vmax=lim, aspect="auto")
-        ax.set_title(f"Decile {d}", fontsize=9)
-        ax.set_xticks(range(0, 11, 2), piv.columns[::2], fontsize=7)
-        ax.set_yticks(range(6), piv.index, fontsize=7)
-    fig.supxlabel("Unemployment scenario (% increase)")
-    fig.supylabel("Wage scenario (%)")
-    fig.suptitle("Change in disposable income by baseline decile across the scenario grid (%)", fontsize=11)
+        piv = gc.pivot(index="wage_pct", columns="unemployment_pct",
+                       values=f"decile{d}_change_pct").sort_index(ascending=False)
+        im = _heatmap(ax, piv, lim, annotate=False)
+        ax.set_title(f"Decile {d}", fontsize=10)
+        ax.set_xticks(range(0, 11, 2), piv.columns[::2])
+        ax.set_yticks(range(len(piv.index)), piv.index)
+        ax.tick_params(labelsize=8)
+    fig.supxlabel("Displacement scenario (% of employees)", fontsize=10)
+    fig.supylabel("Wage scenario (% increase)", fontsize=10)
+    fig.suptitle("Change in disposable income by baseline decile across the scenario grid (%)")
     fig.colorbar(im, ax=axes, shrink=0.7)
-    fig.savefig(APPENDIX / "b9_grid_by_decile.png", dpi=150, bbox_inches="tight")
+    fig.savefig(APPENDIX / "b9_grid_by_decile.png", dpi=DPI, bbox_inches="tight")
     plt.close(fig)
 
     gn = g[g["capital_shock"] == False]  # noqa: E712
-    piv = gn.pivot(index="wage_pct", columns="unemployment_pct", values="avg_disposable_income_change_pct").sort_index(ascending=False)
+    piv = gn.pivot(index="wage_pct", columns="unemployment_pct",
+                   values="avg_disposable_income_change_pct").sort_index(ascending=False)
     lim = np.abs(piv.values).max()
-    fig, ax = plt.subplots(figsize=(10, 5))
-    im = ax.imshow(piv.values, cmap="RdBu_r", vmin=-lim, vmax=lim, aspect="auto")
-    ax.set_xticks(range(11), piv.columns)
-    ax.set_yticks(range(6), piv.index)
-    ax.set_xlabel("Unemployment scenario (% increase)")
+    fig, ax = plt.subplots(figsize=HEATMAP)
+    im = _heatmap(ax, piv, lim)
+    ax.set_xticks(range(len(piv.columns)), piv.columns)
+    ax.set_yticks(range(len(piv.index)), piv.index)
+    ax.set_xlabel("Displacement scenario (% of employees)")
     ax.set_ylabel("Wage scenario (% increase)")
-    ax.set_title("Avg change in household disposable income (%), NO capital shock — UK")
-    for i in range(piv.shape[0]):
-        for j in range(piv.shape[1]):
-            ax.text(j, i, f"{piv.values[i,j]:.1f}", ha="center", va="center", fontsize=7)
+    ax.set_title("Average change in household disposable income (%), no capital shock")
     fig.colorbar(im, ax=ax, shrink=0.8)
-    fig.tight_layout()
-    fig.savefig(APPENDIX / "b11_grid_no_capital.png", dpi=150)
-    plt.close(fig)
+    save(fig, APPENDIX / "b11_grid_no_capital.png")
+
+
+FAMILY_STYLE = {
+    "exposure": ("Exposure-proportional", BLUE),
+    "junior": ("Junior-concentrated", AQUA),
+    "compression": ("Expertise compression", YELLOW),
+    "uniform": ("Uniform", GREEN),
+}
+
+
+def incidence_families():
+    """Two-panel comparison of the four incidence families (same aggregate
+    shock): decile transition shares (left) and the exchequer-cost /
+    poverty-change trade-off (right)."""
+    fams = {}
+    for name in FAMILY_STYLE:
+        with open(INCIDENCE / f"{name}.json") as f:
+            fams[name] = json.load(f)
+
+    fig, (axl, axr) = plt.subplots(1, 2, figsize=TWOPANEL,
+                                   gridspec_kw={"width_ratios": [1.35, 1]})
+
+    deciles = np.arange(1, 11)
+    for name, (label, color) in FAMILY_STYLE.items():
+        shares = [fams[name]["decile_transition_share_pct"][str(d)] for d in deciles]
+        axl.plot(deciles, shares, color=color, lw=2, marker="o", ms=5,
+                 markerfacecolor=color, markeredgecolor="white",
+                 markeredgewidth=1, label=label)
+    decile_ax(axl, "Share transitioning to unemployment (%)")
+    axl.set_ylim(bottom=0)
+    axl.legend(loc="upper left")
+    axl.set_title("Who is displaced, by income decile")
+
+    for name, (label, color) in FAMILY_STYLE.items():
+        x = fams[name]["exchequer_cost_bn"]
+        y = fams[name]["poverty_change_bhc_pp"]
+        axr.scatter(x, y, s=90, color=color, edgecolor="white", lw=1, zorder=3)
+        dx, dy = (0.4, 0.012) if name != "junior" else (0.4, -0.03)
+        axr.annotate(label, (x, y), xytext=(x + dx, y + dy), fontsize=9,
+                     color=INK2)
+    axr.set_xlabel("Exchequer cost (£ billion per year)")
+    axr.set_ylabel("Change in BHC poverty rate (pp)")
+    axr.set_xlim(12, 30)
+    axr.grid(axis="x", visible=True)
+    axr.set_title("What it costs vs poverty impact")
+
+    save(fig, INCIDENCE / "incidence_families.png")
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.parse_args()
+    apply_style()
 
     fig4_1()
     fig4_2()
@@ -197,7 +257,8 @@ def main():
     grid_heatmaps(load_grid())
     decomposition_ci()
     b9_b11()
-    print("figures written to results/jr16 and results/appendix")
+    incidence_families()
+    print("figures written to results/jr16, results/appendix and results/incidence")
 
 
 if __name__ == "__main__":

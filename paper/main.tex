@@ -7,7 +7,7 @@
 \usepackage{natbib}
 \bibliographystyle{apalike}
 
-\title{When the Shock Hits the Top:\\ \Large Artificial Intelligence, the Exchequer, and the Limits of UK Redistribution\thanks{This study applies the scenario architecture of Doorley, O'Connor, O'Shea and Tuda (2026), \emph{Artificial intelligence and income inequality in Ireland}, ESRI/Department of Finance Jointly-published Report No.~16, to the United Kingdom, implemented in the open-source PolicyEngine UK microsimulation model. Code and aggregate results: \url{https://github.com/PolicyEngine/uk-ai-study}. Family Resources Survey microdata are accessed under the UK Data Service End User Licence and are not redistributed. Draft --- not for citation.}}
+\title{Who Bears the AI Shock?\\ \Large Incidence Scenarios for Employment Displacement, Poverty and the Public Finances in the United Kingdom\thanks{The analysis uses the open-source PolicyEngine UK microsimulation model. Family Resources Survey microdata are accessed under the UK Data Service End User Licence and are not redistributed. All code and aggregate results are available at \url{https://github.com/PolicyEngine/uk-ai-study}. Draft --- not for citation.}}
 \author{Vahid Ahmadi}
 \date{July 2026 --- preliminary draft}
 
@@ -15,25 +15,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent We examine how the adoption of artificial intelligence could
-affect employment, household incomes, income inequality and the public
-finances in the United Kingdom, replicating the scenario framework that
-Doorley et al.\ (2026) developed for Ireland. Occupation-level AI exposure
-(the complementarity-adjusted AIOE) is attached to Family Resources Survey
-adults through their SOC2020 occupation; employment, wage and capital-return
-shocks are distributed across occupations by relative exposure; and the
-resulting counterfactual income distributions are evaluated with the
-PolicyEngine UK tax-benefit microsimulation model. In the central scenario
---- 7 per cent job displacement, a 2.6 per cent wage gain for those who
-remain, and a 0.4 percentage-point rise in the return to capital --- the
-annual Exchequer cost is \pounds 18.6 billion ($\pm$\pounds 1.7 billion
-across displacement draws), the before-housing-costs poverty rate rises by
-around 2 percentage points, and the Gini index of equivalised household
-disposable income rises by 1.2--1.3 percentage points.
-Displacement risk is concentrated in higher-income households, yet
-inequality rises in every one of 66 scenarios considered. We extend the
-framework along the age dimension, implementing recent seniority-biased
-evidence as explicit scenarios.
+\noindent How much an AI labour shock costs the United Kingdom depends on who bears it. We build the first open-source, full tax-benefit microsimulation of AI displacement incidence for the UK: occupation-level AI exposure is attached to Family Resources Survey workers, employment and wage shocks are simulated across a grid of 66 scenarios, and counterfactual household incomes are evaluated with PolicyEngine UK. We treat the incidence of displacement --- who loses work, not just how many --- as an explicit scenario axis with four families: exposure-proportional, junior-concentrated, expertise-compression and uniform. In the central exposure-proportional scenario (7 per cent displacement, 2.6 per cent wage gain for remaining workers), the annual Exchequer cost is \pounds 18.4 billion (Monte Carlo mean \pounds 18.0 $\pm$ 1.5 billion across draws), before-housing-costs poverty rises by 1.87 percentage points and the Gini of equivalised disposable income by 1.10 points. Holding the aggregate shock fixed, the fiscal cost varies from \pounds 14.2 billion (uniform) to \pounds 24.5 billion (expertise compression) across incidence families. Inequality rises in all 66 cells and all four families: who bears the shock decides whether the UK gets a fiscal problem or a poverty problem, but inequality rises either way.
 \end{abstract}
 
 \input{sections/summary}

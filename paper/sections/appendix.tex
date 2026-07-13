@@ -2,18 +2,33 @@
 \section{Additional tables and figures}
 \label{sec:appendix}
 
+\subsection{Seed and draw conventions}
+\label{app:seeds}
+
+Displacement is a random draw of which exposed workers lose employment,
+subject to occupation-group quotas proportional to employment times mean
+exposure. Throughout the paper, three conventions apply. The scenario grid
+(Figures~\ref{fig:griddisp}--\ref{fig:gridgini}, and their appendix
+variants below), the decomposition in Figure~\ref{fig:decomp}, the preset
+scenarios and the four incidence families are single draws at seed~0. The
+decile transition and wage-gain profiles (Figures~\ref{fig:transition}
+and~\ref{fig:wages}) are means over 50 independent draws. The robustness
+summary and the confidence intervals in Figure~\ref{fig:decomp-ci} are
+20-draw Monte Carlo runs, with $\pm$ values reported as standard deviations
+across draws. Within each draw, ordering keys are uniform within occupation
+group, so a record's inclusion probability does not depend on its grossing
+weight.
+
 \subsection{Job loss by occupation group}
 
 Table~\ref{tab:jobloss} reports the central-scenario displacement rate for
-each SOC2020 major group, the UK analogue of the occupation-level job-loss
-table in \citet{doorley2026}. The allocation rule concentrates losses in
-administrative and secretarial work (10.4 per cent of the group's
+each SOC2020 major group. The allocation rule concentrates losses in
+administrative and secretarial work (10.5 per cent of the group's
 employment), managerial and professional occupations (around 9.5 per cent)
 and associate professional roles, while elementary occupations---the
 least-exposed group, whose normalised exposure score is zero---experience
-no displacement at all. The pattern matches the Irish result in shape:
-clerical and professional work bears the shock; manual and elementary work
-is insulated.
+no displacement at all. Clerical and professional work bears the shock;
+manual and elementary work is insulated.
 
 \begin{table}[htbp]
 \centering
@@ -26,11 +41,11 @@ Major group & C-AIOE & Employment (m) & Job loss (\%) \\
 1 Managers, directors and senior officials & 0.62 & 2.45 & 9.6 \\
 2 Professional occupations & 0.60 & 6.46 & 9.5 \\
 3 Associate professional occupations & 0.47 & 3.13 & 8.5 \\
-4 Administrative and secretarial occupations & 0.74 & 2.35 & 10.4 \\
-5 Skilled trades occupations & $-0.33$ & 1.56 & 2.9 \\
-6 Caring, leisure and other service occupations & $-0.14$ & 2.32 & 4.2 \\
+4 Administrative and secretarial occupations & 0.74 & 2.35 & 10.5 \\
+5 Skilled trades occupations & $-0.33$ & 1.56 & 2.8 \\
+6 Caring, leisure and other service occupations & $-0.14$ & 2.32 & 3.9 \\
 7 Sales and customer service occupations & 0.27 & 1.22 & 7.2 \\
-8 Process, plant and machine operatives & $-0.54$ & 1.41 & 1.4 \\
+8 Process, plant and machine operatives & $-0.54$ & 1.41 & 1.3 \\
 9 Elementary occupations & $-0.73$ & 2.05 & 0.0 \\
 \bottomrule
 \end{tabular}
@@ -38,51 +53,55 @@ Major group & C-AIOE & Employment (m) & Job loss (\%) \\
 \vspace{2pt}
 {\footnotesize C-AIOE is the standardised complementarity-adjusted exposure
 score before the min-zero normalisation used in the allocation rule.
-Employment and job-loss rates are survey-weighted; seed 0.}
+Employment and job-loss rates are survey-weighted; single draw, seed 0.}
 \end{table}
 
 \subsection{Where the shock lands: baseline distributions}
 
-Figures~\ref{fig:b-market}--\ref{fig:b-disposable} show the baseline decile
-distributions of the income components through which the three channels
-operate. Market income and tax liabilities are heavily concentrated in the
-top deciles---which is why displacement of high earners is fiscally
-expensive---while benefits are spread across the lower and middle deciles,
-and capital income is the most concentrated series of all, with the top
-decile holding more than a third of the total.
+Figures~\ref{fig:b-market}--\ref{fig:b-disposable} show the baseline
+household-level decile distributions of the income components through which
+the three channels operate (aggregate \pounds billion per year by decile of
+equivalised household disposable income). Market income excluding capital
+(\pounds 1{,}313 billion in total) and income tax and National Insurance
+(\pounds 312 billion) are heavily concentrated in the top deciles---which
+is why displacement of high earners is fiscally expensive. Benefits
+(\pounds 320 billion) are spread across the lower and middle deciles,
+peaking in deciles~3 to~5. Capital income (\pounds 23 billion of interest
+and dividends) is the most concentrated series of all: the top decile
+holds more than a third of the total.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.75\textwidth]{../results/appendix/b1_market_income_less_capital.png}
-\caption{Baseline aggregate market income (less capital income) by decile.}
+\caption{Baseline aggregate household market income (less capital income) by decile.}
 \label{fig:b-market}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.75\textwidth]{../results/appendix/b2_capital_income.png}
-\caption{Baseline aggregate capital income (interest and dividends) by decile.}
+\caption{Baseline aggregate household capital income (interest and dividends) by decile.}
 \label{fig:b-capital}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.75\textwidth]{../results/appendix/b3_benefits.png}
-\caption{Baseline aggregate benefits by decile.}
+\caption{Baseline aggregate household benefits by decile.}
 \label{fig:b-benefits}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.75\textwidth]{../results/appendix/b4_tax_and_ni.png}
-\caption{Baseline aggregate income tax and National Insurance by decile.}
+\caption{Baseline aggregate household income tax and National Insurance by decile.}
 \label{fig:b-tax}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.75\textwidth]{../results/appendix/b5_disposable_income.png}
-\caption{Baseline aggregate disposable income by decile.}
+\caption{Baseline aggregate household disposable income (HBAI concept) by decile.}
 \label{fig:b-disposable}
 \end{figure}
 
@@ -114,10 +133,11 @@ Section~\ref{sec:results}.
 
 Figure~\ref{fig:decomp-ci} reports the central-scenario disposable-income
 change by decile as the mean over twenty independent displacement draws
-with 95 per cent confidence intervals. The monotone gradient---from
-$-0.4$ per cent in the bottom decile to $-4.4$ per cent in the
-top---survives the draw noise comfortably; no adjacent-decile reversal is
-statistically meaningful.
+with 95 per cent confidence intervals. The gradient runs from $-0.5$ per
+cent in the bottom decile to $-4.1$ per cent in the top. It is not quite
+monotone: deciles~2 and~3 show a small reversal ($-0.88$ against $-0.82$
+per cent), well inside the draw noise. The overall upward slope of the loss
+profile survives the uncertainty comfortably.
 
 \begin{figure}[htbp]
 \centering
@@ -133,8 +153,9 @@ aggregate shocks allocated uniformly across occupations, decile by decile;
 Figure~\ref{fig:b8} repeats the central scenario with the
 \citet{eloundou2023} GPT-exposure index in place of the C-AIOE. The
 exposure-based allocation shifts losses up the distribution relative to a
-uniform shock, and the choice of exposure index leaves the decile profile
-essentially unchanged.
+uniform shock (top-decile losses of 3.9 against 3.0 per cent; bottom-decile
+losses of 0.5 against 0.9 per cent), and the choice of exposure index
+leaves the decile profile essentially unchanged.
 
 \begin{figure}[htbp]
 \centering
@@ -152,26 +173,31 @@ essentially unchanged.
 
 \subsection{The scenario grid by decile, and without the capital shock}
 
-Figure~\ref{fig:b9} facets the full scenario grid by baseline income
-decile. Every decile's panel shifts from red to blue as displacement
-rises, but the top deciles darken much faster: in the harshest cell (10
-per cent displacement, no wage gain) the bottom decile loses 1.5 per cent
-of disposable income while the top decile loses 8.2 per cent.
-Figure~\ref{fig:b11} removes the capital-return shock: the grid shifts
-uniformly toward losses (the range moves from $+2.9$/$-5.5$ per cent to
-$+2.4$/$-6.1$), confirming that the capital channel raises average incomes
-while concentrating its gains at the top.
+Figure~\ref{fig:b9} facets the full 66-cell scenario grid by baseline
+income decile; cells report the change in mean household disposable income
+(HBAI concept), which across the grid as a whole ranges from $+3.0$ to
+$-5.2$ per cent. Every decile's panel shifts towards losses as displacement
+rises, but the top deciles darken much faster: in the harshest cell (10 per
+cent displacement, no wage gain) the bottom decile loses 1.9 per cent of
+disposable income while the top decile loses 8.2 per cent.
+Figure~\ref{fig:b11} removes the capital-return shock. Average disposable
+incomes fall relative to the capital-on grid, confirming that the capital
+channel raises average incomes while concentrating its gains at the top;
+the Gini result, however, is unchanged in kind: without the capital shock
+the Gini of equivalised disposable income still rises in all 66 cells, by
+0.00 to 1.50 percentage points. The inequality result does not depend on
+the capital channel.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{../results/appendix/b9_grid_by_decile.png}
-\caption{Change in disposable income across the scenario grid, faceted by baseline income decile.}
+\caption{Change in household disposable income across the scenario grid, faceted by baseline income decile. Single draw, seed 0.}
 \label{fig:b9}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.85\textwidth]{../results/appendix/b11_grid_no_capital.png}
-\caption{Average change in household disposable income across the scenario grid with the capital-return shock switched off.}
+\caption{Average change in household disposable income across the scenario grid with the capital-return shock switched off. Single draw, seed 0.}
 \label{fig:b11}
 \end{figure}
