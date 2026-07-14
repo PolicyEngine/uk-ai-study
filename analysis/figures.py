@@ -69,10 +69,15 @@ def fig4_2():
     d = pd.read_csv(JR16 / "fig4_2_wage_gain_by_decile.csv")
     fig, ax = plt.subplots(figsize=SINGLE)
     y = 100 * d["pct_change_employment_income"]
-    ax.bar(d["decile"], y, color=BLUE)
-    _bar_labels(ax, d["decile"], y, fmt="{:.2f}")
+    # gradient spans only ~2.50-2.72%: bars from zero hide it, so plot
+    # points on a tight axis instead of a truncated bar chart
+    ax.plot(d["decile"], y, "o-", color=BLUE, markersize=6, lw=1.2)
+    for x_, y_ in zip(d["decile"], y):
+        ax.annotate(f"{y_:.2f}", (x_, y_), textcoords="offset points",
+                    xytext=(0, 7), ha="center", fontsize=7)
     decile_ax(ax, "Change in employment income (%)\nnon-transitioning population")
-    ax.set_ylim(0, 3.2)
+    pad = (y.max() - y.min()) * 0.25
+    ax.set_ylim(y.min() - pad, y.max() + pad * 1.6)
     save(fig, JR16 / "fig4_2_wages.png")
 
 
