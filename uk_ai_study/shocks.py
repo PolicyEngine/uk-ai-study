@@ -3,8 +3,10 @@
 Employment shock (eq 3.4): the aggregate number of displaced workers is
 ``displacement_rate x employed``; it is allocated across SOC major groups in
 proportion to ``employment x mean C-AIOE`` of the group, then realised by
-weighted random draws within each group (probability proportional to
-individual exposure).
+random draws with UNIFORM ordering keys within each group (the survey weight
+enters only through quota consumption, so a represented person's inclusion
+probability does not depend on their record's grossing weight — #1,
+finding 6).
 
 Wage shock (eq 3.5): surviving workers receive percentage uplifts
 proportional to complementarity (theta), normalised by the
@@ -207,10 +209,14 @@ def build_shocked_simulation(dataset, baseline_sim, shocked_table, period):
         sim.set_input(var, period, values)
     status = baseline_sim.calculate("employment_status", period=period, map_to="person").values.astype(object)
     status[displaced] = "UNEMPLOYED"
-    try:
-        sim.set_input("employment_status", period, status)
-    except Exception as exc:
-        import warnings
-
-        warnings.warn(f"employment_status set_input rejected ({exc}).")
+    # A rejected set_input here would silently leave displaced workers
+    # EMPLOYED (with zero hours), changing benefit entitlements in every
+    # result — fail hard rather than warn.
+    sim.set_input("employment_status", period, status)
+    applied = sim.calculate("employment_status", period=period, map_to="person").values
+    if not (applied[displaced].astype(str) == "UNEMPLOYED").all():
+        raise RuntimeError(
+            "employment_status transition not applied: displaced persons are "
+            "not all UNEMPLOYED in the shocked simulation."
+        )
     return sim

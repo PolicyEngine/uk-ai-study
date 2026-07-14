@@ -52,23 +52,23 @@ def _weighted_tertile_threshold(values, weights, q):
     return values[order][np.searchsorted(cw, q * cw[-1])]
 
 
-def shocked_table_for(family: str, persons: pd.DataFrame) -> pd.DataFrame:
+def shocked_table_for(family: str, persons: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
     scenario = PRESETS["central"]
     if family == "exposure":
-        return apply_shocks(persons, scenario, seed=SEED)
+        return apply_shocks(persons, scenario, seed=seed)
     if family == "junior":
-        return apply_shocks(persons, PRESETS["central_youth_tilted"], seed=SEED)
+        return apply_shocks(persons, PRESETS["central_youth_tilted"], seed=seed)
     if family == "uniform":
         uniform = persons.copy()
         uniform["exposure"] = 1.0
         uniform["complementarity"] = 1.0
-        return apply_shocks(uniform, scenario, seed=SEED)
+        return apply_shocks(uniform, scenario, seed=seed)
     if family == "compression":
-        return compression_table(persons, scenario)
+        return compression_table(persons, scenario, seed=seed)
     raise ValueError(family)
 
 
-def compression_table(persons: pd.DataFrame, scenario) -> pd.DataFrame:
+def compression_table(persons: pd.DataFrame, scenario, seed: int = SEED) -> pd.DataFrame:
     """Stylised Autor-school variant: top-rent erosion + mid-skill gains."""
     shocked = persons.copy()
     w = persons["weight"].to_numpy()
@@ -84,7 +84,7 @@ def compression_table(persons: pd.DataFrame, scenario) -> pd.DataFrame:
     # group, exactly as the youth multiplier tilts toward the young: encode
     # the tilt in a synthetic "age" channel is NOT possible, so draw here
     # with the same quota-fill logic at the all-employee level.
-    rng = np.random.default_rng(SEED)
+    rng = np.random.default_rng(seed)
     quota = scenario.displacement_rate * float(w[employed].sum())
     members = np.flatnonzero(employed)
     p = np.where(elite[members], COMPRESSION_TOP_TERTILE_MULTIPLIER, 1.0)

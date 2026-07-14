@@ -93,6 +93,58 @@ def test_unmatched_employees_in_displacement_universe():
     assert unmatched_hit > 0
 
 
+def test_survivor_composition_wage_drift():
+    """REVISION_PLAN item 2 (code audit #6): with displacement > 0, eq 3.5's
+    theta_bar is the employment-weighted mean over ALL baseline workers, but
+    the uplift is only paid to survivors. When theta correlates with wages
+    and displacement is tilted toward low-theta (high-exposure) groups, the
+    survivors' earnings-weighted mean theta exceeds theta_bar, so the
+    realised aggregate uplift to the survivor wage bill drifts ABOVE the
+    assumed rate. Quantify the drift and bound it."""
+    n = 3000
+    rng = np.random.default_rng(7)
+    group = rng.integers(1, 10, n) * 1000.0
+    g = group / 1000.0
+    # theta rises with group; exposure falls with group (substitution vs
+    # complementarity); wages rise with group -> theta correlates with wages
+    theta_by_group = {gg: t for gg, t in zip(range(1, 10), np.linspace(0.3, 0.9, 9))}
+    exposure_by_group = {gg: x for gg, x in zip(range(1, 10), np.linspace(0.9, 0.1, 9))}
+    persons = pd.DataFrame(
+        {
+            "age": rng.integers(18, 64, n),
+            "employment_income": rng.lognormal(9.5 + 0.15 * g, 0.3),
+            "savings_interest_income": np.zeros(n),
+            "dividend_income": np.zeros(n),
+            "weight": rng.uniform(100, 2000, n),
+            "soc_major_group": group,
+            "exposure": np.vectorize(exposure_by_group.get)(g),
+            "complementarity": np.vectorize(theta_by_group.get)(g),
+        }
+    )
+    scenario = ShockScenario("t", displacement_rate=0.07, wage_uplift=0.026)
+    drifts = []
+    for seed in range(10):
+        shocked = apply_shocks(persons, scenario, seed=seed)
+        base = persons["employment_income"].to_numpy()
+        new = shocked["employment_income"].to_numpy()
+        w = persons["weight"].to_numpy()
+        survivors = (base > 0) & ~shocked["displaced"].to_numpy()
+        realised = float(
+            ((new - base) * w)[survivors].sum() / (base * w)[survivors].sum()
+        )
+        drifts.append(realised / scenario.wage_uplift - 1.0)
+        # the aggregate survivor uplift rate exceeds the assumed 2.6%...
+        assert realised > scenario.wage_uplift
+        # ...but by less than 50% relative
+        assert realised < 1.5 * scenario.wage_uplift
+    print(
+        f"\nsurvivor-composition wage drift over 10 seeds: "
+        f"mean {100 * np.mean(drifts):+.2f}% relative "
+        f"(min {100 * min(drifts):+.2f}%, max {100 * max(drifts):+.2f}%) "
+        f"vs assumed uplift {scenario.wage_uplift:.3f}"
+    )
+
+
 def test_displaced_earn_zero():
     persons = make_persons()
     scenario = ShockScenario("t", displacement_rate=0.10, wage_uplift=0.026)

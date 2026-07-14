@@ -101,9 +101,9 @@ def draw_measured(persons: pd.DataFrame, scenario, london_mult: float, seed=SEED
     return displaced
 
 
-def measured_table(persons: pd.DataFrame, scenario, london_mult: float) -> pd.DataFrame:
+def measured_table(persons: pd.DataFrame, scenario, london_mult: float, seed: int = SEED) -> pd.DataFrame:
     shocked = persons.copy()
-    displaced = draw_measured(persons, scenario, london_mult)
+    displaced = draw_measured(persons, scenario, london_mult, seed=seed)
     shocked["displaced"] = displaced
     earnings = persons["employment_income"].to_numpy(dtype=float)
     w = persons["weight"].to_numpy()
