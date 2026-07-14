@@ -1,0 +1,76 @@
+{
+  "n_draws": 20,
+  "duration_6m": {
+    "description": "Central scenario; displaced workers keep 50% of baseline annual earnings (6-month out-of-work duration), in-model; hours/status transition unchanged (documented hybrid).",
+    "results": {
+      "exchequer_cost_bn": {
+        "mean": 4.201914368,
+        "sd": 0.8511246007759848,
+        "min": 2.959179776,
+        "max": 5.999263744
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 0.0880660119545577,
+        "sd": 0.0766210885773803,
+        "min": -0.0344198561499725,
+        "max": 0.3076994197052846
+      },
+      "gini_change_pp": {
+        "mean": 0.11941074548748484,
+        "sd": 0.04583881050763232,
+        "min": 0.0131989384615893,
+        "max": 0.1857155279900713
+      },
+      "uc_change_bn": {
+        "mean": 0.1844592840265953,
+        "sd": 0.13241919594933735,
+        "min": -0.0915299738548398,
+        "max": 0.3710713062718511
+      }
+    },
+    "convex_combination_comparator_0.5x_full_year": {
+      "exchequer_cost_bn": {
+        "mean": 9.097433907200001,
+        "sd": 0.7713382984433398
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 0.8762351175854228,
+        "sd": 0.05490867943982282
+      },
+      "gini_change_pp": {
+        "mean": 0.5133181698109459,
+        "sd": 0.04672627415087839
+      }
+    }
+  },
+  "takeup_70": {
+    "description": "Central scenario under Bernoulli(0.70) UC take-up (would_claim_uc set identically in baseline and shocked simulations, redrawn per seed).",
+    "dataset_baseline_would_claim_uc_person_weighted_mean": 0.5477457313882192,
+    "results": {
+      "exchequer_cost_bn": {
+        "mean": 19.0105452544,
+        "sd": 1.483300344868583,
+        "min": 16.671244288,
+        "max": 22.279487488
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 1.694262573709873,
+        "sd": 0.10951067879074732,
+        "min": 1.5146620725119575,
+        "max": 1.8794262017475472
+      },
+      "gini_change_pp": {
+        "mean": 0.9479862498790311,
+        "sd": 0.08978244159681552,
+        "min": 0.7455492369773831,
+        "max": 1.0793892552588449
+      },
+      "uc_change_bn": {
+        "mean": 3.8352208215990444,
+        "sd": 0.29320098084538704,
+        "min": 3.2225977283733513,
+        "max": 4.5154288062305525
+      }
+    }
+  }
+}

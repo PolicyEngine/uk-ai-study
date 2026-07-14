@@ -1,0 +1,28 @@
+{
+  "description": "R1 (duration-consistent wage insurance) vs R2 (UC +20% standard allowance) under the 6-month duration variant of the central shock; poverty deltas vs the duration-shocked no-reform world; seeds 0-4.",
+  "n_draws": 5,
+  "r1_cost_bn": {
+    "mean": 10.682933356781373,
+    "sd": 0.11148781771183966
+  },
+  "r1_pov_bhc_pp": {
+    "mean": -0.3280717449984555,
+    "sd": 0.053228091501843065
+  },
+  "r2_cost_bn": {
+    "mean": 5.305735577599999,
+    "sd": 0.025855991094240263
+  },
+  "r2_pov_bhc_pp": {
+    "mean": -0.4822075015136374,
+    "sd": 0.02782314557832183
+  },
+  "r1_cost_per_pp_bn": {
+    "mean": 33.274928840475916,
+    "sd": 5.540198707668673
+  },
+  "r2_cost_per_pp_bn": {
+    "mean": 11.0316947332403,
+    "sd": 0.6240558016241884
+  }
+}

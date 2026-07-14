@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1784036506 "main.tex" "main.pdf" "main" 1784036509 0
+["pdflatex"] 1784038442 "main.tex" "main.pdf" "main" 1784038446 0
   "../results/appendix/b11_grid_no_capital.png" 1783944225 107450 029931b2aefc16dbc05b5475878e4abd ""
   "../results/appendix/b1_market_income_less_capital.png" 1783944226 60078 b9d2df21ef65ab7386621fc2330ca841 ""
   "../results/appendix/b2_capital_income.png" 1783944226 51319 9558a60fa3dd6121a2fbf6d7b5f6df00 ""
@@ -139,17 +139,17 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1705056926 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1705056805 7883455 1909f2c3c6cd855b29ade2d8c45ed799 ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "main.aux" 1784036509 27674 1d63f2d1d9ab96a42ef805d5fc387c15 "pdflatex"
-  "main.out" 1784036509 8048 e7c00b1fc0f2d75f4d780c8592ad580b "pdflatex"
-  "main.tex" 1784036467 2643 46eec8b4321ff723dc708ea19f41dd10 ""
+  "main.aux" 1784038446 27674 dd0d1ff3201c34f5698a5880ff9512ed "pdflatex"
+  "main.out" 1784038446 8048 e7c00b1fc0f2d75f4d780c8592ad580b "pdflatex"
+  "main.tex" 1784038367 2660 3c08cc2f81b15a814049f92933d1b64d ""
   "sections/appendix.tex" 1784023247 13209 ce7b169699541144118bced2321b812c ""
-  "sections/discussion.tex" 1784036486 16317 1d1e57a7940907ad11af514bc1d91b5c ""
+  "sections/discussion.tex" 1784038426 16626 0cc517a60f071ba4db9ef5b416212adf ""
   "sections/intro.tex" 1784036473 7141 8e6c3560dfe444d50e51a0591874ce92 ""
   "sections/literature.tex" 1784023357 9589 b1b5c36756c0b894fa7df0b09bc70c4c ""
-  "sections/methodology.tex" 1784034177 19229 fecc5bcd99ed1198b25605baaed7d66a ""
-  "sections/policy.tex" 1784036449 10555 1120c593b7d00a6af30fcf10bf336185 ""
+  "sections/methodology.tex" 1784038344 20151 9391d9eea06897a4f54f3d6bf6cfe1cd ""
+  "sections/policy.tex" 1784038403 11013 6561c55a892707a9551219ccb24e5826 ""
   "sections/references.tex" 1783949780 8284 af555e5901b22d4bbb3a6e186a8410bf ""
-  "sections/results.tex" 1784036437 32193 530a85870d89584bf99e86d62557c34a ""
+  "sections/results.tex" 1784038394 34272 5012d8c3507c664d0117ec794bbf1dca ""
   (generated)
   "main.aux"
   "main.log"

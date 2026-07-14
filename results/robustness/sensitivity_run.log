@@ -1,0 +1,309 @@
+enhanced_2026 {'poverty_change_bhc_pp': 2.5784595715583003, 'baseline_poverty_bhc_pct': 15.245819465589117, 'exchequer_cost_bn': -118.836494336, 'displaced_weighted_m': 2.244415521621704}
+enhanced_2025 {'poverty_change_bhc_pp': 2.865345925149365, 'baseline_poverty_bhc_pct': 15.41687957545962, 'exchequer_cost_bn': -114.890702848, 'displaced_weighted_m': 2.2359187602996826}
+plain_2025 {'poverty_change_bhc_pp': 1.9087807665495586, 'exchequer_cost_bn': 17.577639936, 'displaced_weighted_m': 1.601506375}
+{
+ "description": "Central scenario, seed 0; enhanced FRS 2023-24 with geo_impact.py's SOC imputation (route B). Decomposes the geography-section (+enhanced, 2025) vs main (+plain, 2026) BHC poverty-change gap.",
+ "enhanced_dataset_path": "/Users/janansadeqian/policyengine-uk-data/policyengine_uk_data/storage/enhanced_frs_2023_24.h5",
+ "cells": {
+  "enhanced_2026": {
+   "poverty_change_bhc_pp": 2.5784595715583003,
+   "baseline_poverty_bhc_pct": 15.245819465589117,
+   "exchequer_cost_bn": -118.836494336,
+   "displaced_weighted_m": 2.244415521621704
+  },
+  "enhanced_2025": {
+   "poverty_change_bhc_pp": 2.865345925149365,
+   "baseline_poverty_bhc_pct": 15.41687957545962,
+   "exchequer_cost_bn": -114.890702848,
+   "displaced_weighted_m": 2.2359187602996826
+  },
+  "plain_2025": {
+   "poverty_change_bhc_pp": 1.9087807665495586,
+   "exchequer_cost_bn": 17.577639936,
+   "displaced_weighted_m": 1.601506375
+  },
+  "plain_2026": {
+   "poverty_change_bhc_pp": 1.8701170103055387,
+   "exchequer_cost_bn": 18.422136832,
+   "displaced_weighted_m": 1.60759225,
+   "source": "results/central.json (main analysis, seed 0)"
+  }
+ },
+ "decomposition_bhc_poverty_pp": {
+  "total_gap_enhanced2025_minus_plain2026": 0.9952289148438265,
+  "dataset_component_at_2026": 0.7083425612527616,
+  "period_component_on_enhanced": 0.28688635359106485,
+  "period_component_on_plain": 0.038663756244019964,
+  "interaction": 0.24822259734704488,
+  "note": "single seed-0 run per cell; imputation noise not separately varied (imputation seed fixed at 0)."
+ }
+}
+wage-tier 3_0.8 seed 0 done
+wage-tier 6_0.7 seed 0 done
+wage-tier 9.6_0.6 seed 0 done
+wage-tier 3_0.8 seed 1 done
+wage-tier 6_0.7 seed 1 done
+wage-tier 9.6_0.6 seed 1 done
+wage-tier 3_0.8 seed 2 done
+wage-tier 6_0.7 seed 2 done
+wage-tier 9.6_0.6 seed 2 done
+wage-tier 3_0.8 seed 3 done
+wage-tier 6_0.7 seed 3 done
+wage-tier 9.6_0.6 seed 3 done
+wage-tier 3_0.8 seed 4 done
+wage-tier 6_0.7 seed 4 done
+wage-tier 9.6_0.6 seed 4 done
+wage-tier 3_0.8 seed 5 done
+wage-tier 6_0.7 seed 5 done
+wage-tier 9.6_0.6 seed 5 done
+wage-tier 3_0.8 seed 6 done
+wage-tier 6_0.7 seed 6 done
+wage-tier 9.6_0.6 seed 6 done
+wage-tier 3_0.8 seed 7 done
+wage-tier 6_0.7 seed 7 done
+wage-tier 9.6_0.6 seed 7 done
+wage-tier 3_0.8 seed 8 done
+wage-tier 6_0.7 seed 8 done
+wage-tier 9.6_0.6 seed 8 done
+wage-tier 3_0.8 seed 9 done
+wage-tier 6_0.7 seed 9 done
+wage-tier 9.6_0.6 seed 9 done
+wage-tier 3_0.8 seed 10 done
+wage-tier 6_0.7 seed 10 done
+wage-tier 9.6_0.6 seed 10 done
+wage-tier 3_0.8 seed 11 done
+wage-tier 6_0.7 seed 11 done
+wage-tier 9.6_0.6 seed 11 done
+wage-tier 3_0.8 seed 12 done
+wage-tier 6_0.7 seed 12 done
+wage-tier 9.6_0.6 seed 12 done
+wage-tier 3_0.8 seed 13 done
+wage-tier 6_0.7 seed 13 done
+wage-tier 9.6_0.6 seed 13 done
+wage-tier 3_0.8 seed 14 done
+wage-tier 6_0.7 seed 14 done
+wage-tier 9.6_0.6 seed 14 done
+wage-tier 3_0.8 seed 15 done
+wage-tier 6_0.7 seed 15 done
+wage-tier 9.6_0.6 seed 15 done
+wage-tier 3_0.8 seed 16 done
+wage-tier 6_0.7 seed 16 done
+wage-tier 9.6_0.6 seed 16 done
+wage-tier 3_0.8 seed 17 done
+wage-tier 6_0.7 seed 17 done
+wage-tier 9.6_0.6 seed 17 done
+wage-tier 3_0.8 seed 18 done
+wage-tier 6_0.7 seed 18 done
+wage-tier 9.6_0.6 seed 18 done
+wage-tier 3_0.8 seed 19 done
+wage-tier 6_0.7 seed 19 done
+wage-tier 9.6_0.6 seed 19 done
+{
+ "description": "Measured family (Klein Teeselink) with alternative high/low wage-tier displacement multipliers; junior 5.8/4.5 and London 1.5 tilts and central aggregate shock held fixed; 20 draws (seeds 0-19).",
+ "n_draws": 20,
+ "3_0.8": {
+  "exchequer_cost_bn": {
+   "mean": 28.383331123199998,
+   "sd": 1.979581507743524,
+   "min": 24.046043136,
+   "max": 32.10657792
+  },
+  "poverty_change_bhc_pp": {
+   "mean": 2.135563256173824,
+   "sd": 0.13872978005368689,
+   "min": 1.7951876754725593,
+   "max": 2.4123098559418437
+  },
+  "gini_change_pp": {
+   "mean": 0.9909464123494715,
+   "sd": 0.12946860518356096,
+   "min": 0.7149378820787589,
+   "max": 1.1842779238379286
+  },
+  "displaced_weighted_m": {
+   "mean": 1.6117976605892181,
+   "sd": 0.0007971837162542338,
+   "min": 1.6105170249938965,
+   "max": 1.6136502027511597
+  }
+ },
+ "6_0.7": {
+  "exchequer_cost_bn": {
+   "mean": 31.3061146624,
+   "sd": 1.7998805478371287,
+   "min": 27.027472384,
+   "max": 34.47373824
+  },
+  "poverty_change_bhc_pp": {
+   "mean": 2.0998819902488033,
+   "sd": 0.13583179820467292,
+   "min": 1.8506611248532256,
+   "max": 2.3950121517628737
+  },
+  "gini_change_pp": {
+   "mean": 0.9402143140364639,
+   "sd": 0.1347685806779671,
+   "min": 0.6960528917368758,
+   "max": 1.2736982878143066
+  },
+  "displaced_weighted_m": {
+   "mean": 1.6115525901317596,
+   "sd": 0.0008731311644463231,
+   "min": 1.6096677780151367,
+   "max": 1.6126331090927124
+  }
+ },
+ "9.6_0.6": {
+  "exchequer_cost_bn": {
+   "mean": 32.589185843200006,
+   "sd": 1.9846315881737946,
+   "min": 28.314779648,
+   "max": 36.648435712
+  },
+  "poverty_change_bhc_pp": {
+   "mean": 2.1524488919021936,
+   "sd": 0.13976806351587287,
+   "min": 1.9395735791859576,
+   "max": 2.3686452399113547
+  },
+  "gini_change_pp": {
+   "mean": 0.9306925276789098,
+   "sd": 0.13364726760316473,
+   "min": 0.7015631510171705,
+   "max": 1.186322330456513
+  },
+  "displaced_weighted_m": {
+   "mean": 1.6122572660446166,
+   "sd": 0.000986419885017498,
+   "min": 1.6101267337799072,
+   "max": 1.6143529415130615
+  }
+ }
+}
+duration_6m seed 0 done
+takeup_70 seed 0 done
+duration_6m seed 1 done
+takeup_70 seed 1 done
+duration_6m seed 2 done
+takeup_70 seed 2 done
+duration_6m seed 3 done
+takeup_70 seed 3 done
+duration_6m seed 4 done
+takeup_70 seed 4 done
+duration_6m seed 5 done
+takeup_70 seed 5 done
+duration_6m seed 6 done
+takeup_70 seed 6 done
+duration_6m seed 7 done
+takeup_70 seed 7 done
+duration_6m seed 8 done
+takeup_70 seed 8 done
+duration_6m seed 9 done
+takeup_70 seed 9 done
+duration_6m seed 10 done
+takeup_70 seed 10 done
+duration_6m seed 11 done
+takeup_70 seed 11 done
+duration_6m seed 12 done
+takeup_70 seed 12 done
+duration_6m seed 13 done
+takeup_70 seed 13 done
+duration_6m seed 14 done
+takeup_70 seed 14 done
+duration_6m seed 15 done
+takeup_70 seed 15 done
+duration_6m seed 16 done
+takeup_70 seed 16 done
+duration_6m seed 17 done
+takeup_70 seed 17 done
+duration_6m seed 18 done
+takeup_70 seed 18 done
+duration_6m seed 19 done
+takeup_70 seed 19 done
+{
+ "n_draws": 20,
+ "duration_6m": {
+  "description": "Central scenario; displaced workers keep 50% of baseline annual earnings (6-month out-of-work duration), in-model; hours/status transition unchanged (documented hybrid).",
+  "results": {
+   "exchequer_cost_bn": {
+    "mean": 4.201914368,
+    "sd": 0.8511246007759848,
+    "min": 2.959179776,
+    "max": 5.999263744
+   },
+   "poverty_change_bhc_pp": {
+    "mean": 0.0880660119545577,
+    "sd": 0.0766210885773803,
+    "min": -0.0344198561499725,
+    "max": 0.3076994197052846
+   },
+   "gini_change_pp": {
+    "mean": 0.11941074548748484,
+    "sd": 0.04583881050763232,
+    "min": 0.0131989384615893,
+    "max": 0.1857155279900713
+   },
+   "uc_change_bn": {
+    "mean": 0.1844592840265953,
+    "sd": 0.13241919594933735,
+    "min": -0.0915299738548398,
+    "max": 0.3710713062718511
+   }
+  },
+  "convex_combination_comparator_0.5x_full_year": {
+   "exchequer_cost_bn": {
+    "mean": 9.097433907200001,
+    "sd": 0.7713382984433398
+   },
+   "poverty_change_bhc_pp": {
+    "mean": 0.8762351175854228,
+    "sd": 0.05490867943982282
+   },
+   "gini_change_pp": {
+    "mean": 0.5133181698109459,
+    "sd": 0.04672627415087839
+   }
+  }
+ },
+ "takeup_70": {
+  "description": "Central scenario under Bernoulli(0.70) UC take-up (would_claim_uc set identically in baseline and shocked simulations, redrawn per seed).",
+  "dataset_baseline_would_claim_uc_person_weighted_mean": 0.5477457313882192,
+  "results": {
+   "exchequer_cost_bn": {
+    "mean": 19.0105452544,
+    "sd": 1.483300344868583,
+    "min": 16.671244288,
+    "max": 22.279487488
+   },
+   "poverty_change_bhc_pp": {
+    "mean": 1.694262573709873,
+    "sd": 0.10951067879074732,
+    "min": 1.5146620725119575,
+    "max": 1.8794262017475472
+   },
+   "gini_change_pp": {
+    "mean": 0.9479862498790311,
+    "sd": 0.08978244159681552,
+    "min": 0.7455492369773831,
+    "max": 1.0793892552588449
+   },
+   "uc_change_bn": {
+    "mean": 3.8352208215990444,
+    "sd": 0.29320098084538704,
+    "min": 3.2225977283733513,
+    "max": 4.5154288062305525
+   }
+  }
+ }
+}
+duration reforms seed 0 done
+duration reforms seed 1 done
+duration reforms seed 2 done
+duration reforms seed 3 done
+duration reforms seed 4 done
+Traceback (most recent call last):
+  File "/Users/janansadeqian/uk-ai-study/analysis/sensitivity_duration_reforms.py", line 155, in <module>
+    main()
+  File "/Users/janansadeqian/uk-ai-study/analysis/sensitivity_duration_reforms.py", line 140, in main
+    "description": "R1 (duration-consistent wage insurance) vs R2 (UC +20% "
+TypeError: not enough arguments for format string

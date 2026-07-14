@@ -61,7 +61,12 @@ LONDON_MULT_CENTRAL = 1.5        # author-imposed (KT London result qualitative)
 LONDON_MULT_SENS = (1.0, 2.0)
 
 
-def composite_tilt(persons: pd.DataFrame, london_mult: float) -> np.ndarray:
+def composite_tilt(
+    persons: pd.DataFrame,
+    london_mult: float,
+    high_wage_mult: float = HIGH_WAGE_MULT,
+    low_wage_mult: float = LOW_WAGE_MULT,
+) -> np.ndarray:
     """Unnormalised draw weights over employees per the KT gradient."""
     earnings = persons["employment_income"].to_numpy(dtype=float)
     w = persons["weight"].to_numpy()
@@ -76,18 +81,25 @@ def composite_tilt(persons: pd.DataFrame, london_mult: float) -> np.ndarray:
     tilt = np.where(exposure > 0, exposure, 1e-9)
     tilt = tilt * np.where(persons["age"].to_numpy() < 25, JUNIOR_MULT, 1.0)
     tilt = tilt * np.where(persons["region"].to_numpy() == "LONDON", london_mult, 1.0)
-    tilt = tilt * np.where(earnings >= med, HIGH_WAGE_MULT, LOW_WAGE_MULT)
+    tilt = tilt * np.where(earnings >= med, high_wage_mult, low_wage_mult)
     return tilt
 
 
-def draw_measured(persons: pd.DataFrame, scenario, london_mult: float, seed=SEED):
+def draw_measured(
+    persons: pd.DataFrame,
+    scenario,
+    london_mult: float,
+    seed=SEED,
+    high_wage_mult: float = HIGH_WAGE_MULT,
+    low_wage_mult: float = LOW_WAGE_MULT,
+):
     """All-employee weighted quota draw, p proportional to the composite tilt."""
     rng = np.random.default_rng(seed)
     w = persons["weight"].to_numpy()
     employed = persons["employment_income"].to_numpy(dtype=float) > 0
     quota = scenario.displacement_rate * float(w[employed].sum())
     members = np.flatnonzero(employed)
-    p = composite_tilt(persons, london_mult)[members]
+    p = composite_tilt(persons, london_mult, high_wage_mult, low_wage_mult)[members]
     p = p / p.sum()
     displaced = np.zeros(len(persons), dtype=bool)
     chosen = rng.choice(members, size=len(members), replace=False, p=p)
@@ -101,9 +113,19 @@ def draw_measured(persons: pd.DataFrame, scenario, london_mult: float, seed=SEED
     return displaced
 
 
-def measured_table(persons: pd.DataFrame, scenario, london_mult: float, seed: int = SEED) -> pd.DataFrame:
+def measured_table(
+    persons: pd.DataFrame,
+    scenario,
+    london_mult: float,
+    seed: int = SEED,
+    high_wage_mult: float = HIGH_WAGE_MULT,
+    low_wage_mult: float = LOW_WAGE_MULT,
+) -> pd.DataFrame:
     shocked = persons.copy()
-    displaced = draw_measured(persons, scenario, london_mult, seed=seed)
+    displaced = draw_measured(
+        persons, scenario, london_mult, seed=seed,
+        high_wage_mult=high_wage_mult, low_wage_mult=low_wage_mult,
+    )
     shocked["displaced"] = displaced
     earnings = persons["employment_income"].to_numpy(dtype=float)
     w = persons["weight"].to_numpy()
