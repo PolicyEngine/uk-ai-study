@@ -255,13 +255,18 @@ def hexmap(df, col, title, path, diverging):
     figstyle.apply_style()
     vals = df[col].to_numpy()
     if diverging:
-        vmax = np.abs(vals).max()
+        # Robustify the scale: a handful of extreme constituencies (NI seats,
+        # inner London) otherwise crush the ~600 English hexes into a single
+        # pale tone, making the map read as flat/random. Clip the symmetric
+        # limit to the 95th percentile of |value| and flag clipping with
+        # extended colourbar caps.
+        vmax = float(np.nanpercentile(np.abs(vals), 95)) or float(np.abs(vals).max())
         norm = TwoSlopeNorm(vcenter=0.0, vmin=-vmax, vmax=vmax)
         cmap = figstyle.DIVERGING
     else:
         norm = Normalize(vmin=vals.min(), vmax=vals.max())
         cmap = LinearSegmentedColormap.from_list(
-            "paper_seq", [figstyle.NEUTRAL, figstyle.LIGHT_BLUE, figstyle.BLUE, "#0d366b"]
+            "pe_seq", [figstyle.BLUE_98, figstyle.BLUE_LIGHT, figstyle.BLUE, figstyle.BLUE_PRESSED]
         )
     fig, ax = plt.subplots(figsize=(8.5, 10.5))
     dy = np.sqrt(3) / 2
@@ -278,7 +283,10 @@ def hexmap(df, col, title, path, diverging):
     ax.axis("off")
     ax.set_title(title + "\nCentral scenario (7% displacement, +2.6% wages), 2025, seed 0")
     sm = ScalarMappable(norm=norm, cmap=cmap)
-    cbar = fig.colorbar(sm, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02)
+    cbar = fig.colorbar(
+        sm, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02,
+        extend="both" if diverging else "neither",
+    )
     cbar.outline.set_visible(False)
     figstyle.save(fig, path)
 

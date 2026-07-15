@@ -69,12 +69,10 @@ def fig4_2():
     d = pd.read_csv(JR16 / "fig4_2_wage_gain_by_decile.csv")
     fig, ax = plt.subplots(figsize=SINGLE)
     y = 100 * d["pct_change_employment_income"]
-    # gradient spans only ~2.50-2.72%: bars from zero hide it, so plot
-    # points on a tight axis instead of a truncated bar chart
-    ax.plot(d["decile"], y, "o-", color=BLUE, markersize=6, lw=1.2)
-    for x_, y_ in zip(d["decile"], y):
-        ax.annotate(f"{y_:.2f}", (x_, y_), textcoords="offset points",
-                    xytext=(0, 7), ha="center", fontsize=7)
+    # gradient spans only ~2.50-2.72%, so use a non-zero baseline to keep the
+    # decile differences visible in the bars (axis truncated, values labelled)
+    ax.bar(d["decile"], y, color=BLUE)
+    _bar_labels(ax, d["decile"], y, fmt="{:.2f}", pad_frac=0.004)
     decile_ax(ax, "Change in employment income (%)\nnon-transitioning population")
     pad = (y.max() - y.min()) * 0.25
     ax.set_ylim(y.min() - pad, y.max() + pad * 1.6)
@@ -227,35 +225,36 @@ def incidence_families():
                                    gridspec_kw={"width_ratios": [1.35, 1]})
 
     deciles = np.arange(1, 11)
+    handles, labels = [], []
     for name, (label, color) in FAMILY_STYLE.items():
         shares = [fams[name]["decile_transition_share_pct"][str(d)] for d in deciles]
-        axl.plot(deciles, shares, color=color, lw=2, marker="o", ms=5,
-                 markerfacecolor=color, markeredgecolor="white",
-                 markeredgewidth=1, label=label)
+        line, = axl.plot(deciles, shares, color=color, lw=2, marker="o", ms=5,
+                         markerfacecolor=color, markeredgecolor="white",
+                         markeredgewidth=1, label=label)
+        handles.append(line)
+        labels.append(label)
     decile_ax(axl, "Share transitioning to unemployment (%)")
     axl.set_ylim(bottom=0)
-    legend_below(axl, ncol=2)
     axl.set_title("Who is displaced, by income decile")
 
+    # Right panel: same families as points; identified by the shared legend
+    # below (no per-point annotations).
     for name, (label, color) in FAMILY_STYLE.items():
         x = fams[name]["exchequer_cost_bn"]
         y = fams[name]["poverty_change_bhc_pp"]
         axr.scatter(x, y, s=90, color=color, edgecolor="white", lw=1, zorder=3)
-        dx, dy = (0.4, 0.012) if name != "junior" else (0.4, -0.03)
-        if name == "measured":
-            dx, dy = (-0.6, -0.02)
-            axr.annotate(label, (x, y), xytext=(x + dx, y + dy), fontsize=9,
-                         color=INK2, ha="right")
-            continue
-        axr.annotate(label, (x, y), xytext=(x + dx, y + dy), fontsize=9,
-                     color=INK2)
     axr.set_xlabel("Exchequer cost (£ billion per year)")
     axr.set_ylabel("Change in BHC poverty rate (pp)")
     axr.set_xlim(12, 35)
     axr.grid(axis="x", visible=True)
     axr.set_title("What it costs vs poverty impact")
 
-    save(fig, INCIDENCE / "incidence_families.png")
+    # One shared legend box serving both panels.
+    fig.legend(handles, labels, loc="lower center", ncol=len(labels),
+               frameon=False, bbox_to_anchor=(0.5, -0.02))
+    fig.tight_layout(rect=[0, 0.07, 1, 1])
+    fig.savefig(INCIDENCE / "incidence_families.png", dpi=DPI, bbox_inches="tight")
+    plt.close(fig)
 
 
 def main():

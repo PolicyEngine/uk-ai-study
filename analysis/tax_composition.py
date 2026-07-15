@@ -153,9 +153,9 @@ def shortfall_figure(grid):
         ax.plot(sub["phi"], shortfall, marker="o", color=colour,
                 label=f"{u}% displacement")
     ax.set_xlabel(
-        "phi: share of displaced wage bill reappearing as corporate profits (taxed at 25%)"
+        r"$\phi$: share of displaced wage bill returning as taxed corporate profit"
     )
-    ax.set_ylabel("Net revenue shortfall (GBP bn / year)")
+    ax.set_ylabel("Net revenue shortfall (£bn per year)")
     ax.set_xticks(PHIS)
     ax.axhline(0, color=figstyle.BASELINE, linewidth=0.8)
     figstyle.legend_below(ax, ncol=3)

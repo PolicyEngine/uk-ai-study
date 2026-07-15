@@ -208,7 +208,7 @@ def fast(dataset, baseline, persons):
         fig, ax = plt.subplots(figsize=SINGLE)
         bottom = np.zeros(10)
         for t, (label, color) in enumerate(
-            [("Low tertile", "#cde2fb"), ("Middle", "#6da7ec"), ("High tertile", "#184f95")]
+            [("Low tertile", "#D8E6F3"), ("Middle", "#2C6496"), ("High tertile", "#17354F")]
         ):
             ax.bar(range(1, 11), shares[t], bottom=bottom, label=label,
                    color=color, edgecolor="white", linewidth=0.8)

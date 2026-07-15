@@ -332,7 +332,7 @@ def main():
                width=width, color=colors[r["reform"]], label=labels[r["reform"]])
     fs.decile_ax(ax, "Share of reform benefit (%)")
     ax.set_title("Who receives the reform (central shock)")
-    fs.legend_below(ax, 1)
+    shared_handles, shared_labels = ax.get_legend_handles_labels()
 
     ax = axes[1]
     bars, names, cols = [], [], []
@@ -350,7 +350,12 @@ def main():
     ax.set_ylabel("£bn per pp of AHC poverty averted")
     ax.set_title("Cost-effectiveness (reform vs no-reform shocked world)")
     ax.grid(axis="x", visible=False)
-    fs.save(fig, OUT / "policy_reforms.png")
+    # One shared legend box serving both panels.
+    fig.legend(shared_handles, shared_labels, loc="lower center",
+               ncol=len(shared_labels), frameon=False, bbox_to_anchor=(0.5, -0.02))
+    fig.tight_layout(rect=[0, 0.08, 1, 1])
+    fig.savefig(OUT / "policy_reforms.png", dpi=fs.DPI, bbox_inches="tight")
+    plt.close(fig)
 
 
 if __name__ == "__main__":

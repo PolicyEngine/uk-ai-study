@@ -4,11 +4,11 @@
   "scenario": "central (7% displacement, +2.6% wage, +0.4pp capital)",
   "results": {
     "c_aioe": {
-      "exchequer_cost_bn": 18.422136832,
-      "poverty_change_bhc_pp": 1.8701170103055387,
-      "gini_change_pp": 1.0979179778287884,
-      "transition_share_decile1_pct": 0.5258610844612122,
-      "transition_share_decile10_pct": 4.667875289916992,
+      "exchequer_cost_bn": 18.590744576,
+      "poverty_change_bhc_pp": 1.844962861999064,
+      "gini_change_pp": 1.0847962721597826,
+      "transition_share_decile1_pct": 0.5437119007110596,
+      "transition_share_decile10_pct": 4.6680121421813965,
       "displaced_weighted_m": 1.607592225074768,
       "conclusions": {
         "gini_rises": true,
@@ -18,11 +18,11 @@
       "all_three_survive": true
     },
     "felten_aioe": {
-      "exchequer_cost_bn": 18.5798656,
-      "poverty_change_bhc_pp": 1.8596659115623804,
-      "gini_change_pp": 1.085481478517869,
-      "transition_share_decile1_pct": 0.5258610844612122,
-      "transition_share_decile10_pct": 4.704334735870361,
+      "exchequer_cost_bn": 18.745950208,
+      "poverty_change_bhc_pp": 1.8345117632559056,
+      "gini_change_pp": 1.0727955184353433,
+      "transition_share_decile1_pct": 0.5437119007110596,
+      "transition_share_decile10_pct": 4.704472541809082,
       "displaced_weighted_m": 1.60466730594635,
       "conclusions": {
         "gini_rises": true,
@@ -32,11 +32,11 @@
       "all_three_survive": true
     },
     "eloundou_beta": {
-      "exchequer_cost_bn": 18.395136,
-      "poverty_change_bhc_pp": 1.9026750265141974,
-      "gini_change_pp": 1.0948412784370198,
-      "transition_share_decile1_pct": 0.4733119606971741,
-      "transition_share_decile10_pct": 4.742760181427002,
+      "exchequer_cost_bn": 18.541576192,
+      "poverty_change_bhc_pp": 1.8775208782077224,
+      "gini_change_pp": 1.084071747157389,
+      "transition_share_decile1_pct": 0.4911424219608307,
+      "transition_share_decile10_pct": 4.742899417877197,
       "displaced_weighted_m": 1.614782452583313,
       "conclusions": {
         "gini_rises": true,
@@ -46,11 +46,11 @@
       "all_three_survive": true
     },
     "dsit_aioe": {
-      "exchequer_cost_bn": 18.586402816,
-      "poverty_change_bhc_pp": 1.8586351352141095,
-      "gini_change_pp": 1.049192792544107,
-      "transition_share_decile1_pct": 0.4305896759033203,
-      "transition_share_decile10_pct": 4.856374740600586,
+      "exchequer_cost_bn": 18.73444864,
+      "poverty_change_bhc_pp": 1.8334809869076345,
+      "gini_change_pp": 1.0388220932352699,
+      "transition_share_decile1_pct": 0.44840356707572937,
+      "transition_share_decile10_pct": 4.856517314910889,
       "displaced_weighted_m": 1.616363763809204,
       "conclusions": {
         "gini_rises": true,
@@ -60,11 +60,11 @@
       "all_three_survive": true
     },
     "dsit_llm": {
-      "exchequer_cost_bn": 17.620893696,
-      "poverty_change_bhc_pp": 1.852489134894622,
-      "gini_change_pp": 1.0871540315830264,
-      "transition_share_decile1_pct": 0.513198971748352,
-      "transition_share_decile10_pct": 4.6843342781066895,
+      "exchequer_cost_bn": 17.776279552,
+      "poverty_change_bhc_pp": 1.8273349865881472,
+      "gini_change_pp": 1.0755024438989458,
+      "transition_share_decile1_pct": 0.5310449004173279,
+      "transition_share_decile10_pct": 4.684471130371094,
       "displaced_weighted_m": 1.6187386512756348,
       "conclusions": {
         "gini_rises": true,

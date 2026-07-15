@@ -4,22 +4,27 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\definecolor{paperblue}{HTML}{1F5BA8}
+% Paper chrome uses the firm-microsim template blue (YGTemplate MyBlue);
+% figures use the PolicyEngine palette separately.
+\definecolor{paperblue}{rgb}{0,0,0.7}   % MyBlue, matching the sister paper
+\definecolor{peteal}{HTML}{39C6C0}      % PolicyEngine teal accent
 \usepackage{sectsty}
 \allsectionsfont{\color{paperblue}}
 \usepackage[colorlinks=true, citecolor=paperblue, linkcolor=paperblue, urlcolor=paperblue]{hyperref}
+\usepackage[hang,flushmargin]{footmisc}
 \usepackage{natbib}
 \bibliographystyle{apalike}
 
-\title{Who bears the AI shock? Displacement, poverty and the public finances in the UK\thanks{Draft --- not for citation.}}
-\author{Vahid Ahmadi}
-\date{July 2026 --- preliminary draft}
+\title{\bfseries Who bears the AI shock?\\[0.15cm] Displacement, poverty and the public finances in the UK\thanks{\textbf{Acknowledgements:} I thank Max Ghenis and Seyed Mahdi Hosseini for their great suggestions and helpful discussions.}}
+\author{Vahid Ahmadi\thanks{Research Associate at PolicyEngine. Email: \href{mailto:vahid@policyengine.org}{vahid@policyengine.org}.}}
+\date{{\small\textcolor{red}{Preliminary and incomplete. Comments are welcome.}}\\[0.3cm]
+\small \ifcase\month\or January\or February\or March\or April\or May\or June\or July\or August\or September\or October\or November\or December\fi\ \the\year}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-\noindent I study how the household and fiscal costs of an AI labour-market shock in the United Kingdom depend on who bears it. Occupation-level AI exposure is linked to workers in the Family Resources Survey 2024--25, and the implied employment, wage and capital-income shocks are passed through PolicyEngine UK, an open-source tax--benefit microsimulation model, across 66 shock-size combinations and five incidence families that hold the aggregate shock fixed while varying who is displaced. In the central scenario---7 per cent of employees displaced---the annual Exchequer cost is \pounds 18.2 billion and before-housing-costs poverty rises by 1.75 percentage points (means over 20 displacement draws). Reallocating the same aggregate shock moves the fiscal cost from \pounds 14.9 billion under uniform incidence to \pounds 22.1 billion under expertise compression, and \pounds 32.6 billion under a top-loaded stress test loosely anchored to UK firm-level displacement evidence, while poverty changes far less. Income inequality rises in every scenario. The incidence of the shock determines whether it arrives as a fiscal problem or a poverty problem.
+\noindent I study how the household and fiscal costs of an AI labour-market shock in the United Kingdom depend on who bears it. I link occupation-level AI exposure to workers in the PolicyEngine UK microdata---the Family Resources Survey 2024--25 as processed for PolicyEngine UK, an open-source tax--benefit microsimulation model---and pass the implied employment, wage and capital-income shocks through that model. I vary the shock along two axes: 66 shock-size combinations, and five incidence families that hold the aggregate shock fixed while varying who is displaced. In the central scenario---7 per cent of employees displaced---the annual Exchequer cost is \pounds 18.2 billion and before-housing-costs poverty rises by 1.75 percentage points. Reallocating the same aggregate shock moves the fiscal cost from \pounds 14.9 billion under uniform incidence to \pounds 22.1 billion under expertise compression, and \pounds 32.6 billion under an author-constructed, top-loaded stress test, while poverty changes far less. Income inequality rises in every scenario. The incidence of the shock determines whether it arrives as a fiscal problem or a poverty problem.
 \end{abstract}
 
 \medskip
@@ -28,15 +33,13 @@
 \smallskip
 \noindent\textbf{JEL classification:} C63, D31, H24, H68, J23, I32
 
+\newpage
 \input{sections/intro}
 \input{sections/literature}
 \input{sections/methodology}
 \input{sections/results}
 \input{sections/policy}
 \input{sections/discussion}
-
-\section*{Acknowledgements}
-\noindent The analysis uses the open-source PolicyEngine UK microsimulation model. Family Resources Survey microdata are accessed under the UK Data Service End User Licence and are not redistributed. All code and aggregate results that support the findings of this study are available at \url{https://github.com/PolicyEngine/uk-ai-study}. The author declares no conflict of interest.
 
 \input{sections/references}
 \input{sections/appendix}
