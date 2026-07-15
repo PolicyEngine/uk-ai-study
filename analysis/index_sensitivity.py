@@ -141,7 +141,7 @@ def figure(results):
     ax2.bar(x - 0.2, [results[k]["transition_share_decile1_pct"] for k in measures],
             width=0.4, color=fs.AQUA, label="Decile 1")
     ax2.bar(x + 0.2, [results[k]["transition_share_decile10_pct"] for k in measures],
-            width=0.4, color=fs.VIOLET, label="Decile 10")
+            width=0.4, color=fs.BLUE, label="Decile 10")
     ax2.set_xticks(x, measures, rotation=20)
     ax2.set_ylabel("Displacement transition share (%)")
     ax2.grid(axis="x", visible=False)

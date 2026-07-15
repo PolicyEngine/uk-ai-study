@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.12)  15 JUL 2026 13:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.12)  15 JUL 2026 14:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -503,53 +503,49 @@ nput line 140.
 (pdftex.def)             Requested size: 432.53372pt x 181.71373pt.
 [18 <../results/jr16/fig4_7_gini_grid.png>] [19 <../results/incidence/incidence
 _families.png>] [20]
-<../results/geo/hexmap_income_change.png, id=570, 614.295pt x 758.835pt>
-File: ../results/geo/hexmap_income_change.png Graphic file (type png)
-<use ../results/geo/hexmap_income_change.png>
-Package pdftex.def Info: ../results/geo/hexmap_income_change.png  used on input
- line 162.
+<../results/geo/map_income_change.png, id=570, 614.295pt x 758.835pt>
+File: ../results/geo/map_income_change.png Graphic file (type png)
+<use ../results/geo/map_income_change.png>
+Package pdftex.def Info: ../results/geo/map_income_change.png  used on input li
+ne 162.
 (pdftex.def)             Requested size: 223.09955pt x 275.5888pt.
-<../results/geo/hexmap_displacement.png, id=571, 614.295pt x 758.835pt>
-File: ../results/geo/hexmap_displacement.png Graphic file (type png)
-<use ../results/geo/hexmap_displacement.png>
-Package pdftex.def Info: ../results/geo/hexmap_displacement.png  used on input 
-line 163.
+<../results/geo/map_displacement.png, id=571, 614.295pt x 758.835pt>
+File: ../results/geo/map_displacement.png Graphic file (type png)
+<use ../results/geo/map_displacement.png>
+Package pdftex.def Info: ../results/geo/map_displacement.png  used on input lin
+e 163.
 (pdftex.def)             Requested size: 223.09955pt x 275.5888pt.
- [21 <../results/geo/hexmap_income_change.png> <../results/geo/hexmap_displacem
-ent.png>]) (./sections/policy.tex [22]
-Overfull \hbox (51.82416pt too wide) in paragraph at lines 16--26
- [][] 
- []
-
+ [21 <../results/geo/map_income_change.png> <../results/geo/map_displacement.pn
+g>]) (./sections/policy.tex [22]
 <../results/policy/policy_reforms.png, id=595, 787.0203pt x 330.63525pt>
 File: ../results/policy/policy_reforms.png Graphic file (type png)
 <use ../results/policy/policy_reforms.png>
 Package pdftex.def Info: ../results/policy/policy_reforms.png  used on input li
-ne 35.
+ne 37.
 (pdftex.def)             Requested size: 432.53372pt x 181.71373pt.
-[23] [24 <../results/policy/policy_reforms.png>]
+ [23] [24 <../results/policy/policy_reforms.png>]
 <../results/tax_composition/revenue_shortfall_phi.png, id=614, 578.16pt x 325.2
 15pt>
 File: ../results/tax_composition/revenue_shortfall_phi.png Graphic file (type p
 ng)
 <use ../results/tax_composition/revenue_shortfall_phi.png>
 Package pdftex.def Info: ../results/tax_composition/revenue_shortfall_phi.png  
-used on input line 51.
+used on input line 53.
 (pdftex.def)             Requested size: 387.00787pt x 217.68945pt.
-) (./sections/discussion.tex
-[25 <../results/tax_composition/revenue_shortfall_phi.png>] [26]
+) (./sections/discussion.tex [25 <../results/tax_composition/revenue_shortfall_
+phi.png>] [26]
 Overfull \hbox (2.98842pt too wide) in paragraph at lines 16--17
 \OT1/cmr/m/n/10.95 tual re-forms of Sec-tion [][]5[][] show that tem-porar-ily 
 en-larg-ing the ex-ist-ing means-tested architecture---
  []
 
 [27] [28]) (./sections/references.tex [29] [30]) (./sections/appendix.tex
-[31]
 Overfull \hbox (2.74493pt too wide) in paragraph at lines 8--22
 \OT1/cmr/m/n/10.95 Displacement is a ran-dom draw of which ex-posed work-ers lo
 se em-ploy-ment, sub-ject to occupation-
  []
 
+[31]
 <../results/appendix/b1_market_income_less_capital.png, id=699, 578.16pt x 325.
 215pt>
 File: ../results/appendix/b1_market_income_less_capital.png Graphic file (type 
@@ -558,7 +554,7 @@ png)
 Package pdftex.def Info: ../results/appendix/b1_market_income_less_capital.png 
  used on input line 76.
 (pdftex.def)             Requested size: 341.47508pt x 192.07864pt.
-[32]
+ [32]
 <../results/appendix/b2_capital_income.png, id=708, 578.16pt x 325.215pt>
 File: ../results/appendix/b2_capital_income.png Graphic file (type png)
 <use ../results/appendix/b2_capital_income.png>
@@ -633,7 +629,8 @@ File: ../results/robustness/index_sensitivity.png Graphic file (type png)
 Package pdftex.def Info: ../results/robustness/index_sensitivity.png  used on i
 nput line 231.
 (pdftex.def)             Requested size: 409.76732pt x 167.63397pt.
- [38 <../results/appendix/b8_alternative_index_decile.png>]
+
+[38 <../results/appendix/b8_alternative_index_decile.png>]
 <../results/appendix/b9_grid_by_decile.png, id=781, 939.14865pt x 470.11635pt>
 File: ../results/appendix/b9_grid_by_decile.png Graphic file (type png)
 <use ../results/appendix/b9_grid_by_decile.png>
@@ -654,12 +651,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  11086 strings out of 476025
- 177385 string characters out of 5790017
+ 177343 string characters out of 5790017
  1865388 words of memory out of 5000000
  31183 multiletter control sequences out of 15000+600000
  524595 words of font info for 74 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,76p,2267b,587s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,76p,2267b,592s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
 , replaced by a fixed one
@@ -692,7 +689,7 @@ fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2023/texmf-dist/fo
 nts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2023/texmf-dist/font
 s/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2023/texmf-dist/fonts/
 type1/public/cm-super/sfrm1200.pfb>
-Output written on main.pdf (40 pages, 2617164 bytes).
+Output written on main.pdf (40 pages, 2674245 bytes).
 PDF statistics:
  935 PDF objects out of 1000 (max. 8388607)
  785 compressed objects within 8 object streams

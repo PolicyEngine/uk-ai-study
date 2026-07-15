@@ -344,6 +344,11 @@ def main():
         names.append(f"{tag}\n{r['family']}")
         bars.append(v)
         cols.append(colors[r["reform"]])
+    # order bars by cost-effectiveness (cheapest £/pp first) so it reads as a ranking
+    order = sorted(range(len(bars)), key=lambda i: bars[i])
+    bars = [bars[i] for i in order]
+    names = [names[i] for i in order]
+    cols = [cols[i] for i in order]
     ax.bar(range(len(bars)), bars, color=cols)
     ax.set_xticks(range(len(bars)))
     ax.set_xticklabels(names)
