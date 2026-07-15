@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1784123111 "main.tex" "main.pdf" "main" 1784123115 0
+["pdflatex"] 1784123475 "main.tex" "main.pdf" "main" 1784123478 0
   "../results/appendix/b11_grid_no_capital.png" 1784117603 115159 07f9dae926815d3f6bf42d87b4fbf043 ""
   "../results/appendix/b1_market_income_less_capital.png" 1784115778 75347 563997234d1076e9f241f77c7f06bb52 ""
   "../results/appendix/b2_capital_income.png" 1784115778 65983 fadd4995d447cb0eb213d8d081c4d769 ""
@@ -12,8 +12,8 @@
   "../results/appendix/complementarity_incidence_by_decile.png" 1784115779 66394 0d6e4310bf818cc072b6c875d58515cc ""
   "../results/appendix/decomposition_ci.png" 1784117602 61601 46ba221f0b87163fab4afb255e64e205 ""
   "../results/appendix/exposure_incidence_by_decile.png" 1784115779 66679 7ea18b40ce33f1af171dc0fe562bf01b ""
-  "../results/geo/map_displacement.png" 1784122991 462601 4edb1db5891eb38978bc27ab2192431f ""
-  "../results/geo/map_income_change.png" 1784122991 423004 441c67ea2137c0a29300e2384b933ea1 ""
+  "../results/geo/map_displacement.png" 1784123363 467880 ec39f7b56ae98e1cd2bfdfdd748dfeb9 ""
+  "../results/geo/map_income_change.png" 1784123362 412628 96c883bf827a4d15c1a3c68e2379b54b ""
   "../results/incidence/incidence_families.png" 1784117604 197264 5e345c6e012778b65c57f862a42f1cf9 ""
   "../results/jr16/fig4_1_transition.png" 1784117599 56274 99bcb6ce366da3d4e05e60481c2c1603 ""
   "../results/jr16/fig4_2_wages.png" 1784117599 73186 184ce4ee1c1713157db6f1484138407f ""
@@ -142,11 +142,11 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1705056926 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1705056805 7883455 1909f2c3c6cd855b29ade2d8c45ed799 ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "main.aux" 1784123115 27081 8505f585c1fddf631c162994d7a1f8ec "pdflatex"
-  "main.out" 1784123115 8048 e7c00b1fc0f2d75f4d780c8592ad580b "pdflatex"
+  "main.aux" 1784123478 27048 c76e3c0cffb53270f7f9ff14dd009b19 "pdflatex"
+  "main.out" 1784123478 8048 e7c00b1fc0f2d75f4d780c8592ad580b "pdflatex"
   "main.tex" 1784119608 2771 0bb9bf6463eddf15b58023ca9d5496d8 ""
   "sections/appendix.tex" 1784114154 14315 6518aa6a9fb097887d580e1e84f331f6 ""
-  "sections/discussion.tex" 1784119964 14061 d83605238a0f0dd89bf41b2ef888cf13 ""
+  "sections/discussion.tex" 1784123463 12305 a94e9a678018497820ee1e5605929149 ""
   "sections/intro.tex" 1784116400 6997 df09c8a5f2ae4ab842c7b3aeb03fed2d ""
   "sections/literature.tex" 1784113987 9548 ae03661f2ef9e4917740a8fec33b5eac ""
   "sections/methodology.tex" 1784119413 20192 4f4e2eb96570ff4d69ca5bedfb4f5125 ""

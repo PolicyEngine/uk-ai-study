@@ -52,16 +52,20 @@ def choropleth(gdf, col, title, path, diverging):
         cmap = figstyle.DIVERGING
         extend = "both"
     else:
-        norm = Normalize(vmin=float(np.nanmin(vals)), vmax=float(np.nanmax(vals)))
+        # clip to the 5th-95th percentile so the legend bar has the same
+        # capped shape as the diverging map
+        lo = float(np.nanpercentile(vals, 5))
+        hi = float(np.nanpercentile(vals, 95))
+        norm = Normalize(vmin=lo, vmax=hi)
         cmap = figstyle.SEQUENTIAL
-        extend = "neither"
+        extend = "both"
 
     fig, ax = plt.subplots(figsize=(8.5, 10.5))
     gdf.plot(column=col, cmap=cmap, norm=norm, ax=ax,
              edgecolor="white", linewidth=0.15)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_title(title + "\nCentral scenario (7% displacement, +2.6% wages), 2025, seed 0")
+    # No in-figure title; the Figure 9 caption describes both panels.
 
     sm = ScalarMappable(norm=norm, cmap=cmap)
     cbar = fig.colorbar(sm, ax=ax, orientation="horizontal",
