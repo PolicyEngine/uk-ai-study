@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1784285780 "main.tex" "main.pdf" "main" 1784285786 0
+["pdflatex"] 1784286314 "main.tex" "main.pdf" "main" 1784286319 0
   "../results/appendix/b11_grid_no_capital.png" 1784117603 115159 07f9dae926815d3f6bf42d87b4fbf043 ""
   "../results/appendix/b1_market_income_less_capital.png" 1784115778 75347 563997234d1076e9f241f77c7f06bb52 ""
   "../results/appendix/b2_capital_income.png" 1784115778 65983 fadd4995d447cb0eb213d8d081c4d769 ""
@@ -142,12 +142,12 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1705056926 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1705056805 7883455 1909f2c3c6cd855b29ade2d8c45ed799 ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "main.aux" 1784285785 29255 dbe4871fd6e791d366888a42a3a2577c "pdflatex"
-  "main.out" 1784285785 8572 775aeef8d0d3a5d778801a0c315f39f6 "pdflatex"
-  "main.tex" 1784119608 2771 0bb9bf6463eddf15b58023ca9d5496d8 ""
+  "main.aux" 1784286319 29328 eb4ef03b750acea7dad8b8881c8943b7 "pdflatex"
+  "main.out" 1784286319 8572 775aeef8d0d3a5d778801a0c315f39f6 "pdflatex"
+  "main.tex" 1784286261 3063 7d97332a5facb64dca0aa1b8d702e22e ""
   "sections/appendix.tex" 1784285760 17438 f9b2538258a7d76e337c529dea7be577 ""
   "sections/discussion.tex" 1784285766 14977 ce3a478ae42e0c89e823c0840b98da13 ""
-  "sections/intro.tex" 1784116400 6997 df09c8a5f2ae4ab842c7b3aeb03fed2d ""
+  "sections/intro.tex" 1784286292 7803 4ba43123ef4c91e4c3eb4922c9bd1f95 ""
   "sections/literature.tex" 1784283870 11040 b28294d97b732fd2dc9956ed3db7d36a ""
   "sections/methodology.tex" 1784285768 24806 ae82256585dbac841d15b0e894d09834 ""
   "sections/policy.tex" 1784119843 11524 e132e41cf4bfcc2dde2ab3e504e4d7b2 ""
