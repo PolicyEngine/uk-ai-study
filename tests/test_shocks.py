@@ -5,7 +5,12 @@ import pandas as pd
 import pytest
 
 from uk_ai_study.shocks import (
+    RIPPLE_PRESETS,
+    RippleScenario,
     ShockScenario,
+    apply_ripple_shocks,
+    compute_inflow_shares,
+    load_ripple_routing,
     WAGE_MARGIN_PRESETS,
     WageMarginScenario,
     apply_shocks,
@@ -241,6 +246,105 @@ def test_wage_margin_composes_with_uplift():
     workers = base > 0
     pct = (uplift_only["employment_income"].to_numpy() - base)[workers] / base[workers]
     assert np.average(pct, weights=w[workers]) == pytest.approx(0.026, rel=1e-9)
+
+
+# --- ripple family ----------------------------------------------------------
+
+
+def make_routing(seed=3):
+    """Synthetic 9x9 row-stochastic routing matrix with zero diagonal."""
+    rng = np.random.default_rng(seed)
+    m = rng.uniform(0.1, 1.0, (9, 9))
+    np.fill_diagonal(m, 0.0)
+    m = m / m.sum(axis=1, keepdims=True)
+    return pd.DataFrame(m, index=range(1, 10), columns=range(1, 10))
+
+
+def test_ripple_routing_csv_row_stochastic():
+    """The packaged routing matrix is 9x9, row-stochastic, zero-diagonal."""
+    routing = load_ripple_routing()
+    m = routing.to_numpy()
+    assert m.shape == (9, 9)
+    assert (m >= 0).all()
+    np.testing.assert_allclose(m.sum(axis=1), 1.0, rtol=1e-9)
+    np.testing.assert_allclose(np.diag(m), 0.0)
+
+
+def test_ripple_inflow_shares_sane():
+    """Inflow shares are non-negative and bounded by the displacement rate's
+    order of magnitude: total routed weight = total displaced weight, so each
+    s_l is at most (displaced weight) / (smallest destination employment)."""
+    persons = make_persons()
+    scenario = RIPPLE_PRESETS["central_ripple"]
+    from uk_ai_study.shocks import draw_displaced
+
+    displaced = draw_displaced(persons, scenario, seed=0)
+    routing = make_routing()
+    s = compute_inflow_shares(persons, displaced, routing)
+    assert (s.to_numpy() >= 0).all()
+    # with a 7% draw and 9 groups of comparable size, no group should see an
+    # inflow anywhere near its own size
+    assert (s.to_numpy() < 1.0).all()
+    # conservation: total inflow weight equals total SOC-coded displaced weight
+    w = persons["weight"].to_numpy()
+    group = persons["soc_major_group"].to_numpy() / 1000
+    base_emp = {
+        l: w[(persons["employment_income"] > 0) & (group == l)].sum()
+        for l in range(1, 10)
+    }
+    total_inflow = sum(s[l] * base_emp[l] for l in range(1, 10))
+    assert total_inflow == pytest.approx(w[displaced].sum(), rel=1e-9)
+
+
+def test_ripple_cuts_nonnegative_and_only_hit_survivors():
+    """Ripple cuts (vs the eta=0 counterfactual) are non-negative and land
+    only on non-displaced workers; displaced workers stay fully displaced."""
+    persons = make_persons()
+    scenario = RIPPLE_PRESETS["central_ripple"]
+    routing = make_routing()
+    with_ripple = apply_ripple_shocks(persons, scenario, seed=0, routing=routing)
+    without = apply_shocks(persons, scenario, seed=0)
+    displaced = with_ripple["displaced"].to_numpy()
+    assert (displaced == without["displaced"].to_numpy()).all()
+    new = with_ripple["employment_income"].to_numpy()
+    ref = without["employment_income"].to_numpy()
+    # displaced: unchanged (zero) either way
+    assert (new[displaced] == 0).all()
+    # survivors: cut relative to the no-ripple treatment, never below zero
+    survivors = (persons["employment_income"].to_numpy() > 0) & ~displaced
+    assert (new[survivors] <= ref[survivors] + 1e-9).all()
+    assert (new >= 0).all()
+    assert (new[survivors] < ref[survivors]).any()
+
+
+def test_ripple_eta_zero_reproduces_central():
+    """eta = 0 reproduces apply_shocks' wage treatment exactly."""
+    persons = make_persons()
+    scenario = RippleScenario("t", 0.07, 0.026, labour_demand_elasticity=0.0)
+    ripple = apply_ripple_shocks(persons, scenario, seed=4, routing=make_routing())
+    central = apply_shocks(persons, ShockScenario("t", 0.07, 0.026), seed=4)
+    np.testing.assert_array_equal(
+        ripple["employment_income"].to_numpy(),
+        central["employment_income"].to_numpy(),
+    )
+    np.testing.assert_array_equal(
+        ripple["displaced"].to_numpy(), central["displaced"].to_numpy()
+    )
+
+
+def test_ripple_eta_scales_the_cut():
+    """Doubling eta doubles each survivor's cut relative to eta = 0."""
+    persons = make_persons()
+    routing = make_routing()
+    outs = {}
+    for eta in (0.0, 0.15, 0.3):
+        sc = RippleScenario("t", 0.07, 0.026, labour_demand_elasticity=eta)
+        outs[eta] = apply_ripple_shocks(persons, sc, seed=1, routing=routing)[
+            "employment_income"
+        ].to_numpy()
+    np.testing.assert_allclose(
+        outs[0.0] - outs[0.3], 2 * (outs[0.0] - outs[0.15]), rtol=1e-9
+    )
 
 
 def test_wage_margin_pss_missing_file_errors_clearly():

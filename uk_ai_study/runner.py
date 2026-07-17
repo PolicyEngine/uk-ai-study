@@ -12,9 +12,12 @@ import pandas as pd
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
 from uk_ai_study.shocks import (
     PRESETS,
+    RIPPLE_PRESETS,
     WAGE_MARGIN_PRESETS,
+    RippleScenario,
     ShockScenario,
     WageMarginScenario,
+    apply_ripple_shocks,
     apply_shocks,
     apply_wage_margin_shock,
     build_shocked_simulation,
@@ -101,7 +104,11 @@ def run_scenario(
     from policyengine_uk.data import UKSingleYearDataset
 
     if isinstance(scenario, str):
-        scenario = PRESETS.get(scenario) or WAGE_MARGIN_PRESETS[scenario]
+        scenario = (
+            PRESETS.get(scenario)
+            or RIPPLE_PRESETS.get(scenario)
+            or WAGE_MARGIN_PRESETS[scenario]
+        )
 
     dataset = UKSingleYearDataset(file_path=str(dataset_path))
     baseline = Microsimulation(dataset=dataset)
@@ -116,6 +123,8 @@ def run_scenario(
     if isinstance(scenario, WageMarginScenario):
         # deterministic (no draw): the seed is irrelevant to the cut
         shocked_table = apply_wage_margin_shock(persons, scenario)
+    elif isinstance(scenario, RippleScenario):
+        shocked_table = apply_ripple_shocks(persons, scenario, seed=seed)
     else:
         shocked_table = apply_shocks(persons, scenario, seed=seed)
 

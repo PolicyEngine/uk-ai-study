@@ -341,6 +341,146 @@ def apply_wage_margin_shock(
     return shocked
 
 
+# --- ripple family (reduced-form Acemoglu & Restrepo 2022 propagation) ------
+
+
+@dataclass(frozen=True)
+class RippleScenario(ShockScenario):
+    """Displacement scenario plus a reduced-form 'ripple' on survivors.
+
+    After the central displacement draw, displaced workers seek work
+    elsewhere and bid down the wages of NON-displaced workers in destination
+    occupations (Acemoglu & Restrepo 2022 propagation, reduced form):
+
+    1. Each displaced worker's labour supply is routed across destination
+       SOC2020 major groups by a 9x9 row-stochastic matrix R (origin ->
+       destination, zero diagonal). Default R is EMPLOYMENT-PROPORTIONAL
+       routing (see analysis/build_ripple_routing.py: no pairwise
+       retraining-cost matrix exists in the Hosseini & Lichtinger release,
+       so R[o, l] ∝ destination employment share, ASHE 2025 Table 14,
+       excluding the origin group).
+    2. For each destination group l the proportional labour-supply inflow is
+       s_l = (weighted displaced routed to l) / (weighted baseline employment
+       of l). Non-displaced workers in l take a wage cut of
+       ``labour_demand_elasticity`` (eta) x s_l, composed additively with the
+       eq 3.5 uplift exactly as WageMarginScenario composes cut and uplift:
+       net income = baseline x (1 + uplift_rate - cut_rate). With eta = 0 the
+       scenario reproduces apply_shocks exactly.
+    3. Displaced workers themselves are unchanged (fully displaced).
+
+    Displaced workers without an observed SOC code have no origin row: their
+    weight is routed by unconditional employment shares (the R rows are
+    near-identical, so this is innocuous). Non-displaced employees without a
+    SOC code belong to no destination group and take no ripple cut.
+    """
+
+    labour_demand_elasticity: float = 0.3  # eta: dlog(wage)/dlog(supply inflow)
+
+
+#: Ripple presets = central preset + ripple, eta in {0.3 central, 0.15, 0.5}.
+RIPPLE_PRESETS = {
+    "central_ripple": RippleScenario("central_ripple", 0.07, 0.026),
+    "central_ripple_low": RippleScenario(
+        "central_ripple_low", 0.07, 0.026, labour_demand_elasticity=0.15
+    ),
+    "central_ripple_high": RippleScenario(
+        "central_ripple_high", 0.07, 0.026, labour_demand_elasticity=0.5
+    ),
+}
+
+RIPPLE_ROUTING_CSV_NAME = "uk_soc2020_major_group_ripple_routing.csv"
+
+
+def load_ripple_routing() -> pd.DataFrame:
+    """9x9 row-stochastic routing matrix R, indexed 1-9, columns 1-9."""
+    from importlib import resources
+
+    path = resources.files("uk_ai_study") / "data" / RIPPLE_ROUTING_CSV_NAME
+    table = pd.read_csv(str(path)).set_index("origin_major_group")
+    table.columns = [int(c.replace("dest_", "")) for c in table.columns]
+    matrix = table.reindex(index=range(1, 10), columns=range(1, 10))
+    if matrix.isna().any().any():
+        raise ValueError(f"{RIPPLE_ROUTING_CSV_NAME} is not a full 9x9 matrix")
+    if not np.allclose(matrix.to_numpy().sum(axis=1), 1.0, atol=1e-9):
+        raise ValueError(f"{RIPPLE_ROUTING_CSV_NAME} rows must sum to 1")
+    return matrix
+
+
+def compute_inflow_shares(
+    persons: pd.DataFrame,
+    displaced: np.ndarray,
+    routing: pd.DataFrame,
+) -> pd.Series:
+    """Per-destination-group proportional labour-supply inflow s_l.
+
+    s_l = (weighted displaced routed to l) / (weighted baseline employment
+    of l). Baseline employment of l counts all employees observed in group l
+    (displaced and not) — the pre-shock workforce.
+    """
+    weight = persons["weight"].to_numpy(dtype=float)
+    employed = persons["employment_income"].to_numpy(dtype=float) > 0
+    codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
+    codes = codes.where(codes < 10, codes / 1000)  # accept 1-9 or FRS 1000-9000
+    group = codes.to_numpy(dtype=float)
+
+    dest = routing.columns
+    inflow = pd.Series(0.0, index=dest)
+    for o in routing.index:
+        w_o = float(weight[displaced & (group == o)].sum())
+        if w_o:
+            inflow = inflow + w_o * routing.loc[o]
+    # displaced without an observed SOC code: no origin row — route by
+    # unconditional destination employment shares (mean of R rows,
+    # renormalised, which collapses to employment shares for the
+    # employment-proportional R up to the excluded-origin correction)
+    w_nan = float(weight[displaced & ~np.isfinite(group)].sum())
+    if w_nan:
+        shares = routing.to_numpy().mean(axis=0)
+        inflow = inflow + w_nan * shares / shares.sum()
+
+    base_emp = pd.Series(
+        {l: float(weight[employed & (group == l)].sum()) for l in dest}
+    )
+    return (inflow / base_emp.replace(0.0, np.nan)).fillna(0.0)
+
+
+def apply_ripple_shocks(
+    persons: pd.DataFrame,
+    scenario: RippleScenario,
+    seed: int = 0,
+    routing: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """apply_shocks plus the ripple wage cut on non-displaced workers.
+
+    The cut for a non-displaced employee in destination group l is
+    eta x s_l of BASELINE earnings, subtracted from the apply_shocks result
+    — i.e. net income = baseline x (1 + uplift_rate - eta x s_l), the same
+    additive rate composition as apply_wage_margin_shock. eta = 0 reproduces
+    apply_shocks bit-for-bit. Displaced workers are unchanged (still zero).
+    """
+    shocked = apply_shocks(persons, scenario, seed=seed)
+    eta = scenario.labour_demand_elasticity
+    if eta == 0.0:
+        return shocked
+    if routing is None:
+        routing = load_ripple_routing()
+
+    displaced = shocked["displaced"].to_numpy()
+    s = compute_inflow_shares(persons, displaced, routing)
+
+    earnings = persons["employment_income"].to_numpy(dtype=float)
+    codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
+    codes = codes.where(codes < 10, codes / 1000)
+    cut_rate = codes.map(eta * s).fillna(0.0).to_numpy(dtype=float)
+    survivors = (earnings > 0) & ~displaced
+    new = shocked["employment_income"].to_numpy(dtype=float).copy()
+    new[survivors] = np.maximum(
+        0.0, new[survivors] - cut_rate[survivors] * earnings[survivors]
+    )
+    shocked["employment_income"] = new
+    return shocked
+
+
 #: The transition contract (#1, finding 4 / decision 2): "displaced" means
 #: fully out of work. Besides employment_income = 0, these person-level
 #: inputs are zeroed so displaced workers do not remain in_work (hours > 0

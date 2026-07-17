@@ -233,6 +233,70 @@ mechanism under every index.}
 \label{fig:indexsens}
 \end{figure}
 
+\subsection{Ripple-effect sensitivity}
+\label{app:ripple}
+
+The displacement scenarios of the main text hold non-displaced wages at
+the uplifted baseline, so the ripple effects of
+\citet{acemoglu2022tasks}---displaced workers bidding down the wages of
+the non-displaced---are absent. Here I price that channel in reduced
+form. After the central displacement draw, each displaced worker's
+labour supply is routed across destination SOC2020 major groups using a
+row-stochastic $9\times 9$ routing matrix with a zero diagonal: the
+preferred source for this matrix, a pairwise retraining-cost matrix from
+the \citet{hosseinilichtinger2026barriers} data release, does not exist
+(the release contains only occupation-level measures, with no
+origin--destination pairs), so I fall back on employment-proportional
+routing, with each origin row proportional to destination employment
+shares from the same ASHE 2025 employment weights used throughout the
+paper. For each destination group I compute the proportional
+labour-supply inflow $s_l$ (routed displaced FTE over baseline
+employment), and every non-displaced employee in group $l$ takes a wage
+cut of $\eta \times s_l$ of baseline earnings, composed additively with
+the $+2.6$ per cent uplift. I interpret $\eta$ as an own-wage labour
+demand elasticity; with 7 per cent of workers displaced the inflow
+shares are around 7 per cent, so $\eta = 0.3$ implies wage cuts of
+roughly 2 per cent across the non-displaced workforce. This is a
+directional sensitivity, not an implementation of the
+\citet{acemoglu2022tasks} propagation matrix: there is no task
+structure, no equilibrium feedback, and the routing is exogenous.
+Table~\ref{tab:ripple} reports the results for $\eta \in \{0, 0.15,
+0.3, 0.5\}$.
+
+\begin{table}[htbp]
+\centering
+\caption{Central scenario with reduced-form ripple effects}
+\label{tab:ripple}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+$\eta$ & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Pov.\ AHC (pp) & $\Delta$Gini (pp) \\
+\midrule
+0 (central) & 18.4 & 1.87 & 1.88 & 1.10 \\
+0.15 & 23.6 & 1.99 & 2.04 & 1.04 \\
+0.30 & 28.7 & 2.06 & 2.14 & 0.99 \\
+0.50 & 35.4 & 2.20 & 2.30 & 0.93 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\parbox{\textwidth}{\footnotesize Single draw, seed 0, 2026. $\eta$ is
+the own-wage labour demand elasticity applied to each destination
+group's proportional labour-supply inflow. $\eta = 0$ reproduces the
+central scenario exactly.}
+\end{table}
+
+The ripple channel loads almost entirely on the Exchequer. At $\eta =
+0.3$ the fiscal cost rises by more than half, from \pounds 18.4 to
+\pounds 28.7~billion, because thin, widespread wage cuts across the
+non-displaced workforce forgo income tax and National Insurance at the
+margin. The distributional headlines barely move: BHC poverty rises by
+only 0.19 points more than in the central run, and the Gini increase
+actually \emph{eases} slightly, since the cuts fall on employed workers
+concentrated in the middle and upper deciles. Excluding ripples
+therefore makes the central fiscal estimate conservative, while the
+poverty and inequality conclusions are robust to the omission.
+
 \subsection{Data appendix: constituency-level occupation imputation}
 \label{app:geo-imputation}
 
