@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.12)  15 JUL 2026 14:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.12)  17 JUL 2026 11:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -440,91 +440,93 @@ Package hyperref Info: Link coloring ON on input line 22.
 {/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
 al/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] (./secti
 ons/intro.tex [2]) (./sections/literature.tex
-[3] [4] [5]) (./sections/methodology.tex [6] [7] [8] [9] [10])
-(./sections/results.tex [11]
-<../results/jr16/fig4_1_transition.png, id=470, 578.16pt x 325.215pt>
+[3] [4] [5]) (./sections/methodology.tex [6] [7] [8] [9] [10] [11])
+(./sections/results.tex [12]
+<../results/jr16/fig4_1_transition.png, id=514, 578.16pt x 325.215pt>
 File: ../results/jr16/fig4_1_transition.png Graphic file (type png)
 <use ../results/jr16/fig4_1_transition.png>
 Package pdftex.def Info: ../results/jr16/fig4_1_transition.png  used on input l
 ine 13.
 (pdftex.def)             Requested size: 387.00787pt x 217.68945pt.
-<../results/jr16/fig4_2_wages.png, id=473, 578.16pt x 325.215pt>
+<../results/jr16/fig4_2_wages.png, id=520, 578.16pt x 325.215pt>
 File: ../results/jr16/fig4_2_wages.png Graphic file (type png)
 <use ../results/jr16/fig4_2_wages.png>
 Package pdftex.def Info: ../results/jr16/fig4_2_wages.png  used on input line 2
 2.
 (pdftex.def)             Requested size: 387.00787pt x 217.68945pt.
-<../results/jr16/fig4_3_capital.png, id=476, 578.16pt x 325.215pt>
+<../results/jr16/fig4_3_capital.png, id=523, 578.16pt x 325.215pt>
 File: ../results/jr16/fig4_3_capital.png Graphic file (type png)
 <use ../results/jr16/fig4_3_capital.png>
 Package pdftex.def Info: ../results/jr16/fig4_3_capital.png  used on input line
  31.
 (pdftex.def)             Requested size: 387.00787pt x 217.68945pt.
- [12 <../results/jr16/fig4_1_transition.png>]
-[13 <../results/jr16/fig4_2_wages.png> <../results/jr16/fig4_3_capital.png>]
-<../results/jr16/fig4_4_decomposition.png, id=491, 650.43pt x 325.215pt>
+ [13] [14 <../results/jr16/fig4_1_transition.png> <../results/jr16/fig4_2_wages
+.png>]
+<../results/jr16/fig4_4_decomposition.png, id=538, 650.43pt x 325.215pt>
 File: ../results/jr16/fig4_4_decomposition.png Graphic file (type png)
 <use ../results/jr16/fig4_4_decomposition.png>
 Package pdftex.def Info: ../results/jr16/fig4_4_decomposition.png  used on inpu
 t line 45.
 (pdftex.def)             Requested size: 387.00787pt x 193.5078pt.
-
-[14 <../results/jr16/fig4_4_decomposition.png>] [15]
-<../results/jr16/fig4_5_disposable_grid.png, id=512, 722.7pt x 361.35pt>
+ [15 <../results/jr16/fig4_3_capital.png>]
+[16 <../results/jr16/fig4_4_decomposition.png>]
+<../results/jr16/fig4_5_disposable_grid.png, id=561, 722.7pt x 361.35pt>
 File: ../results/jr16/fig4_5_disposable_grid.png Graphic file (type png)
 <use ../results/jr16/fig4_5_disposable_grid.png>
 Package pdftex.def Info: ../results/jr16/fig4_5_disposable_grid.png  used on in
 put line 88.
 (pdftex.def)             Requested size: 387.00787pt x 193.50505pt.
- [16 <../results/jr16/fig4_5_disposable_grid.png>]
-<../results/jr16/fig4_6_exchequer_grid.png, id=522, 722.7pt x 361.35pt>
+ [17]
+<../results/jr16/fig4_6_exchequer_grid.png, id=570, 722.7pt x 361.35pt>
 File: ../results/jr16/fig4_6_exchequer_grid.png Graphic file (type png)
 <use ../results/jr16/fig4_6_exchequer_grid.png>
 Package pdftex.def Info: ../results/jr16/fig4_6_exchequer_grid.png  used on inp
 ut line 97.
 (pdftex.def)             Requested size: 387.00787pt x 193.50505pt.
-<../results/jr16/fig4_7_gini_grid.png, id=524, 722.7pt x 361.35pt>
+ [18 <../results/jr16/fig4_5_disposable_grid.png> <../results/jr16/fig4_6_exche
+quer_grid.png>]
+<../results/jr16/fig4_7_gini_grid.png, id=578, 722.7pt x 361.35pt>
 File: ../results/jr16/fig4_7_gini_grid.png Graphic file (type png)
 <use ../results/jr16/fig4_7_gini_grid.png>
 Package pdftex.def Info: ../results/jr16/fig4_7_gini_grid.png  used on input li
 ne 106.
 (pdftex.def)             Requested size: 387.00787pt x 193.50505pt.
- [17 <../results/jr16/fig4_6_exchequer_grid.png>]
+ [19 <../results/jr16/fig4_7_gini_grid.png>]
 Overfull \hbox (5.47847pt too wide) in paragraph at lines 121--133
  [][] 
  []
 
-<../results/incidence/incidence_families.png, id=545, 787.0203pt x 330.63525pt>
+<../results/incidence/incidence_families.png, id=600, 787.0203pt x 330.63525pt>
 
 File: ../results/incidence/incidence_families.png Graphic file (type png)
 <use ../results/incidence/incidence_families.png>
 Package pdftex.def Info: ../results/incidence/incidence_families.png  used on i
 nput line 140.
 (pdftex.def)             Requested size: 432.53372pt x 181.71373pt.
-[18 <../results/jr16/fig4_7_gini_grid.png>] [19 <../results/incidence/incidence
-_families.png>] [20]
-<../results/geo/map_income_change.png, id=570, 614.295pt x 758.835pt>
+[20 <../results/incidence/incidence_families.png>] [21] [22]
+<../results/geo/map_income_change.png, id=633, 614.295pt x 758.835pt>
 File: ../results/geo/map_income_change.png Graphic file (type png)
 <use ../results/geo/map_income_change.png>
 Package pdftex.def Info: ../results/geo/map_income_change.png  used on input li
-ne 162.
+ne 193.
 (pdftex.def)             Requested size: 223.09955pt x 275.5888pt.
-<../results/geo/map_displacement.png, id=571, 614.295pt x 758.835pt>
+<../results/geo/map_displacement.png, id=634, 614.295pt x 758.835pt>
 File: ../results/geo/map_displacement.png Graphic file (type png)
 <use ../results/geo/map_displacement.png>
 Package pdftex.def Info: ../results/geo/map_displacement.png  used on input lin
-e 163.
+e 194.
 (pdftex.def)             Requested size: 223.09955pt x 275.5888pt.
- [21 <../results/geo/map_income_change.png> <../results/geo/map_displacement.pn
-g>]) (./sections/policy.tex [22]
-<../results/policy/policy_reforms.png, id=595, 787.0203pt x 330.63525pt>
+ [23] [24 <../results/geo/map_income_change.png> <../results/geo/map_displaceme
+nt.png>])
+(./sections/policy.tex [25]
+<../results/policy/policy_reforms.png, id=663, 787.0203pt x 330.63525pt>
 File: ../results/policy/policy_reforms.png Graphic file (type png)
 <use ../results/policy/policy_reforms.png>
 Package pdftex.def Info: ../results/policy/policy_reforms.png  used on input li
 ne 37.
 (pdftex.def)             Requested size: 432.53372pt x 181.71373pt.
- [23] [24 <../results/policy/policy_reforms.png>]
-<../results/tax_composition/revenue_shortfall_phi.png, id=614, 578.16pt x 325.2
+ [26]
+<../results/tax_composition/revenue_shortfall_phi.png, id=676, 578.16pt x 325.2
 15pt>
 File: ../results/tax_composition/revenue_shortfall_phi.png Graphic file (type p
 ng)
@@ -532,21 +534,22 @@ ng)
 Package pdftex.def Info: ../results/tax_composition/revenue_shortfall_phi.png  
 used on input line 53.
 (pdftex.def)             Requested size: 387.00787pt x 217.68945pt.
-) (./sections/discussion.tex [25 <../results/tax_composition/revenue_shortfall_
-phi.png>] [26]
+ [27 <../results/policy/policy_reforms.png>])
+(./sections/discussion.tex [28 <../results/tax_composition/revenue_shortfall_ph
+i.png>] [29]
 Overfull \hbox (2.98842pt too wide) in paragraph at lines 16--17
 \OT1/cmr/m/n/10.95 tual re-forms of Sec-tion [][]5[][] show that tem-porar-ily 
 en-larg-ing the ex-ist-ing means-tested architecture---
  []
 
-[27] [28]) (./sections/references.tex [29] [30]) (./sections/appendix.tex
+[30] [31]) (./sections/references.tex [32] [33]) (./sections/appendix.tex
 Overfull \hbox (2.74493pt too wide) in paragraph at lines 8--22
 \OT1/cmr/m/n/10.95 Displacement is a ran-dom draw of which ex-posed work-ers lo
 se em-ploy-ment, sub-ject to occupation-
  []
 
-[31]
-<../results/appendix/b1_market_income_less_capital.png, id=700, 578.16pt x 325.
+[34]
+<../results/appendix/b1_market_income_less_capital.png, id=778, 578.16pt x 325.
 215pt>
 File: ../results/appendix/b1_market_income_less_capital.png Graphic file (type 
 png)
@@ -554,35 +557,32 @@ png)
 Package pdftex.def Info: ../results/appendix/b1_market_income_less_capital.png 
  used on input line 76.
 (pdftex.def)             Requested size: 341.47508pt x 192.07864pt.
-<../results/appendix/b2_capital_income.png, id=701, 578.16pt x 325.215pt>
+ [35]
+<../results/appendix/b2_capital_income.png, id=787, 578.16pt x 325.215pt>
 File: ../results/appendix/b2_capital_income.png Graphic file (type png)
 <use ../results/appendix/b2_capital_income.png>
 Package pdftex.def Info: ../results/appendix/b2_capital_income.png  used on inp
 ut line 83.
 (pdftex.def)             Requested size: 341.47508pt x 192.07864pt.
-<../results/appendix/b3_benefits.png, id=702, 578.16pt x 325.215pt>
+<../results/appendix/b3_benefits.png, id=788, 578.16pt x 325.215pt>
 File: ../results/appendix/b3_benefits.png Graphic file (type png)
 <use ../results/appendix/b3_benefits.png>
 Package pdftex.def Info: ../results/appendix/b3_benefits.png  used on input lin
 e 90.
 (pdftex.def)             Requested size: 341.47508pt x 192.07864pt.
-<../results/appendix/b4_tax_and_ni.png, id=703, 578.16pt x 325.215pt>
+<../results/appendix/b4_tax_and_ni.png, id=789, 578.16pt x 325.215pt>
 File: ../results/appendix/b4_tax_and_ni.png Graphic file (type png)
 <use ../results/appendix/b4_tax_and_ni.png>
 Package pdftex.def Info: ../results/appendix/b4_tax_and_ni.png  used on input l
 ine 97.
 (pdftex.def)             Requested size: 341.47508pt x 192.07864pt.
-<../results/appendix/b5_disposable_income.png, id=704, 578.16pt x 325.215pt>
+<../results/appendix/b5_disposable_income.png, id=790, 578.16pt x 325.215pt>
 File: ../results/appendix/b5_disposable_income.png Graphic file (type png)
 <use ../results/appendix/b5_disposable_income.png>
 Package pdftex.def Info: ../results/appendix/b5_disposable_income.png  used on 
 input line 104.
 (pdftex.def)             Requested size: 341.47508pt x 192.07864pt.
- [32 <../results/appendix/b1_market_income_less_capital.png>] [33 <../results/a
-ppendix/b2_capital_income.png> <../results/appendix/b3_benefits.png>]
-[34 <../results/appendix/b4_tax_and_ni.png> <../results/appendix/b5_disposable_
-income.png>]
-<../results/appendix/exposure_incidence_by_decile.png, id=730, 578.16pt x 325.2
+<../results/appendix/exposure_incidence_by_decile.png, id=794, 578.16pt x 325.2
 15pt>
 File: ../results/appendix/exposure_incidence_by_decile.png Graphic file (type p
 ng)
@@ -590,7 +590,7 @@ ng)
 Package pdftex.def Info: ../results/appendix/exposure_incidence_by_decile.png  
 used on input line 121.
 (pdftex.def)             Requested size: 364.24149pt x 204.88654pt.
-<../results/appendix/complementarity_incidence_by_decile.png, id=731, 578.16pt 
+<../results/appendix/complementarity_incidence_by_decile.png, id=795, 578.16pt 
 x 325.215pt>
 File: ../results/appendix/complementarity_incidence_by_decile.png Graphic file 
 (type png)
@@ -598,22 +598,26 @@ File: ../results/appendix/complementarity_incidence_by_decile.png Graphic file
 Package pdftex.def Info: ../results/appendix/complementarity_incidence_by_decil
 e.png  used on input line 128.
 (pdftex.def)             Requested size: 364.24149pt x 204.88654pt.
- [35 <../results/appendix/exposure_incidence_by_decile.png> <../results/appendi
-x/complementarity_incidence_by_decile.png>]
-<../results/appendix/decomposition_ci.png, id=741, 578.16pt x 325.215pt>
+ [36 <../results/appendix/b1_market_income_less_capital.png> <../results/append
+ix/b2_capital_income.png>] [37 <../results/appendix/b3_benefits.png> <../result
+s/appendix/b4_tax_and_ni.png>] [38 <../results/appendix/b5_disposable_income.pn
+g> <../results/appendix/exposure_incidence_by_decile.png>]
+<../results/appendix/decomposition_ci.png, id=821, 578.16pt x 325.215pt>
 File: ../results/appendix/decomposition_ci.png Graphic file (type png)
 <use ../results/appendix/decomposition_ci.png>
 Package pdftex.def Info: ../results/appendix/decomposition_ci.png  used on inpu
 t line 145.
 (pdftex.def)             Requested size: 364.24149pt x 204.88654pt.
-<../results/appendix/b7_uniform_vs_ai_decile.png, id=746, 578.16pt x 325.215pt>
+ [39 <../results/appendix/complementarity_incidence_by_decile.png> <../results/
+appendix/decomposition_ci.png>]
+<../results/appendix/b7_uniform_vs_ai_decile.png, id=832, 578.16pt x 325.215pt>
 
 File: ../results/appendix/b7_uniform_vs_ai_decile.png Graphic file (type png)
 <use ../results/appendix/b7_uniform_vs_ai_decile.png>
 Package pdftex.def Info: ../results/appendix/b7_uniform_vs_ai_decile.png  used 
 on input line 163.
 (pdftex.def)             Requested size: 364.24149pt x 204.88654pt.
-<../results/appendix/b8_alternative_index_decile.png, id=747, 578.16pt x 325.21
+<../results/appendix/b8_alternative_index_decile.png, id=833, 578.16pt x 325.21
 5pt>
 File: ../results/appendix/b8_alternative_index_decile.png Graphic file (type pn
 g)
@@ -621,40 +625,41 @@ g)
 Package pdftex.def Info: ../results/appendix/b8_alternative_index_decile.png  u
 sed on input line 170.
 (pdftex.def)             Requested size: 364.24149pt x 204.88654pt.
- [36 <../results/appendix/decomposition_ci.png>] [37 <../results/appendix/b7_un
-iform_vs_ai_decile.png> <../results/appendix/b8_alternative_index_decile.png>]
-<../results/robustness/index_sensitivity.png, id=771, 794.97pt x 325.215pt>
+ [40 <../results/appendix/b7_uniform_vs_ai_decile.png>]
+<../results/robustness/index_sensitivity.png, id=851, 794.97pt x 325.215pt>
 File: ../results/robustness/index_sensitivity.png Graphic file (type png)
 <use ../results/robustness/index_sensitivity.png>
 Package pdftex.def Info: ../results/robustness/index_sensitivity.png  used on i
 nput line 231.
 (pdftex.def)             Requested size: 409.76732pt x 167.63397pt.
- [38 <../results/robustness/index_sensitivity.png>]
-<../results/appendix/b9_grid_by_decile.png, id=781, 939.14865pt x 470.11635pt>
+
+[41 <../results/appendix/b8_alternative_index_decile.png>]
+<../results/appendix/b9_grid_by_decile.png, id=859, 939.14865pt x 470.11635pt>
 File: ../results/appendix/b9_grid_by_decile.png Graphic file (type png)
 <use ../results/appendix/b9_grid_by_decile.png>
 Package pdftex.def Info: ../results/appendix/b9_grid_by_decile.png  used on inp
 ut line 293.
 (pdftex.def)             Requested size: 455.30013pt x 227.91289pt.
-<../results/appendix/b11_grid_no_capital.png, id=782, 722.7pt x 361.35pt>
+<../results/appendix/b11_grid_no_capital.png, id=860, 722.7pt x 361.35pt>
 File: ../results/appendix/b11_grid_no_capital.png Graphic file (type png)
 <use ../results/appendix/b11_grid_no_capital.png>
 Package pdftex.def Info: ../results/appendix/b11_grid_no_capital.png  used on i
 nput line 300.
 (pdftex.def)             Requested size: 387.00787pt x 193.50505pt.
-) [39] [40 <../results/appendix/b9_grid_by_decile.png> <../results/appendix/b11
-_grid_no_capital.png>] (./main.aux)
+) [42 <../results/robustness/index_sensitivity.png>] [43 <../results/appendix/b
+9_grid_by_decile.png> <../results/appendix/b11_grid_no_capital.png>] (./main.au
+x)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: E7C00B1FC0F2D75F4D780C8592AD580B;8048.
+(rerunfilecheck)             Checksum: C465FF175857F7CBB372A5FE3EDDB26F;8384.
  ) 
 Here is how much of TeX's memory you used:
- 11086 strings out of 476025
- 177343 string characters out of 5790017
+ 11103 strings out of 476025
+ 177666 string characters out of 5790017
  1865388 words of memory out of 5000000
- 31183 multiletter control sequences out of 15000+600000
+ 31192 multiletter control sequences out of 15000+600000
  524595 words of font info for 74 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,76p,2267b,604s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,76p,2267b,596s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
 , replaced by a fixed one
@@ -687,10 +692,10 @@ fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2023/texmf-dist/fo
 nts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2023/texmf-dist/font
 s/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2023/texmf-dist/fonts/
 type1/public/cm-super/sfrm1200.pfb>
-Output written on main.pdf (40 pages, 2675942 bytes).
+Output written on main.pdf (43 pages, 2692279 bytes).
 PDF statistics:
- 934 PDF objects out of 1000 (max. 8388607)
- 784 compressed objects within 8 object streams
- 163 named destinations out of 1000 (max. 500000)
- 422 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1016 PDF objects out of 1200 (max. 8388607)
+ 862 compressed objects within 9 object streams
+ 171 named destinations out of 1000 (max. 500000)
+ 430 words of extra memory for PDF output out of 10000 (max. 10000000)
 

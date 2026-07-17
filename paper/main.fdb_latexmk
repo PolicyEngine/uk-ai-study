@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1784123475 "main.tex" "main.pdf" "main" 1784123478 0
+["pdflatex"] 1784283890 "main.tex" "main.pdf" "main" 1784283899 0
   "../results/appendix/b11_grid_no_capital.png" 1784117603 115159 07f9dae926815d3f6bf42d87b4fbf043 ""
   "../results/appendix/b1_market_income_less_capital.png" 1784115778 75347 563997234d1076e9f241f77c7f06bb52 ""
   "../results/appendix/b2_capital_income.png" 1784115778 65983 fadd4995d447cb0eb213d8d081c4d769 ""
@@ -142,17 +142,17 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1705056926 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1705056805 7883455 1909f2c3c6cd855b29ade2d8c45ed799 ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "main.aux" 1784123478 27048 c76e3c0cffb53270f7f9ff14dd009b19 "pdflatex"
-  "main.out" 1784123478 8048 e7c00b1fc0f2d75f4d780c8592ad580b "pdflatex"
+  "main.aux" 1784283899 28690 71652f8312d385b5db3d69f3545ce01e "pdflatex"
+  "main.out" 1784283899 8384 c465ff175857f7cbb372a5fe3eddb26f "pdflatex"
   "main.tex" 1784119608 2771 0bb9bf6463eddf15b58023ca9d5496d8 ""
   "sections/appendix.tex" 1784114154 14315 6518aa6a9fb097887d580e1e84f331f6 ""
-  "sections/discussion.tex" 1784123463 12305 a94e9a678018497820ee1e5605929149 ""
+  "sections/discussion.tex" 1784283864 14543 79e395175ed4cb75dcb8c2fc2cba30b5 ""
   "sections/intro.tex" 1784116400 6997 df09c8a5f2ae4ab842c7b3aeb03fed2d ""
-  "sections/literature.tex" 1784113987 9548 ae03661f2ef9e4917740a8fec33b5eac ""
-  "sections/methodology.tex" 1784119413 20192 4f4e2eb96570ff4d69ca5bedfb4f5125 ""
+  "sections/literature.tex" 1784283870 11040 b28294d97b732fd2dc9956ed3db7d36a ""
+  "sections/methodology.tex" 1784283808 24720 6363c0dfeb3d8f5ccfe66d489b80bb15 ""
   "sections/policy.tex" 1784119843 11524 e132e41cf4bfcc2dde2ab3e504e4d7b2 ""
-  "sections/references.tex" 1784113912 8393 1e1df1c8a425cb34b1b3a37cdbbe658f ""
-  "sections/results.tex" 1784123022 31572 8acc07eeffaaa05d5808ebb66850d235 ""
+  "sections/references.tex" 1784281564 9009 6ddc910892de814490d98fcb17a7784d ""
+  "sections/results.tex" 1784283846 37299 b9c668ce6acc15c357801078ddbbf87b ""
   (generated)
   "main.aux"
   "main.log"

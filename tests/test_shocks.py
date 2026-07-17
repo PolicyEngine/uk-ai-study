@@ -4,7 +4,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from uk_ai_study.shocks import ShockScenario, apply_shocks, draw_displaced
+from uk_ai_study.shocks import (
+    ShockScenario,
+    WAGE_MARGIN_PRESETS,
+    WageMarginScenario,
+    apply_shocks,
+    apply_wage_margin_shock,
+    draw_displaced,
+)
 
 
 def make_persons(n=2000, seed=1):
@@ -151,3 +158,103 @@ def test_displaced_earn_zero():
     shocked = apply_shocks(persons, scenario, seed=0)
     displaced = shocked["displaced"].to_numpy()
     assert (shocked["employment_income"].to_numpy()[displaced] == 0).all()
+
+
+# --- wage-margin family -----------------------------------------------------
+
+
+def test_wage_margin_aggregate_earnings_equivalence():
+    """With no uplift, the weighted aggregate fall in employee earnings
+    equals aggregate_earnings_loss_share x baseline aggregate earnings."""
+    persons = make_persons()
+    scenario = WageMarginScenario("t", aggregate_earnings_loss_share=0.07, wage_uplift=0.0)
+    shocked = apply_wage_margin_shock(persons, scenario)
+    base = persons["employment_income"].to_numpy()
+    new = shocked["employment_income"].to_numpy()
+    w = persons["weight"].to_numpy()
+    workers = base > 0
+    loss = ((base - new) * w)[workers].sum()
+    assert loss == pytest.approx(0.07 * (base * w)[workers].sum(), rel=1e-9)
+
+
+def test_wage_margin_no_negative_incomes_and_no_job_loss():
+    persons = make_persons()
+    for scenario in WAGE_MARGIN_PRESETS.values():
+        shocked = apply_wage_margin_shock(
+            persons,
+            scenario,
+            # supply explicit per-group weights for the pss preset so the
+            # test does not depend on the packaged csv
+            gradient_weights={g: float(g) for g in range(1, 10)}
+            if scenario.gradient == "pss"
+            else None,
+        )
+        new = shocked["employment_income"].to_numpy()
+        base = persons["employment_income"].to_numpy()
+        assert (new >= 0).all()
+        # nobody loses their job: all baseline workers still earn > 0, and
+        # the displaced mask (which drives hours/pension zeroing and the
+        # UNEMPLOYED transition downstream) is all False
+        assert (new[base > 0] > 0).all()
+        assert not shocked["displaced"].to_numpy().any()
+        # non-earnings person inputs untouched (hours/pension are only ever
+        # modified downstream for displaced == True)
+        assert (shocked["age"].to_numpy() == persons["age"].to_numpy()).all()
+
+
+def test_wage_margin_gradient_monotonicity():
+    """Higher-exposure major groups take larger percentage cuts."""
+    persons = make_persons()
+    scenario = WageMarginScenario("t", wage_uplift=0.0)
+    shocked = apply_wage_margin_shock(persons, scenario)
+    base = persons["employment_income"].to_numpy()
+    new = shocked["employment_income"].to_numpy()
+    workers = base > 0
+    pct_cut = pd.Series((base - new)[workers] / base[workers])
+    group = persons["soc_major_group"][workers].reset_index(drop=True)
+    by_group = pct_cut.groupby(group).mean()
+    exposure = persons.groupby("soc_major_group")["exposure"].first()
+    ordered = by_group.reindex(exposure.sort_values().index)
+    assert (ordered.diff().dropna() >= -1e-12).all()
+    assert ordered.iloc[-1] > ordered.iloc[0]
+
+
+def test_wage_margin_composes_with_uplift():
+    """cut + uplift = (cut alone) + (uplift alone), person by person, and the
+    aggregate net change equals uplift-implied gain minus the loss share."""
+    persons = make_persons()
+    both = apply_wage_margin_shock(persons, WageMarginScenario("t", wage_uplift=0.026))
+    cut_only = apply_wage_margin_shock(persons, WageMarginScenario("t", wage_uplift=0.0))
+    uplift_only = apply_wage_margin_shock(
+        persons, WageMarginScenario("t", aggregate_earnings_loss_share=0.0, wage_uplift=0.026)
+    )
+    base = persons["employment_income"].to_numpy()
+    np.testing.assert_allclose(
+        both["employment_income"].to_numpy() - base,
+        (cut_only["employment_income"].to_numpy() - base)
+        + (uplift_only["employment_income"].to_numpy() - base),
+        rtol=1e-9,
+    )
+    # eq 3.5 conservation still holds for the uplift leg: weighted mean %
+    # change is exactly +2.6% with no displacement
+    w = persons["weight"].to_numpy()
+    workers = base > 0
+    pct = (uplift_only["employment_income"].to_numpy() - base)[workers] / base[workers]
+    assert np.average(pct, weights=w[workers]) == pytest.approx(0.026, rel=1e-9)
+
+
+def test_wage_margin_pss_missing_file_errors_clearly():
+    persons = make_persons()
+    scenario = WAGE_MARGIN_PRESETS["wage_margin_pss"]
+    try:
+        from uk_ai_study.shocks import load_pss_weights
+
+        load_pss_weights()
+    except FileNotFoundError as exc:
+        assert "genai_expertise" in str(exc)
+        with pytest.raises(FileNotFoundError):
+            apply_wage_margin_shock(persons, scenario)
+    else:
+        # csv exists (built by the parallel task): the preset must just work
+        shocked = apply_wage_margin_shock(persons, scenario)
+        assert (shocked["employment_income"].to_numpy() >= 0).all()

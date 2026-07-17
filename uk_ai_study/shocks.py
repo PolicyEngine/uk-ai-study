@@ -169,6 +169,178 @@ def apply_shocks(
     return shocked
 
 
+@dataclass(frozen=True)
+class WageMarginScenario:
+    """Wage-margin scenario: same aggregate earnings loss as displacement,
+    delivered as occupation-level wage CUTS with no job loss.
+
+    Motivated by equilibrium task models (Acemoglu & Restrepo 2022): the AI
+    shock arrives mostly as RELATIVE WAGE DECLINES for workers who stay
+    employed, not as full unemployment.
+
+    aggregate_earnings_loss_share: the weighted fall in aggregate employee
+    earnings as a share of baseline aggregate employee earnings. Default 0.07
+    matches the central displacement preset: eq 3.4 removes a weighted head-
+    count of ``displacement_rate x employees``, drawn with uniform ordering
+    keys within groups and quotas ∝ employment x exposure, so the expected
+    earnings removed is displacement_rate x aggregate earnings up to the
+    (second-order) covariance between within-draw selection and earnings —
+    across seeds the central draw removes ~7% of the aggregate employee wage
+    bill. We therefore calibrate the cuts to exactly 7% of the baseline
+    employee wage bill of the same universe (all employees with positive
+    employment_income).
+
+    gradient: "caioe" (cut ∝ max(0, C-AIOE normalised so the least-exposed
+    employed person scores 0 — the same min-shift normalisation eq 3.4 uses
+    for quota weights) or "pss" (cut ∝ a per-major-group weight column, e.g.
+    the PSS column of uk_soc2020_major_group_genai_expertise.csv).
+
+    wage_uplift: the eq 3.5 survivor uplift, applied ON TOP of the cut
+    (net % change = uplift_i - cut_i, varying by occupation). Set to 0.0 to
+    run the cut without the uplift.
+    """
+
+    name: str
+    aggregate_earnings_loss_share: float = 0.07
+    gradient: str = "caioe"
+    wage_uplift: float = 0.026
+    capital_return_increase: float = CAPITAL_RETURN_INCREASE
+
+
+#: Wage-margin presets: capital shock ON, as in all presets.
+WAGE_MARGIN_PRESETS = {
+    "wage_margin_central": WageMarginScenario("wage_margin_central", gradient="caioe"),
+    "wage_margin_pss": WageMarginScenario("wage_margin_pss", gradient="pss"),
+}
+
+PSS_CSV_NAME = "uk_soc2020_major_group_genai_expertise.csv"
+
+
+def load_pss_weights(column: str = "pss") -> "pd.Series":
+    """Per-major-group PSS weights from the packaged genai-expertise csv.
+
+    Returns a Series indexed by major group (1-9). Raises FileNotFoundError
+    with a clear message if the csv has not been built yet.
+    """
+    from importlib import resources
+
+    path = resources.files("uk_ai_study") / "data" / PSS_CSV_NAME
+    try:
+        table = pd.read_csv(str(path))
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            f"uk_ai_study/data/{PSS_CSV_NAME} not found: the PSS gradient "
+            "requires the genai-expertise crosswalk (built separately). "
+            "Either add the file or pass gradient_weights explicitly."
+        )
+    matches = [c for c in table.columns if c.lower() == column.lower()]
+    if not matches:
+        raise ValueError(
+            f"{PSS_CSV_NAME} has no '{column}' column; found {list(table.columns)}."
+        )
+    return table.set_index("soc2020_major_group")[matches[0]]
+
+
+def _gradient_values(
+    persons: pd.DataFrame,
+    scenario: WageMarginScenario,
+    gradient_weights=None,
+) -> np.ndarray:
+    """Non-negative per-person gradient g_i (relative cut sizes, unscaled)."""
+    employed = persons["employment_income"].to_numpy(dtype=float) > 0
+    if gradient_weights is None and scenario.gradient == "caioe":
+        # min-shift normalisation, exactly as eq 3.4's quota weights: only
+        # occupations more exposed than the least-exposed employed person
+        # lose; the least-exposed group takes a zero cut.
+        exposure = persons["exposure"].to_numpy(dtype=float)
+        return np.maximum(0.0, exposure - exposure[employed].min())
+    if gradient_weights is None:
+        if scenario.gradient != "pss":
+            raise ValueError(f"unknown gradient: {scenario.gradient!r}")
+        gradient_weights = load_pss_weights()
+    # per-major-group weights: accept any dict/Series keyed by major group
+    # (1-9 or FRS 1000-9000); employees without a SOC code get the
+    # employment-weighted mean weight (mirroring mean-imputed exposure)
+    weights = pd.Series(gradient_weights, dtype=float)
+    if (weights < 0).any():
+        raise ValueError("gradient weights must be non-negative")
+    codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
+    codes = codes.where(codes < 10, codes / 1000)
+    g = codes.map(weights).to_numpy(dtype=float)
+    w = persons["weight"].to_numpy(dtype=float)
+    matched = employed & np.isfinite(g)
+    mean_g = float(np.average(g[matched], weights=w[matched])) if matched.any() else 0.0
+    return np.where(np.isfinite(g), g, mean_g)
+
+
+def apply_wage_margin_shock(
+    persons: pd.DataFrame,
+    scenario: WageMarginScenario,
+    gradient_weights=None,
+) -> pd.DataFrame:
+    """Shocked copy of the person table under the wage-margin family.
+
+    Every employee keeps their job (``displaced`` is all False; hours,
+    pension contributions and employment_status are untouched downstream —
+    ``build_shocked_simulation``'s displacement transition no-ops). Each
+    employee's employment_income is scaled by ``1 + uplift_i - cut_i`` where:
+
+    - cut_i = k * g_i, with g_i the gradient (see WageMarginScenario) and k
+      the single calibration constant chosen so the weighted aggregate
+      earnings removed equals ``aggregate_earnings_loss_share`` x baseline
+      aggregate employee earnings (earnings-equivalence with the central
+      displacement draw);
+    - uplift_i = wage_uplift * theta_i / theta_bar — eq 3.5 with the same
+      employment-weighted theta_bar as apply_shocks (with no displacement,
+      the survivor universe is all baseline workers).
+
+    Only employment_income changes, mirroring the existing eq 3.5 uplift,
+    which also leaves hours and pension contributions untouched for workers
+    who keep their jobs. The capital shock applies as in every scenario.
+    """
+    shocked = persons.copy()
+    earnings = shocked["employment_income"].to_numpy(dtype=float)
+    weight = shocked["weight"].to_numpy(dtype=float)
+    employed = earnings > 0
+    shocked["displaced"] = np.zeros(len(shocked), dtype=bool)
+
+    g = _gradient_values(persons, scenario, gradient_weights)
+    gradient_bill = float((g * earnings * weight)[employed].sum())
+    total_bill = float((earnings * weight)[employed].sum())
+    if scenario.aggregate_earnings_loss_share > 0 and gradient_bill <= 0:
+        raise ValueError(
+            "wage-margin gradient is zero on the entire employed wage bill; "
+            "cannot calibrate the aggregate earnings loss."
+        )
+    k = (
+        scenario.aggregate_earnings_loss_share * total_bill / gradient_bill
+        if gradient_bill > 0
+        else 0.0
+    )
+    cut = k * g
+    if (cut[employed] > 1.0).any():
+        raise ValueError(
+            "calibrated wage-margin cut exceeds 100% of earnings for some "
+            "workers; the gradient is too concentrated for this loss share."
+        )
+
+    theta = shocked["complementarity"].to_numpy(dtype=float)
+    theta_bar = float(np.average(theta[employed], weights=weight[employed]))
+    uplift = np.zeros_like(earnings)
+    if scenario.wage_uplift and theta_bar > 0:
+        uplift[employed] = scenario.wage_uplift * theta[employed] / theta_bar
+
+    factor = np.where(employed, 1.0 + uplift - cut, 1.0)
+    shocked["employment_income"] = np.maximum(0.0, earnings * factor)
+
+    capital_factor = (
+        BASELINE_CAPITAL_RETURN + scenario.capital_return_increase
+    ) / BASELINE_CAPITAL_RETURN
+    for column in ("savings_interest_income", "dividend_income"):
+        shocked[column] = shocked[column].to_numpy(dtype=float) * capital_factor
+    return shocked
+
+
 #: The transition contract (#1, finding 4 / decision 2): "displaced" means
 #: fully out of work. Besides employment_income = 0, these person-level
 #: inputs are zeroed so displaced workers do not remain in_work (hours > 0

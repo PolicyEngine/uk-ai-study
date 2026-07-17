@@ -10,7 +10,15 @@ import numpy as np
 import pandas as pd
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.shocks import PRESETS, ShockScenario, apply_shocks, build_shocked_simulation
+from uk_ai_study.shocks import (
+    PRESETS,
+    WAGE_MARGIN_PRESETS,
+    ShockScenario,
+    WageMarginScenario,
+    apply_shocks,
+    apply_wage_margin_shock,
+    build_shocked_simulation,
+)
 
 AGE_BANDS = ((16, 24), (25, 34), (35, 44), (45, 54), (55, 64), (65, 200))
 
@@ -93,7 +101,7 @@ def run_scenario(
     from policyengine_uk.data import UKSingleYearDataset
 
     if isinstance(scenario, str):
-        scenario = PRESETS[scenario]
+        scenario = PRESETS.get(scenario) or WAGE_MARGIN_PRESETS[scenario]
 
     dataset = UKSingleYearDataset(file_path=str(dataset_path))
     baseline = Microsimulation(dataset=dataset)
@@ -105,7 +113,11 @@ def run_scenario(
     persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
     persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
 
-    shocked_table = apply_shocks(persons, scenario, seed=seed)
+    if isinstance(scenario, WageMarginScenario):
+        # deterministic (no draw): the seed is irrelevant to the cut
+        shocked_table = apply_wage_margin_shock(persons, scenario)
+    else:
+        shocked_table = apply_shocks(persons, scenario, seed=seed)
 
     shocked = build_shocked_simulation(dataset, baseline, shocked_table, period)
     displaced = shocked_table["displaced"].to_numpy()
@@ -139,7 +151,7 @@ def run_scenario(
 
     return ScenarioResult(
         scenario=scenario.name,
-        displacement_rate=scenario.displacement_rate,
+        displacement_rate=getattr(scenario, "displacement_rate", 0.0),
         wage_uplift=scenario.wage_uplift,
         exchequer_cost=base["gov_balance"] - shock["gov_balance"],
         poverty_rate_change_bhc=shock["poverty_bhc"] - base["poverty_bhc"],
