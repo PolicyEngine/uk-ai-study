@@ -93,12 +93,16 @@ pip install -e .
 export HUGGING_FACE_TOKEN=hf_...   # needs access to policyengine/policyengine-uk-data
 python analysis/download_data.py    # FRS h5 + raw UKDA zip (adult.tab) -> data/
 python analysis/run_all.py          # all presets -> results/*.json
-bash analysis/regenerate_all.sh     # or: the FULL result set from empty results/
+bash analysis/regenerate_all.sh     # full snapshot; prior results moved to a timestamped backup
+python analysis/artifact_manifest.py validate  # verify inputs and aggregate artifacts
 python -m pytest tests/             # shock-mechanics unit tests
 ```
 
 Microdata is licensed (UKDS EUL) and never committed; `data/` is gitignored.
 Results in `results/` are aggregates only.
+Every complete regeneration writes `results/manifest.json` with the git
+commit, package versions, input checksums and checksums for every aggregate
+artifact. Cross-workflow comparisons are valid only within one manifest.
 
 ## Known limitations (v0.1)
 
