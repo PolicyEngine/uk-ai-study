@@ -53,8 +53,7 @@ sys.path.insert(0, str(ROOT / "analysis"))
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
 from uk_ai_study.runner import gini
 from uk_ai_study.shocks import (
-    SHOCKED_INCOME_VARIABLES,
-    TRANSITION_ZEROED_VARIABLES,
+    build_shocked_simulation,
 )
 from incidence_scenarios import shocked_table_for  # noqa: E402
 
@@ -79,29 +78,6 @@ def person_calc(sim, var):
 
 def hh_calc(sim, var):
     return sim.calculate(var, period=PERIOD, map_to="household").values
-
-
-def build_sim(dataset, base_arrays, table, reform=None):
-    """build_shocked_simulation, with an optional parameter reform."""
-    from policyengine_uk import Microsimulation
-
-    sim = Microsimulation(dataset=dataset, reform=reform)
-    for column in SHOCKED_INCOME_VARIABLES:
-        sim.set_input(column, PERIOD, table[column].to_numpy(dtype=float))
-    displaced = table["displaced"].to_numpy()
-    for var in TRANSITION_ZEROED_VARIABLES:
-        values = base_arrays[var].copy()
-        values[displaced] = 0.0
-        sim.set_input(var, PERIOD, values)
-    status = base_arrays["employment_status"].copy()
-    status[displaced] = "UNEMPLOYED"
-    try:
-        sim.set_input("employment_status", PERIOD, status)
-    except Exception as exc:  # pragma: no cover
-        import warnings
-
-        warnings.warn(f"employment_status set_input rejected ({exc}).")
-    return sim
 
 
 def hh_state(sim):
@@ -174,13 +150,6 @@ def main():
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
-    # baseline arrays needed to rebuild shocked simulations without keeping
-    # the baseline Microsimulation alive (memory discipline)
-    base_arrays = {
-        var: person_calc(baseline, var).astype(float) for var in TRANSITION_ZEROED_VARIABLES
-    }
-    base_arrays["employment_status"] = person_calc(baseline, "employment_status").astype(object)
-
     # person -> household mapping and baseline deciles (JR16 convention)
     person_hh = person_calc(baseline, "household_id")
     hh_ids = hh_calc(baseline, "household_id")
@@ -194,8 +163,6 @@ def main():
     ranks = np.empty(len(equiv0))
     ranks[order] = cw / cw[-1]
     dec = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
-
-    del baseline
 
     # UC standard-allowance reform values from the live parameter tree
     sa = system.parameters.gov.dwp.universal_credit.standard_allowance.amount
@@ -264,7 +231,7 @@ def main():
     for family in FAMILIES_R1:
         table = shocked_table_for(family, persons)
         displaced = table["displaced"].to_numpy()
-        sim0 = build_sim(ds, base_arrays, table)
+        sim0 = build_shocked_simulation(ds, baseline, table, PERIOD)
         s0 = hh_state(sim0)
         del sim0
         m0 = metrics_from_state(s0, pw_by_hh)
@@ -295,7 +262,7 @@ def main():
         if family == "exposure":
             for name, reform in (("R2_uc_circuit_breaker", r2_reform),
                                  ("R3_cap_suspension_taper_cut", r3_reform)):
-                simr = build_sim(ds, base_arrays, table, reform=reform)
+                simr = build_shocked_simulation(ds, baseline, table, PERIOD, reform=reform)
                 sr = hh_state(simr)
                 del simr
                 mr = metrics_from_state(sr, pw_by_hh)

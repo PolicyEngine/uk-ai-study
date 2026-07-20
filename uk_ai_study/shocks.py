@@ -572,7 +572,7 @@ SHOCKED_INCOME_VARIABLES = (
 )
 
 
-def build_shocked_simulation(dataset, baseline_sim, shocked_table, period):
+def build_shocked_simulation(dataset, baseline_sim, shocked_table, period, reform=None):
     """One shared constructor for the shocked simulation (every pipeline).
 
     Sets the shocked income inputs from ``shocked_table`` and applies the
@@ -580,7 +580,7 @@ def build_shocked_simulation(dataset, baseline_sim, shocked_table, period):
     """
     from policyengine_uk import Microsimulation
 
-    sim = Microsimulation(dataset=dataset)
+    sim = Microsimulation(dataset=dataset, reform=reform)
     for column in SHOCKED_INCOME_VARIABLES:
         sim.set_input(column, period, shocked_table[column].to_numpy(dtype=float))
     displaced = shocked_table["displaced"].to_numpy()
@@ -600,4 +600,8 @@ def build_shocked_simulation(dataset, baseline_sim, shocked_table, period):
             "employment_status transition not applied: displaced persons are "
             "not all UNEMPLOYED in the shocked simulation."
         )
+    for variable in ("employment_income", *TRANSITION_ZEROED_VARIABLES):
+        actual = sim.calculate(variable, period=period, map_to="person").values
+        if displaced.any() and not np.allclose(actual[displaced].astype(float), 0.0):
+            raise RuntimeError(f"{variable} transition not applied to all displaced persons")
     return sim
