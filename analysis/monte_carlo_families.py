@@ -33,7 +33,7 @@ sys.path.insert(0, str(ROOT / "analysis"))
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
 from uk_ai_study.runner import gini
-from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES
+from uk_ai_study.shocks import PRESETS, build_shocked_simulation
 from incidence_scenarios import shocked_table_for  # noqa: E402
 from measured_incidence import LONDON_MULT_CENTRAL, measured_table  # noqa: E402
 from policy_counterfactuals import (  # noqa: E402
@@ -43,7 +43,6 @@ from policy_counterfactuals import (  # noqa: E402
     WAGE_INSURANCE_CAP,
     WAGE_INSURANCE_RATE,
     YEAR_SPAN,
-    build_sim,
     hh_state,
     metrics_from_state,
     person_calc,
@@ -76,8 +75,9 @@ def summarise(df: pd.DataFrame, cols) -> dict:
         c: {
             "mean": float(df[c].mean()),
             "sd": float(df[c].std(ddof=1)),
-            "min": float(df[c].min()),
-            "max": float(df[c].max()),
+            "mcse": float(df[c].std(ddof=1) / np.sqrt(len(df))),
+            "q025": float(df[c].quantile(0.025)),
+            "q975": float(df[c].quantile(0.975)),
         }
         for c in cols
     }
@@ -127,10 +127,6 @@ def main():
 
     b = sim_metrics(baseline)
 
-    base_arrays = {
-        var: person_calc(baseline, var).astype(float) for var in TRANSITION_ZEROED_VARIABLES
-    }
-    base_arrays["employment_status"] = person_calc(baseline, "employment_status").astype(object)
     person_hh = person_calc(baseline, "household_id")
     hh_ids = hh_calc(baseline, "household_id")
     hh_index = pd.Series(np.arange(len(hh_ids)), index=hh_ids)
@@ -182,7 +178,7 @@ def main():
 
             table = family_table(family, persons, seed)
             displaced = table["displaced"].to_numpy()
-            sim = build_sim(ds, base_arrays, table)
+            sim = build_shocked_simulation(ds, baseline, table, PERIOD)
             m = sim_metrics(sim)
             s0 = hh_state(sim) if pol_needed else None
             del sim
@@ -225,7 +221,9 @@ def main():
             for name in pol_needed:
                 if name == "R1_wage_insurance":
                     continue
-                simr = build_sim(ds, base_arrays, table, reform=reforms_exposure[name])
+                simr = build_shocked_simulation(
+                    ds, baseline, table, PERIOD, reform=reforms_exposure[name]
+                )
                 sr = hh_state(simr)
                 del simr
                 mr = metrics_from_state(sr, pw_by_hh)
@@ -248,6 +246,14 @@ def main():
     inc_summary = {
         fam: summarise(inc[inc.family == fam], metrics_cols) for fam in FAMILIES
     }
+    paired = {}
+    reference = inc[inc.family == "exposure"].set_index("seed")
+    for family in FAMILIES:
+        current = inc[inc.family == family].set_index("seed")
+        common = reference.index.intersection(current.index)
+        differences = current.loc[common, metrics_cols] - reference.loc[common, metrics_cols]
+        paired[f"{family}_minus_exposure"] = summarise(differences, metrics_cols)
+    inc_summary["paired_differences"] = paired
     (OUT / "incidence_monte_carlo.json").write_text(json.dumps(inc_summary, indent=2))
 
     pol = pd.read_csv(POL_CSV)
