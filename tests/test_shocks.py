@@ -5,10 +5,12 @@ import pandas as pd
 import pytest
 
 from uk_ai_study.shocks import (
+    MixedMarginScenario,
     RIPPLE_PRESETS,
     RippleScenario,
     ShockScenario,
     apply_ripple_shocks,
+    apply_mixed_margin_shock,
     compute_inflow_shares,
     load_ripple_routing,
     WAGE_MARGIN_PRESETS,
@@ -17,6 +19,31 @@ from uk_ai_study.shocks import (
     apply_wage_margin_shock,
     draw_displaced,
 )
+
+
+def test_wage_uplift_is_invariant_to_complementarity_level_offset():
+    persons = make_persons()
+    shifted = persons.copy()
+    shifted["complementarity"] += 10.0
+    scenario = ShockScenario("offset", 0.07, 0.026)
+    a = apply_shocks(persons, scenario, seed=4)
+    b = apply_shocks(shifted, scenario, seed=4)
+    np.testing.assert_allclose(a["employment_income"], b["employment_income"])
+
+
+def test_mixed_margin_holds_gross_earnings_loss_fixed():
+    persons = make_persons()
+    w = persons["weight"].to_numpy()
+    base = persons["employment_income"].to_numpy()
+    losses = []
+    for lam in (0.0, 0.25, 0.5, 0.75, 1.0):
+        out = apply_mixed_margin_shock(
+            persons,
+            MixedMarginScenario("mixed", lam, wage_uplift=0.0, capital_return_increase=0.0),
+            seed=0,
+        )
+        losses.append(float(((base - out["employment_income"].to_numpy()) * w).sum()))
+    np.testing.assert_allclose(losses, losses[0], rtol=1e-10)
 
 
 def make_persons(n=2000, seed=1):

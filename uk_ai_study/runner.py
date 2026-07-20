@@ -14,12 +14,14 @@ from uk_ai_study.shocks import (
     PRESETS,
     RIPPLE_PRESETS,
     WAGE_MARGIN_PRESETS,
+    MixedMarginScenario,
     RippleScenario,
     ShockScenario,
     WageMarginScenario,
     apply_ripple_shocks,
     apply_shocks,
     apply_wage_margin_shock,
+    apply_mixed_margin_shock,
     build_shocked_simulation,
 )
 
@@ -96,7 +98,7 @@ def _metrics(sim, period: int) -> dict:
 def run_scenario(
     dataset_path: str | Path,
     adult_tab_path: str | Path,
-    scenario: ShockScenario | str,
+    scenario: ShockScenario | WageMarginScenario | MixedMarginScenario | str,
     period: int = 2026,
     seed: int = 0,
 ) -> ScenarioResult:
@@ -120,7 +122,9 @@ def run_scenario(
     persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
     persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
 
-    if isinstance(scenario, WageMarginScenario):
+    if isinstance(scenario, MixedMarginScenario):
+        shocked_table = apply_mixed_margin_shock(persons, scenario, seed=seed)
+    elif isinstance(scenario, WageMarginScenario):
         # deterministic (no draw): the seed is irrelevant to the cut
         shocked_table = apply_wage_margin_shock(persons, scenario)
     elif isinstance(scenario, RippleScenario):

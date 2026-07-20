@@ -151,15 +151,10 @@ def apply_shocks(
     # with theta_bar the EMPLOYMENT-weighted mean theta over baseline workers
     # (JR16-literal; deterministic across draws) — estimand decision on
     # uk-ai-study#1, finding 5
-    theta = shocked["complementarity"].to_numpy(dtype=float)
     weight = shocked["weight"].to_numpy(dtype=float)
     baseline_workers = employment > 0
-    theta_bar = float(
-        (theta * weight)[baseline_workers].sum() / weight[baseline_workers].sum()
-    )
-    uplift = np.zeros_like(employment)
-    if theta_bar > 0:
-        uplift[survivors] = scenario.wage_uplift * (theta[survivors] / theta_bar) * employment[survivors]
+    uplift_rate = _wage_uplift_rates(shocked, baseline_workers, weight, scenario.wage_uplift)
+    uplift = np.where(survivors, uplift_rate * employment, 0.0)
     employment_shocked = np.where(displaced, 0.0, employment + uplift)
     shocked["employment_income"] = employment_shocked
 
@@ -167,6 +162,27 @@ def apply_shocks(
     for column in ("savings_interest_income", "dividend_income"):
         shocked[column] = shocked[column].to_numpy(dtype=float) * capital_factor
     return shocked
+
+
+def _wage_uplift_rates(
+    persons: pd.DataFrame,
+    employed: np.ndarray,
+    weight: np.ndarray,
+    aggregate_rate: float,
+) -> np.ndarray:
+    """Shift-invariant complementarity gradient, normalized over employees.
+
+    The reconstructed complementarity series is identified up to an additive
+    level.  Subtracting its employed minimum before normalizing makes wage
+    incidence invariant to that unidentified offset.
+    """
+    theta = persons["complementarity"].to_numpy(dtype=float)
+    shifted = theta - float(np.nanmin(theta[employed]))
+    mean = float(np.average(shifted[employed], weights=weight[employed]))
+    rates = np.zeros(len(persons), dtype=float)
+    if aggregate_rate and mean > 0:
+        rates[employed] = aggregate_rate * shifted[employed] / mean
+    return rates
 
 
 @dataclass(frozen=True)
@@ -178,17 +194,11 @@ class WageMarginScenario:
     shock arrives mostly as RELATIVE WAGE DECLINES for workers who stay
     employed, not as full unemployment.
 
-    aggregate_earnings_loss_share: the weighted fall in aggregate employee
-    earnings as a share of baseline aggregate employee earnings. Default 0.07
-    matches the central displacement preset: eq 3.4 removes a weighted head-
-    count of ``displacement_rate x employees``, drawn with uniform ordering
-    keys within groups and quotas ∝ employment x exposure, so the expected
-    earnings removed is displacement_rate x aggregate earnings up to the
-    (second-order) covariance between within-draw selection and earnings —
-    across seeds the central draw removes ~7% of the aggregate employee wage
-    bill. We therefore calibrate the cuts to exactly 7% of the baseline
-    employee wage bill of the same universe (all employees with positive
-    employment_income).
+    aggregate_earnings_loss_share: optional explicit wage-bill loss. When
+    omitted, calibrate to the realised wage bill removed by the reference
+    central displacement draw. This makes adjustment-margin comparisons hold
+    the gross earnings shock fixed rather than equating a headcount rate with
+    an earnings share.
 
     gradient: "caioe" (cut ∝ max(0, C-AIOE normalised so the least-exposed
     employed person scores 0 — the same min-shift normalisation eq 3.4 uses
@@ -201,10 +211,12 @@ class WageMarginScenario:
     """
 
     name: str
-    aggregate_earnings_loss_share: float = 0.07
+    aggregate_earnings_loss_share: float | None = None
     gradient: str = "caioe"
     wage_uplift: float = 0.026
     capital_return_increase: float = CAPITAL_RETURN_INCREASE
+    calibration_displacement_rate: float = 0.07
+    calibration_seed: int = 0
 
 
 #: Wage-margin presets: capital shock ON, as in all presets.
@@ -307,13 +319,21 @@ def apply_wage_margin_shock(
     g = _gradient_values(persons, scenario, gradient_weights)
     gradient_bill = float((g * earnings * weight)[employed].sum())
     total_bill = float((earnings * weight)[employed].sum())
-    if scenario.aggregate_earnings_loss_share > 0 and gradient_bill <= 0:
+    loss_share = scenario.aggregate_earnings_loss_share
+    if loss_share is None:
+        reference = draw_displaced(
+            persons,
+            ShockScenario("wage_margin_reference", scenario.calibration_displacement_rate, 0.0),
+            seed=scenario.calibration_seed,
+        )
+        loss_share = float((earnings * weight)[reference].sum() / total_bill)
+    if loss_share > 0 and gradient_bill <= 0:
         raise ValueError(
             "wage-margin gradient is zero on the entire employed wage bill; "
             "cannot calibrate the aggregate earnings loss."
         )
     k = (
-        scenario.aggregate_earnings_loss_share * total_bill / gradient_bill
+        loss_share * total_bill / gradient_bill
         if gradient_bill > 0
         else 0.0
     )
@@ -324,11 +344,7 @@ def apply_wage_margin_shock(
             "workers; the gradient is too concentrated for this loss share."
         )
 
-    theta = shocked["complementarity"].to_numpy(dtype=float)
-    theta_bar = float(np.average(theta[employed], weights=weight[employed]))
-    uplift = np.zeros_like(earnings)
-    if scenario.wage_uplift and theta_bar > 0:
-        uplift[employed] = scenario.wage_uplift * theta[employed] / theta_bar
+    uplift = _wage_uplift_rates(shocked, employed, weight, scenario.wage_uplift)
 
     factor = np.where(employed, 1.0 + uplift - cut, 1.0)
     shocked["employment_income"] = np.maximum(0.0, earnings * factor)
@@ -338,6 +354,59 @@ def apply_wage_margin_shock(
     ) / BASELINE_CAPITAL_RETURN
     for column in ("savings_interest_income", "dividend_income"):
         shocked[column] = shocked[column].to_numpy(dtype=float) * capital_factor
+    return shocked
+
+
+@dataclass(frozen=True)
+class MixedMarginScenario:
+    name: str
+    displacement_share: float
+    reference_displacement_rate: float = 0.07
+    wage_uplift: float = 0.026
+    capital_return_increase: float = CAPITAL_RETURN_INCREASE
+    reference_seed: int = 0
+
+
+def apply_mixed_margin_shock(
+    persons: pd.DataFrame, scenario: MixedMarginScenario, seed: int = 0
+) -> pd.DataFrame:
+    """Split one fixed gross earnings loss between jobs and wage cuts."""
+    lam = float(scenario.displacement_share)
+    if not 0 <= lam <= 1:
+        raise ValueError("displacement_share must be in [0, 1]")
+    earnings = persons["employment_income"].to_numpy(dtype=float)
+    weight = persons["weight"].to_numpy(dtype=float)
+    employed = earnings > 0
+    total_bill = float((earnings * weight)[employed].sum())
+    reference = draw_displaced(
+        persons, ShockScenario("reference", scenario.reference_displacement_rate, 0.0),
+        seed=scenario.reference_seed,
+    )
+    target_loss = float((earnings * weight)[reference].sum())
+    displaced = draw_displaced(
+        persons, ShockScenario("mixed", lam * scenario.reference_displacement_rate, 0.0),
+        seed=seed,
+    ) if lam else np.zeros(len(persons), dtype=bool)
+    realised_displacement_loss = float((earnings * weight)[displaced].sum())
+    wage_loss = max(0.0, target_loss - realised_displacement_loss)
+
+    shocked = persons.copy()
+    shocked["displaced"] = displaced
+    survivors = employed & ~displaced
+    gradient = _gradient_values(persons, WageMarginScenario("mixed"))
+    gradient_bill = float((gradient * earnings * weight)[survivors].sum())
+    cut = wage_loss * gradient / gradient_bill if gradient_bill else np.zeros(len(persons))
+    uplift = _wage_uplift_rates(persons, employed, weight, scenario.wage_uplift)
+    factor = 1 + uplift - np.where(survivors, cut, 0.0)
+    shocked["employment_income"] = np.where(
+        displaced, 0.0, np.maximum(0.0, earnings * factor)
+    )
+    capital_factor = (
+        BASELINE_CAPITAL_RETURN + scenario.capital_return_increase
+    ) / BASELINE_CAPITAL_RETURN
+    for column in ("savings_interest_income", "dividend_income"):
+        shocked[column] = persons[column].to_numpy(dtype=float) * capital_factor
+    shocked.attrs["gross_earnings_loss_share"] = target_loss / total_bill
     return shocked
 
 
