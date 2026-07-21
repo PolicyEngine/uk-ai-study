@@ -1,7 +1,7 @@
 """Phase 1 Monte Carlo (REVISION_PLAN item 6): 20 draws (seeds 0-19) for
 
   (a) all five incidence families (exposure, junior, compression, uniform,
-      measured) — mean/sd/min/max of exchequer cost, BHC poverty change and
+      Klein-anchored top-loaded) — mean/sd/min/max of exchequer cost, BHC poverty change and
       Gini change -> results/robustness/incidence_monte_carlo.json
   (b) every policy counterfactual in policy_counterfactuals.py (R1 under
       exposure/junior/uniform, R2/R3 under exposure), holding the reform
@@ -55,14 +55,14 @@ OUT = ROOT / "results" / "robustness"
 ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 PERIOD = 2026
 N_DRAWS = 20
-FAMILIES = ("exposure", "junior", "compression", "uniform", "measured")
+FAMILIES = ("exposure", "junior", "compression", "uniform", "klein_top_loaded")
 FAMILIES_R1 = ("exposure", "junior", "uniform")
 INC_CSV = OUT / "incidence_draws_five.csv"
 POL_CSV = OUT / "policy_draws.csv"
 
 
 def family_table(family: str, persons: pd.DataFrame, seed: int) -> pd.DataFrame:
-    if family == "measured":
+    if family == "klein_top_loaded":
         return measured_table(persons, PRESETS["central"], LONDON_MULT_CENTRAL, seed=seed)
     return shocked_table_for(family, persons, seed=seed)
 

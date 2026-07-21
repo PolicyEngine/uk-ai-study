@@ -208,7 +208,7 @@ FAMILY_STYLE = {
     "junior": ("Junior-concentrated", AQUA),
     "compression": ("Expertise compression", YELLOW),
     "uniform": ("Uniform", GREEN),
-    "measured": ("Measured (Klein Teeselink)", VIOLET),
+    "klein_top_loaded": ("Klein-anchored top-loaded stress test", VIOLET),
 }
 
 
