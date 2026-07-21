@@ -371,17 +371,31 @@ def test_mixed_margin_endpoints_reproduce_existing_families():
     all_wages = apply_mixed_margin_shock(
         persons, MixedMarginScenario("mixed_0", displacement_share=0.0), seed=3
     )
-    wage_margin = apply_wage_margin_shock(
-        persons, WageMarginScenario("wage", gradient="caioe")
-    )
     all_jobs = apply_mixed_margin_shock(
         persons, MixedMarginScenario("mixed_1", displacement_share=1.0), seed=3
     )
     central = apply_shocks(persons, ShockScenario("central", 0.07, 0.026), seed=3)
-    np.testing.assert_array_equal(all_wages["displaced"], wage_margin["displaced"])
-    np.testing.assert_allclose(all_wages["employment_income"], wage_margin["employment_income"])
+    assert not all_wages["displaced"].to_numpy().any()
     np.testing.assert_array_equal(all_jobs["displaced"], central["displaced"])
     np.testing.assert_allclose(all_jobs["employment_income"], central["employment_income"])
+
+
+def test_mixed_margin_holds_gross_earnings_loss_constant():
+    """Every lambda has the central draw's gross pre-uplift earnings loss."""
+    persons = make_persons()
+    base = persons["employment_income"].to_numpy()
+    weight = persons["weight"].to_numpy()
+    for seed in range(5):
+        central = apply_shocks(persons, ShockScenario("central", 0.07, 0.0), seed=seed)
+        target = float(((base - central["employment_income"].to_numpy()) * weight).sum())
+        for lam in (0.0, 0.25, 0.5, 0.75, 1.0):
+            mixed = apply_mixed_margin_shock(
+                persons,
+                MixedMarginScenario("mixed", displacement_share=lam, wage_uplift=0.0),
+                seed=seed,
+            )
+            loss = float(((base - mixed["employment_income"].to_numpy()) * weight).sum())
+            assert loss == pytest.approx(target, rel=1e-10)
 
 
 def test_mixed_margin_intermediate_combines_both_adjustments():

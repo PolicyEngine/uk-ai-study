@@ -5,10 +5,10 @@ Outputs:
   results/robustness/survivor_wage_grid.csv
   results/robustness/mixed_wage_adjustment.json
 
-The mixed grid varies lambda between calibrations on different bases: lambda
-scales the central 7% displacement-rate parameter, while (1-lambda) scales a
-C-AIOE-graded cut equal to 7% of the baseline wage bill. It is not a
-constant-realised-loss comparison. The
+The mixed grid holds gross pre-uplift earnings loss fixed at the loss generated
+by the seed-specific central 7% employee-displacement draw. Lambda scales that
+displacement rate; C-AIOE-graded cuts among survivors fill the remaining loss.
+The
 survivor-wage grid fixes the central 7% displacement draw and varies the
 complementarity-graded wage effect from -5% to +5%.  Capital treatment and
 all tax-benefit recomputation are unchanged from the main paper.
@@ -132,6 +132,16 @@ def main() -> None:
 
     mixed_rows = []
     for lam in LAMBDAS:
+        gross_table = apply_mixed_margin_shock(
+            persons,
+            MixedMarginScenario(
+                f"mixed_lambda_{lam:g}_gross",
+                displacement_share=lam,
+                wage_uplift=0.0,
+                capital_return_increase=0.0,
+            ),
+            seed=SEED,
+        )
         table = apply_mixed_margin_shock(
             persons,
             MixedMarginScenario(f"mixed_lambda_{lam:g}", displacement_share=lam),
@@ -139,6 +149,14 @@ def main() -> None:
         )
         row = evaluate(f"mixed_lambda_{lam:g}", table)
         row["lambda_displacement_share"] = lam
+        gross_displaced = gross_table["displaced"].to_numpy(dtype=bool)
+        displaced_loss = float((base_earnings[gross_displaced] * weights[gross_displaced]).sum())
+        total_loss = float(
+            ((base_earnings - gross_table["employment_income"].to_numpy()) * weights).sum()
+        )
+        row["gross_earnings_loss_pct"] = 100 * total_loss / base_wage_bill
+        row["gross_displacement_loss_pct"] = 100 * displaced_loss / base_wage_bill
+        row["gross_wage_cut_loss_pct"] = 100 * (total_loss - displaced_loss) / base_wage_bill
         mixed_rows.append(row)
         print(row, flush=True)
 
@@ -166,12 +184,10 @@ def main() -> None:
             "aggregate_adjustment_share": 0.07,
             "lambda_definition": (
                 "lambda scales the 7% employee-displacement-rate parameter; "
-                "one minus lambda scales a cut equal to 7% of the baseline wage bill"
+                "C-AIOE-graded survivor cuts fill the gap to the seed-specific "
+                "central draw's gross earnings loss"
             ),
-            "comparison_warning": (
-                "headcount and wage-bill calibrations use different bases; realised "
-                "net employment-income changes vary across lambda"
-            ),
+            "common_loss_basis": "gross employment earnings before the common wage uplift",
             "mixed_wage_gradient": "C-AIOE",
             "standard_wage_uplift": 0.026,
             "capital_return_increase_pp": 0.4,
