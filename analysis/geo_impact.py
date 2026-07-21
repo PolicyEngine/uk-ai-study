@@ -51,13 +51,32 @@ import figstyle  # noqa: E402
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group  # noqa: E402
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation  # noqa: E402
 
-import policyengine_uk_data  # noqa: E402
-
-STORAGE = Path(policyengine_uk_data.__file__).parent / "storage"
 PLAIN_FRS = ROOT / "data" / "frs_2024_25.h5"
-ENHANCED_FRS = STORAGE / "enhanced_frs_2023_24.h5"
-WEIGHTS_H5 = STORAGE / "parliamentary_constituency_weights.h5"
-CONSTITUENCIES = STORAGE / "constituencies_2024.csv"
+
+
+def _storage_file(name: str) -> Path:
+    """Resolve a policyengine-uk-data storage artefact.
+
+    Prefers a copy in the repo's data/ directory (reproducible, hashed by
+    the rebuild attestation); falls back to an installed
+    policyengine_uk_data package's storage directory.
+    """
+    local = ROOT / "data" / name
+    if local.exists():
+        return local
+    try:
+        import policyengine_uk_data
+    except Exception as exc:
+        raise FileNotFoundError(
+            f"{name} not found in {ROOT / 'data'} and policyengine_uk_data "
+            f"is not importable ({exc}); copy the file into data/."
+        )
+    return Path(policyengine_uk_data.__file__).parent / "storage" / name
+
+
+ENHANCED_FRS = _storage_file("enhanced_frs_2023_24.h5")
+WEIGHTS_H5 = _storage_file("parliamentary_constituency_weights.h5")
+CONSTITUENCIES = _storage_file("constituencies_2024.csv")
 ADULT_TAB = ROOT / "data" / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 OUT = ROOT / "results" / "geo"
 OUT.mkdir(parents=True, exist_ok=True)
