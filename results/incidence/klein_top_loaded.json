@@ -35,17 +35,22 @@
   },
   "provenance": {
     "source": "Klein Teeselink (2025), 'Generative AI and Labor Market Outcomes: Evidence from the United Kingdom', SSRN 5516798; KCL press release 2025-09.",
-    "from_paper": {
-      "total_employment_effect_exposed_firms_pct": -4.5,
-      "junior_employment_effect_pct": -5.8,
-      "junior_multiplier": 1.2888888888888888,
-      "high_paying_firms_employment_effect_pct": -9.6,
-      "low_paying_firms_employment_effect": "almost no change (qualitative)",
-      "london": "minimal and statistically insignificant effects",
+    "paper_per_standard_deviation_estimates_pct": {
+      "total_employment": -0.3,
+      "junior_employment": -0.4,
+      "high_compensation_firm_employment": -0.7,
+      "low_compensation_firm_employment": "close to zero",
+      "london": "minimal and statistically insignificant effects"
+    },
+    "press_release_maximum_exposure_scalings_pct": {
+      "total_employment": -4.5,
+      "junior_employment": -5.8,
+      "high_paying_firm_employment": -9.6,
       "exposed_occupations_postings_pct": -23.4,
       "high_salary_occupations_postings_pct": -34.2
     },
     "author_imposed": {
+      "junior_multiplier": 1.2888888888888888,
       "geographic_multiplier": "none (London multiplier fixed at 1.0)",
       "low_wage_multiplier_floor": 0.6,
       "high_wage_multiplier": 9.6,

@@ -220,7 +220,10 @@ def main() -> None:
 
     # --- duration / take-up sensitivities ---------------------------------
     dt = "robustness/duration_takeup_sensitivity.json"
-    for variant, pref in [("duration_6m", "genDurSixMo"), ("takeup_70", "genTakeup")]:
+    # "genDurSixMo" macro names kept for TeX stability; the variant was
+    # renamed half_earnings_retention (R2-10) and duration_6m is accepted
+    # only as a legacy fallback.
+    for variant, pref in [("half_earnings_retention", "genDurSixMo"), ("takeup_70", "genTakeup")]:
         def res(variant=variant):
             d = jload(dt)
             key = variant if variant in d else next(

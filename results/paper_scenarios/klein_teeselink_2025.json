@@ -1,40 +1,40 @@
 {
   "scenario": "klein_teeselink_2025",
-  "displaced_weighted_total": 1028259.25,
-  "share_of_employed_displaced": 0.044653359800577164,
-  "exchequer_cost_bn": 22.47180288,
-  "poverty_change_bhc_pp": 1.2996213175529818,
-  "gini_change_pp": 0.4242036094710744,
+  "displaced_weighted_total": 972402.0625,
+  "share_of_employed_displaced": 0.042227696627378464,
+  "exchequer_cost_bn": 21.840592896,
+  "poverty_change_bhc_pp": 1.213828570160877,
+  "gini_change_pp": 0.40304927903329624,
   "age_bands": {
     "16-24": {
-      "displaced_weighted": 65806.7578125,
-      "displacement_rate_of_employed": 0.04457811638712883,
-      "mean_income_change": -2511.82666015625
+      "displaced_weighted": 63541.05078125,
+      "displacement_rate_of_employed": 0.04304330796003342,
+      "mean_income_change": -1760.0218505859375
     },
     "25-34": {
-      "displaced_weighted": 203455.09375,
-      "displacement_rate_of_employed": 0.042551975697278976,
-      "mean_income_change": -2134.017822265625
+      "displaced_weighted": 213405.625,
+      "displacement_rate_of_employed": 0.04463309422135353,
+      "mean_income_change": -2112.16162109375
     },
     "35-44": {
-      "displaced_weighted": 286232.9375,
-      "displacement_rate_of_employed": 0.046903979033231735,
-      "mean_income_change": -2340.9931640625
+      "displaced_weighted": 269309.375,
+      "displacement_rate_of_employed": 0.044130776077508926,
+      "mean_income_change": -2273.42724609375
     },
     "45-54": {
-      "displaced_weighted": 261726.65625,
-      "displacement_rate_of_employed": 0.05216243490576744,
-      "mean_income_change": -2652.886474609375
+      "displaced_weighted": 217058.46875,
+      "displacement_rate_of_employed": 0.043260011821985245,
+      "mean_income_change": -2033.005615234375
     },
     "55-64": {
-      "displaced_weighted": 174049.390625,
-      "displacement_rate_of_employed": 0.038885727524757385,
-      "mean_income_change": -1287.095947265625
+      "displaced_weighted": 181679.609375,
+      "displacement_rate_of_employed": 0.04059045389294624,
+      "mean_income_change": -1441.376708984375
     },
     "65-+": {
-      "displaced_weighted": 36988.4375,
-      "displacement_rate_of_employed": 0.03150457516312599,
-      "mean_income_change": -157.3516387939453
+      "displaced_weighted": 27407.94140625,
+      "displacement_rate_of_employed": 0.02334447205066681,
+      "mean_income_change": -205.90206909179688
     }
   }
 }
