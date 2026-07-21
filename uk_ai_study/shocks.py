@@ -216,13 +216,13 @@ WAGE_MARGIN_PRESETS = {
 
 @dataclass(frozen=True)
 class MixedMarginScenario:
-    """Split the central labour shock between displacement and wage cuts.
+    """Interpolate between the central displacement and wage-cut calibrations.
 
-    ``displacement_share`` is lambda in [0, 1].  A share lambda of the
-    central 7% adjustment is delivered through the existing displacement
-    mechanism, and the remaining share through C-AIOE-graded wage cuts among
-    workers who are not displaced.  The standard complementarity-graded wage
-    uplift and capital shock are then applied on top.
+    ``displacement_share`` is lambda in [0, 1]. Lambda scales the central 7%
+    employee-displacement-rate parameter; (1-lambda) scales a wage cut equal
+    to 7% of the baseline wage bill, allocated among survivors. Those are
+    different bases, so lambda is not a share of a conserved realised earnings
+    loss. The standard wage uplift and capital shock are then applied on top.
 
     The endpoints deliberately reproduce the existing model families:
     lambda=0 is ``wage_margin_central`` and lambda=1 is ``central`` for the
@@ -279,9 +279,10 @@ def apply_mixed_margin_shock(
 
     # The wage component removes (1-lambda)*7% of the baseline wage bill,
     # allocated across surviving workers by the same C-AIOE gradient used in
-    # the all-wage endpoint.  Calibrating to the baseline bill makes lambda's
-    # interpretation transparent; realised total earnings loss is therefore
-    # approximately 7%, with small draw-related variation in displaced pay.
+    # the all-wage endpoint. Because displacement is a headcount-rate
+    # calibration whereas
+    # the cut is a wage-bill calibration, realised total earnings losses vary
+    # along this interpolation and must be reported with the outcomes.
     wage_loss_share = (1.0 - lam) * scenario.aggregate_adjustment_share
     g = _gradient_values(
         persons,

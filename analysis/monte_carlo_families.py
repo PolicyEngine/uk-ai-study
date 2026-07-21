@@ -163,6 +163,11 @@ def main():
     done_inc = set()
     if INC_CSV.exists():
         d = pd.read_csv(INC_CSV)
+        # Migrate the pre-revision family name. Keeping those rows would mix
+        # two calibrations in one checkpoint file after a clean branch rerun.
+        if "measured" in set(d["family"]):
+            d = d[d["family"] != "measured"].copy()
+            d.to_csv(INC_CSV, index=False)
         done_inc = set(zip(d["seed"], d["family"]))
     done_pol = set()
     if POL_CSV.exists():
@@ -244,6 +249,10 @@ def main():
 
     # ---- summaries ----
     inc = pd.read_csv(INC_CSV)
+    expected = {(seed, family) for seed in range(N_DRAWS) for family in FAMILIES}
+    observed = set(zip(inc["seed"], inc["family"]))
+    if observed != expected or inc.duplicated(["seed", "family"]).any():
+        raise ValueError("incidence checkpoint is incomplete, duplicated, or contains stale families")
     metrics_cols = ["exchequer_cost_bn", "poverty_change_bhc_pp", "gini_change_pp"]
     inc_summary = {
         fam: summarise(inc[inc.family == fam], metrics_cols) for fam in FAMILIES

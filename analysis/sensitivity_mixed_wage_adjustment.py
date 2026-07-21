@@ -5,8 +5,10 @@ Outputs:
   results/robustness/survivor_wage_grid.csv
   results/robustness/mixed_wage_adjustment.json
 
-The mixed grid varies lambda, the share of a common 7% labour adjustment
-delivered through displacement rather than C-AIOE-graded wage cuts.  The
+The mixed grid varies lambda between calibrations on different bases: lambda
+scales the central 7% displacement-rate parameter, while (1-lambda) scales a
+C-AIOE-graded cut equal to 7% of the baseline wage bill. It is not a
+constant-realised-loss comparison. The
 survivor-wage grid fixes the central 7% displacement draw and varies the
 complementarity-graded wage effect from -5% to +5%.  Capital treatment and
 all tax-benefit recomputation are unchanged from the main paper.
@@ -162,6 +164,14 @@ def main() -> None:
         "survivor_wage_grid": wage_rows,
         "assumptions": {
             "aggregate_adjustment_share": 0.07,
+            "lambda_definition": (
+                "lambda scales the 7% employee-displacement-rate parameter; "
+                "one minus lambda scales a cut equal to 7% of the baseline wage bill"
+            ),
+            "comparison_warning": (
+                "headcount and wage-bill calibrations use different bases; realised "
+                "net employment-income changes vary across lambda"
+            ),
             "mixed_wage_gradient": "C-AIOE",
             "standard_wage_uplift": 0.026,
             "capital_return_increase_pp": 0.4,

@@ -4,12 +4,12 @@
 (SSRN 5516798, KCL). Diff-in-diff on ~75m UK employment spells / job postings,
 2021-2025, by firm & occupation LLM exposure. Estimates used here:
 
-  MEASURED (paper):
-    - firms maximally exposed to LLMs cut total employment by 4.5%
-      (18 months post-ChatGPT); highly exposed occupations: -23.4% postings
-    - junior positions fell 5.8% vs 4.5% total -> junior multiplier 5.8/4.5
-    - high-paying firms: -9.6% employment; low-paying firms: "almost no
-      change" -> high/low relative displacement rates 9.6 : ~0
+  PAPER ESTIMATES (December 2025 revision, per standard deviation):
+    - total employment about -0.3%; junior employment about -0.4%
+    - high-compensation-firm employment about -0.7%; low-compensation effect
+      close to zero; London effect minimal and statistically insignificant
+  PRESS-RELEASE / MAXIMUM-EXPOSURE SCALINGS:
+    - 4.5% total, 5.8% junior and 9.6% high-paying-firm employment effects
   AUTHOR-IMPOSED (documented, not from the paper):
     - LOW_WAGE_MULT floor = 0.6 (relative to 9.6 for above-median earners):
       the paper reports "almost no change", not zero; a strict 0 would
@@ -52,8 +52,8 @@ OUT = Path("results/incidence")
 PERIOD = 2026
 SEED = 0
 
-JUNIOR_MULT = 5.8 / 4.5          # KT: junior -5.8% vs total -4.5%
-HIGH_WAGE_MULT = 9.6             # KT: high-paying firms -9.6%
+JUNIOR_MULT = 5.8 / 4.5          # press-release maximum-exposure scaling
+HIGH_WAGE_MULT = 9.6             # press-release maximum-exposure scaling
 LOW_WAGE_MULT = 0.6              # author floor for KT's "almost no change"
 LONDON_MULT_CENTRAL = 1.0        # neutral: revised paper contradicts a London tilt
 
@@ -227,17 +227,22 @@ def main():
             "source": "Klein Teeselink (2025), 'Generative AI and Labor Market "
                       "Outcomes: Evidence from the United Kingdom', SSRN 5516798; "
                       "KCL press release 2025-09.",
-            "from_paper": {
-                "total_employment_effect_exposed_firms_pct": -4.5,
-                "junior_employment_effect_pct": -5.8,
-                "junior_multiplier": JUNIOR_MULT,
-                "high_paying_firms_employment_effect_pct": -9.6,
-                "low_paying_firms_employment_effect": "almost no change (qualitative)",
+            "paper_per_standard_deviation_estimates_pct": {
+                "total_employment": -0.3,
+                "junior_employment": -0.4,
+                "high_compensation_firm_employment": -0.7,
+                "low_compensation_firm_employment": "close to zero",
                 "london": "minimal and statistically insignificant effects",
+            },
+            "press_release_maximum_exposure_scalings_pct": {
+                "total_employment": -4.5,
+                "junior_employment": -5.8,
+                "high_paying_firm_employment": -9.6,
                 "exposed_occupations_postings_pct": -23.4,
                 "high_salary_occupations_postings_pct": -34.2,
             },
             "author_imposed": {
+                "junior_multiplier": JUNIOR_MULT,
                 "geographic_multiplier": "none (London multiplier fixed at 1.0)",
                 "low_wage_multiplier_floor": LOW_WAGE_MULT,
                 "high_wage_multiplier": HIGH_WAGE_MULT,

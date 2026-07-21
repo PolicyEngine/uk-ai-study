@@ -106,6 +106,8 @@
   ],
   "assumptions": {
     "aggregate_adjustment_share": 0.07,
+    "lambda_definition": "lambda scales the 7% employee-displacement-rate parameter; one minus lambda scales a cut equal to 7% of the baseline wage bill",
+    "comparison_warning": "headcount and wage-bill calibrations use different bases; realised net employment-income changes vary across lambda",
     "mixed_wage_gradient": "C-AIOE",
     "standard_wage_uplift": 0.026,
     "capital_return_increase_pp": 0.4
