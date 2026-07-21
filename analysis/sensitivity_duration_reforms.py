@@ -1,15 +1,17 @@
 """Referee M6 follow-up: does the R1-vs-R2 cost-effectiveness ranking survive
-the 6-month displacement duration?
+the half-earnings-retention displacement variant?
 
 Central exposure-proportional shock with displaced workers keeping 50% of
-baseline annual earnings (as in sensitivity_duration_takeup.py). Seeds 0-4.
-  R1 wage insurance, duration-consistent: 50% of LOST earnings (= 50% x half
+baseline annual earnings while carrying full-year unemployed status/hours —
+a 50%-earnings-retention hybrid, NOT a six-month unemployment spell (R2-10;
+as in sensitivity_duration_takeup.py). Seeds 0-4.
+  R1 wage insurance, retention-consistent: 50% of LOST earnings (= 50% x half
      a year's baseline pay), cap pro-rated to £7,500; post-simulation
      transfer, non-taxable, means-test disregarded (as in the main analysis).
   R2 UC circuit breaker: +20% on all four UC standard allowances, parameter
-     reform on the duration-shocked simulation.
+     reform on the retention-shocked simulation.
 Ranking metric: £bn of gross/net cost per pp of BHC poverty averted relative
-to the duration-shocked no-reform world.
+to the retention-shocked no-reform world.
 
 Output: results/robustness/duration_reform_ranking.json (draws checkpointed
 to duration_reform_draws.csv).
@@ -64,8 +66,18 @@ def main():
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _w = persons["weight"].to_numpy()
+
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(e)
+    persons["complementarity"] = _weighted_fill(th)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
@@ -137,10 +149,12 @@ def main():
 
     d = pd.read_csv(CSV)
     summary = {
-        "description": "R1 (duration-consistent wage insurance) vs R2 (UC +20% "
-                       "standard allowance) under the 6-month duration variant "
-                       "of the central shock; poverty deltas vs the duration-"
-                       f"shocked no-reform world; seeds 0-{N_DRAWS - 1}.",
+        "description": "R1 (retention-consistent wage insurance) vs R2 (UC +20% "
+                       "standard allowance) under the half-earnings-retention "
+                       "variant of the central shock (50% earnings retention, "
+                       "full-year unemployed status; not a six-month spell); "
+                       "poverty deltas vs the retention-shocked no-reform "
+                       f"world; seeds 0-{N_DRAWS - 1}.",
         "n_draws": int(len(d)),
     }
     for c in d.columns:

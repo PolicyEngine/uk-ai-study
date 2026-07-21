@@ -55,7 +55,18 @@ def main():
     )
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _w = persons["weight"].to_numpy()
+
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["complementarity"] = _weighted_fill(th)
 
     def m(s):
         hw = s.calculate("household_weight", period=PERIOD, map_to="household").values
@@ -82,7 +93,7 @@ def main():
     for measure in MEASURES:
         e = exposure_for_major_group(persons["soc_major_group"], measure)
         p = persons.copy()
-        p["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
+        p["exposure"] = _weighted_fill(e)
         table = apply_shocks(p, PRESETS["central"], seed=SEED)
         sim = build_shocked_simulation(ds, baseline, table, PERIOD)
         sh = m(sim)
@@ -91,6 +102,8 @@ def main():
             "exchequer_cost_bn": (b["gov"] - sh["gov"]) / 1e9,
             "poverty_change_bhc_pp": 100 * (sh["pov"] - b["pov"]),
             "gini_change_pp": 100 * (sh["gini"] - b["gini"]),
+            # share of the decile's PERSONS who are displaced — not
+            # "households pushed down a decile" (R2-10 label fix)
             "transition_share_decile1_pct": float(100 * w[(dec == 1) & disp].sum() / w[dec == 1].sum()),
             "transition_share_decile10_pct": float(100 * w[(dec == 10) & disp].sum() / w[dec == 10].sum()),
             "displaced_weighted_m": float(w[disp].sum() / 1e6),
@@ -115,6 +128,11 @@ def main():
         "central_measure": CENTRAL_MEASURE,
         "seed": SEED,
         "scenario": "central (7% displacement, +2.6% wage, +0.4pp capital)",
+        "transition_share_definition": (
+            "transition_share_decileN_pct = share of persons in baseline "
+            "equivalised-income decile N who are displaced (weighted); it is "
+            "NOT the share of households pushed down a decile."
+        ),
         "results": results,
     }
     (OUT / "index_sensitivity_full.json").write_text(json.dumps(payload, indent=2))
@@ -143,7 +161,7 @@ def figure(results):
     ax2.bar(x + 0.2, [results[k]["transition_share_decile10_pct"] for k in measures],
             width=0.4, color=fs.BLUE, label="Decile 10")
     ax2.set_xticks(x, measures, rotation=20)
-    ax2.set_ylabel("Displacement transition share (%)")
+    ax2.set_ylabel("Share of decile's persons displaced (%)")
     ax2.grid(axis="x", visible=False)
     fs.legend_below(ax2, 2)
     fig.suptitle("Central scenario under alternative AI-exposure indices", fontsize=11)

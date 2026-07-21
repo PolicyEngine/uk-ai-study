@@ -48,6 +48,10 @@ class ScenarioResult:
     decile_income_change: dict = field(default_factory=dict)
     age_band_displacement_share: dict = field(default_factory=dict)
     age_band_income_change: dict = field(default_factory=dict)
+    # wage-margin runs only (R2-2): the paired gross-cut calibration target
+    # (share of the baseline wage bill) and the realised aggregate cut
+    gross_cut_share_target: float | None = None
+    gross_cut_realised: float | None = None
 
 
 def gini(values: np.ndarray, weights: np.ndarray) -> float:
@@ -117,12 +121,23 @@ def run_scenario(
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], adult_tab_path)
     exposure = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     theta = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
-    persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED mean of the matched
+    # employed (survey-weighted), as the paper states (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _w = persons["weight"].to_numpy()
+
+    def _weighted_fill(values: np.ndarray) -> np.ndarray:
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(exposure)
+    persons["complementarity"] = _weighted_fill(theta)
 
     if isinstance(scenario, WageMarginScenario):
-        # deterministic (no draw): the seed is irrelevant to the cut
-        shocked_table = apply_wage_margin_shock(persons, scenario)
+        # the seed drives the paired central displacement draw the gross cut
+        # is calibrated to (R2-2)
+        shocked_table = apply_wage_margin_shock(persons, scenario, seed=seed)
     elif isinstance(scenario, RippleScenario):
         shocked_table = apply_ripple_shocks(persons, scenario, seed=seed)
     else:
@@ -171,6 +186,8 @@ def run_scenario(
         decile_income_change=decile_change,
         age_band_displacement_share=band_share,
         age_band_income_change=band_income,
+        gross_cut_share_target=shocked_table.attrs.get("gross_cut_share_target"),
+        gross_cut_realised=shocked_table.attrs.get("gross_cut_realised"),
     )
 
 

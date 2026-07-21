@@ -1,19 +1,11 @@
 #!/bin/bash
-# Full regeneration from an empty results/ (issue #1 fix checklist).
+# Thin wrapper around the manifest/DAG rebuild driver (issue #1, R2-1).
+#
+#   analysis/regenerate_all.sh              attested clean-room rebuild + atomic publish
+#   analysis/regenerate_all.sh --dry-run    print the DAG and manifest coverage
+#   analysis/regenerate_all.sh --check      verify results/ against manifest + attestation
+#
+# All logic lives in analysis/rebuild.py; see its module docstring.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-
-rm -rf results
-mkdir -p results/jr16 results/appendix results/robustness results/paper_scenarios
-
-python analysis/run_all.py
-python analysis/replicate_jr16.py figs
-python analysis/replicate_jr16.py grid
-python analysis/appendix.py fast
-python analysis/appendix.py decomp
-python analysis/appendix.py grids
-python analysis/robustness.py all
-python analysis/paper_scenarios.py
-python analysis/gender.py
-python analysis/figures.py
-echo "REGENERATION COMPLETE"
+exec python3 analysis/rebuild.py "$@"

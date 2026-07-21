@@ -1,6 +1,6 @@
 # uk-ai-study
 
-**When the shock hits the top: the fiscal and distributional incidence of AI in the United Kingdom.** The UK pairs one of the most AI-exposed workforces in the advanced economies with a tax-benefit system designed to insure shocks at the bottom of the income distribution. This study traces AI's employment, wage and capital shocks through the full UK tax-benefit system with PolicyEngine UK, using the scenario architecture of Doorley, O'Connor, O'Shea & Tuda (2026), *Artificial intelligence and income inequality in Ireland*, ESRI/DoF Report 16 ([PDF](https://www.esri.ie/system/files/publications/JR16_0.pdf)).
+**Who bears the AI shock? The distributional and fiscal incidence in the UK.** Who loses work is at least as uncertain as how much work is lost, so this study treats incidence — exposure-proportional, junior-concentrated, uniform, and author-designed top-loaded stress tests — as an explicit scenario axis rather than assuming the shock hits the top. The UK pairs one of the most AI-exposed workforces in the advanced economies with a tax-benefit system designed to insure shocks at the bottom of the income distribution. This study traces AI's employment, wage and capital shocks through the full UK tax-benefit system with PolicyEngine UK, using the scenario architecture of Doorley, O'Connor, O'Shea & Tuda (2026), *Artificial intelligence and income inequality in Ireland*, ESRI/DoF Report 16 ([PDF](https://www.esri.ie/system/files/publications/JR16_0.pdf)).
 
 The study asks: if generative AI displaces some workers, raises the wages of
 the rest, and raises returns to capital, what happens to the Exchequer,
@@ -39,11 +39,14 @@ they never enter the employment shock, which conditions on positive earnings.
   employees (weighted)`; employees without an observed SOC code form a
   pseudo-group with mean-imputed exposure, so the displacement and
   wage-uplift universes coincide. Quotas are allocated across major groups ∝
-  `employment × mean C-AIOE` and realised by random draws with uniform
-  ordering keys within each group (the survey weight enters only through
-  quota consumption, so inclusion probability does not depend on a record's
-  grossing weight — [#1](https://github.com/PolicyEngine/uk-ai-study/issues/1),
-  finding 6). Displaced workers are fully out of work:
+  `employment × mean C-AIOE` and realised by systematic sampling on a random
+  permutation within each group, with prescribed first-order inclusion
+  probabilities that are equal for all records in a group (probability tilts
+  such as the youth multiplier enter as tilts to these inclusion
+  probabilities); a record's grossing weight enters only through the quota
+  accounting, never its inclusion probability
+  ([#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), findings 6 and
+  R2-5). Displaced workers are fully out of work:
   `employment_income = 0`, `hours_worked = 0`, employee pension
   contributions, salary sacrifice and statutory pay zeroed,
   `employment_status = UNEMPLOYED` (the shared transition constructor

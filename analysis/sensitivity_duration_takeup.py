@@ -1,13 +1,15 @@
 """Referee M6: duration and UC take-up sensitivities for the CENTRAL
 (exposure-proportional) scenario. 20 draws (seeds 0-19) each.
 
-(a) DURATION (6 months): displaced workers keep 50% of their baseline annual
-    employment income instead of 0 (half a year out of work), evaluated
-    IN-MODEL so taxes and means-tested benefits respond to the actual annual
-    income. This is a documented hybrid: the annual model has no intra-year
-    timing, so displaced persons carry the full displacement transition
-    (hours zeroed, employment_status = UNEMPLOYED) while receiving half a
-    year's earnings. The in-model run is preferred over the alternative
+(a) HALF-EARNINGS RETENTION (formerly labelled "6-month duration"; R2-10):
+    displaced workers keep 50% of their baseline annual employment income
+    instead of 0, evaluated IN-MODEL so taxes and means-tested benefits
+    respond to the actual annual income. This is NOT a true six-month
+    unemployment spell: the annual model has no intra-year timing, so
+    displaced persons carry the full displacement transition for the whole
+    year (hours zeroed, employment_status = UNEMPLOYED) while receiving half
+    a year's earnings — a documented 50%-earnings-retention hybrid with
+    full-year unemployed status. The in-model run is preferred over the alternative
     "weight the annual result" (0.5 x full-year metrics deltas), which is
     exact for the exchequer only if the tax-benefit response were linear;
     the convex-combination comparator is reported alongside for reference.
@@ -46,7 +48,7 @@ DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
 ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 20
-EARNINGS_RETENTION = 0.5   # half a year of earnings kept by displaced
+EARNINGS_RETENTION = 0.5   # 50% earnings retention (full-year unemployed status)
 UC_TAKEUP = 0.70
 CSV = OUT / "duration_takeup_draws.csv"
 METRICS = ["exchequer_cost_bn", "poverty_change_bhc_pp", "gini_change_pp"]
@@ -86,8 +88,18 @@ def main():
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _w = persons["weight"].to_numpy()
+
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(e)
+    persons["complementarity"] = _weighted_fill(th)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
@@ -116,14 +128,17 @@ def main():
     scenario = PRESETS["central"]
     for seed in range(N_DRAWS):
         table = None
-        for variant in ("duration_6m", "takeup_70"):
+        # "half_earnings_retention" was checkpointed as "duration_6m" in
+        # earlier runs; the variant is a 50%-earnings-retention hybrid, not a
+        # six-month unemployment spell (R2-10)
+        for variant in ("half_earnings_retention", "takeup_70"):
             if (variant, seed) in done:
                 continue
             if table is None:
                 table = apply_shocks(persons, scenario, seed=seed)
             displaced = table["displaced"].to_numpy()
 
-            if variant == "duration_6m":
+            if variant == "half_earnings_retention":
                 t = table.copy()
                 emp = t["employment_income"].to_numpy(dtype=float)
                 t["employment_income"] = np.where(
@@ -162,11 +177,12 @@ def main():
     d = pd.read_csv(CSV)
     summary = {
         "n_draws": N_DRAWS,
-        "duration_6m": {
+        "half_earnings_retention": {
             "description": "Central scenario; displaced workers keep 50% of "
-                           "baseline annual earnings (6-month out-of-work "
-                           "duration), in-model; hours/status transition "
-                           "unchanged (documented hybrid).",
+                           "baseline annual earnings, in-model, while carrying "
+                           "full-year unemployed status/hours (documented "
+                           "50%-earnings-retention hybrid, NOT a six-month "
+                           "unemployment spell).",
         },
         "takeup_70": {
             "description": "Central scenario under Bernoulli(0.70) UC take-up "
@@ -175,7 +191,7 @@ def main():
             "dataset_baseline_would_claim_uc_person_weighted_mean": baseline_takeup_mean_w,
         },
     }
-    for variant in ("duration_6m", "takeup_70"):
+    for variant in ("half_earnings_retention", "takeup_70"):
         g = d[d.variant == variant]
         summary[variant]["results"] = {
             c: {"mean": float(g[c].mean()), "sd": float(g[c].std(ddof=1)),
@@ -183,12 +199,12 @@ def main():
             for c in METRICS + ["uc_change_bn"]
         }
 
-    # convex-combination comparator for duration: 0.5 x full-year central MC
+    # convex-combination comparator: 0.5 x full-year central MC
     mc_path = OUT / "incidence_draws_five.csv"
     if mc_path.exists():
         mc = pd.read_csv(mc_path)
         mc = mc[mc.family == "exposure"]
-        summary["duration_6m"]["convex_combination_comparator_0.5x_full_year"] = {
+        summary["half_earnings_retention"]["convex_combination_comparator_0.5x_full_year"] = {
             c: {"mean": float(0.5 * mc[c].mean()), "sd": float(0.5 * mc[c].std(ddof=1))}
             for c in METRICS
         }

@@ -3,10 +3,13 @@
 Employment shock (eq 3.4): the aggregate number of displaced workers is
 ``displacement_rate x employed``; it is allocated across SOC major groups in
 proportion to ``employment x mean C-AIOE`` of the group, then realised by
-random draws with UNIFORM ordering keys within each group (the survey weight
-enters only through quota consumption, so a represented person's inclusion
-probability does not depend on their record's grossing weight — #1,
-finding 6).
+systematic sampling on a random permutation with PRESCRIBED first-order
+inclusion probabilities: every member of a group shares the same inclusion
+probability (up to the youth multiplier), chosen so the expected displaced
+grossing weight equals the group quota exactly. A represented person's
+inclusion probability therefore does not depend on their record's grossing
+weight at ANY order (#1, round-1 finding 6 and round-2 finding R2-5 — the
+earlier prefix-fill rule made inclusion depend on weight at second order).
 
 Wage shock (eq 3.5): surviving workers receive percentage uplifts
 proportional to complementarity (theta), normalised by the
@@ -106,27 +109,38 @@ def draw_displaced(
         quota = raw[g] * scale
         if quota <= 0:
             continue
-        # uniform ordering keys within group: exposure is constant within a
-        # 1-digit group, and weighting the ordering as well as the quota
-        # consumption would double-count the survey weight, making a
-        # represented person's risk depend on their record's grossing
-        # weight (#1, finding 6)
-        p = np.ones(len(members))
+        # prescribed first-order inclusion probabilities: pi_i proportional
+        # to the (uniform, youth-tilted) multiplier m_i, scaled so
+        # sum_i w_i pi_i == quota. Exposure is constant within a 1-digit
+        # group, and the grossing weight enters only through the scaling, so
+        # every same-multiplier member shares the same pi regardless of
+        # their record's weight (#1, findings 6 and R2-5).
+        m = np.ones(len(members))
         if scenario.youth_displacement_multiplier != 1.0:
-            p = p * np.where(age[members] < 25, scenario.youth_displacement_multiplier, 1.0)
-        p = p / p.sum()
-        # draw members (weighted, without replacement) until the weighted
-        # quota fills; the quota-crossing person is included with probability
-        # equal to the remaining quota fraction, so the expected displaced
-        # weight equals the quota exactly
-        chosen = rng.choice(members, size=len(members), replace=False, p=p)
-        cum = np.cumsum(weight[chosen])
-        displaced[chosen[cum <= quota]] = True
-        crossing = np.searchsorted(cum, quota)
-        if crossing < len(chosen) and cum[crossing] > quota:
-            shortfall = quota - (cum[crossing - 1] if crossing else 0.0)
-            if rng.random() < shortfall / weight[chosen[crossing]]:
-                displaced[chosen[crossing]] = True
+            m = m * np.where(age[members] < 25, scenario.youth_displacement_multiplier, 1.0)
+        w_g = weight[members]
+        pi = quota * m / float((w_g * m).sum())
+        # cap at 1 and redistribute the residual quota over uncapped members
+        for _ in range(len(members)):
+            over = pi > 1.0
+            if not over.any():
+                break
+            pi[over] = 1.0
+            free = ~over
+            residual = quota - float(w_g[over].sum())
+            if residual <= 0 or not free.any():
+                pi[free] = 0.0
+                break
+            pi[free] = residual * m[free] / float((w_g[free] * m[free]).sum())
+        # systematic sampling on a random permutation realises the pi_i
+        # exactly at first order: member j (in permuted order) is included
+        # iff an integer lies in (C_{j-1} - u, C_j - u] with C the cumsum of
+        # pi and u ~ U[0, 1)
+        perm = rng.permutation(len(members))
+        c = np.concatenate(([0.0], np.cumsum(pi[perm])))
+        u = rng.random()
+        f = np.floor(c - u)
+        displaced[members[perm[f[1:] > f[:-1]]]] = True
     return displaced
 
 
@@ -179,14 +193,17 @@ class WageMarginScenario:
     employed, not as full unemployment.
 
     aggregate_earnings_loss_share: the weighted fall in aggregate employee
-    earnings as a share of baseline aggregate employee earnings. Default 0.07
-    applies the same headline parameter as the central preset to a different
-    base. It does not match a realised central-draw loss: equation 3.4 fixes a
-    weighted employee headcount, and exposure-proportional selection can make
-    the selected earnings share differ materially from 7%. The separate mixed-
-    margin comparison below explicitly matches the central draw's realised
-    gross loss. The employee universe here is everyone with positive annual
-    employment income.
+    earnings (gross cut, before the eq 3.5 uplift) as a share of baseline
+    aggregate employee earnings. Default ``None`` calibrates the cut to the
+    PAIRED central displacement draw for the run's seed: equation 3.4 fixes a
+    weighted employee headcount, not an earnings share, and because group
+    job-loss rates correlate with group pay the central draw removes ~7.8% of
+    the baseline wage bill, not 7% (round-2 finding R2-2). Pass an explicit
+    share to break the pairing. ``apply_wage_margin_shock`` asserts the
+    realised gross cut equals the target. The eq 3.5 uplift then applies to
+    all employees (with no displacement every baseline worker survives); the
+    gross-cut equivalence is stated before the uplift. The employee universe
+    is everyone with positive annual employment income.
 
     gradient: "caioe" (cut ∝ max(0, C-AIOE normalised so the least-exposed
     employed person scores 0 — the same min-shift normalisation eq 3.4 uses
@@ -199,7 +216,7 @@ class WageMarginScenario:
     """
 
     name: str
-    aggregate_earnings_loss_share: float = 0.07
+    aggregate_earnings_loss_share: float | None = None
     gradient: str = "caioe"
     wage_uplift: float = 0.026
     capital_return_increase: float = CAPITAL_RETURN_INCREASE
@@ -216,18 +233,21 @@ WAGE_MARGIN_PRESETS = {
 class MixedMarginScenario:
     """Hold gross earnings loss fixed while varying the adjustment margin.
 
-    ``displacement_share`` is lambda in [0, 1]. Lambda scales the central 7%
-    employee-displacement-rate parameter. For each seed, the gross earnings
-    removed by the full central displacement draw is the common loss target;
-    C-AIOE-graded cuts among survivors fill the gap between that target and
+    ``displacement_share`` is lambda in [0, 1]. For each seed, the gross
+    earnings removed by the full central displacement draw is the common
+    loss target; the partial displacement is a Bernoulli(lambda) THINNING of
+    that central draw (each centrally displaced person stays displaced with
+    probability lambda), so the displaced sets are nested across lambda and
+    the expected displaced weight is lambda x the central draw's.
+    C-AIOE-graded cuts among survivors fill the gap between the target and
     earnings removed through partial displacement. The standard wage uplift
     and capital shock are applied only after this identity is imposed.
 
     Lambda=1 exactly reproduces ``central`` for the same seed. Lambda=0 is a
-    pure wage-cut counterfactual matched to that seed's central gross loss; it
-    is distinct from ``wage_margin_central``, which removes exactly 7% of the
-    baseline wage bill. Intermediate cases are reduced-form comparative
-    statics, not equilibrium paths.
+    pure wage-cut counterfactual matched to that seed's central gross loss —
+    the same pairing ``wage_margin_central`` now uses by default (R2-2).
+    Intermediate cases are reduced-form comparative statics, not equilibrium
+    paths.
     """
 
     name: str
@@ -259,29 +279,28 @@ def apply_mixed_margin_shock(
     central_displaced = draw_displaced(persons, central_scenario, seed=seed)
     target_gross_loss = float((earnings * weight)[central_displaced].sum())
 
-    displacement_scenario = ShockScenario(
-        scenario.name,
-        displacement_rate=lam * scenario.aggregate_adjustment_share,
-        wage_uplift=scenario.wage_uplift,
-        capital_return_increase=scenario.capital_return_increase,
-    )
     if lam == 1.0:
-        return apply_shocks(persons, displacement_scenario, seed=seed)
+        return apply_shocks(persons, central_scenario, seed=seed)
 
     shocked = persons.copy()
-    displaced = draw_displaced(persons, displacement_scenario, seed=seed)
+    # Bernoulli(lambda) thinning of the central draw: nests the displaced
+    # sets across lambda and makes the wage-cut residual non-negative by
+    # construction (the systematic-sampling draws are not prefix-nested
+    # across rates, so re-drawing at rate lambda x 7% would not guarantee
+    # this).
+    displaced = central_displaced.copy()
+    if lam > 0.0:
+        thin_rng = np.random.default_rng([seed, 202607])
+        idx = np.flatnonzero(displaced)
+        displaced[idx[thin_rng.random(len(idx)) >= lam]] = False
+    else:
+        displaced[:] = False
     shocked["displaced"] = displaced
 
     survivors = employed & ~displaced
 
-    # Fill the gap to the seed-specific central gross-loss target. Using the
-    # same seed makes the partial displacement draw a prefix of the central
-    # draw, so the residual is non-negative.
     displaced_loss = float((earnings * weight)[displaced].sum())
-    wage_loss = target_gross_loss - displaced_loss
-    if wage_loss < -1e-6:
-        raise ValueError("partial displacement exceeds central gross-loss target")
-    wage_loss = max(0.0, wage_loss)
+    wage_loss = max(0.0, target_gross_loss - displaced_loss)
     g = _gradient_values(
         persons,
         WageMarginScenario(scenario.name, gradient="caioe"),
@@ -375,6 +394,7 @@ def apply_wage_margin_shock(
     persons: pd.DataFrame,
     scenario: WageMarginScenario,
     gradient_weights=None,
+    seed: int = 0,
 ) -> pd.DataFrame:
     """Shocked copy of the person table under the wage-margin family.
 
@@ -405,21 +425,34 @@ def apply_wage_margin_shock(
     g = _gradient_values(persons, scenario, gradient_weights)
     gradient_bill = float((g * earnings * weight)[employed].sum())
     total_bill = float((earnings * weight)[employed].sum())
-    if scenario.aggregate_earnings_loss_share > 0 and gradient_bill <= 0:
+    share = scenario.aggregate_earnings_loss_share
+    if share is None:
+        # pair the gross cut to the central displacement draw for this seed:
+        # equal aggregate baseline earnings removed, by construction (R2-2)
+        paired = ShockScenario(
+            scenario.name,
+            displacement_rate=PRESETS["central"].displacement_rate,
+            wage_uplift=scenario.wage_uplift,
+            capital_return_increase=scenario.capital_return_increase,
+        )
+        central_displaced = draw_displaced(persons, paired, seed=seed)
+        share = float((earnings * weight)[central_displaced].sum()) / total_bill
+    if share > 0 and gradient_bill <= 0:
         raise ValueError(
             "wage-margin gradient is zero on the entire employed wage bill; "
             "cannot calibrate the aggregate earnings loss."
         )
-    k = (
-        scenario.aggregate_earnings_loss_share * total_bill / gradient_bill
-        if gradient_bill > 0
-        else 0.0
-    )
+    k = share * total_bill / gradient_bill if gradient_bill > 0 else 0.0
     cut = k * g
     if (cut[employed] > 1.0).any():
         raise ValueError(
             "calibrated wage-margin cut exceeds 100% of earnings for some "
             "workers; the gradient is too concentrated for this loss share."
+        )
+    realised_cut = float((cut * earnings * weight)[employed].sum())
+    if not np.isclose(realised_cut, share * total_bill, rtol=1e-9):
+        raise AssertionError(
+            "wage-margin gross cut does not equal its calibration target"
         )
 
     theta = shocked["complementarity"].to_numpy(dtype=float)
@@ -430,6 +463,8 @@ def apply_wage_margin_shock(
 
     factor = np.where(employed, 1.0 + uplift - cut, 1.0)
     shocked["employment_income"] = np.maximum(0.0, earnings * factor)
+    shocked.attrs["gross_cut_share_target"] = share
+    shocked.attrs["gross_cut_realised"] = realised_cut
 
     capital_factor = (
         BASELINE_CAPITAL_RETURN + scenario.capital_return_increase
@@ -601,23 +636,37 @@ SHOCKED_INCOME_VARIABLES = (
 )
 
 
-def build_shocked_simulation(dataset, baseline_sim, shocked_table, period):
+def build_shocked_simulation(
+    dataset, baseline_sim, shocked_table, period, reform=None, base_arrays=None
+):
     """One shared constructor for the shocked simulation (every pipeline).
 
     Sets the shocked income inputs from ``shocked_table`` and applies the
-    full displacement transition to displaced persons.
+    full displacement transition to displaced persons. ``reform`` (an
+    optional PolicyEngine reform) is passed through so the policy pipeline
+    uses this same fail-fast path (R2-7) instead of a local copy.
+    ``base_arrays`` optionally supplies the baseline person arrays for
+    TRANSITION_ZEROED_VARIABLES and employment_status (pipelines that drop
+    the baseline simulation for memory); otherwise they are calculated from
+    ``baseline_sim``.
     """
     from policyengine_uk import Microsimulation
 
-    sim = Microsimulation(dataset=dataset)
+    sim = Microsimulation(dataset=dataset, reform=reform)
     for column in SHOCKED_INCOME_VARIABLES:
         sim.set_input(column, period, shocked_table[column].to_numpy(dtype=float))
     displaced = shocked_table["displaced"].to_numpy()
     for var in TRANSITION_ZEROED_VARIABLES:
-        values = baseline_sim.calculate(var, period=period, map_to="person").values.astype(float)
+        if base_arrays is not None:
+            values = np.asarray(base_arrays[var], dtype=float).copy()
+        else:
+            values = baseline_sim.calculate(var, period=period, map_to="person").values.astype(float)
         values[displaced] = 0.0
         sim.set_input(var, period, values)
-    status = baseline_sim.calculate("employment_status", period=period, map_to="person").values.astype(object)
+    if base_arrays is not None:
+        status = np.asarray(base_arrays["employment_status"], dtype=object).copy()
+    else:
+        status = baseline_sim.calculate("employment_status", period=period, map_to="person").values.astype(object)
     status[displaced] = "UNEMPLOYED"
     # A rejected set_input here would silently leave displaced workers
     # EMPLOYED (with zero hours), changing benefit entitlements in every

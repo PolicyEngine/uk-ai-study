@@ -685,7 +685,11 @@ INPUT ../results/incidence/incidence_families.png
 INPUT ../results/incidence/incidence_families.png
 INPUT ../results/incidence/incidence_families.png
 INPUT ../results/incidence/incidence_families.png
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti8.tfm
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
 INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
 INPUT ../results/geo/map_income_change.png
 INPUT ../results/geo/map_income_change.png
 INPUT ../results/geo/map_income_change.png

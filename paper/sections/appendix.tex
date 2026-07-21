@@ -134,11 +134,13 @@ Section~\ref{sec:results}.
 
 Figure~\ref{fig:decomp-ci} reports the central-scenario disposable-income
 change by decile as the mean over twenty independent displacement draws
-with central 95 per cent intervals across assignment draws. The gradient runs from $-0.5$ per
-cent in the bottom decile to $-4.1$ per cent in the top. It is not quite
-monotone: deciles~2 and~3 show a small reversal ($-0.88$ against $-0.82$
-per cent), well inside the draw noise. The overall upward slope of the loss
+with central 95 per cent intervals across assignment draws. The gradient runs from $-0.6$ per
+cent in the bottom decile to $-4.1$ per cent in the top. On the current
+20-draw means it is monotone through deciles~2 and~3 ($-0.84$ against
+$-0.88$ per cent), with the difference well inside the draw noise. The
+overall upward slope of the loss
 profile appears across the reported draw interval.
+% TODO-rebuild: decile means from results/appendix/decomposition_ci.csv; recheck after the clean-room rebuild.
 
 \begin{figure}[htbp]
 \centering
@@ -219,9 +221,10 @@ DSIT LLM & 17.6 & 1.85 & 1.09 & 0.51 & 4.68 \\
 \vspace{2pt}
 \parbox{\textwidth}{\footnotesize Single draw, seed 0, 2026. D1 and D10
 shares are the percentages of persons in the bottom and top baseline
-income deciles whose household is pushed down at least one decile by
-displacement. Aggregate displacement is held at 7 per cent by the quota
+income deciles who transition to unemployment (displaced shares) under
+the draw. Aggregate displacement is held at 7 per cent by the quota
 mechanism under every index.}
+% TODO-rebuild: table values are stale against current index_sensitivity_full.json; regenerate mechanically in the clean-room rebuild.
 \end{table}
 
 \begin{figure}[htbp]
@@ -251,8 +254,11 @@ paper. For each destination group I compute the proportional
 labour-supply inflow $s_l$ (routed displaced FTE over baseline
 employment), and every non-displaced employee in group $l$ takes a wage
 cut of $\eta \times s_l$ of baseline earnings, composed additively with
-the $+2.6$ per cent uplift. I treat $\eta$ as an author-chosen reduced-form
-wage sensitivity, not an estimated structural elasticity; with 7 per cent of workers displaced the inflow
+the $+2.6$ per cent uplift. The parameter $\eta$ is an \emph{assumed
+inverse-demand slope}---the proportional wage decline per unit
+proportional labour-supply inflow---not a sourced own-wage elasticity,
+and no conclusion about whether the central scenario is conservative
+should be drawn from any single value of it; with 7 per cent of workers displaced the inflow
 shares are around 7 per cent, so $\eta = 0.3$ implies wage cuts of
 roughly 2 per cent across the non-displaced workforce. This is a
 directional sensitivity, not an implementation of the
@@ -324,14 +330,19 @@ points of the gap to the dataset itself and $+0.3$ points to the
 simulation period, with the remainder arising in the constituency-weight
 aggregation.
 
-\medskip\noindent\emph{Constituency ranking.} The worst-hit
-constituencies are Lagan Valley ($-5.43$ per cent), Upper Bann ($-4.11$
-per cent) and Belfast East ($-4.03$ per cent), with Stratford and Bow and
-Islington South and Finsbury close behind---a pattern combining Northern
-Irish seats with high-exposure inner-London ones. A small number of
-constituencies gain on net, led by Kingston and Surbiton ($+2.05$ per
-cent) and Dumfriesshire, Clydesdale and Tweeddale ($+1.75$ per cent),
-where wage and capital gains outweigh displacement losses.
+\medskip\noindent\emph{Constituency ranking.} Because the constituency
+weights are calibrated to demographic and income targets that contain no
+local occupation mix, the constituency figures are synthetic
+demographic/income projections of the national scenario. The pattern of
+simulated losses combines Northern Irish seats (worst around $-4$ to
+$-5$ per cent of household income) with high-exposure inner-London
+seats, while a small number of constituencies (around $+2$ per cent at
+most) gain on net where wage and capital gains outweigh displacement
+losses. Individual named rankings rest on a single occupation imputation
+and a single seed-0 displacement draw; their stability has not been
+established, so I report the pattern rather than a precise league table.
+A nested Monte Carlo over imputation draws and displacement draws is
+left to future work.
 
 \subsection{The scenario grid by decile, and without the capital shock}
 
@@ -346,9 +357,11 @@ Figure~\ref{fig:b11} removes the capital-return shock. Average disposable
 incomes fall relative to the capital-on grid, confirming that the capital
 channel raises average incomes while concentrating its gains at the top.
 Within this grid, without the capital shock
-the Gini of equivalised disposable income still rises in all 66 cells, by
-0.00 to 1.50 percentage points. Thus the positive Gini change in these
-66 cells is not generated solely by the capital channel.
+the Gini of equivalised disposable income rises in 65 of the 66 cells,
+by up to 1.50 percentage points; the remaining cell is the null $(0,0)$
+cell, which with the capital shock also off contains no shock at all and
+is exactly zero. Thus the positive Gini change in the shocked cells is
+not generated solely by the capital channel.
 
 \begin{figure}[htbp]
 \centering

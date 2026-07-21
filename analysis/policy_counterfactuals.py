@@ -55,6 +55,7 @@ from uk_ai_study.runner import gini
 from uk_ai_study.shocks import (
     SHOCKED_INCOME_VARIABLES,
     TRANSITION_ZEROED_VARIABLES,
+    build_shocked_simulation,
 )
 from incidence_scenarios import shocked_table_for  # noqa: E402
 
@@ -82,26 +83,10 @@ def hh_calc(sim, var):
 
 
 def build_sim(dataset, base_arrays, table, reform=None):
-    """build_shocked_simulation, with an optional parameter reform."""
-    from policyengine_uk import Microsimulation
-
-    sim = Microsimulation(dataset=dataset, reform=reform)
-    for column in SHOCKED_INCOME_VARIABLES:
-        sim.set_input(column, PERIOD, table[column].to_numpy(dtype=float))
-    displaced = table["displaced"].to_numpy()
-    for var in TRANSITION_ZEROED_VARIABLES:
-        values = base_arrays[var].copy()
-        values[displaced] = 0.0
-        sim.set_input(var, PERIOD, values)
-    status = base_arrays["employment_status"].copy()
-    status[displaced] = "UNEMPLOYED"
-    try:
-        sim.set_input("employment_status", PERIOD, status)
-    except Exception as exc:  # pragma: no cover
-        import warnings
-
-        warnings.warn(f"employment_status set_input rejected ({exc}).")
-    return sim
+    """Shared fail-fast constructor, with an optional parameter reform (R2-7)."""
+    return build_shocked_simulation(
+        dataset, None, table, PERIOD, reform=reform, base_arrays=base_arrays
+    )
 
 
 def hh_state(sim):

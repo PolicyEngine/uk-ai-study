@@ -20,11 +20,13 @@ so pro-rata attribution is exact for NIC whenever employment income is the
 only earned income.
 
 Second channel: a share of the recycled profits flows back to households as
-dividends, distributed pro-rata over the observed household dividend
-distribution (payout ratio treated as a parameter, 0.5 — roughly the
-long-run FTSE dividend payout ratio; no UK-specific AI-firm evidence, so it
-is a parameter, not an estimate). ONE extra PolicyEngine simulation prices
-the phi=0.5 case against the no-recycling central scenario.
+dividends. Dividends are paid out of POST-corporation-tax profit, so the
+recycled amount is W_lost * phi * (1 - CT_MAIN_RATE) * payout, distributed
+pro-rata over the observed household dividend distribution (payout ratio
+treated as a parameter, 0.5 — roughly the long-run FTSE dividend payout
+ratio; no UK-specific AI-firm evidence, so it is a parameter, not an
+estimate). ONE extra PolicyEngine simulation prices the phi=0.5 case
+against the no-recycling central scenario.
 
 Caveats printed into the outputs: static accounting; incidence of CT (on
 wages, prices, or shareholders) NOT modelled; no behavioural response; CT
@@ -195,11 +197,14 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
     central = hh_metrics(sim)
     del sim
 
-    # recycling: distribute W_lost * phi * payout pro-rata over the observed
-    # dividend distribution (baseline shares == shocked shares, since the
-    # capital shock scales every dividend by the same factor)
+    # recycling: distribute W_lost * phi * (1 - CT) * payout pro-rata over
+    # the observed dividend distribution (baseline shares == shocked shares,
+    # since the capital shock scales every dividend by the same factor).
+    # Dividends come out of post-corporation-tax profit (R2-8): CT at the
+    # 25% main rate is charged on phi*W_lost, and only the after-CT residual
+    # is available for distribution.
     phi = 0.5
-    recycled = w_lost * phi * PAYOUT_RATIO
+    recycled = w_lost * phi * (1 - CT_MAIN_RATE) * PAYOUT_RATIO
     div = shocked_table["dividend_income"].to_numpy(dtype=float)
     agg_div = float((div * weight).sum())
     recycled_table = shocked_table.copy()
@@ -243,7 +248,7 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
             "Static accounting on top of the microsimulation; incidence of corporation tax not modelled.",
             "Effective labour tax rate is a pro-rata attribution of IT+NICs to employment income; ignores schedule ordering of savings/dividend bands.",
             "CT base assumed equal to accounting profit (no allowances, losses or profit shifting).",
-            "Payout ratio 0.5 is a parameter, not an estimate; recycled dividends allocated pro-rata to existing dividend holders only.",
+            "Payout ratio 0.5 is a parameter, not an estimate; recycled dividends are paid out of post-corporation-tax profit (x(1-0.25)) and allocated pro-rata to existing dividend holders only.",
             "Dividend tax on the recycled dividends IS captured by the simulation; CT is added outside it.",
         ],
     }

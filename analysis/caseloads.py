@@ -50,8 +50,9 @@ def uc_metrics(sim):
     try:
         h = sim.calculate("uc_housing_costs_element", period=PERIOD, map_to="benunit").values
         # condition on actual UC receipt: the element is a formula component
-        # computed for every benunit, so the policy-relevant aggregate is the
-        # housing support delivered inside paid UC awards
+        # computed for every benunit, so the aggregate is the housing element
+        # inside paid UC awards. NOTE: uc_housing_costs_element is the GROSS
+        # entitlement (pre-taper); outputs are labelled accordingly (R2-10).
         out["uc_housing_spend"] = float((h * bw * (uc_b > 0)).sum())
     except Exception:
         out["uc_housing_spend"] = None
@@ -86,8 +87,18 @@ def main():
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _w = persons["weight"].to_numpy()
+
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(e)
+    persons["complementarity"] = _weighted_fill(th)
 
     pw = persons["weight"].to_numpy()
     hw = baseline.calculate("household_weight", period=PERIOD, map_to="household").values
@@ -128,7 +139,8 @@ def main():
             "uc_spend_baseline_bn": b["uc_spend"] / 1e9,
             "uc_spend_shocked_bn": s["uc_spend"] / 1e9,
             "uc_spend_change_bn": (s["uc_spend"] - b["uc_spend"]) / 1e9,
-            "uc_housing_element_change_bn": (
+            # gross entitlement (pre-taper) within paid UC awards
+            "uc_housing_element_gross_entitlement_change_bn": (
                 (s["uc_housing_spend"] - b["uc_housing_spend"]) / 1e9
                 if s["uc_housing_spend"] is not None and b["uc_housing_spend"] is not None
                 else None
@@ -164,8 +176,8 @@ def figure(df):
     ax1.set_ylabel("Net newly UC-entitled benefit units (thousands)")
     ax1.grid(axis="x", visible=False)
     ax2.bar(x - 0.2, df["uc_spend_change_bn"], width=0.4, color=fs.RED, label="Total UC")
-    ax2.bar(x + 0.2, df["uc_housing_element_change_bn"], width=0.4, color=fs.YELLOW,
-            label="Housing-costs element")
+    ax2.bar(x + 0.2, df["uc_housing_element_gross_entitlement_change_bn"], width=0.4,
+            color=fs.YELLOW, label="Housing-costs element (gross entitlement)")
     ax2.set_xticks(x, labels)
     ax2.set_ylabel("Change in annual UC spending (£bn/yr)")
     ax2.grid(axis="x", visible=False)
