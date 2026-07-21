@@ -5,10 +5,12 @@ import pandas as pd
 import pytest
 
 from uk_ai_study.shocks import (
+    MixedMarginScenario,
     RIPPLE_PRESETS,
     RippleScenario,
     ShockScenario,
     apply_ripple_shocks,
+    apply_mixed_margin_shock,
     compute_inflow_shares,
     load_ripple_routing,
     WAGE_MARGIN_PRESETS,
@@ -362,3 +364,49 @@ def test_wage_margin_pss_missing_file_errors_clearly():
         # csv exists (built by the parallel task): the preset must just work
         shocked = apply_wage_margin_shock(persons, scenario)
         assert (shocked["employment_income"].to_numpy() >= 0).all()
+
+
+def test_mixed_margin_endpoints_reproduce_existing_families():
+    persons = make_persons()
+    all_wages = apply_mixed_margin_shock(
+        persons, MixedMarginScenario("mixed_0", displacement_share=0.0), seed=3
+    )
+    all_jobs = apply_mixed_margin_shock(
+        persons, MixedMarginScenario("mixed_1", displacement_share=1.0), seed=3
+    )
+    central = apply_shocks(persons, ShockScenario("central", 0.07, 0.026), seed=3)
+    assert not all_wages["displaced"].to_numpy().any()
+    np.testing.assert_array_equal(all_jobs["displaced"], central["displaced"])
+    np.testing.assert_allclose(all_jobs["employment_income"], central["employment_income"])
+
+
+def test_mixed_margin_holds_gross_earnings_loss_constant():
+    """Every lambda has the central draw's gross pre-uplift earnings loss."""
+    persons = make_persons()
+    base = persons["employment_income"].to_numpy()
+    weight = persons["weight"].to_numpy()
+    for seed in range(5):
+        central = apply_shocks(persons, ShockScenario("central", 0.07, 0.0), seed=seed)
+        target = float(((base - central["employment_income"].to_numpy()) * weight).sum())
+        for lam in (0.0, 0.25, 0.5, 0.75, 1.0):
+            mixed = apply_mixed_margin_shock(
+                persons,
+                MixedMarginScenario("mixed", displacement_share=lam, wage_uplift=0.0),
+                seed=seed,
+            )
+            loss = float(((base - mixed["employment_income"].to_numpy()) * weight).sum())
+            assert loss == pytest.approx(target, rel=1e-10)
+
+
+def test_mixed_margin_intermediate_combines_both_adjustments():
+    persons = make_persons()
+    mixed = apply_mixed_margin_shock(
+        persons, MixedMarginScenario("mixed_50", displacement_share=0.5), seed=2
+    )
+    displaced = mixed["displaced"].to_numpy()
+    base = persons["employment_income"].to_numpy()
+    new = mixed["employment_income"].to_numpy()
+    assert displaced.any()
+    assert (new[displaced] == 0).all()
+    assert ((new[~displaced] - base[~displaced]) < 0).any()
+    assert (new >= 0).all()

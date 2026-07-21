@@ -1,0 +1,58 @@
+{
+  "family": "klein_top_loaded",
+  "displaced_weighted_m": 1.6110962629318237,
+  "exchequer_cost_bn": 31.034966016,
+  "poverty_change_bhc_pp": 2.109211878179937,
+  "poverty_change_ahc_pp": 2.3985361166053707,
+  "gini_change_pp": 1.0315275768687293,
+  "decile_transition_share_pct": {
+    "1": 0.10202119499444962,
+    "2": 0.09919314086437225,
+    "3": 0.8006193041801453,
+    "4": 0.8109394907951355,
+    "5": 1.5578196048736572,
+    "6": 2.5330562591552734,
+    "7": 3.057961940765381,
+    "8": 4.239451885223389,
+    "9": 5.780932426452637,
+    "10": 6.682201862335205
+  },
+  "decile_income_change_pct": {
+    "1": 1.0605549812316895,
+    "2": 0.7383767366409302,
+    "3": -1.385132074356079,
+    "4": -0.799751877784729,
+    "5": -1.9199659824371338,
+    "6": -3.0711019039154053,
+    "7": -3.3474433422088623,
+    "8": -4.90696907043457,
+    "9": -6.386325359344482,
+    "10": -7.420380592346191
+  },
+  "london_composition_no_tilt": {
+    "london_share_of_displaced_pct": 11.359416007995605,
+    "london_displacement_rate_pct": 6.166439056396484
+  },
+  "provenance": {
+    "source": "Klein Teeselink (2025), 'Generative AI and Labor Market Outcomes: Evidence from the United Kingdom', SSRN 5516798; KCL press release 2025-09.",
+    "from_paper": {
+      "total_employment_effect_exposed_firms_pct": -4.5,
+      "junior_employment_effect_pct": -5.8,
+      "junior_multiplier": 1.2888888888888888,
+      "high_paying_firms_employment_effect_pct": -9.6,
+      "low_paying_firms_employment_effect": "almost no change (qualitative)",
+      "london": "minimal and statistically insignificant effects",
+      "exposed_occupations_postings_pct": -23.4,
+      "high_salary_occupations_postings_pct": -34.2
+    },
+    "author_imposed": {
+      "geographic_multiplier": "none (London multiplier fixed at 1.0)",
+      "low_wage_multiplier_floor": 0.6,
+      "high_wage_multiplier": 9.6,
+      "junior_proxy": "junior positions proxied by age < 25 (KT's concept is seniority, not age; under-25s are ~2% of the displaced given the wage-tier tilt)",
+      "wage_tier_split": "weighted median of employee earnings (FRS person earnings proxy for KT's firm pay tiers)",
+      "composite": "multiplicative combination of exposure x junior x wage-tier channels (independence imposed)",
+      "aggregate_shock": "central preset (7% displacement, +2.6% wages, +0.4pp capital) \u2014 KT shapes incidence, not size"
+    }
+  }
+}

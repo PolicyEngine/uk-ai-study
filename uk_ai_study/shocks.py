@@ -171,7 +171,7 @@ def apply_shocks(
 
 @dataclass(frozen=True)
 class WageMarginScenario:
-    """Wage-margin scenario: same aggregate earnings loss as displacement,
+    """Wage-margin scenario: fixed baseline-wage-bill loss,
     delivered as occupation-level wage CUTS with no job loss.
 
     Motivated by equilibrium task models (Acemoglu & Restrepo 2022): the AI
@@ -180,15 +180,13 @@ class WageMarginScenario:
 
     aggregate_earnings_loss_share: the weighted fall in aggregate employee
     earnings as a share of baseline aggregate employee earnings. Default 0.07
-    matches the central displacement preset: eq 3.4 removes a weighted head-
-    count of ``displacement_rate x employees``, drawn with uniform ordering
-    keys within groups and quotas ∝ employment x exposure, so the expected
-    earnings removed is displacement_rate x aggregate earnings up to the
-    (second-order) covariance between within-draw selection and earnings —
-    across seeds the central draw removes ~7% of the aggregate employee wage
-    bill. We therefore calibrate the cuts to exactly 7% of the baseline
-    employee wage bill of the same universe (all employees with positive
-    employment_income).
+    applies the same headline parameter as the central preset to a different
+    base. It does not match a realised central-draw loss: equation 3.4 fixes a
+    weighted employee headcount, and exposure-proportional selection can make
+    the selected earnings share differ materially from 7%. The separate mixed-
+    margin comparison below explicitly matches the central draw's realised
+    gross loss. The employee universe here is everyone with positive annual
+    employment income.
 
     gradient: "caioe" (cut ∝ max(0, C-AIOE normalised so the least-exposed
     employed person scores 0 — the same min-shift normalisation eq 3.4 uses
@@ -212,6 +210,106 @@ WAGE_MARGIN_PRESETS = {
     "wage_margin_central": WageMarginScenario("wage_margin_central", gradient="caioe"),
     "wage_margin_pss": WageMarginScenario("wage_margin_pss", gradient="pss"),
 }
+
+
+@dataclass(frozen=True)
+class MixedMarginScenario:
+    """Hold gross earnings loss fixed while varying the adjustment margin.
+
+    ``displacement_share`` is lambda in [0, 1]. Lambda scales the central 7%
+    employee-displacement-rate parameter. For each seed, the gross earnings
+    removed by the full central displacement draw is the common loss target;
+    C-AIOE-graded cuts among survivors fill the gap between that target and
+    earnings removed through partial displacement. The standard wage uplift
+    and capital shock are applied only after this identity is imposed.
+
+    Lambda=1 exactly reproduces ``central`` for the same seed. Lambda=0 is a
+    pure wage-cut counterfactual matched to that seed's central gross loss; it
+    is distinct from ``wage_margin_central``, which removes exactly 7% of the
+    baseline wage bill. Intermediate cases are reduced-form comparative
+    statics, not equilibrium paths.
+    """
+
+    name: str
+    displacement_share: float
+    aggregate_adjustment_share: float = 0.07
+    wage_uplift: float = 0.026
+    capital_return_increase: float = CAPITAL_RETURN_INCREASE
+
+
+def apply_mixed_margin_shock(
+    persons: pd.DataFrame,
+    scenario: MixedMarginScenario,
+    seed: int = 0,
+) -> pd.DataFrame:
+    """Apply a convex mixture of the displacement and wage-cut families."""
+    lam = float(scenario.displacement_share)
+    if not 0.0 <= lam <= 1.0:
+        raise ValueError("displacement_share must be between 0 and 1")
+
+    earnings = persons["employment_income"].to_numpy(dtype=float)
+    weight = persons["weight"].to_numpy(dtype=float)
+    employed = earnings > 0
+    central_scenario = ShockScenario(
+        scenario.name,
+        displacement_rate=scenario.aggregate_adjustment_share,
+        wage_uplift=scenario.wage_uplift,
+        capital_return_increase=scenario.capital_return_increase,
+    )
+    central_displaced = draw_displaced(persons, central_scenario, seed=seed)
+    target_gross_loss = float((earnings * weight)[central_displaced].sum())
+
+    displacement_scenario = ShockScenario(
+        scenario.name,
+        displacement_rate=lam * scenario.aggregate_adjustment_share,
+        wage_uplift=scenario.wage_uplift,
+        capital_return_increase=scenario.capital_return_increase,
+    )
+    if lam == 1.0:
+        return apply_shocks(persons, displacement_scenario, seed=seed)
+
+    shocked = persons.copy()
+    displaced = draw_displaced(persons, displacement_scenario, seed=seed)
+    shocked["displaced"] = displaced
+
+    survivors = employed & ~displaced
+
+    # Fill the gap to the seed-specific central gross-loss target. Using the
+    # same seed makes the partial displacement draw a prefix of the central
+    # draw, so the residual is non-negative.
+    displaced_loss = float((earnings * weight)[displaced].sum())
+    wage_loss = target_gross_loss - displaced_loss
+    if wage_loss < -1e-6:
+        raise ValueError("partial displacement exceeds central gross-loss target")
+    wage_loss = max(0.0, wage_loss)
+    g = _gradient_values(
+        persons,
+        WageMarginScenario(scenario.name, gradient="caioe"),
+    )
+    survivor_gradient_bill = float((g * earnings * weight)[survivors].sum())
+    if wage_loss > 0 and survivor_gradient_bill <= 0:
+        raise ValueError("mixed-margin wage gradient is zero among survivors")
+    k = wage_loss / survivor_gradient_bill
+    cut_rate = k * g
+    if (cut_rate[survivors] > 1.0).any():
+        raise ValueError("mixed-margin wage cut exceeds 100% for some survivors")
+
+    theta = persons["complementarity"].to_numpy(dtype=float)
+    theta_bar = float(np.average(theta[employed], weights=weight[employed]))
+    uplift_rate = np.zeros_like(earnings)
+    if theta_bar > 0:
+        uplift_rate[survivors] = scenario.wage_uplift * theta[survivors] / theta_bar
+    factor = 1.0 + uplift_rate - np.where(survivors, cut_rate, 0.0)
+    shocked["employment_income"] = np.where(
+        displaced, 0.0, np.maximum(0.0, earnings * factor)
+    )
+
+    capital_factor = (
+        BASELINE_CAPITAL_RETURN + scenario.capital_return_increase
+    ) / BASELINE_CAPITAL_RETURN
+    for column in ("savings_interest_income", "dividend_income"):
+        shocked[column] = persons[column].to_numpy(dtype=float) * capital_factor
+    return shocked
 
 PSS_CSV_NAME = "uk_soc2020_major_group_genai_expertise.csv"
 

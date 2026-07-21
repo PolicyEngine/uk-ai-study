@@ -1,7 +1,7 @@
 """Phase 1 Monte Carlo (REVISION_PLAN item 6): 20 draws (seeds 0-19) for
 
   (a) all five incidence families (exposure, junior, compression, uniform,
-      measured) — mean/sd/min/max of exchequer cost, BHC poverty change and
+      Klein-anchored top-loaded) — mean/sd/min/max of exchequer cost, BHC poverty change and
       Gini change -> results/robustness/incidence_monte_carlo.json
   (b) every policy counterfactual in policy_counterfactuals.py (R1 under
       exposure/junior/uniform, R2/R3 under exposure), holding the reform
@@ -55,14 +55,14 @@ OUT = ROOT / "results" / "robustness"
 ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 PERIOD = 2026
 N_DRAWS = 20
-FAMILIES = ("exposure", "junior", "compression", "uniform", "measured")
+FAMILIES = ("exposure", "junior", "compression", "uniform", "klein_top_loaded")
 FAMILIES_R1 = ("exposure", "junior", "uniform")
 INC_CSV = OUT / "incidence_draws_five.csv"
 POL_CSV = OUT / "policy_draws.csv"
 
 
 def family_table(family: str, persons: pd.DataFrame, seed: int) -> pd.DataFrame:
-    if family == "measured":
+    if family == "klein_top_loaded":
         return measured_table(persons, PRESETS["central"], LONDON_MULT_CENTRAL, seed=seed)
     return shocked_table_for(family, persons, seed=seed)
 
@@ -163,6 +163,11 @@ def main():
     done_inc = set()
     if INC_CSV.exists():
         d = pd.read_csv(INC_CSV)
+        # Migrate the pre-revision family name. Keeping those rows would mix
+        # two calibrations in one checkpoint file after a clean branch rerun.
+        if "measured" in set(d["family"]):
+            d = d[d["family"] != "measured"].copy()
+            d.to_csv(INC_CSV, index=False)
         done_inc = set(zip(d["seed"], d["family"]))
     done_pol = set()
     if POL_CSV.exists():
@@ -244,6 +249,10 @@ def main():
 
     # ---- summaries ----
     inc = pd.read_csv(INC_CSV)
+    expected = {(seed, family) for seed in range(N_DRAWS) for family in FAMILIES}
+    observed = set(zip(inc["seed"], inc["family"]))
+    if observed != expected or inc.duplicated(["seed", "family"]).any():
+        raise ValueError("incidence checkpoint is incomplete, duplicated, or contains stale families")
     metrics_cols = ["exchequer_cost_bn", "poverty_change_bhc_pp", "gini_change_pp"]
     inc_summary = {
         fam: summarise(inc[inc.family == fam], metrics_cols) for fam in FAMILIES
