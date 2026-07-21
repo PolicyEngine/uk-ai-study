@@ -14,7 +14,7 @@ scenarios are single draws at seed~0, while the five incidence families
 report means over 20 draws (seeds 0--19). The
 decile transition and wage-gain profiles (Figures~\ref{fig:transition}
 and~\ref{fig:wages}) are means over 50 independent draws. The robustness
-summary and the confidence intervals in Figure~\ref{fig:decomp-ci} are
+summary and the assignment-draw intervals in Figure~\ref{fig:decomp-ci} are
 20-draw Monte Carlo runs, with $\pm$ values reported as standard deviations
 across draws. Within each draw, ordering keys are uniform within occupation
 group, so a record's inclusion probability does not depend on its grossing
@@ -134,16 +134,16 @@ Section~\ref{sec:results}.
 
 Figure~\ref{fig:decomp-ci} reports the central-scenario disposable-income
 change by decile as the mean over twenty independent displacement draws
-with 95 per cent confidence intervals. The gradient runs from $-0.5$ per
+with central 95 per cent intervals across assignment draws. The gradient runs from $-0.5$ per
 cent in the bottom decile to $-4.1$ per cent in the top. It is not quite
 monotone: deciles~2 and~3 show a small reversal ($-0.88$ against $-0.82$
 per cent), well inside the draw noise. The overall upward slope of the loss
-profile survives the uncertainty comfortably.
+profile appears across the reported draw interval.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/decomposition_ci.png}
-\caption{Disposable income change by decile, central scenario: mean of 20 displacement draws with 95 per cent confidence intervals.}
+\caption{Disposable income change by decile, central scenario: mean and central 95 per cent interval across 20 assignment draws.}
 \label{fig:decomp-ci}
 \end{figure}
 
@@ -189,17 +189,15 @@ be fragile. My quota mechanism holds the aggregate displacement rate at
 shock lands across occupation groups.
 
 Table~\ref{tab:indexsens} and Figure~\ref{fig:indexsens} report the
-outcomes. The exchequer cost spans \pounds 17.6--18.6~billion (the largest
+outcomes. The Exchequer cost spans \pounds 17.6--18.6~billion (the largest
 deviation from the C-AIOE figure is $-4.3$ per cent, under the DSIT LLM
 index), the Gini change spans $+1.05$ to $+1.10$ points, and the
 before-housing-costs poverty change spans $+1.85$ to $+1.90$ points. The
 decile-10 transition share exceeds the decile-1 share by a factor of 8.9
-to 11.3 across indices. All three qualitative conclusions of the
-paper---the Gini rises, the displacement-transition gradient rises with
-income, and the fiscal cost is within 20 per cent of the central
-estimate---hold under every index, essentially because all five rank
-SOC major groups similarly: clerical and professional work is most
-exposed under each, and the quota fixes the aggregate.
+to 11.3. Within this seed-0 sensitivity, all five indices produce a
+positive Gini change, a transition gradient that rises with income, and
+a fiscal cost within 20 per cent of the C-AIOE result. This is consistent
+with their similar major-group rankings and the fixed aggregate quota.
 
 \begin{table}[htbp]
 \centering
@@ -253,8 +251,8 @@ paper. For each destination group I compute the proportional
 labour-supply inflow $s_l$ (routed displaced FTE over baseline
 employment), and every non-displaced employee in group $l$ takes a wage
 cut of $\eta \times s_l$ of baseline earnings, composed additively with
-the $+2.6$ per cent uplift. I interpret $\eta$ as an own-wage labour
-demand elasticity; with 7 per cent of workers displaced the inflow
+the $+2.6$ per cent uplift. I treat $\eta$ as an author-chosen reduced-form
+wage sensitivity, not an estimated structural elasticity; with 7 per cent of workers displaced the inflow
 shares are around 7 per cent, so $\eta = 0.3$ implies wage cuts of
 roughly 2 per cent across the non-displaced workforce. This is a
 directional sensitivity, not an implementation of the
@@ -281,21 +279,21 @@ $\eta$ & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Pov.\ AHC (pp) & $
 
 \vspace{2pt}
 \parbox{\textwidth}{\footnotesize Single draw, seed 0, 2026. $\eta$ is
-the own-wage labour demand elasticity applied to each destination
+the author-chosen wage sensitivity applied to each destination
 group's proportional labour-supply inflow. $\eta = 0$ reproduces the
 central scenario exactly.}
 \end{table}
 
-The ripple channel loads almost entirely on the Exchequer. At $\eta =
+Under this specification, the ripple channel loads mainly on the Exchequer. At $\eta =
 0.3$ the fiscal cost rises by more than half, from \pounds 18.4 to
 \pounds 28.7~billion, because thin, widespread wage cuts across the
 non-displaced workforce forgo income tax and National Insurance at the
-margin. The distributional headlines barely move: BHC poverty rises by
+margin. The distributional estimates move less: BHC poverty rises by
 only 0.19 points more than in the central run, and the Gini increase
-actually \emph{eases} slightly, since the cuts fall on employed workers
-concentrated in the middle and upper deciles. Excluding ripples
-therefore makes the central fiscal estimate conservative, while the
-poverty and inequality conclusions are robust to the omission.
+falls slightly; the cuts are imposed on employed workers concentrated in
+the middle and upper deciles. Adding this particular ripple raises the
+simulated fiscal cost; other routing and wage-response assumptions could
+produce different results.
 
 \subsection{Data appendix: constituency-level occupation imputation}
 \label{app:geo-imputation}
@@ -346,11 +344,11 @@ cent displacement, no wage gain) the bottom decile loses 1.9 per cent of
 disposable income while the top decile loses 8.2 per cent.
 Figure~\ref{fig:b11} removes the capital-return shock. Average disposable
 incomes fall relative to the capital-on grid, confirming that the capital
-channel raises average incomes while concentrating its gains at the top;
-the Gini result, however, is unchanged in kind: without the capital shock
+channel raises average incomes while concentrating its gains at the top.
+Within this grid, without the capital shock
 the Gini of equivalised disposable income still rises in all 66 cells, by
-0.00 to 1.50 percentage points. The inequality result does not depend on
-the capital channel.
+0.00 to 1.50 percentage points. Thus the positive Gini change in these
+66 cells is not generated solely by the capital channel.
 
 \begin{figure}[htbp]
 \centering
