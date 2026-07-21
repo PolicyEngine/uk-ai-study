@@ -25,10 +25,8 @@ import figstyle  # noqa: E402
 
 GEO = ROOT / "results" / "geo"
 IMPACTS = GEO / "constituency_impacts.csv"
-# 2024 Westminster constituency boundaries (GSS-coded), sourced locally.
-BOUNDARIES = Path(
-    "/Users/janansadeqian/energy-price-shock/dashboard/public/data/uk_constituencies_2024.geojson"
-)
+# 2024 Westminster constituency boundaries (GSS-coded), staged in data/.
+BOUNDARIES = ROOT / "data" / "uk_constituencies_2024.geojson"
 
 
 def load():
