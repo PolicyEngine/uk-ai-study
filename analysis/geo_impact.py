@@ -243,6 +243,22 @@ def main():
     pov_base = W @ hh_pov_base
     people = W @ hh_people
 
+    # Renormalise the constituency-weighted displacement mass to the
+    # scenario rate. The calibration weights re-gross individual households
+    # by up to ~20x relative to the dataset weights the draw consumed
+    # (colsum/dataset-weight ratio p5-p95 spans ~0.06-20), so W-aggregated
+    # displacement from a single binary draw overstates the national rate
+    # (9.95% vs the 7% scenario at seed 0). A single national scale factor
+    # restores the scenario rate; the pre-normalisation inflation is
+    # recorded in imputation_notes.json. Income and poverty deltas are
+    # actual household outcomes and are NOT rescaled (R2-9 caveat applies).
+    displacement_inflation = float(
+        disp.sum() / (SCENARIO.displacement_rate * workers.sum())
+    )
+    disp = disp / displacement_inflation
+    notes["w_displacement_inflation_factor"] = displacement_inflation
+    notes["w_displacement_renormalised_to_rate"] = SCENARIO.displacement_rate
+
     df = const[["code", "name", "region", "x", "y"]].copy()
     df["income_change_pct"] = 100 * inc_delta / inc_base
     df["displaced_per_1000_workers"] = 1000 * disp / workers
