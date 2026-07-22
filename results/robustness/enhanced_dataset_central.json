@@ -1,42 +1,37 @@
 {
   "description": "Central scenario, seed 0; enhanced FRS 2023-24 with geo_impact.py's SOC imputation (route B). Decomposes the geography-section (+enhanced, 2025) vs main (+plain, 2026) BHC poverty-change gap.",
-  "enhanced_dataset_path": "/Users/janansadeqian/policyengine-uk-data/policyengine_uk_data/storage/enhanced_frs_2023_24.h5",
+  "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-nxh9280m/worktree/data/enhanced_frs_2023_24.h5",
   "cells": {
     "enhanced_2026": {
-      "poverty_change_bhc_pp": 2.5784595715583003,
-      "baseline_poverty_bhc_pct": 15.245819465589117,
-      "exchequer_cost_bn": -118.836494336,
-      "displaced_weighted_m": 2.244415521621704
+      "poverty_change_bhc_pp": 2.947655506864892,
+      "baseline_poverty_bhc_pct": 9.429371637563193,
+      "exchequer_cost_bn": 29.432348672,
+      "displaced_weighted_m": 2.971003532409668
     },
     "enhanced_2025": {
-      "poverty_change_bhc_pp": 2.865345925149365,
-      "baseline_poverty_bhc_pct": 15.41687957545962,
-      "exchequer_cost_bn": -114.890702848,
-      "displaced_weighted_m": 2.2359187602996826
+      "poverty_change_bhc_pp": 2.948810372742973,
+      "baseline_poverty_bhc_pct": 10.10425581009954,
+      "exchequer_cost_bn": 29.126393856,
+      "displaced_weighted_m": 2.9862473011016846
     },
     "plain_2025": {
-      "poverty_change_bhc_pp": 1.9087807665495586,
-      "exchequer_cost_bn": 17.577639936,
-      "displaced_weighted_m": 1.601506375
+      "poverty_change_bhc_pp": 1.907548667877354,
+      "exchequer_cost_bn": 17.212997632,
+      "displaced_weighted_m": 1.551361875
     },
     "plain_2026": {
-      "poverty_change_bhc_pp": 1.8701170103055387,
-      "exchequer_cost_bn": 18.422136832,
-      "displaced_weighted_m": 1.60759225,
+      "poverty_change_bhc_pp": 1.8069433542672653,
+      "exchequer_cost_bn": 18.209980416,
+      "displaced_weighted_m": 1.557257125,
       "source": "results/central.json (main analysis, seed 0)"
     }
   },
   "decomposition_bhc_poverty_pp": {
-    "total_gap_enhanced2025_minus_plain2026": 0.9952289148438265,
-    "dataset_component_at_2026": 0.7083425612527616,
-    "period_component_on_enhanced": 0.28688635359106485,
-    "period_component_on_plain": 0.038663756244019964,
-    "interaction": 0.24822259734704488,
+    "total_gap_enhanced2025_minus_plain2026": 1.1418670184757076,
+    "dataset_component_at_2026": 1.1407121525976267,
+    "period_component_on_enhanced": 0.0011548658780808907,
+    "period_component_on_plain": 0.10060531361008884,
+    "interaction": -0.09945044773200795,
     "note": "single seed-0 run per cell; imputation noise not separately varied (imputation seed fixed at 0)."
-  },
-  "exchequer_cost_note": {
-    "warning": "exchequer_cost_bn in the enhanced cells is NOT comparable to the plain-FRS figures.",
-    "diagnosis": "The enhanced FRS 2023-24 calibrates capital incomes to administrative totals (baseline weighted dividend income ~GBP 888bn vs a much smaller plain-FRS base). The JR16 capital shock scales dividend/interest income by x1.398, adding ~GBP 353bn of dividends and ~+GBP 130bn income tax, which swamps the ~-GBP 64bn earnings loss (hence gov_balance IMPROVES by ~GBP 119bn). Channel decomposition, seed 0, 2026: delta income_tax +129.9bn, NI -2.6bn, UC +0.1bn, employment_income -64.5bn, dividend_income +353.3bn.",
-    "implication": "Use the enhanced cells only for the poverty decomposition (M7); the proportional capital-return scaling should be re-parameterised before fiscal use on this dataset."
   }
 }

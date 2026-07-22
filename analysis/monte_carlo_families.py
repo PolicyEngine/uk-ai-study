@@ -34,7 +34,10 @@ sys.path.insert(0, str(ROOT / "analysis"))
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
 from uk_ai_study.runner import gini
 from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES
-from incidence_scenarios import shocked_table_for  # noqa: E402
+from incidence_scenarios import (  # noqa: E402
+    COMPRESSION_TOP_TERTILE_MULTIPLIER,
+    shocked_table_for,
+)
 from measured_incidence import LONDON_MULT_CENTRAL, measured_table  # noqa: E402
 from policy_counterfactuals import (  # noqa: E402
     CAP_MULTIPLIER,
@@ -61,10 +64,25 @@ INC_CSV = OUT / "incidence_draws_five.csv"
 POL_CSV = OUT / "policy_draws.csv"
 
 
-def family_table(family: str, persons: pd.DataFrame, seed: int) -> pd.DataFrame:
+def family_table(
+    family: str,
+    persons: pd.DataFrame,
+    seed: int,
+    compression_multiplier: float = COMPRESSION_TOP_TERTILE_MULTIPLIER,
+) -> pd.DataFrame:
+    """Shocked table for one (family, seed) draw.
+
+    Families use the R2-3 factorial design: shocked_table_for's default
+    wage_axis="central" holds the person-level wage-uplift and capital
+    channels fixed across families; only the displacement mask varies.
+    ``compression_multiplier`` (R2-6a) is the compression draw tilt
+    (1.5 / 2.0 / 3.0 sensitivity runs).
+    """
     if family == "klein_top_loaded":
         return measured_table(persons, PRESETS["central"], LONDON_MULT_CENTRAL, seed=seed)
-    return shocked_table_for(family, persons, seed=seed)
+    return shocked_table_for(
+        family, persons, seed=seed, compression_multiplier=compression_multiplier
+    )
 
 
 def append_row(path: Path, row: dict) -> None:
@@ -163,10 +181,21 @@ def main():
     done_inc = set()
     if INC_CSV.exists():
         d = pd.read_csv(INC_CSV)
-        # Migrate the pre-revision family name. Keeping those rows would mix
-        # two calibrations in one checkpoint file after a clean branch rerun.
-        if "measured" in set(d["family"]):
-            d = d[d["family"] != "measured"].copy()
+        # Migrations. (1) The pre-revision "measured" family name; keeping
+        # those rows would mix two calibrations in one checkpoint file.
+        # (2) R2-3: checkpoints written before the factorial redesign carry
+        # no wage_axis column, and their compression/uniform rows are the
+        # old COMPOUND bundles (family-specific wage channel) — stale under
+        # the new default (wage_axis="central"), so they are redrawn.
+        stale = d["family"].eq("measured")
+        migrated = "wage_axis" not in d.columns
+        if migrated:
+            stale |= d["family"].isin(["compression", "uniform"])
+            d["wage_axis"] = "central"
+        else:
+            stale |= d["wage_axis"].fillna("central").ne("central")
+        if stale.any() or migrated:
+            d = d[~stale].copy()
             d.to_csv(INC_CSV, index=False)
         done_inc = set(zip(d["seed"], d["family"]))
     done_pol = set()
@@ -198,6 +227,7 @@ def main():
                     {
                         "seed": seed,
                         "family": family,
+                        "wage_axis": "central",
                         "exchequer_cost_bn": (b["gov"] - m["gov"]) / 1e9,
                         "poverty_change_bhc_pp": 100 * (m["pov_bhc"] - b["pov_bhc"]),
                         "relative_poverty_change_bhc_pp": 100 * (m["relpov_bhc"] - b["relpov_bhc"]),

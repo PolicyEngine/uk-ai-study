@@ -46,11 +46,18 @@ def main():
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], adult_tab)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
-
     w = persons["weight"].to_numpy()
     emp = persons["employment_income"].to_numpy() > 0
+
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & emp
+        mean = float(np.average(values[ok], weights=w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(e)
+    persons["complementarity"] = _weighted_fill(th)
     female = np.char.upper(persons["gender"].to_numpy().astype(str)) == "FEMALE"
     matched = emp & np.isfinite(e)
 
@@ -71,6 +78,8 @@ def main():
 
     st = apply_shocks(persons, PRESETS["central"], seed=0)
     sim = build_shocked_simulation(ds, base, st, P)
+    # household-level totals broadcast to persons; only the % ratio below is
+    # reported, identical for all members — broadcast intentional (issue #6)
     hni_b = base.calculate("hbai_household_net_income", period=P, map_to="person").values
     hni_s = sim.calculate("hbai_household_net_income", period=P, map_to="person").values
     for label, m in [("female", female), ("male", ~female)]:

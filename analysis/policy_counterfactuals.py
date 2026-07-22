@@ -55,6 +55,7 @@ from uk_ai_study.runner import gini
 from uk_ai_study.shocks import (
     SHOCKED_INCOME_VARIABLES,
     TRANSITION_ZEROED_VARIABLES,
+    build_shocked_simulation,
 )
 from incidence_scenarios import shocked_table_for  # noqa: E402
 
@@ -82,26 +83,10 @@ def hh_calc(sim, var):
 
 
 def build_sim(dataset, base_arrays, table, reform=None):
-    """build_shocked_simulation, with an optional parameter reform."""
-    from policyengine_uk import Microsimulation
-
-    sim = Microsimulation(dataset=dataset, reform=reform)
-    for column in SHOCKED_INCOME_VARIABLES:
-        sim.set_input(column, PERIOD, table[column].to_numpy(dtype=float))
-    displaced = table["displaced"].to_numpy()
-    for var in TRANSITION_ZEROED_VARIABLES:
-        values = base_arrays[var].copy()
-        values[displaced] = 0.0
-        sim.set_input(var, PERIOD, values)
-    status = base_arrays["employment_status"].copy()
-    status[displaced] = "UNEMPLOYED"
-    try:
-        sim.set_input("employment_status", PERIOD, status)
-    except Exception as exc:  # pragma: no cover
-        import warnings
-
-        warnings.warn(f"employment_status set_input rejected ({exc}).")
-    return sim
+    """Shared fail-fast constructor, with an optional parameter reform (R2-7)."""
+    return build_shocked_simulation(
+        dataset, None, table, PERIOD, reform=reform, base_arrays=base_arrays
+    )
 
 
 def hh_state(sim):
@@ -120,6 +105,9 @@ def hh_state(sim):
         "equiv_factor_ahc": hh_calc(sim, "household_equivalisation_ahc"),
         "pov_bhc_model": hh_calc(sim, "in_poverty_bhc"),
         "pov_ahc_model": hh_calc(sim, "in_poverty_ahc"),
+        # NOTE: person-broadcast household TOTAL (not per-capita) — currently
+        # unused downstream; divide by household size before any per-person
+        # cash aggregation (issue #6)
         "hni_person": person_calc(sim, "hbai_household_net_income"),
     }
 
@@ -168,8 +156,18 @@ def main():
     )
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED mean of the matched
+    # employed (survey-weighted), matching runner.py (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _pw = persons["weight"].to_numpy()
+
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_pw[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(e)
+    persons["complementarity"] = _weighted_fill(th)
 
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)

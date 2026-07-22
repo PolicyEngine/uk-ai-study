@@ -186,6 +186,8 @@ def main():
             "pov_bhc": float(np.average(s.calculate("in_poverty_bhc", period=PERIOD, map_to="person").values, weights=pw)),
             "pov_ahc": float(np.average(s.calculate("in_poverty_ahc", period=PERIOD, map_to="person").values, weights=pw)),
             "gini": gini(eq, hw * n),
+            # household-level %, identical for all members; broadcast
+            # intentional — used only in the delta/base ratio below (issue #6)
             "hni": s.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values,
         }
 

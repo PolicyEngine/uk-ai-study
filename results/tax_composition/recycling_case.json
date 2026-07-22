@@ -2,85 +2,85 @@
   "scenario": "central (7% displacement, +2.6% wages, +0.4pp capital return), seed 0",
   "phi": 0.5,
   "payout_ratio": 0.5,
-  "displaced_wage_bill_bn": 77.944905728,
-  "effective_labour_tax_rate_on_displaced": 0.24930593647498347,
-  "recycled_dividends_bn": 19.486226432,
-  "ct_on_recycled_profits_bn": 9.743113216,
+  "displaced_wage_bill_bn": 75.580760064,
+  "effective_labour_tax_rate_on_displaced": 0.25411619097960453,
+  "recycled_dividends_bn": 14.171392512,
+  "ct_on_recycled_profits_bn": 9.447595008,
   "baseline": {
-    "gini": 0.3101273036544886,
-    "poverty_bhc": 0.14832010232636275,
-    "poverty_ahc": 0.18858822444910275
+    "gini": 0.30908967456288927,
+    "poverty_bhc": 0.14607251204109342,
+    "poverty_ahc": 0.18690132778805474
   },
   "central_no_recycling": {
-    "gini": 0.3209752663760864,
-    "poverty_bhc": 0.1667697309463534,
-    "poverty_ahc": 0.20729797896218527
+    "gini": 0.31891498587515277,
+    "poverty_bhc": 0.16292158765516923,
+    "poverty_ahc": 0.2048908761153644
   },
   "recycling_phi05": {
-    "gini": 0.32712192829493614,
-    "poverty_bhc": 0.1667697309463534,
-    "poverty_ahc": 0.20729797896218527
+    "gini": 0.32338174407033593,
+    "poverty_bhc": 0.16292158765516923,
+    "poverty_ahc": 0.2048908761153644
   },
   "recycling_minus_central": {
-    "gini_pp": 0.6146661918849716,
+    "gini_pp": 0.44667581951831625,
     "poverty_bhc_pp": 0.0,
     "poverty_ahc_pp": 0.0
   },
-  "decile_mean_hbai_net_income": {
+  "decile_mean_per_capita_hbai_net_income": {
     "baseline": {
-      "1": 11579.4716796875,
-      "2": 24518.361328125,
-      "3": 32662.30078125,
-      "4": 36811.99609375,
-      "5": 43146.73046875,
-      "6": 49915.796875,
-      "7": 56689.546875,
-      "8": 64894.55859375,
-      "9": 76861.4609375,
-      "10": 119200.5
+      "1": 4567.042898424409,
+      "2": 10113.964674584047,
+      "3": 12640.945523932918,
+      "4": 15257.595903502059,
+      "5": 17014.140018147562,
+      "6": 18957.785184564786,
+      "7": 21584.19102269705,
+      "8": 25123.834317338158,
+      "9": 30213.080980016148,
+      "10": 47060.18432387826
     },
     "central_no_recycling": {
-      "1": 11509.291015625,
-      "2": 24155.91015625,
-      "3": 32282.892578125,
-      "4": 36239.94921875,
-      "5": 42634.46484375,
-      "6": 48847.83984375,
-      "7": 54759.546875,
-      "8": 63446.44921875,
-      "9": 73136.96875,
-      "10": 114566.375
+      "1": 4547.513685819628,
+      "2": 10080.145439481144,
+      "3": 12574.097872640818,
+      "4": 15106.538292256708,
+      "5": 16823.193840986667,
+      "6": 18714.723971185063,
+      "7": 21053.972426293978,
+      "8": 24530.880086987614,
+      "9": 29474.996728587805,
+      "10": 45164.22153310574
     },
     "recycling_phi05": {
-      "1": 11509.291015625,
-      "2": 24155.91015625,
-      "3": 32282.892578125,
-      "4": 36239.94921875,
-      "5": 44507.04296875,
-      "6": 49166.625,
-      "7": 55373.01171875,
-      "8": 64750.51953125,
-      "9": 73136.96875,
-      "10": 115034.3203125
+      "1": 4547.513685819628,
+      "2": 10080.145439481144,
+      "3": 12574.097872640818,
+      "4": 15106.538292256708,
+      "5": 17505.984656422286,
+      "6": 18789.18305507087,
+      "7": 21277.181160789314,
+      "8": 24769.320902155552,
+      "9": 29474.996728587805,
+      "10": 45333.83328861649
     },
     "recycling_minus_central_gbp": {
       "1": 0.0,
       "2": 0.0,
       "3": 0.0,
       "4": 0.0,
-      "5": 1872.578125,
-      "6": 318.78515625,
-      "7": 613.46484375,
-      "8": 1304.0703125,
+      "5": 682.7908154356192,
+      "6": 74.45908388580574,
+      "7": 223.2087344953361,
+      "8": 238.44081516793813,
       "9": 0.0,
-      "10": 467.9453125
+      "10": 169.61175551075576
     }
   },
   "caveats": [
     "Static accounting on top of the microsimulation; incidence of corporation tax not modelled.",
     "Effective labour tax rate is a pro-rata attribution of IT+NICs to employment income; ignores schedule ordering of savings/dividend bands.",
     "CT base assumed equal to accounting profit (no allowances, losses or profit shifting).",
-    "Payout ratio 0.5 is a parameter, not an estimate; recycled dividends allocated pro-rata to existing dividend holders only.",
+    "Payout ratio 0.5 is a parameter, not an estimate; recycled dividends are paid out of post-corporation-tax profit (x(1-0.25)) and allocated pro-rata to existing dividend holders only.",
     "Dividend tax on the recycled dividends IS captured by the simulation; CT is added outside it."
   ]
 }

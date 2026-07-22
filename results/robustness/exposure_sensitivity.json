@@ -1,23 +1,23 @@
 {
   "c_aioe": {
-    "exchequer_cost_bn": 18.422136832,
-    "poverty_change_bhc_pp": 1.8701170103055387,
-    "gini_change_pp": 1.0979179778287884,
-    "transition_share_decile1_pct": 0.5258610844612122,
-    "transition_share_decile10_pct": 4.667875289916992
+    "exchequer_cost_bn": 18.209980416,
+    "poverty_change_bhc_pp": 1.8069433542672653,
+    "gini_change_pp": 1.0383741096702703,
+    "transition_share_decile1_pct": 0.6389977931976318,
+    "transition_share_decile10_pct": 5.342141628265381
   },
   "dsit_aioe": {
-    "exchequer_cost_bn": 18.586402816,
-    "poverty_change_bhc_pp": 1.8586351352141095,
-    "gini_change_pp": 1.049192792544107,
-    "transition_share_decile1_pct": 0.4305896759033203,
-    "transition_share_decile10_pct": 4.856374740600586
+    "exchequer_cost_bn": 18.18624,
+    "poverty_change_bhc_pp": 2.044943008738392,
+    "gini_change_pp": 1.1800173595563068,
+    "transition_share_decile1_pct": 0.36349380016326904,
+    "transition_share_decile10_pct": 4.890209674835205
   },
   "eloundou_beta": {
-    "exchequer_cost_bn": 18.395136,
-    "poverty_change_bhc_pp": 1.9026750265141974,
-    "gini_change_pp": 1.0948412784370198,
-    "transition_share_decile1_pct": 0.4733119606971741,
-    "transition_share_decile10_pct": 4.742760181427002
+    "exchequer_cost_bn": 20.382449664,
+    "poverty_change_bhc_pp": 2.02621993800903,
+    "gini_change_pp": 1.099797458384555,
+    "transition_share_decile1_pct": 0.31924110651016235,
+    "transition_share_decile10_pct": 4.785903453826904
   }
 }

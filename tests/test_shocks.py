@@ -95,6 +95,69 @@ def test_equal_inclusion_regardless_of_weight():
     assert hits[1] / n == pytest.approx(0.5, abs=0.03)
 
 
+def test_prescribed_inclusion_three_heterogeneous_weights():
+    """R2-5: three records with weights (1, 1, 9), quota 5. The old
+    prefix-fill/boundary rule gave inclusion (1/2, 1/2, 4/9); prescribed
+    first-order probabilities give every member the common target 5/11."""
+    persons = pd.DataFrame(
+        {
+            "age": [40, 40, 40],
+            "employment_income": [30000.0] * 3,
+            "savings_interest_income": [0.0] * 3,
+            "dividend_income": [0.0] * 3,
+            "weight": [1.0, 1.0, 9.0],
+            "soc_major_group": [1000.0] * 3,
+            "exposure": [0.5] * 3,
+            "complementarity": [0.6] * 3,
+        }
+    )
+    scenario = ShockScenario("t", displacement_rate=5.0 / 11.0, wage_uplift=0.0)
+    n = 8000
+    hits = np.zeros(3)
+    for s in range(n):
+        hits += draw_displaced(persons, scenario, seed=s)
+    for h in hits:
+        assert h / n == pytest.approx(5.0 / 11.0, abs=0.02)
+
+
+def test_expected_displaced_weight_equals_quota_heterogeneous():
+    """R2-5: with heterogeneous weights, the EXPECTED displaced grossing
+    weight still equals the quota under the prescribed-probability design."""
+    persons = make_persons()
+    scenario = ShockScenario("t", displacement_rate=0.07, wage_uplift=0.0)
+    w = persons["weight"].to_numpy()
+    total = w[persons["employment_income"] > 0].sum()
+    mean_w = np.mean(
+        [w[draw_displaced(persons, scenario, seed=s)].sum() for s in range(400)]
+    )
+    assert mean_w == pytest.approx(0.07 * total, rel=0.02)
+
+
+def test_wage_margin_paired_to_central_draw():
+    """R2-2: with aggregate_earnings_loss_share=None (the default), the
+    gross cut equals the paired central displacement draw's realised gross
+    earnings loss for the same seed, and the result records target and
+    realised values."""
+    persons = make_persons()
+    base = persons["employment_income"].to_numpy()
+    w = persons["weight"].to_numpy()
+    workers = base > 0
+    for seed in (0, 3):
+        shocked = apply_wage_margin_shock(
+            persons, WageMarginScenario("t", wage_uplift=0.0), seed=seed
+        )
+        loss = ((base - shocked["employment_income"].to_numpy()) * w)[workers].sum()
+        central = draw_displaced(
+            persons, ShockScenario("t", displacement_rate=0.07, wage_uplift=0.0), seed=seed
+        )
+        target = (base * w)[central].sum()
+        assert loss == pytest.approx(target, rel=1e-9)
+        assert shocked.attrs["gross_cut_realised"] == pytest.approx(target, rel=1e-9)
+        assert shocked.attrs["gross_cut_share_target"] == pytest.approx(
+            target / (base * w)[workers].sum(), rel=1e-9
+        )
+
+
 def test_unmatched_employees_in_displacement_universe():
     """Employees without a SOC code are drawable (finding 7)."""
     persons = make_persons()

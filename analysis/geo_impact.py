@@ -17,6 +17,14 @@ cells. Match rates are written to results/geo/imputation_notes.json.
 Central scenario (7% displacement, +2.6% wages, +0.4pp capital return),
 seed 0, period 2025 (the weights' calibration year).
 
+IMPORTANT (R2-9): constituency-level outputs are SYNTHETIC demographic/
+income projections — calibrated survey weights over imputed-SOC enhanced-FRS
+households under a stylised shock — not observed local data. Single-seed
+point estimates; constituency-level sampling/imputation uncertainty is not
+quantified here.
+TODO(R2-9, rebuild-time): nested Monte Carlo over the SOC-imputation draw
+and the displacement draw to attach constituency-level uncertainty bands.
+
 Outputs (results/geo/):
   constituency_impacts.csv   code, name, region, metrics
   region_summary.csv         ITL1-style region aggregates
@@ -43,13 +51,32 @@ import figstyle  # noqa: E402
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group  # noqa: E402
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation  # noqa: E402
 
-import policyengine_uk_data  # noqa: E402
-
-STORAGE = Path(policyengine_uk_data.__file__).parent / "storage"
 PLAIN_FRS = ROOT / "data" / "frs_2024_25.h5"
-ENHANCED_FRS = STORAGE / "enhanced_frs_2023_24.h5"
-WEIGHTS_H5 = STORAGE / "parliamentary_constituency_weights.h5"
-CONSTITUENCIES = STORAGE / "constituencies_2024.csv"
+
+
+def _storage_file(name: str) -> Path:
+    """Resolve a policyengine-uk-data storage artefact.
+
+    Prefers a copy in the repo's data/ directory (reproducible, hashed by
+    the rebuild attestation); falls back to an installed
+    policyengine_uk_data package's storage directory.
+    """
+    local = ROOT / "data" / name
+    if local.exists():
+        return local
+    try:
+        import policyengine_uk_data
+    except Exception as exc:
+        raise FileNotFoundError(
+            f"{name} not found in {ROOT / 'data'} and policyengine_uk_data "
+            f"is not importable ({exc}); copy the file into data/."
+        )
+    return Path(policyengine_uk_data.__file__).parent / "storage" / name
+
+
+ENHANCED_FRS = _storage_file("enhanced_frs_2023_24.h5")
+WEIGHTS_H5 = _storage_file("parliamentary_constituency_weights.h5")
+CONSTITUENCIES = _storage_file("constituencies_2024.csv")
 ADULT_TAB = ROOT / "data" / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 OUT = ROOT / "results" / "geo"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -96,7 +123,13 @@ def main():
     from policyengine_uk.data import UKSingleYearDataset
 
     notes = {"method": "route B: SOC imputation on enhanced FRS 2023-24", "period": PERIOD,
-             "scenario": "central", "seed": SEED}
+             "scenario": "central", "seed": SEED,
+             "interpretation": (
+                 "Constituency figures are synthetic demographic/income "
+                 "projections (imputed SOC, calibrated weights, stylised "
+                 "shock), not observed local outcomes; single seed, no "
+                 "constituency-level uncertainty bands."
+             )}
 
     # ---- Step 1: plain FRS donor SOC distribution -------------------------
     plain = Microsimulation(dataset=UKSingleYearDataset(file_path=str(PLAIN_FRS)))
@@ -158,8 +191,15 @@ def main():
     persons["soc_major_group"] = soc
     exposure = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     theta = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
-    persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & emp
+        mean = float(np.average(values[ok], weights=w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(exposure)
+    persons["complementarity"] = _weighted_fill(theta)
 
     shocked_table = apply_shocks(persons, SCENARIO, seed=SEED)
     shocked = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
@@ -203,6 +243,22 @@ def main():
     pov_base = W @ hh_pov_base
     people = W @ hh_people
 
+    # Renormalise the constituency-weighted displacement mass to the
+    # scenario rate. The calibration weights re-gross individual households
+    # by up to ~20x relative to the dataset weights the draw consumed
+    # (colsum/dataset-weight ratio p5-p95 spans ~0.06-20), so W-aggregated
+    # displacement from a single binary draw overstates the national rate
+    # (9.95% vs the 7% scenario at seed 0). A single national scale factor
+    # restores the scenario rate; the pre-normalisation inflation is
+    # recorded in imputation_notes.json. Income and poverty deltas are
+    # actual household outcomes and are NOT rescaled (R2-9 caveat applies).
+    displacement_inflation = float(
+        disp.sum() / (SCENARIO.displacement_rate * workers.sum())
+    )
+    disp = disp / displacement_inflation
+    notes["w_displacement_inflation_factor"] = displacement_inflation
+    notes["w_displacement_renormalised_to_rate"] = SCENARIO.displacement_rate
+
     df = const[["code", "name", "region", "x", "y"]].copy()
     df["income_change_pct"] = 100 * inc_delta / inc_base
     df["displaced_per_1000_workers"] = 1000 * disp / workers
@@ -211,6 +267,8 @@ def main():
     df["baseline_poverty_headcount"] = pov_base
     df["workers"] = workers
     df["displaced"] = disp
+    # synthetic demographic/income projection (see module docstring, R2-9)
+    df["note"] = "synthetic projection (imputed SOC, calibrated weights, single seed)"
     df.drop(columns=["x", "y"]).to_csv(OUT / "constituency_impacts.csv", index=False)
 
     # aggregate from numerators/denominators (not means of ratios)
@@ -234,8 +292,10 @@ def main():
 
     (OUT / "imputation_notes.json").write_text(json.dumps(notes, indent=2))
 
-    top = df.nlargest(10, "income_change_pct")[["code", "name", "income_change_pct"]]
-    bot = df.nsmallest(10, "income_change_pct")[["code", "name", "income_change_pct"]]
+    # round named-extrema values to 1 dp: two-decimal precision overstates
+    # what a single-seed synthetic projection supports (R2-9)
+    top = df.nlargest(10, "income_change_pct")[["code", "name", "income_change_pct"]].round({"income_change_pct": 1})
+    bot = df.nsmallest(10, "income_change_pct")[["code", "name", "income_change_pct"]].round({"income_change_pct": 1})
     print(json.dumps({
         "notes": notes,
         "national_income_change_pct": float(100 * inc_delta.sum() / inc_base.sum()),
@@ -281,7 +341,8 @@ def hexmap(df, col, title, path, diverging):
     ax.set_ylim(df["y"].min() * dy - 1.5, df["y"].max() * dy + 1.5)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_title(title + "\nCentral scenario (7% displacement, +2.6% wages), 2025, seed 0")
+    ax.set_title(title + "\nCentral scenario (7% displacement, +2.6% wages), 2025, seed 0"
+                 "\nSynthetic projection: imputed SOC, calibrated weights")
     sm = ScalarMappable(norm=norm, cmap=cmap)
     cbar = fig.colorbar(
         sm, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02,

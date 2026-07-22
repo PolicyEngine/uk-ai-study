@@ -84,8 +84,18 @@ def exposure_sensitivity():
         persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
         e = exposure_for_major_group(persons["soc_major_group"], measure)
         th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-        persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-        persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+        # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight)
+        # mean of the matched employed, as the paper states (R2-10)
+        _emp = persons["employment_income"].to_numpy() > 0
+        _w = persons["weight"].to_numpy()
+
+        def _weighted_fill(values):
+            ok = np.isfinite(values) & _emp
+            mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+            return np.where(np.isfinite(values), values, mean)
+
+        persons["exposure"] = _weighted_fill(e)
+        persons["complementarity"] = _weighted_fill(th)
 
         shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
         sim = build_shocked_simulation(dataset, baseline, shocked_table, 2026)
@@ -113,6 +123,8 @@ def exposure_sensitivity():
             "exchequer_cost_bn": (b["gov"] - sh["gov"]) / 1e9,
             "poverty_change_bhc_pp": 100 * (sh["pov"] - b["pov"]),
             "gini_change_pp": 100 * (sh["gini"] - b["gini"]),
+            # share of the decile's PERSONS who are displaced — not
+            # "households pushed down a decile" (R2-10 label fix)
             "transition_share_decile1_pct": float(100 * w[(dec == 1) & disp].sum() / w[dec == 1].sum()),
             "transition_share_decile10_pct": float(100 * w[(dec == 10) & disp].sum() / w[dec == 10].sum()),
         }

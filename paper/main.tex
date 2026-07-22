@@ -14,6 +14,7 @@
 \usepackage[hang,flushmargin]{footmisc}
 \usepackage{natbib}
 \bibliographystyle{apalike}
+\input{values_generated} % machine-generated numeric macros from results/
 
 \title{\bfseries Who bears the AI shock?\\[0.15cm] The distributional and fiscal incidence in the UK\thanks{\textbf{Acknowledgements:} I thank Max Ghenis and Seyed Mahdi Hosseini for valuable comments and helpful discussions.}\\[0.7cm]}
 \author{Vahid Ahmadi\thanks{Research Associate at PolicyEngine. Email: \href{mailto:vahid@policyengine.org}{vahid@policyengine.org}.}}
@@ -23,7 +24,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent I examine how the simulated household and fiscal effects of an AI labour-market shock in the United Kingdom vary with its incidence. I link occupation-level AI exposure to workers in the 2024--25 Family Resources Survey and use PolicyEngine UK to simulate employment, wage and capital-income shocks. The design covers 66 shock-size combinations and five displacement-incidence families that hold aggregate displacement fixed. In the central 7 per cent displacement calibration, the 20-draw mean Exchequer cost is \pounds 18.2 billion and absolute before-housing-costs poverty, measured against a baseline-fixed threshold, rises by 1.75 percentage points. Across incidence families, the mean fiscal cost ranges from \pounds 14.9 billion under uniform incidence to \pounds 22.1 billion under expertise compression and \pounds 33.3 billion in an author-constructed top-loaded stress test; poverty varies less. The Gini rises in every displacement scenario examined. In an additional sensitivity, imposing occupation-level wage cuts instead of job losses produces a similar fiscal cost, little change in poverty and a small fall in the Gini. These simulations suggest that both incidence and the adjustment margin matter for household outcomes and the public finances.
+\noindent I examine how the simulated household and fiscal effects of an AI labour-market shock in the United Kingdom vary with its incidence. I link occupation-level AI exposure to workers in the 2024--25 Family Resources Survey and use PolicyEngine UK to simulate employment, wage and capital-income shocks. The design covers 66 shock-size combinations and five displacement-incidence families that hold aggregate displacement fixed. In the central 7 per cent displacement calibration, the 20-draw mean Exchequer cost is \pounds \genCentralMcCostMeanBn~billion and absolute before-housing-costs poverty, measured against a baseline-fixed threshold, rises by \genCentralMcPovBhcMeanPp~percentage points. Across incidence families, the mean fiscal cost ranges from \pounds \genIncUniformCostMeanBn~billion under uniform incidence to \pounds \genIncCompressionCostMeanBn~billion under expertise compression and \pounds \genIncKleinCostMeanBn~billion in an author-constructed top-loaded stress test; poverty varies less. The Gini rises in every displacement scenario examined. In an additional sensitivity, imposing occupation-level wage cuts instead of job losses produces a larger fiscal cost, little change in poverty and a small fall in the Gini. These simulations suggest that both incidence and the adjustment margin matter for household outcomes and the public finances.
 \end{abstract}
 
 \medskip

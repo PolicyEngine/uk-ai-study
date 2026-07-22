@@ -528,6 +528,13 @@ INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty
+INPUT ./values_generated.tex
+INPUT ./values_generated.tex
+INPUT ./values_generated.tex
+INPUT values_generated.tex
+INPUT ./values_generated.tex
+INPUT ./values_generated.tex
+INPUT values_generated.tex
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
@@ -685,7 +692,11 @@ INPUT ../results/incidence/incidence_families.png
 INPUT ../results/incidence/incidence_families.png
 INPUT ../results/incidence/incidence_families.png
 INPUT ../results/incidence/incidence_families.png
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti8.tfm
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
 INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
 INPUT ../results/geo/map_income_change.png
 INPUT ../results/geo/map_income_change.png
 INPUT ../results/geo/map_income_change.png

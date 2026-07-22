@@ -66,8 +66,18 @@ def setup():
     persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
+    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
+    # of the matched employed, as the paper states (R2-10)
+    _emp = persons["employment_income"].to_numpy() > 0
+    _w = persons["weight"].to_numpy()
+
+    def _weighted_fill(values):
+        ok = np.isfinite(values) & _emp
+        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
+        return np.where(np.isfinite(values), values, mean)
+
+    persons["exposure"] = _weighted_fill(e)
+    persons["complementarity"] = _weighted_fill(th)
     persons["exposure_raw"] = e
 
     equiv = calc("equiv_hbai_household_net_income")
@@ -244,6 +254,7 @@ def fast(dataset, baseline, persons):
     def decile_change(persons_variant, label):
         shocked_table = apply_shocks(persons_variant, PRESETS["central"], seed=0)
         sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+        # household-level %, identical for all members; broadcast intentional
         hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         out = []
@@ -267,7 +278,12 @@ def fast(dataset, baseline, persons):
     # --- B.8: alternative exposure index (eloundou_beta), decile change
     alt = persons.copy()
     e2 = exposure_for_major_group(persons["soc_major_group"], "eloundou_beta")
-    alt["exposure"] = np.where(np.isfinite(e2), e2, np.nanmean(e2))
+    # employment-weighted fill for unmatched employees (R2-10)
+    _emp2 = persons["employment_income"].to_numpy() > 0
+    _ok2 = np.isfinite(e2) & _emp2
+    alt["exposure"] = np.where(
+        np.isfinite(e2), e2, float(np.average(e2[_ok2], weights=w[_ok2]))
+    )
     alt_change = decile_change(alt, "alt")
     df_b8 = pd.DataFrame({"decile": x, "c_aioe_pct": ai, "eloundou_pct": alt_change})
     df_b8.to_csv(OUT / "b8_alternative_index_decile.csv", index=False)
@@ -282,6 +298,7 @@ def decomp_ci(dataset, baseline, persons, n_draws=20):
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
+    # household-level %, identical for all members; broadcast intentional
     hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
     draws = np.zeros((n_draws, 10))
     for s in range(n_draws):
@@ -308,6 +325,7 @@ def grids(dataset, baseline, persons):
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
+    # household-level %, identical for all members; broadcast intentional
     hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
     hw = baseline.calculate("household_weight", period=PERIOD, map_to="household").values
     eq_b = baseline.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values

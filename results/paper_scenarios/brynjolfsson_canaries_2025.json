@@ -9,32 +9,32 @@
     "16-24": {
       "displaced_weighted": 15295.8330078125,
       "displacement_rate_of_employed": 0.01036154106259346,
-      "mean_income_change": -100.84001159667969
+      "mean_per_capita_income_change": -46.89903832057514
     },
     "25-34": {
       "displaced_weighted": 5037.94921875,
       "displacement_rate_of_employed": 0.0010536707704886794,
-      "mean_income_change": -26.48611068725586
+      "mean_per_capita_income_change": -7.186705232628363
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -8.839226722717285
+      "mean_per_capita_income_change": -3.738474327314298
     },
     "45-54": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -29.692041397094727
+      "mean_per_capita_income_change": -7.7998299616680935
     },
     "55-64": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -9.011743545532227
+      "mean_per_capita_income_change": -2.74957540427179
     },
     "65-+": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_income_change": -8.706833839416504
+      "mean_per_capita_income_change": -1.6086601308945725
     }
   }
 }

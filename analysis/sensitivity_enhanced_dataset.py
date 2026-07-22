@@ -27,14 +27,12 @@ sys.path.insert(0, str(ROOT / "analysis"))
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group  # noqa: E402
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation  # noqa: E402
-from geo_impact import age_band, person_frame, weighted_decile_edges  # noqa: E402
+from geo_impact import age_band, person_frame, weighted_decile_edges, _storage_file  # noqa: E402
 
 DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
 PLAIN_FRS = DATA / "frs_2024_25.h5"
-ENHANCED_FRS = Path(
-    "/Users/janansadeqian/policyengine-uk-data/policyengine_uk_data/storage/enhanced_frs_2023_24.h5"
-)
+ENHANCED_FRS = _storage_file("enhanced_frs_2023_24.h5")
 ADULT_TAB = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 SEED = 0
 SCENARIO = PRESETS["central"]

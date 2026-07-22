@@ -7,14 +7,16 @@ import argparse
 from pathlib import Path
 
 from uk_ai_study.runner import run_scenario, write_result
-from uk_ai_study.shocks import PRESETS
+from uk_ai_study.shocks import PRESETS, RIPPLE_PRESETS, WAGE_MARGIN_PRESETS
+
+ALL_PRESETS = list(PRESETS) + list(RIPPLE_PRESETS) + list(WAGE_MARGIN_PRESETS)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", default="data")
     parser.add_argument("--period", type=int, default=2026)
-    parser.add_argument("--scenarios", nargs="*", default=list(PRESETS))
+    parser.add_argument("--scenarios", nargs="*", default=ALL_PRESETS)
     args = parser.parse_args()
 
     data = Path(args.data_dir)

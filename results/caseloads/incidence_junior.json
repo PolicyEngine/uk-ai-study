@@ -1,18 +1,18 @@
 {
   "scenario": "incidence_junior",
-  "displaced_weighted_m": 1.6116807460784912,
-  "new_uc_benunits_thousands": 380.9651794433594,
-  "exiting_uc_benunits_thousands": 54.561100006103516,
-  "net_new_uc_benunits_thousands": 326.4040832519531,
-  "new_uc_households_thousands": 355.3255615234375,
-  "new_uc_persons_thousands": 884.2899780273438,
-  "uc_spend_baseline_bn": 39.82927872,
-  "uc_spend_shocked_bn": 42.377388032,
-  "uc_spend_change_bn": 2.548109312,
-  "uc_housing_element_change_bn": 0.414222336,
+  "displaced_weighted_m": 1.5430988073349,
+  "new_uc_benunits_thousands": 314.35675048828125,
+  "exiting_uc_benunits_thousands": 61.4310302734375,
+  "net_new_uc_benunits_thousands": 252.92572021484375,
+  "new_uc_households_thousands": 297.6606140136719,
+  "new_uc_persons_thousands": 697.7534790039062,
+  "uc_spend_baseline_bn": 41.361952768,
+  "uc_spend_shocked_bn": 43.758968832,
+  "uc_spend_change_bn": 2.397016064,
+  "uc_housing_element_gross_entitlement_change_bn": 0.438506496,
   "passported_change_bn": {
     "free_school_meals": 0.0,
-    "council_tax_benefit": 0.0
+    "council_tax_benefit": 0.024435456
   },
   "context_dwp_welfare_spend_2025_26_bn": 334.0
 }
