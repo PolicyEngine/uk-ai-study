@@ -78,6 +78,8 @@ def main():
 
     st = apply_shocks(persons, PRESETS["central"], seed=0)
     sim = build_shocked_simulation(ds, base, st, P)
+    # household-level totals broadcast to persons; only the % ratio below is
+    # reported, identical for all members — broadcast intentional (issue #6)
     hni_b = base.calculate("hbai_household_net_income", period=P, map_to="person").values
     hni_s = sim.calculate("hbai_household_net_income", period=P, map_to="person").values
     for label, m in [("female", female), ("male", ~female)]:

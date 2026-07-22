@@ -34,7 +34,7 @@ import numpy as np
 import pandas as pd
 
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.runner import AGE_BANDS, gini
+from uk_ai_study.runner import AGE_BANDS, gini, per_capita_household_income
 from uk_ai_study.shocks import ShockScenario, draw_displaced
 
 DATA = Path("data")
@@ -140,7 +140,11 @@ def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
             "poverty_bhc": float(np.average(
                 s.calculate("in_poverty_bhc", period=PERIOD, map_to="person").values, weights=pw)),
             "gini": gini(eq, hw * npeople),
-            "hni": s.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values,
+            # per-capita household disposable income (£ per person, issue #6)
+            "hni_pc": per_capita_household_income(
+                s.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values,
+                s.calculate("household_count_people", period=PERIOD, map_to="person").values,
+            ),
         }
 
     base, shock = metrics(baseline_sim), metrics(sim)
@@ -148,7 +152,8 @@ def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
     weight = persons["weight"].to_numpy()
     age = persons["age"].to_numpy()
     employed = employment > 0
-    delta = shock["hni"] - base["hni"]
+    # per-capita household disposable income change (£ per person)
+    delta = shock["hni_pc"] - base["hni_pc"]
     bands = {}
     for lo, hi in AGE_BANDS:
         m = (age >= lo) & (age <= hi)
@@ -156,7 +161,8 @@ def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
         bands[f"{lo}-{hi if hi < 200 else '+'}"] = {
             "displaced_weighted": float(weight[m & displaced].sum()),
             "displacement_rate_of_employed": float(weight[m & displaced].sum() / emp_w) if emp_w else 0.0,
-            "mean_income_change": float(np.average(delta[m], weights=weight[m])) if m.any() else 0.0,
+            # per-capita household disposable income change (£), person-weighted
+            "mean_per_capita_income_change": float(np.average(delta[m], weights=weight[m])) if m.any() else 0.0,
         }
 
     result = {

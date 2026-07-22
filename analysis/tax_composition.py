@@ -54,7 +54,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import figstyle
 from replicate_jr16 import PERIOD, build_person_table
-from uk_ai_study.runner import gini
+from uk_ai_study.runner import gini, per_capita_household_income
 from uk_ai_study.shocks import (
     PRESETS,
     ShockScenario,
@@ -175,7 +175,11 @@ def hh_metrics(sim):
             sim.calculate("in_poverty_bhc", period=PERIOD, map_to="person").values, weights=pw)),
         "poverty_ahc": float(np.average(
             sim.calculate("in_poverty_ahc", period=PERIOD, map_to="person").values, weights=pw)),
-        "hni_person": sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values,
+        # per-capita household disposable income (£ per person, issue #6)
+        "hni_pc": per_capita_household_income(
+            sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values,
+            sim.calculate("household_count_people", period=PERIOD, map_to="person").values,
+        ),
     }
 
 
@@ -216,8 +220,9 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
     base = hh_metrics(baseline_sim)
 
     def decile_means(m):
+        # person-weighted mean per-capita household disposable income (£)
         return {
-            int(d): float(np.average(m["hni_person"][deciles == d], weights=pw[deciles == d]))
+            int(d): float(np.average(m["hni_pc"][deciles == d], weights=pw[deciles == d]))
             for d in range(1, 11)
         }
 
@@ -238,7 +243,8 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
             "poverty_bhc_pp": 100 * (recyc["poverty_bhc"] - central["poverty_bhc"]),
             "poverty_ahc_pp": 100 * (recyc["poverty_ahc"] - central["poverty_ahc"]),
         },
-        "decile_mean_hbai_net_income": {
+        # per-capita household disposable income (£ per person, issue #6)
+        "decile_mean_per_capita_hbai_net_income": {
             "baseline": dm_base,
             "central_no_recycling": dm_c,
             "recycling_phi05": dm_r,

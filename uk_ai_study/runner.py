@@ -45,13 +45,38 @@ class ScenarioResult:
     gini_baseline: float
     gini_shocked: float
     displaced_weighted: float
+    # per-capita household disposable income change (£), person-weighted mean
     decile_income_change: dict = field(default_factory=dict)
     age_band_displacement_share: dict = field(default_factory=dict)
+    # per-capita household disposable income change (£), person-weighted mean
     age_band_income_change: dict = field(default_factory=dict)
     # wage-margin runs only (R2-2): the paired gross-cut calibration target
     # (share of the baseline wage bill) and the realised aggregate cut
     gross_cut_share_target: float | None = None
     gross_cut_realised: float | None = None
+
+
+def per_capita_household_income(
+    household_income: np.ndarray, household_size: np.ndarray
+) -> np.ndarray:
+    """Per-capita household disposable income (£ per person).
+
+    ``map_to="person"`` broadcasts the household TOTAL to each member; dividing
+    by the (person-broadcast) household size gives the per-capita quantity used
+    in the cash-change decile and age-band summaries. Raises on zero, negative,
+    or non-finite household sizes.
+    """
+    household_income = np.asarray(household_income, dtype=float)
+    household_size = np.asarray(household_size, dtype=float)
+    if household_income.shape != household_size.shape:
+        raise ValueError(
+            f"shape mismatch: income {household_income.shape} vs size {household_size.shape}"
+        )
+    if household_size.size and (
+        not np.all(np.isfinite(household_size)) or np.any(household_size < 1)
+    ):
+        raise ValueError("household_size must be finite and >= 1 for every person")
+    return household_income / household_size
 
 
 def gini(values: np.ndarray, weights: np.ndarray) -> float:
@@ -93,7 +118,12 @@ def _metrics(sim, period: int) -> dict:
             weights=sim.calculate("person_weight", period=period, map_to="person").values,
         )),
         "gini": gini(equiv, hh_w * hh_count),
-        "hni": sim.calculate("hbai_household_net_income", period=period, map_to="person").values,
+        # per-capita household disposable income (£): the person-broadcast
+        # household total divided by household size (issue #6)
+        "hni_pc": per_capita_household_income(
+            sim.calculate("hbai_household_net_income", period=period, map_to="person").values,
+            sim.calculate("household_count_people", period=period, map_to="person").values,
+        ),
     }
 
 
@@ -150,7 +180,8 @@ def run_scenario(
 
     weight = persons["weight"].to_numpy()
     age = persons["age"].to_numpy()
-    income_delta = shock["hni"] - base["hni"]
+    # per-capita household disposable income change (£ per person)
+    income_delta = shock["hni_pc"] - base["hni_pc"]
     # weighted deciles of baseline EQUIVALISED household disposable income
     # (HBAI concept, person-level, survey-weighted) — the JR16 convention
     equiv = baseline.calculate(

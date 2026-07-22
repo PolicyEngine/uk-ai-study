@@ -254,6 +254,7 @@ def fast(dataset, baseline, persons):
     def decile_change(persons_variant, label):
         shocked_table = apply_shocks(persons_variant, PRESETS["central"], seed=0)
         sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+        # household-level %, identical for all members; broadcast intentional
         hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         out = []
@@ -297,6 +298,7 @@ def decomp_ci(dataset, baseline, persons, n_draws=20):
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
+    # household-level %, identical for all members; broadcast intentional
     hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
     draws = np.zeros((n_draws, 10))
     for s in range(n_draws):
@@ -323,6 +325,7 @@ def grids(dataset, baseline, persons):
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
+    # household-level %, identical for all members; broadcast intentional
     hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
     hw = baseline.calculate("household_weight", period=PERIOD, map_to="household").values
     eq_b = baseline.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
