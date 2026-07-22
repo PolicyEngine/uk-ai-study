@@ -137,6 +137,8 @@ MANIFEST = [
         "outputs": [
             "incidence/exposure.json", "incidence/junior.json",
             "incidence/uniform.json", "incidence/compression.json",
+            "incidence/uniform_compound.json",
+            "incidence/compression_compound.json",
             "incidence/summary.csv",
         ],
         "inputs": FRS_INPUTS,
