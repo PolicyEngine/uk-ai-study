@@ -9,32 +9,32 @@
     "16-24": {
       "displaced_weighted": 63541.05078125,
       "displacement_rate_of_employed": 0.04304330796003342,
-      "mean_income_change": -1760.0218505859375
+      "mean_per_capita_income_change": -525.4728762804746
     },
     "25-34": {
       "displaced_weighted": 213405.625,
       "displacement_rate_of_employed": 0.04463309422135353,
-      "mean_income_change": -2112.16162109375
+      "mean_per_capita_income_change": -863.0560859099821
     },
     "35-44": {
       "displaced_weighted": 269309.375,
       "displacement_rate_of_employed": 0.044130776077508926,
-      "mean_income_change": -2273.42724609375
+      "mean_per_capita_income_change": -871.5669179589503
     },
     "45-54": {
       "displaced_weighted": 217058.46875,
       "displacement_rate_of_employed": 0.043260011821985245,
-      "mean_income_change": -2033.005615234375
+      "mean_per_capita_income_change": -829.5084438120583
     },
     "55-64": {
       "displaced_weighted": 181679.609375,
       "displacement_rate_of_employed": 0.04059045389294624,
-      "mean_income_change": -1441.376708984375
+      "mean_per_capita_income_change": -601.4604242126115
     },
     "65-+": {
       "displaced_weighted": 27407.94140625,
       "displacement_rate_of_employed": 0.02334447205066681,
-      "mean_income_change": -205.90206909179688
+      "mean_per_capita_income_change": -80.844995850738
     }
   }
 }

@@ -914,7 +914,7 @@ enhanced_2025 {'poverty_change_bhc_pp': 2.948810372742973, 'baseline_poverty_bhc
 plain_2025 {'poverty_change_bhc_pp': 1.907548667877354, 'exchequer_cost_bn': 17.212997632, 'displaced_weighted_m': 1.551361875}
 {
  "description": "Central scenario, seed 0; enhanced FRS 2023-24 with geo_impact.py's SOC imputation (route B). Decomposes the geography-section (+enhanced, 2025) vs main (+plain, 2026) BHC poverty-change gap.",
- "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-6q3d1krv/worktree/data/enhanced_frs_2023_24.h5",
+ "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-nxh9280m/worktree/data/enhanced_frs_2023_24.h5",
  "cells": {
   "enhanced_2026": {
    "poverty_change_bhc_pp": 2.947655506864892,
@@ -957,10 +957,10 @@ hosseini_lichtinger_2026_adopter_scaled: displaced 0.02m (0.1% of employees), ex
 brynjolfsson_canaries_2025: displaced 0.02m (0.1% of employees), exchequer £0.2bn, poverty +0.02pp, gini +0.01pp
 
 === stage policy: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/policy_counterfactuals.py
-R1_wage_insurance exposure cost £20.32bn dpov_ahc -1.418pp dgini -0.881pp
-R2_uc_circuit_breaker exposure cost £5.73bn dpov_ahc -0.571pp dgini -0.301pp
-R3_cap_suspension_taper_cut exposure cost £4.61bn dpov_ahc -0.490pp dgini -0.221pp
-R1_wage_insurance junior cost £20.33bn dpov_ahc -1.675pp dgini -0.910pp
+R1_wage_insurance exposure cost £20.64bn dpov_ahc -1.490pp dgini -0.922pp
+R2_uc_circuit_breaker exposure cost £5.72bn dpov_ahc -0.579pp dgini -0.300pp
+R3_cap_suspension_taper_cut exposure cost £4.57bn dpov_ahc -0.510pp dgini -0.217pp
+R1_wage_insurance junior cost £20.38bn dpov_ahc -1.772pp dgini -0.924pp
 R1_wage_insurance uniform cost £19.87bn dpov_ahc -1.776pp dgini -0.917pp
 
 === stage caseloads: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/caseloads.py
@@ -1014,10 +1014,12 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
       "age_gender": 0.0,
       "marginal": 0.0011398714279851267
     },
-    "enhanced_frs_employees": 55764
+    "enhanced_frs_employees": 55764,
+    "w_displacement_inflation_factor": 1.4215371987924372,
+    "w_displacement_renormalised_to_rate": 0.07
   },
   "national_income_change_pct": -2.1695945262908936,
-  "national_displaced_per_1000": 99.50760391547061,
+  "national_displaced_per_1000": 70.00000000000001,
   "national_poverty_headcount_change": 2009852.6218831723,
   "top10_income_change": [
     {
@@ -1126,8 +1128,8 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
 }
 
 === stage geo_choropleth: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/geo_choropleth.py
-wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-6q3d1krv/worktree/results/geo/map_income_change.png
-wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-6q3d1krv/worktree/results/geo/map_displacement.png
+wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-nxh9280m/worktree/results/geo/map_income_change.png
+wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-nxh9280m/worktree/results/geo/map_displacement.png
 
 === stage figures: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/figures.py
 figures written to results/jr16, results/appendix and results/incidence

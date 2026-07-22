@@ -12,5 +12,7 @@
     "age_gender": 0.0,
     "marginal": 0.0011398714279851267
   },
-  "enhanced_frs_employees": 55764
+  "enhanced_frs_employees": 55764,
+  "w_displacement_inflation_factor": 1.4215371987924372,
+  "w_displacement_renormalised_to_rate": 0.07
 }

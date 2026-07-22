@@ -4,7 +4,7 @@
   "gross_cost_bn": 19.874710166998696,
   "poverty_change_bhc_pp": -1.5404749470240897,
   "poverty_change_ahc_pp": -1.775989469838779,
-  "gini_change_pp": -0.916917225239211,
+  "gini_change_pp": -0.916916801017198,
   "cost_per_pp_bhc_bn": 12.901676983058328,
   "cost_per_pp_ahc_bn": 11.190781535885392,
   "decile_benefit_share_pct": {
@@ -34,12 +34,12 @@
   "shocked_no_reform": {
     "poverty_bhc": 0.16482391637922586,
     "poverty_ahc": 0.20752805127082988,
-    "gini": 0.3210449923960308
+    "gini": 0.3210449959792141
   },
   "shocked_with_reform": {
     "poverty_bhc": 0.14941916690898496,
     "poverty_ahc": 0.1897681565724421,
-    "gini": 0.3118758201436387
+    "gini": 0.3118758279690421
   },
   "implementation": "post-simulation transfer, non-taxable, means-test disregarded",
   "poverty_rule_agreement_bhc": 1.0,
