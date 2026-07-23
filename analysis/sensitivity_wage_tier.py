@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT / "analysis"))
 from uk_ai_study.runner import build_person_table, gini  # noqa: E402
 from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES  # noqa: E402
 from measured_incidence import LONDON_MULT_CENTRAL, measured_table  # noqa: E402
-from policy_counterfactuals import build_sim, person_calc, hh_calc  # noqa: E402
+from policy_counterfactuals import PERIOD, build_sim, person_calc, hh_calc  # noqa: E402
 
 DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
