@@ -192,7 +192,7 @@ Second, the poverty effect all but disappears in the simulated wage-cut cases: t
 
 Third, the sign of the inequality effect flips under both author-chosen wage gradients: the Gini falls by 0.44 and 0.35 points, whereas it rises in the simulated displacement cells. Percentage cuts scale with gradients concentrated in well-paid occupations, compressing earnings from above. The comparison shows that poverty and inequality conclusions depend on both the adjustment margin and its imposed schedule; it does not establish a universal fiscal or distributional result.
 
-Table~\ref{tab:mixedwage} makes the like-for-like comparison. In every row gross earnings loss before the common uplift is 7.53 per cent of the baseline wage bill, exactly the loss realised in the seed-0 exposure-family displacement draw to which the exercise is paired. Moving that fixed loss from wage cuts to displacement reduces the Exchequer cost from \pounds 25.3 billion to \pounds 17.0 billion, while raising BHC poverty from 0.08 to 1.68 points and the Gini effect from $-0.42$ to $+0.98$ points. The half-index case costs \pounds 21.2 billion, raises poverty by 0.95 points and raises the Gini by 0.32 points. Net employee-income losses after the uplift still rise slightly, from 4.87 to 5.07 per cent, because fewer survivors receive the uplift as displacement rises; the pre-uplift loss being compared is invariant. % results/robustness/mixed_adjustment.csv
+Table~\ref{tab:mixedwage} makes the like-for-like comparison. In every row gross earnings loss before the common uplift is 7.77 per cent of the baseline wage bill, exactly the loss realised in the seed-0 central/exposure draw to which the exercise is paired. Moving that fixed loss from wage cuts to displacement reduces the Exchequer cost from \pounds 26.6 billion to \pounds 18.2 billion, while raising BHC poverty from 0.10 to 1.81 points and the Gini effect from $-0.44$ to $+1.04$ points. The half-index case costs \pounds 22.7 billion, raises poverty by 1.02 points and raises the Gini by 0.29 points. Net employee-income losses after the uplift rise slightly, from 5.11 to 5.32 per cent, because fewer survivors receive the uplift as displacement rises; the pre-uplift loss being compared is invariant. % results/robustness/mixed_adjustment.csv
 Conditional on this author-designed allocation rule, the monotone poverty and inequality patterns is consistent with the changing adjustment margin under this allocation rule; it is not a structural causal estimate.
 
 \begin{table}[htbp]
@@ -205,28 +205,28 @@ Conditional on this author-designed allocation rule, the monotone poverty and in
 Scenario & Displaced & Exchequer cost & $\Delta$ Poverty & $\Delta$ Gini \\
  & (million) & (\pounds bn/yr) & BHC (pp) & (pp) \\
 \midrule
-\multicolumn{5}{l}{\emph{Fixed gross earnings loss (7.53 per cent); $\lambda$ scales displacement}} \\
-$\lambda=0$ & 0.00 & 25.3 & +0.08 & $-$0.42 \\
-$\lambda=.25$ & 0.40 & 23.2 & +0.52 & $-$0.02 \\
-$\lambda=.50$ & 0.77 & 21.2 & +0.95 & +0.32 \\
-$\lambda=.75$ & 1.13 & 19.4 & +1.39 & +0.66 \\
-$\lambda=1$ & 1.54 & 17.0 & +1.68 & +0.98 \\
+\multicolumn{5}{l}{\emph{Fixed gross earnings loss (7.77 per cent); $\lambda$ scales displacement}} \\
+$\lambda=0$ & 0.00 & 26.6 & +0.10 & $-$0.44 \\
+$\lambda=.25$ & 0.42 & 24.5 & +0.61 & $-$0.03 \\
+$\lambda=.50$ & 0.77 & 22.7 & +1.02 & +0.29 \\
+$\lambda=.75$ & 1.15 & 20.6 & +1.39 & +0.62 \\
+$\lambda=1$ & 1.56 & 18.2 & +1.81 & +1.04 \\
 \midrule
 \multicolumn{5}{l}{\emph{Central 7 per cent displacement with alternative survivor-wage effects}} \\
-$-5.0\%$ & 1.54 & 56.2 & +2.51 & +0.54 \\
-$-2.6\%$ & 1.54 & 43.9 & +2.07 & +0.67 \\
-$0.0\%$ & 1.54 & 30.5 & +1.86 & +0.83 \\
-$+2.6\%$ & 1.54 & 17.0 & +1.68 & +0.98 \\
-$+5.0\%$ & 1.54 & 4.5 & +1.55 & +1.13 \\
+$-5.0\%$ & 1.56 & 57.3 & +2.65 & +0.59 \\
+$-2.6\%$ & 1.56 & 45.0 & +2.21 & +0.73 \\
+$0.0\%$ & 1.56 & 31.6 & +2.01 & +0.88 \\
+$+2.6\%$ & 1.56 & 18.2 & +1.81 & +1.04 \\
+$+5.0\%$ & 1.56 & 5.8 & +1.68 & +1.19 \\
 % source: results/robustness/mixed_adjustment.csv, results/robustness/survivor_wage_grid.csv
 \bottomrule
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} In the mixed panel, $\lambda$ scales the 7 per cent employee-displacement rate and C-AIOE-graded survivor cuts fill the gap to the seed-0 exposure-family draw's gross pre-uplift earnings loss (7.53 per cent of the wage bill). Gross loss is identical in every row; the 2.6 per cent complementarity-graded uplift and capital shock then apply. The pure wage-cut endpoint therefore differs from the wage-margin rows of Table~\ref{tab:wagemargin}, which are calibrated to the central preset draw's realised loss (7.77 per cent). The second panel holds displaced workers and the capital shock fixed and changes only the employment-weighted survivor-wage parameter. These are author-designed reduced-form comparative statics, not estimates of equilibrium wage responses.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} In the mixed panel, $\lambda$ thins the central 7 per cent employee-displacement draw and C-AIOE-graded survivor cuts fill the gap to that same seed-0 draw's gross pre-uplift earnings loss (7.77 per cent of the wage bill). Gross loss is identical in every row; the 2.6 per cent complementarity-graded uplift and capital shock then apply. The pure wage-cut endpoint therefore matches the C-AIOE wage-margin row's gross-loss calibration. The second panel holds displaced workers and the capital shock fixed and changes only the employment-weighted survivor-wage parameter. These are author-designed reduced-form comparative statics, not estimates of equilibrium wage responses.}
 \end{table}
 
-Allowing survivor wages to fall is more consequential for the level of the fiscal estimate. With the same 1.54 million displaced workers, removing the productivity pass-through raises the Exchequer cost from \pounds 17.0 billion to \pounds 30.5 billion; an average 2.6 per cent wage decline raises it to \pounds 43.9 billion, and a 5 per cent decline to \pounds 56.2 billion. Poverty also rises, but less dramatically, from 1.68 points under the central uplift to 2.51 points under a 5 per cent wage decline, because the additional loss is spread across survivors rather than concentrated as total earnings loss. The assumed positive wage pass-through is a large fiscal offset in this grid. The Gini remains positive in every central-displacement wage cell, including the adverse-wage cases; more positive survivor gains are associated with a larger Gini response, consistent with wider the gap between displaced workers and those who keep their jobs.
+Allowing survivor wages to fall is more consequential for the level of the fiscal estimate. With the same 1.56 million displaced workers, removing the productivity pass-through raises the Exchequer cost from \pounds 18.2 billion to \pounds 31.6 billion; an average 2.6 per cent wage decline raises it to \pounds 45.0 billion, and a 5 per cent decline to \pounds 57.3 billion. Poverty also rises, but less dramatically, from 1.81 points under the central uplift to 2.65 points under a 5 per cent wage decline, because the additional loss is spread across survivors rather than concentrated as total earnings loss. The assumed positive wage pass-through is a large fiscal offset in this grid. The Gini remains positive in every central-displacement wage cell, including the adverse-wage cases; more positive survivor gains are associated with a larger Gini response, consistent with a wider gap between displaced workers and those who keep their jobs.
 
 \subsection{The geography of the shock}
 \label{sec:results-geo}

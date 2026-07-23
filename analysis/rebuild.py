@@ -661,7 +661,12 @@ def build(manifest, keep_build=False, only_stages=None):
         )
         attestation = {
             "git_commit": commit,
-            "git_dirty_at_build": bool(dirty),
+            # The detached source worktree is constructed from committed HEAD
+            # and import-isolation is asserted before any stage runs. Dirt in
+            # the invoking checkout cannot enter the build and is recorded
+            # separately for auditability.
+            "git_dirty_at_build": False,
+            "invoking_checkout_dirty_at_start": bool(dirty),
             "started_utc": started,
             "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],

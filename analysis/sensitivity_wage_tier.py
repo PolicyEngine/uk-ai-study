@@ -100,7 +100,7 @@ def main():
     summary = {
         "description": "Measured family (Klein Teeselink) with alternative "
                        "high/low wage-tier displacement multipliers; junior "
-                       "5.8/4.5 and London 1.5 tilts and central aggregate "
+                       "5.8/4.5 junior tilt, neutral London multiplier, and central aggregate "
                        "shock held fixed; 20 draws (seeds 0-19).",
         "n_draws": N_DRAWS,
     }
