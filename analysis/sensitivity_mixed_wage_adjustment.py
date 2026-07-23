@@ -22,8 +22,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.runner import gini
+from uk_ai_study.runner import build_person_table, gini
 from uk_ai_study.shocks import (
     MixedMarginScenario,
     ShockScenario,
@@ -53,21 +52,7 @@ def main() -> None:
     def pcalc(variable: str) -> np.ndarray:
         return baseline.calculate(variable, period=PERIOD, map_to="person").values
 
-    persons = pd.DataFrame(
-        {
-            "person_id": pcalc("person_id"),
-            "age": pcalc("age"),
-            "employment_income": pcalc("employment_income"),
-            "savings_interest_income": pcalc("savings_interest_income"),
-            "dividend_income": pcalc("dividend_income"),
-            "weight": pcalc("person_weight"),
-        }
-    )
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
-    exposure = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    theta = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
-    persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
+    persons = build_person_table(baseline, PERIOD, ADULT)
 
     def metrics(sim) -> dict[str, float]:
         pw = sim.calculate("person_weight", period=PERIOD, map_to="person").values

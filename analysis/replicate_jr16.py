@@ -41,7 +41,7 @@ from uk_ai_study.shocks import (
     build_shocked_simulation,
     draw_displaced,
 )
-from uk_ai_study.runner import gini
+from uk_ai_study.runner import build_person_table as canonical_person_table, gini
 
 DATA = Path("data")
 OUT = Path("results/jr16")
@@ -59,24 +59,12 @@ def build_person_table():
     def calc(v, entity="person"):
         return sim.calculate(v, period=PERIOD, map_to=entity).values
 
-    persons = pd.DataFrame(
-        {
-            "person_id": calc("person_id"),
-            "household_id": calc("household_id"),
-            "age": calc("age"),
-            "employment_income": calc("employment_income"),
-            "savings_interest_income": calc("savings_interest_income"),
-            "dividend_income": calc("dividend_income"),
-            "weight": calc("person_weight"),
-        }
+    persons = canonical_person_table(
+        sim,
+        PERIOD,
+        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
+        extra_variables=("household_id",),
     )
-    persons["soc_major_group"] = attach_soc_major_group(
-        persons["person_id"], DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
-    )
-    exposure = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    theta = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
-    persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
 
     # deciles of equivalised household disposable income (HBAI concept,
     # person-level, weighted), fixed at baseline as in JR16 — #1, finding 2

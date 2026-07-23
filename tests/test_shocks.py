@@ -120,6 +120,19 @@ def test_prescribed_inclusion_three_heterogeneous_weights():
         assert h / n == pytest.approx(5.0 / 11.0, abs=0.02)
 
 
+def test_prescribed_probabilities_redistribute_multiple_caps():
+    """Capped units stay capped across successive redistribution waves."""
+    from uk_ai_study.shocks import prescribed_inclusion_probabilities
+
+    weights = np.array([1.0, 1.0, 9.0, 20.0])
+    tilts = np.array([100.0, 20.0, 2.0, 1.0])
+    quota = 20.0
+    pi = prescribed_inclusion_probabilities(weights, quota, tilts)
+    assert np.all((0 <= pi) & (pi <= 1))
+    assert np.dot(weights, pi) == pytest.approx(quota)
+    assert pi[0] == 1.0
+
+
 def test_expected_displaced_weight_equals_quota_heterogeneous():
     """R2-5: with heterogeneous weights, the EXPECTED displaced grossing
     weight still equals the quota under the prescribed-probability design."""

@@ -55,23 +55,14 @@ PLAIN_FRS = ROOT / "data" / "frs_2024_25.h5"
 
 
 def _storage_file(name: str) -> Path:
-    """Resolve a policyengine-uk-data storage artefact.
-
-    Prefers a copy in the repo's data/ directory (reproducible, hashed by
-    the rebuild attestation); falls back to an installed
-    policyengine_uk_data package's storage directory.
-    """
+    """Resolve a pinned local data input; never use ambient package storage."""
     local = ROOT / "data" / name
-    if local.exists():
-        return local
-    try:
-        import policyengine_uk_data
-    except Exception as exc:
+    if not local.exists():
         raise FileNotFoundError(
-            f"{name} not found in {ROOT / 'data'} and policyengine_uk_data "
-            f"is not importable ({exc}); copy the file into data/."
+            f"required pinned input {local} is absent; copy the reviewed "
+            "PolicyEngine data artefact into data/ before rebuilding"
         )
-    return Path(policyengine_uk_data.__file__).parent / "storage" / name
+    return local
 
 
 ENHANCED_FRS = _storage_file("enhanced_frs_2023_24.h5")
@@ -201,9 +192,38 @@ def main():
     persons["exposure"] = _weighted_fill(exposure)
     persons["complementarity"] = _weighted_fill(theta)
 
+    # Load the constituency matrix before drawing. Summing its 650 rows gives
+    # the national grossing weight for each household in the exact universe
+    # used by every geographic outcome below. The displacement draw must use
+    # these weights too; drawing under enhanced-dataset weights and rescaling
+    # only the displayed displacement column mixed 9.95% outcomes with a 7%
+    # label (R3-2).
+    hh_id = baseline.calculate(
+        "household_id", period=PERIOD, map_to="household"
+    ).values
+    person_hh = baseline.calculate(
+        "household_id", period=PERIOD, map_to="person"
+    ).values
+    pos = pd.Series(np.arange(len(hh_id)), index=hh_id)
+    pidx = pos.loc[person_hh].to_numpy()
+    with h5py.File(WEIGHTS_H5) as f:
+        W = f["2025"][:]
+    assert W.shape[1] == len(hh_id), (W.shape, len(hh_id))
+    persons["weight"] = W.sum(axis=0)[pidx]
+
     shocked_table = apply_shocks(persons, SCENARIO, seed=SEED)
     shocked = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
     displaced = shocked_table["displaced"].to_numpy()
+    realised_rate = float(
+        persons.loc[displaced, "weight"].sum()
+        / persons.loc[emp, "weight"].sum()
+    )
+    if not np.isclose(realised_rate, SCENARIO.displacement_rate, atol=0.003):
+        raise AssertionError(
+            f"W-universe realised displacement rate {realised_rate:.4%} "
+            f"is not close to {SCENARIO.displacement_rate:.4%}"
+        )
+    notes["w_universe_realised_displacement_rate"] = realised_rate
 
     # ---- Step 3: household-level vectors -----------------------------------
     hh_income_base = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values
@@ -211,10 +231,6 @@ def main():
     hh_people = baseline.calculate("household_count_people", period=PERIOD, map_to="household").values
 
     # person -> household aggregation for poverty headcounts / workers / displaced
-    hh_id = baseline.calculate("household_id", period=PERIOD, map_to="household").values
-    person_hh = baseline.calculate("household_id", period=PERIOD, map_to="person").values
-    pos = pd.Series(np.arange(len(hh_id)), index=hh_id)
-    pidx = pos.loc[person_hh].to_numpy()
     hh_workers = np.zeros(len(hh_id))
     np.add.at(hh_workers, pidx, emp.astype(float))
     hh_displaced = np.zeros(len(hh_id))
@@ -229,9 +245,6 @@ def main():
     del shocked, baseline
 
     # ---- Step 4: constituency estimates ------------------------------------
-    with h5py.File(WEIGHTS_H5) as f:
-        W = f["2025"][:]  # 650 x n_households, grossing weights
-    assert W.shape[1] == len(hh_id), (W.shape, len(hh_id))
     const = pd.read_csv(CONSTITUENCIES)
     assert len(const) == W.shape[0]
 
@@ -243,21 +256,10 @@ def main():
     pov_base = W @ hh_pov_base
     people = W @ hh_people
 
-    # Renormalise the constituency-weighted displacement mass to the
-    # scenario rate. The calibration weights re-gross individual households
-    # by up to ~20x relative to the dataset weights the draw consumed
-    # (colsum/dataset-weight ratio p5-p95 spans ~0.06-20), so W-aggregated
-    # displacement from a single binary draw overstates the national rate
-    # (9.95% vs the 7% scenario at seed 0). A single national scale factor
-    # restores the scenario rate; the pre-normalisation inflation is
-    # recorded in imputation_notes.json. Income and poverty deltas are
-    # actual household outcomes and are NOT rescaled (R2-9 caveat applies).
-    displacement_inflation = float(
-        disp.sum() / (SCENARIO.displacement_rate * workers.sum())
+    notes["w_displacement_draw_universe"] = (
+        "national household weights obtained by summing all 650 "
+        "constituency-matrix rows; no post-hoc outcome rescaling"
     )
-    disp = disp / displacement_inflation
-    notes["w_displacement_inflation_factor"] = displacement_inflation
-    notes["w_displacement_renormalised_to_rate"] = SCENARIO.displacement_rate
 
     df = const[["code", "name", "region", "x", "y"]].copy()
     df["income_change_pct"] = 100 * inc_delta / inc_base

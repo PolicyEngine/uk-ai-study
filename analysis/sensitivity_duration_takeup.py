@@ -39,8 +39,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "analysis"))
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group  # noqa: E402
-from uk_ai_study.runner import gini  # noqa: E402
+from uk_ai_study.runner import build_person_table, gini  # noqa: E402
 from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES, apply_shocks  # noqa: E402
 from policy_counterfactuals import PERIOD, build_sim, person_calc, hh_calc  # noqa: E402
 
@@ -75,31 +74,7 @@ def main():
     ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
     baseline = Microsimulation(dataset=ds)
 
-    persons = pd.DataFrame(
-        {
-            "person_id": person_calc(baseline, "person_id"),
-            "age": person_calc(baseline, "age"),
-            "employment_income": person_calc(baseline, "employment_income"),
-            "savings_interest_income": person_calc(baseline, "savings_interest_income"),
-            "dividend_income": person_calc(baseline, "dividend_income"),
-            "weight": person_calc(baseline, "person_weight"),
-        }
-    )
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
-    e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
-    # of the matched employed, as the paper states (R2-10)
-    _emp = persons["employment_income"].to_numpy() > 0
-    _w = persons["weight"].to_numpy()
-
-    def _weighted_fill(values):
-        ok = np.isfinite(values) & _emp
-        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
-        return np.where(np.isfinite(values), values, mean)
-
-    persons["exposure"] = _weighted_fill(e)
-    persons["complementarity"] = _weighted_fill(th)
+    persons = build_person_table(baseline, PERIOD, ADULT)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 

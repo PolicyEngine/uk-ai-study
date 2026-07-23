@@ -50,8 +50,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "analysis"))
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.runner import gini
+from uk_ai_study.runner import build_person_table, gini
 from uk_ai_study.shocks import (
     SHOCKED_INCOME_VARIABLES,
     TRANSITION_ZEROED_VARIABLES,
@@ -72,6 +71,23 @@ TAPER_CUT_TO = 0.45
 CAP_MULTIPLIER = 1000.0  # de-facto suspension
 
 FAMILIES_R1 = ("exposure", "junior", "uniform")
+
+def household_decile_benefit_shares(
+    household_gain, household_weight, household_decile
+) -> dict[int, float]:
+    """Strict reform-pound shares, counting each household exactly once."""
+    gain = np.asarray(household_gain, dtype=float)
+    weight = np.asarray(household_weight, dtype=float)
+    decile = np.asarray(household_decile, dtype=int)
+    if not (gain.shape == weight.shape == decile.shape):
+        raise ValueError("household gain, weight and decile shapes must match")
+    total = float((gain * weight).sum())
+    if total <= 0:
+        return {d: 0.0 for d in range(1, 11)}
+    return {
+        d: float(100 * (gain[decile == d] * weight[decile == d]).sum() / total)
+        for d in range(1, 11)
+    }
 
 
 def person_calc(sim, var):
@@ -141,33 +157,11 @@ def main():
     ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
     baseline = Microsimulation(dataset=ds)
 
-    persons = pd.DataFrame(
-        {
-            "person_id": person_calc(baseline, "person_id"),
-            "age": person_calc(baseline, "age"),
-            "employment_income": person_calc(baseline, "employment_income"),
-            "savings_interest_income": person_calc(baseline, "savings_interest_income"),
-            "dividend_income": person_calc(baseline, "dividend_income"),
-            "weight": person_calc(baseline, "person_weight"),
-        }
+    persons = build_person_table(
+        baseline,
+        PERIOD,
+        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
     )
-    persons["soc_major_group"] = attach_soc_major_group(
-        persons["person_id"], DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
-    )
-    e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    # unmatched employees carry the EMPLOYMENT-WEIGHTED mean of the matched
-    # employed (survey-weighted), matching runner.py (R2-10)
-    _emp = persons["employment_income"].to_numpy() > 0
-    _pw = persons["weight"].to_numpy()
-
-    def _weighted_fill(values):
-        ok = np.isfinite(values) & _emp
-        mean = float(np.average(values[ok], weights=_pw[ok])) if ok.any() else 0.0
-        return np.where(np.isfinite(values), values, mean)
-
-    persons["exposure"] = _weighted_fill(e)
-    persons["complementarity"] = _weighted_fill(th)
 
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
@@ -185,6 +179,7 @@ def main():
     hh_index = pd.Series(np.arange(len(hh_ids)), index=hh_ids)
     p2h = hh_index.loc[person_hh].to_numpy()
     pw_by_hh = np.bincount(p2h, weights=w, minlength=len(hh_ids))
+    hh_weight = hh_calc(baseline, "household_weight")
 
     equiv0 = person_calc(baseline, "equiv_hbai_household_net_income")
     order = np.argsort(equiv0)
@@ -192,6 +187,8 @@ def main():
     ranks = np.empty(len(equiv0))
     ranks[order] = cw / cw[-1]
     dec = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
+    hh_dec = np.zeros(len(hh_ids), dtype=int)
+    hh_dec[p2h] = dec
 
     del baseline
 
@@ -218,16 +215,13 @@ def main():
 
     results = []
 
-    def decile_shares(hh_gain, pw_hh_gain_person):
-        total = float((pw_hh_gain_person * w).sum())
-        if total <= 0:
-            return {int(d): 0.0 for d in range(1, 11)}
-        return {
-            int(d): float(100 * (pw_hh_gain_person[dec == d] * w[dec == d]).sum() / total)
-            for d in range(1, 11)
-        }
+    def decile_shares(hh_gain):
+        """Strict pound shares: count each household gain exactly once."""
+        return household_decile_benefit_shares(hh_gain, hh_weight, hh_dec)
 
-    def record(name, family, gross_cost, s0, m0, m1, gain_person, extra=None):
+    def record(name, family, gross_cost, s0, m0, m1, gain_hh, extra=None):
+        gain_hh = np.asarray(gain_hh, dtype=float)
+        gain_person = gain_hh[p2h]
         pov_bhc_pp = 100 * (m1["poverty_bhc"] - m0["poverty_bhc"])
         pov_ahc_pp = 100 * (m1["poverty_ahc"] - m0["poverty_ahc"])
         rec = {
@@ -239,7 +233,7 @@ def main():
             "gini_change_pp": 100 * (m1["gini"] - m0["gini"]),
             "cost_per_pp_bhc_bn": (gross_cost / 1e9 / -pov_bhc_pp) if pov_bhc_pp < 0 else None,
             "cost_per_pp_ahc_bn": (gross_cost / 1e9 / -pov_ahc_pp) if pov_ahc_pp < 0 else None,
-            "decile_benefit_share_pct": decile_shares(None, gain_person),
+            "decile_benefit_share_pct": decile_shares(gain_hh),
             "decile_mean_gain_gbp": {
                 int(d): float(np.average(gain_person[dec == d], weights=w[dec == d]))
                 for d in range(1, 11)
@@ -280,7 +274,7 @@ def main():
         m1 = metrics_from_state(s0, pw_by_hh, extra_hh_income=transfer_hh)
         gain_person = transfer_hh[p2h]
         record(
-            "R1_wage_insurance", family, gross_r1, s0, m0, m1, gain_person,
+            "R1_wage_insurance", family, gross_r1, s0, m0, m1, transfer_hh,
             extra={
                 "implementation": "post-simulation transfer, non-taxable, means-test disregarded",
                 "poverty_rule_agreement_bhc": agree_bhc,
@@ -298,8 +292,8 @@ def main():
                 del simr
                 mr = metrics_from_state(sr, pw_by_hh)
                 gross = s0["gov"] - sr["gov"]  # net-of-clawback exchequer cost
-                gain_person = (sr["hbai_bhc"] - s0["hbai_bhc"])[p2h]
-                record(name, family, gross, s0, m0, mr, np.clip(gain_person, 0, None),
+                gain_hh = np.clip(sr["hbai_bhc"] - s0["hbai_bhc"], 0, None)
+                record(name, family, gross, s0, m0, mr, gain_hh,
                        extra={"implementation": "PolicyEngine parameter reform on shocked sim",
                               "reform_parameters": reform})
         del s0
