@@ -33,7 +33,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.runner import build_person_table
 from uk_ai_study.runner import AGE_BANDS, gini, per_capita_household_income
 from uk_ai_study.shocks import ShockScenario, draw_displaced
 
@@ -189,21 +189,11 @@ def main():
     def calc(v):
         return baseline.calculate(v, period=PERIOD, map_to="person").values
 
-    persons = pd.DataFrame(
-        {
-            "person_id": calc("person_id"),
-            "age": calc("age"),
-            "employment_income": calc("employment_income"),
-            "weight": calc("person_weight"),
-        }
+    persons = build_person_table(
+        baseline,
+        PERIOD,
+        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
     )
-    persons["soc_major_group"] = attach_soc_major_group(
-        persons["person_id"], DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
-    )
-    exposure = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    theta = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(exposure), exposure, np.nanmean(exposure))
-    persons["complementarity"] = np.where(np.isfinite(theta), theta, np.nanmean(theta))
 
     for name, fn in [
         ("klein_teeselink_2025", displaced_klein_teeselink),

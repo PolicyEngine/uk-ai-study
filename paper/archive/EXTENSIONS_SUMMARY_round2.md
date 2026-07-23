@@ -1,4 +1,8 @@
-# Extensions Summary
+# Archived Extensions Summary (pre-Round-3)
+
+> Historical snapshot only. Superseded by the attested Round-3 rebuild and
+> retained outside `results/` so an exact-tree attestation cannot mistake it
+> for a current generated output.
 
 Five verified extension workstreams to the UK AI labour-shock study. All numbers below
 were computed by the scripts listed and independently re-derived in verification; prose

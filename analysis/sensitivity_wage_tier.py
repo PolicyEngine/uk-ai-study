@@ -21,8 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "analysis"))
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group  # noqa: E402
-from uk_ai_study.runner import gini  # noqa: E402
+from uk_ai_study.runner import build_person_table, gini  # noqa: E402
 from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES  # noqa: E402
 from measured_incidence import LONDON_MULT_CENTRAL, measured_table  # noqa: E402
 from policy_counterfactuals import build_sim, person_calc, hh_calc  # noqa: E402
@@ -56,22 +55,9 @@ def main():
     ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
     baseline = Microsimulation(dataset=ds)
 
-    persons = pd.DataFrame(
-        {
-            "person_id": person_calc(baseline, "person_id"),
-            "age": person_calc(baseline, "age"),
-            "employment_income": person_calc(baseline, "employment_income"),
-            "savings_interest_income": person_calc(baseline, "savings_interest_income"),
-            "dividend_income": person_calc(baseline, "dividend_income"),
-            "weight": person_calc(baseline, "person_weight"),
-            "region": person_calc(baseline, "region"),
-        }
+    persons = build_person_table(
+        baseline, PERIOD, ADULT, extra_variables=("region",)
     )
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
-    e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
     w = persons["weight"].to_numpy()
 
     b = sim_metrics(baseline)

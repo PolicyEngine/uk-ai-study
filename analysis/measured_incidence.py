@@ -39,12 +39,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
-from uk_ai_study.runner import gini
+from uk_ai_study.runner import build_person_table, gini
 from uk_ai_study.shocks import (
     BASELINE_CAPITAL_RETURN,
     PRESETS,
     build_shocked_simulation,
+    prescribed_systematic_sample,
 )
 
 DATA = Path("data")
@@ -92,22 +92,17 @@ def draw_measured(
     low_wage_mult: float = LOW_WAGE_MULT,
 ):
     """All-employee weighted quota draw, p proportional to the composite tilt."""
-    rng = np.random.default_rng(seed)
     w = persons["weight"].to_numpy()
     employed = persons["employment_income"].to_numpy(dtype=float) > 0
     quota = scenario.displacement_rate * float(w[employed].sum())
     members = np.flatnonzero(employed)
-    p = composite_tilt(persons, london_mult, high_wage_mult, low_wage_mult)[members]
-    p = p / p.sum()
     displaced = np.zeros(len(persons), dtype=bool)
-    chosen = rng.choice(members, size=len(members), replace=False, p=p)
-    cum = np.cumsum(w[chosen])
-    displaced[chosen[cum <= quota]] = True
-    crossing = np.searchsorted(cum, quota)
-    if crossing < len(chosen) and cum[crossing] > quota:
-        shortfall = quota - (cum[crossing - 1] if crossing else 0.0)
-        if rng.random() < shortfall / w[chosen[crossing]]:
-            displaced[chosen[crossing]] = True
+    displaced[members] = prescribed_systematic_sample(
+        w[members],
+        quota,
+        composite_tilt(persons, london_mult, high_wage_mult, low_wage_mult)[members],
+        np.random.default_rng(seed),
+    )
     return displaced
 
 
@@ -149,24 +144,12 @@ def main():
     ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
     baseline = Microsimulation(dataset=ds)
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = pd.DataFrame(
-        {
-            "person_id": calc("person_id"),
-            "age": calc("age"),
-            "employment_income": calc("employment_income"),
-            "savings_interest_income": calc("savings_interest_income"),
-            "dividend_income": calc("dividend_income"),
-            "weight": calc("person_weight"),
-            "region": baseline.calculate("region", period=PERIOD, map_to="person").values,
-        }
+    persons = build_person_table(
+        baseline,
+        PERIOD,
+        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
+        extra_variables=("region",),
     )
-    persons["soc_major_group"] = attach_soc_major_group(
-        persons["person_id"], DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
-    )
-    e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    persons["exposure"] = np.where(np.isfinite(e), e, np.nanmean(e))
-    persons["complementarity"] = np.where(np.isfinite(th), th, np.nanmean(th))
 
     equiv = calc("equiv_hbai_household_net_income")
     w = persons["weight"].to_numpy()

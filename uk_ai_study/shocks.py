@@ -64,6 +64,67 @@ PRESETS = {
     ),
 }
 
+def prescribed_inclusion_probabilities(
+    weights: np.ndarray,
+    quota: float,
+    tilts: np.ndarray,
+) -> np.ndarray:
+    """Return capped prescribed first-order inclusion probabilities.
+
+    ``pi`` is proportional to ``tilts`` subject to
+    ``sum(weights * pi) == quota`` and ``0 <= pi <= 1``.  Capped units remain
+    capped across redistribution waves; this avoids the multi-wave bug where
+    an earlier capped unit was accidentally returned to the free pool.
+    """
+    weights = np.asarray(weights, dtype=float)
+    tilts = np.asarray(tilts, dtype=float)
+    if weights.shape != tilts.shape:
+        raise ValueError("weights and tilts must have the same shape")
+    if np.any(weights <= 0) or np.any(tilts < 0):
+        raise ValueError("weights must be positive and tilts non-negative")
+    if quota < 0 or quota > weights.sum() + 1e-9:
+        raise ValueError("quota must lie between zero and total weight")
+    pi = np.zeros(len(weights), dtype=float)
+    free = tilts > 0
+    remaining = float(quota)
+    while free.any() and remaining > 0:
+        denom = float((weights[free] * tilts[free]).sum())
+        if denom <= 0:
+            break
+        candidate = remaining * tilts[free] / denom
+        free_idx = np.flatnonzero(free)
+        newly_capped = candidate >= 1.0
+        if not newly_capped.any():
+            pi[free_idx] = candidate
+            remaining = 0.0
+            break
+        capped_idx = free_idx[newly_capped]
+        pi[capped_idx] = 1.0
+        remaining -= float(weights[capped_idx].sum())
+        free[capped_idx] = False
+    pi = np.clip(pi, 0.0, 1.0)
+    if not np.isclose((weights * pi).sum(), quota, rtol=1e-10, atol=1e-8):
+        raise ValueError("prescribed probabilities cannot realise quota")
+
+    return pi
+
+
+def prescribed_systematic_sample(
+    weights: np.ndarray,
+    quota: float,
+    tilts: np.ndarray,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    """Draw a systematic sample with prescribed first-order probabilities."""
+    pi = prescribed_inclusion_probabilities(weights, quota, tilts)
+    order = rng.permutation(len(weights))
+    cumulative = np.concatenate(([0.0], np.cumsum(pi[order])))
+    offset = rng.random()
+    crossings = np.floor(cumulative - offset)
+    selected = np.zeros(len(weights), dtype=bool)
+    selected[order[crossings[1:] > crossings[:-1]]] = True
+    return selected
+
 
 def draw_displaced(
     persons: pd.DataFrame,
@@ -118,29 +179,9 @@ def draw_displaced(
         m = np.ones(len(members))
         if scenario.youth_displacement_multiplier != 1.0:
             m = m * np.where(age[members] < 25, scenario.youth_displacement_multiplier, 1.0)
-        w_g = weight[members]
-        pi = quota * m / float((w_g * m).sum())
-        # cap at 1 and redistribute the residual quota over uncapped members
-        for _ in range(len(members)):
-            over = pi > 1.0
-            if not over.any():
-                break
-            pi[over] = 1.0
-            free = ~over
-            residual = quota - float(w_g[over].sum())
-            if residual <= 0 or not free.any():
-                pi[free] = 0.0
-                break
-            pi[free] = residual * m[free] / float((w_g[free] * m[free]).sum())
-        # systematic sampling on a random permutation realises the pi_i
-        # exactly at first order: member j (in permuted order) is included
-        # iff an integer lies in (C_{j-1} - u, C_j - u] with C the cumsum of
-        # pi and u ~ U[0, 1)
-        perm = rng.permutation(len(members))
-        c = np.concatenate(([0.0], np.cumsum(pi[perm])))
-        u = rng.random()
-        f = np.floor(c - u)
-        displaced[members[perm[f[1:] > f[:-1]]]] = True
+        displaced[members] = prescribed_systematic_sample(
+            weight[members], quota, m, rng
+        )
     return displaced
 
 

@@ -22,7 +22,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.runner import build_person_table
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
 from incidence_scenarios import shocked_table_for
@@ -74,31 +74,7 @@ def main():
     ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
     baseline = Microsimulation(dataset=ds)
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = pd.DataFrame(
-        {
-            "person_id": calc("person_id"),
-            "age": calc("age"),
-            "employment_income": calc("employment_income"),
-            "savings_interest_income": calc("savings_interest_income"),
-            "dividend_income": calc("dividend_income"),
-            "weight": calc("person_weight"),
-        }
-    )
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
-    e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
-    # of the matched employed, as the paper states (R2-10)
-    _emp = persons["employment_income"].to_numpy() > 0
-    _w = persons["weight"].to_numpy()
-
-    def _weighted_fill(values):
-        ok = np.isfinite(values) & _emp
-        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
-        return np.where(np.isfinite(values), values, mean)
-
-    persons["exposure"] = _weighted_fill(e)
-    persons["complementarity"] = _weighted_fill(th)
+    persons = build_person_table(baseline, PERIOD, ADULT)
 
     pw = persons["weight"].to_numpy()
     hw = baseline.calculate("household_weight", period=PERIOD, map_to="household").values

@@ -91,11 +91,46 @@ def gini(values: np.ndarray, weights: np.ndarray) -> float:
     return float(1 - 2 * np.sum((cv - v * w / 2) * w) / (cv[-1] * cw[-1]))
 
 
-def _person_table(sim, period: int) -> pd.DataFrame:
+def build_person_table(
+    sim,
+    period: int,
+    adult_tab_path: str | Path,
+    *,
+    extra_variables: tuple[str, ...] = (),
+) -> pd.DataFrame:
+    """Build the canonical shock person table used by every analysis.
+
+    Missing SOC matches receive survey-employment-weighted exposure and
+    complementarity means.  Keeping this construction here prevents the
+    central runner and extension scripts from silently defining different
+    versions of the same exposure scenario.
+    """
+    variables = PERSON_VARIABLES + tuple(
+        v for v in extra_variables if v not in PERSON_VARIABLES
+    )
     table = pd.DataFrame(
-        {v: sim.calculate(v, period=period, map_to="person").values for v in PERSON_VARIABLES}
+        {v: sim.calculate(v, period=period, map_to="person").values for v in variables}
     )
     table["weight"] = sim.calculate("person_weight", period=period, map_to="person").values
+    table["soc_major_group"] = attach_soc_major_group(
+        table["person_id"], adult_tab_path
+    )
+    employed = table["employment_income"].to_numpy(dtype=float) > 0
+    weights = table["weight"].to_numpy(dtype=float)
+
+    def weighted_fill(values: np.ndarray) -> np.ndarray:
+        ok = np.isfinite(values) & employed
+        mean = (
+            float(np.average(values[ok], weights=weights[ok])) if ok.any() else 0.0
+        )
+        return np.where(np.isfinite(values), values, mean)
+
+    table["exposure"] = weighted_fill(
+        exposure_for_major_group(table["soc_major_group"], "c_aioe")
+    )
+    table["complementarity"] = weighted_fill(
+        exposure_for_major_group(table["soc_major_group"], "complementarity_theta")
+    )
     return table
 
 
@@ -147,22 +182,7 @@ def run_scenario(
     dataset = UKSingleYearDataset(file_path=str(dataset_path))
     baseline = Microsimulation(dataset=dataset)
 
-    persons = _person_table(baseline, period)
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], adult_tab_path)
-    exposure = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
-    theta = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
-    # unmatched employees carry the EMPLOYMENT-WEIGHTED mean of the matched
-    # employed (survey-weighted), as the paper states (R2-10)
-    _emp = persons["employment_income"].to_numpy() > 0
-    _w = persons["weight"].to_numpy()
-
-    def _weighted_fill(values: np.ndarray) -> np.ndarray:
-        ok = np.isfinite(values) & _emp
-        mean = float(np.average(values[ok], weights=_w[ok])) if ok.any() else 0.0
-        return np.where(np.isfinite(values), values, mean)
-
-    persons["exposure"] = _weighted_fill(exposure)
-    persons["complementarity"] = _weighted_fill(theta)
+    persons = build_person_table(baseline, period, adult_tab_path)
 
     if isinstance(scenario, WageMarginScenario):
         # the seed drives the paired central displacement draw the gross cut

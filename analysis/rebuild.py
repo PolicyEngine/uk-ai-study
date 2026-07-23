@@ -72,6 +72,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,9 +82,7 @@ BUILD_LOG = "robustness/sensitivity_run.log"
 
 # Tracked files under results/ that no analysis script produces (documentation
 # etc.). Preserved verbatim across an atomic publish.
-NON_GENERATED = [
-    "EXTENSIONS_SUMMARY.md",
-]
+NON_GENERATED = []
 
 PY = sys.executable or "python3"
 
@@ -350,14 +349,18 @@ MANIFEST = [
             "geo/hexmap_displacement.png",
             "geo/imputation_notes.json",
         ],
-        "inputs": FRS_INPUTS + ["data/enhanced_frs_2023_24.h5"],
+        "inputs": FRS_INPUTS + [
+            "data/enhanced_frs_2023_24.h5",
+            "data/parliamentary_constituency_weights.h5",
+            "data/constituencies_2024.csv",
+        ],
         "after": [],
     },
     {
         "stage": "geo_choropleth",
         "cmd": [PY, "analysis/geo_choropleth.py"],
         "outputs": ["geo/map_income_change.png", "geo/map_displacement.png"],
-        "inputs": [],
+        "inputs": ["data/uk_constituencies_2024.geojson"],
         "after": ["geo_impact"],  # reads results/geo/constituency_impacts.csv
     },
     {
@@ -377,6 +380,27 @@ MANIFEST = [
         # presentation layer: reads jr16 CSVs, appendix CSVs, incidence JSONs
         "after": ["jr16_figs", "jr16_grid", "appendix_decomp",
                   "appendix_grids", "incidence", "measured_incidence"],
+    },
+    {
+        "stage": "tex_values",
+        "cmd": [PY, "analysis/emit_tex_values.py"],
+        "outputs": [],
+        "repo_outputs": ["paper/values_generated.tex"],
+        "inputs": [],
+        "after": [
+            "presets", "jr16_figs", "jr16_grid", "incidence",
+            "measured_incidence", "monte_carlo", "policy", "caseloads",
+            "tax_composition", "enhanced_dataset", "figures",
+        ],
+    },
+    {
+        "stage": "paper_pdf",
+        "cmd": ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
+                "-cd", "paper/main.tex"],
+        "outputs": [],
+        "repo_outputs": ["paper/main.pdf"],
+        "inputs": [],
+        "after": ["tex_values", "geo_choropleth"],
     },
 ]
 
@@ -487,11 +511,27 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
             att = json.loads(att_path.read_text())
             for rel, digest in att.get("files", {}).items():
                 p = results_dir / rel
-                if p.exists() and sha256(p) != digest:
+                if not p.exists():
+                    problems.append(f"DELETED   {rel}  (attested file absent)")
+                elif sha256(p) != digest:
                     problems.append(f"STALE     {rel}  (hash != attestation)")
+            actual = {
+                str(p.relative_to(results_dir))
+                for p in results_dir.rglob("*")
+                if p.is_file() and p.name != ATTESTATION
+            }
+            attested = set(att.get("files", {}))
+            for rel in sorted(actual - attested):
+                problems.append(f"EXTRA     {rel}  (not in attested tree)")
             for rel in outputs:
                 if rel not in att.get("files", {}):
                     problems.append(f"UNATTESTED {rel}  (not in attestation)")
+            for rel, digest in att.get("inputs", {}).items():
+                p = ROOT / rel
+                if not p.exists():
+                    problems.append(f"INPUT-MISSING {rel}")
+                elif sha256(p) != digest:
+                    problems.append(f"INPUT-STALE {rel}  (hash != attestation)")
 
     if problems:
         print(f"CHECK FAILED: {len(problems)} problem(s)")
@@ -529,6 +569,29 @@ def build(manifest, keep_build=False, only_stages=None):
         # data/ is untracked (large survey files): share it read-only by symlink
         if (ROOT / "data").exists() and not (wt / "data").exists():
             (wt / "data").symlink_to(ROOT / "data")
+        build_env = os.environ.copy()
+        build_env["PYTHONPATH"] = str(wt)
+        probe = subprocess.run(
+            [
+                PY,
+                "-c",
+                "import pathlib, uk_ai_study; "
+                "p=pathlib.Path(uk_ai_study.__file__).resolve(); "
+                "w=pathlib.Path.cwd().resolve(); "
+                "assert p.is_relative_to(w), (p, w); print(p)",
+            ],
+            cwd=wt,
+            env=build_env,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode:
+            raise SystemExit(
+                "clean-room import isolation failed:\n"
+                + probe.stdout
+                + probe.stderr
+            )
+        print("isolated package import:", probe.stdout.strip())
         # clean-room: build results from EMPTY
         build_results = wt / "results"
         if build_results.exists():
@@ -544,7 +607,7 @@ def build(manifest, keep_build=False, only_stages=None):
             with open(log_path, "a") as log:
                 log.write(f"\n=== stage {s['stage']}: {' '.join(s['cmd'])}\n")
                 log.flush()
-                proc = subprocess.run(s["cmd"], cwd=wt,
+                proc = subprocess.run(s["cmd"], cwd=wt, env=build_env,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT, text=True)
                 log.write(proc.stdout)
@@ -558,6 +621,15 @@ def build(manifest, keep_build=False, only_stages=None):
             if missing:
                 raise SystemExit(f"stage {s['stage']} succeeded but declared "
                                  f"outputs missing/empty: {missing}")
+            missing_repo = [
+                o for o in s.get("repo_outputs", [])
+                if not (wt / o).exists() or (wt / o).stat().st_size == 0
+            ]
+            if missing_repo:
+                raise SystemExit(
+                    f"stage {s['stage']} succeeded but repo outputs "
+                    f"missing/empty: {missing_repo}"
+                )
 
         # full-manifest validation before publish (skip when --stages subset)
         if not only_stages:
@@ -579,6 +651,14 @@ def build(manifest, keep_build=False, only_stages=None):
         for p in sorted(build_results.rglob("*")):
             if p.is_file() and p.name != ATTESTATION:
                 files[str(p.relative_to(build_results))] = sha256(p)
+        input_paths = sorted(
+            {
+                rel
+                for stage in ordered
+                for rel in stage.get("inputs", [])
+                if (wt / rel).is_file()
+            }
+        )
         attestation = {
             "git_commit": commit,
             "git_dirty_at_build": bool(dirty),
@@ -586,11 +666,17 @@ def build(manifest, keep_build=False, only_stages=None):
             "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],
             "script_sha256": {
-                str(f.relative_to(ROOT)): sha256(f)
-                for f in sorted((ROOT / "analysis").glob("*.py"))
+                str(f.relative_to(wt)): sha256(f)
+                for f in sorted((wt / "analysis").glob("*.py"))
             } | {
-                str(f.relative_to(ROOT)): sha256(f)
-                for f in sorted((ROOT / "uk_ai_study").glob("*.py"))
+                str(f.relative_to(wt)): sha256(f)
+                for f in sorted((wt / "uk_ai_study").glob("*.py"))
+            },
+            "inputs": {rel: sha256(wt / rel) for rel in input_paths},
+            "presentation_files": {
+                rel: sha256(wt / rel)
+                for stage in ordered
+                for rel in stage.get("repo_outputs", [])
             },
             "seed_policy": ("headline single-draw results use seed 0; "
                             "Monte Carlo families use the scripts' internal "
@@ -610,6 +696,16 @@ def build(manifest, keep_build=False, only_stages=None):
                  str(build_results) + "/", str(RESULTS) + "/"],
                 check=True,
             )
+            for rel in {
+                rel
+                for stage in ordered
+                for rel in stage.get("repo_outputs", [])
+            }:
+                src = wt / rel
+                dst = ROOT / rel
+                staged = dst.with_name(dst.name + ".rebuild-new")
+                shutil.copy2(src, staged)
+                os.replace(staged, dst)
             print(f"\nPUBLISHED {len(files)} files to {RESULTS} "
                   f"(attestation: results/{ATTESTATION})")
         ok = True
