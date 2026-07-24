@@ -458,6 +458,17 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def package_versions(names) -> dict[str, str | None]:
+    """Installed distribution versions, with explicit nulls for source-only deps."""
+    versions = {}
+    for name in names:
+        try:
+            versions[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            versions[name] = None
+    return versions
+
+
 # ---------------------------------------------------------------------------
 # Modes
 # ---------------------------------------------------------------------------
@@ -594,9 +605,8 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
             "implementation": platform.python_implementation(),
             "executable": PY,
         },
-        "package_versions": {
-            name: importlib.metadata.version(name)
-            for name in (
+        "package_versions": package_versions(
+            (
                 "uk-ai-study",
                 "policyengine-uk",
                 "policyengine-core",
@@ -606,7 +616,7 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
                 "matplotlib",
                 "geopandas",
             )
-        },
+        ),
         "stages": [
             {"stage": s["stage"], "cmd": s["cmd"]} for s in topo_order(MANIFEST)
         ],
@@ -768,9 +778,8 @@ def build(manifest, keep_build=False, only_stages=None):
                 "implementation": platform.python_implementation(),
                 "executable": PY,
             },
-            "package_versions": {
-                name: importlib.metadata.version(name)
-                for name in (
+            "package_versions": package_versions(
+                (
                     "uk-ai-study",
                     "policyengine-uk",
                     "policyengine-core",
@@ -780,7 +789,7 @@ def build(manifest, keep_build=False, only_stages=None):
                     "matplotlib",
                     "geopandas",
                 )
-            },
+            ),
             "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],
             "script_sha256": {
                 str(f.relative_to(wt)): sha256(f)
