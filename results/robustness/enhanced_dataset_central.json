@@ -1,18 +1,18 @@
 {
   "description": "Central scenario, seed 0; enhanced FRS 2023-24 with geo_impact.py's SOC imputation (route B). Decomposes the geography-section (+enhanced, 2025) vs main (+plain, 2026) BHC poverty-change gap.",
-  "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-o820y5vl/worktree/data/enhanced_frs_2023_24.h5",
+  "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-4o0ffk2y/worktree/data/enhanced_frs_2023_24.h5",
   "cells": {
     "enhanced_2026": {
-      "poverty_change_bhc_pp": 2.947655506864892,
+      "poverty_change_bhc_pp": 2.9682356109222945,
       "baseline_poverty_bhc_pct": 9.429371637563193,
-      "exchequer_cost_bn": 29.432348672,
-      "displaced_weighted_m": 2.971003532409668
+      "exchequer_cost_bn": 29.51790592,
+      "displaced_weighted_m": 2.9756269454956055
     },
     "enhanced_2025": {
-      "poverty_change_bhc_pp": 2.948810372742973,
+      "poverty_change_bhc_pp": 2.9503802761120452,
       "baseline_poverty_bhc_pct": 10.10425581009954,
-      "exchequer_cost_bn": 29.126393856,
-      "displaced_weighted_m": 2.9862473011016846
+      "exchequer_cost_bn": 29.126656,
+      "displaced_weighted_m": 2.9864065647125244
     },
     "plain_2025": {
       "poverty_change_bhc_pp": 1.907548667877354,
@@ -27,11 +27,11 @@
     }
   },
   "decomposition_bhc_poverty_pp": {
-    "total_gap_enhanced2025_minus_plain2026": 1.1418670184757076,
-    "dataset_component_at_2026": 1.1407121525976267,
-    "period_component_on_enhanced": 0.0011548658780808907,
+    "total_gap_enhanced2025_minus_plain2026": 1.14343692184478,
+    "dataset_component_at_2026": 1.1612922566550292,
+    "period_component_on_enhanced": -0.017855334810249257,
     "period_component_on_plain": 0.10060531361008884,
-    "interaction": -0.09945044773200795,
+    "interaction": -0.1184606484203381,
     "note": "single seed-0 run per cell; imputation noise not separately varied (imputation seed fixed at 0)."
   }
 }

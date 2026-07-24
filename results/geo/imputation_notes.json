@@ -13,6 +13,6 @@
     "marginal": 0.0011398714279851267
   },
   "enhanced_frs_employees": 55764,
-  "w_universe_realised_displacement_rate": 0.06718901544809341,
+  "w_universe_realised_displacement_rate": 0.06716436892747879,
   "w_displacement_draw_universe": "national household weights obtained by summing all 650 constituency-matrix rows; no post-hoc outcome rescaling"
 }
