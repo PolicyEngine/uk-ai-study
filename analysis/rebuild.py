@@ -66,6 +66,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import shutil
 import subprocess
@@ -73,12 +74,14 @@ import sys
 import tempfile
 import time
 import os
+import platform
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "results"
 ATTESTATION = "BUILD_MANIFEST.json"
 BUILD_LOG = "robustness/sensitivity_run.log"
+IGNORED_RESULT_FILES = {".DS_Store"}
 
 # Tracked files under results/ that no analysis script produces (documentation
 # etc.). Preserved verbatim across an atomic publish.
@@ -518,7 +521,9 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
             actual = {
                 str(p.relative_to(results_dir))
                 for p in results_dir.rglob("*")
-                if p.is_file() and p.name != ATTESTATION
+                if p.is_file()
+                and p.name != ATTESTATION
+                and p.name not in IGNORED_RESULT_FILES
             }
             attested = set(att.get("files", {}))
             for rel in sorted(actual - attested):
@@ -669,6 +674,24 @@ def build(manifest, keep_build=False, only_stages=None):
             "invoking_checkout_dirty_at_start": bool(dirty),
             "started_utc": started,
             "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "python": {
+                "version": platform.python_version(),
+                "implementation": platform.python_implementation(),
+                "executable": PY,
+            },
+            "package_versions": {
+                name: importlib.metadata.version(name)
+                for name in (
+                    "uk-ai-study",
+                    "policyengine-uk",
+                    "policyengine-core",
+                    "policyengine-uk-data",
+                    "numpy",
+                    "pandas",
+                    "matplotlib",
+                    "geopandas",
+                )
+            },
             "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],
             "script_sha256": {
                 str(f.relative_to(wt)): sha256(f)
@@ -684,8 +707,9 @@ def build(manifest, keep_build=False, only_stages=None):
                 for rel in stage.get("repo_outputs", [])
             },
             "seed_policy": ("headline single-draw results use seed 0; "
-                            "Monte Carlo families use the scripts' internal "
-                            "fixed seed sequences (paired seeds 0..19)"),
+                            "incidence and policy Monte Carlo use paired "
+                            "seeds 0..49; other sensitivities declare their "
+                            "own fixed draw budgets"),
             "non_generated": NON_GENERATED,
             "files": files,
         }

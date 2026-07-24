@@ -1,4 +1,4 @@
-"""Phase 1 Monte Carlo (REVISION_PLAN item 6): 20 draws (seeds 0-19) for
+"""Monte Carlo analysis: 50 paired draws (seeds 0-49) for
 
   (a) all five incidence families (exposure, junior, compression, uniform,
       Klein-anchored top-loaded) — mean/sd/min/max of exchequer cost, BHC poverty change and
@@ -56,7 +56,7 @@ DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
 ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 PERIOD = 2026
-N_DRAWS = 20
+N_DRAWS = 50
 FAMILIES = ("exposure", "junior", "compression", "uniform", "klein_top_loaded")
 FAMILIES_R1 = ("exposure", "junior", "uniform")
 INC_CSV = OUT / "incidence_draws_five.csv"
@@ -93,11 +93,38 @@ def summarise(df: pd.DataFrame, cols) -> dict:
         c: {
             "mean": float(df[c].mean()),
             "sd": float(df[c].std(ddof=1)),
+            "mcse": float(df[c].std(ddof=1) / np.sqrt(len(df))),
+            "q025": float(df[c].quantile(0.025)),
+            "median": float(df[c].median()),
+            "q975": float(df[c].quantile(0.975)),
             "min": float(df[c].min()),
             "max": float(df[c].max()),
         }
         for c in cols
     }
+
+
+def convergence_diagnostics(df: pd.DataFrame, cols, checkpoint: int = 20) -> dict:
+    """Compare the original draw budget with the enlarged run."""
+    if len(df) <= checkpoint:
+        raise ValueError("convergence diagnostic requires more checkpoint draws")
+    first = df.nsmallest(checkpoint, "seed")
+    out = {}
+    for col in cols:
+        full_mean = float(df[col].mean())
+        early_mean = float(first[col].mean())
+        mcse = float(df[col].std(ddof=1) / np.sqrt(len(df)))
+        delta = full_mean - early_mean
+        out[col] = {
+            "checkpoint_draws": checkpoint,
+            "full_draws": int(len(df)),
+            "checkpoint_mean": early_mean,
+            "full_mean": full_mean,
+            "mean_change": delta,
+            "full_mcse": mcse,
+            "passes_two_mcse": bool(abs(delta) <= 2 * mcse),
+        }
+    return out
 
 
 def main():
@@ -123,6 +150,7 @@ def main():
         return {
             "gov": float((hh_calc(s, "gov_balance") * hw).sum()),
             "pov_bhc": float(np.average(person_calc(s, "in_poverty_bhc"), weights=pw)),
+            "pov_ahc": float(np.average(person_calc(s, "in_poverty_ahc"), weights=pw)),
             "relpov_bhc": float(
                 np.average(person_calc(s, "in_relative_poverty_bhc"), weights=pw)
             ),
@@ -167,6 +195,12 @@ def main():
     done_inc = set()
     if INC_CSV.exists():
         d = pd.read_csv(INC_CSV)
+        if "poverty_change_ahc_pp" not in d.columns:
+            # The enlarged design evaluates AHC on every draw; legacy
+            # checkpoints cannot be mixed because they contain no AHC result.
+            d = d.iloc[0:0].copy()
+            d["poverty_change_ahc_pp"] = pd.Series(dtype=float)
+            d.to_csv(INC_CSV, index=False)
         # Migrations. (1) The pre-revision "measured" family name; keeping
         # those rows would mix two calibrations in one checkpoint file.
         # (2) R2-3: checkpoints written before the factorial redesign carry
@@ -216,6 +250,7 @@ def main():
                         "wage_axis": "central",
                         "exchequer_cost_bn": (b["gov"] - m["gov"]) / 1e9,
                         "poverty_change_bhc_pp": 100 * (m["pov_bhc"] - b["pov_bhc"]),
+                        "poverty_change_ahc_pp": 100 * (m["pov_ahc"] - b["pov_ahc"]),
                         "relative_poverty_change_bhc_pp": 100 * (m["relpov_bhc"] - b["relpov_bhc"]),
                         "gini_change_pp": 100 * (m["gini"] - b["gini"]),
                         "displaced_weighted_m": float(w[displaced].sum() / 1e6),
@@ -269,16 +304,35 @@ def main():
     observed = set(zip(inc["seed"], inc["family"]))
     if observed != expected or inc.duplicated(["seed", "family"]).any():
         raise ValueError("incidence checkpoint is incomplete, duplicated, or contains stale families")
-    metrics_cols = ["exchequer_cost_bn", "poverty_change_bhc_pp", "gini_change_pp"]
+    incidence_metrics = [
+        "exchequer_cost_bn",
+        "poverty_change_bhc_pp",
+        "poverty_change_ahc_pp",
+        "gini_change_pp",
+    ]
     inc_summary = {
-        fam: summarise(inc[inc.family == fam], metrics_cols) for fam in FAMILIES
+        fam: summarise(inc[inc.family == fam], incidence_metrics)
+        for fam in FAMILIES
+    }
+    inc_summary["_metadata"] = {
+        "draws": N_DRAWS,
+        "seeds": [0, N_DRAWS - 1],
+        "interval_interpretation": (
+            "Quantiles, SDs and MCSEs describe assignment-draw variation only; "
+            "they are not survey-sampling confidence intervals."
+        ),
+        "convergence_vs_20_draws": {
+            fam: convergence_diagnostics(inc[inc.family == fam], incidence_metrics)
+            for fam in FAMILIES
+        },
     }
     (OUT / "incidence_monte_carlo.json").write_text(json.dumps(inc_summary, indent=2))
 
     pol = pd.read_csv(POL_CSV)
+    policy_metrics = ["exchequer_cost_bn", "poverty_change_bhc_pp", "gini_change_pp"]
     pol_summary = {}
     for (reform, family), g in pol.groupby(["reform", "family"]):
-        pol_summary[f"{reform}_{family}"] = summarise(g, metrics_cols)
+        pol_summary[f"{reform}_{family}"] = summarise(g, policy_metrics)
     (OUT / "policy_monte_carlo.json").write_text(json.dumps(pol_summary, indent=2))
 
     # central = exposure family (identical mechanics to the central preset via
@@ -286,7 +340,7 @@ def main():
     # poverty variant added
     central = inc[inc.family == "exposure"]
     central_summary = summarise(
-        central, metrics_cols + ["relative_poverty_change_bhc_pp"]
+        central, incidence_metrics + ["relative_poverty_change_bhc_pp"]
     )
     central_summary["baseline_relative_poverty_bhc_rate"] = b["relpov_bhc"]
     (OUT / "central_monte_carlo.json").write_text(json.dumps(central_summary, indent=2))

@@ -26,7 +26,7 @@ Macros emitted (grouped by source):
     \\genWageMarginCentralCostBn \\genWageMarginPssCostBn
     \\genWageMarginPssGiniChangePp \\genCentralRippleCostBn
 
-  central 20-draw Monte Carlo (results/robustness/central_monte_carlo.json):
+  central 50-draw Monte Carlo (results/robustness/central_monte_carlo.json):
     \\genCentralMcCostMeanBn \\genCentralMcCostSdBn \\genCentralMcCostMinBn
     \\genCentralMcCostMaxBn \\genCentralMcPovBhcMeanPp \\genCentralMcPovBhcSdPp
     \\genCentralMcGiniMeanPp \\genCentralMcGiniSdPp

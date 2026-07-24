@@ -183,6 +183,50 @@ def test_unmatched_employees_in_displacement_universe():
     assert unmatched_hit > 0
 
 
+def test_empty_employee_universe_is_safe():
+    persons = make_persons(20)
+    persons["employment_income"] = 0.0
+    displaced = draw_displaced(
+        persons, ShockScenario("empty", displacement_rate=0.07, wage_uplift=0.0)
+    )
+    assert not displaced.any()
+    shocked = apply_shocks(
+        persons, ShockScenario("empty", displacement_rate=0.07, wage_uplift=0.0)
+    )
+    assert not shocked["displaced"].any()
+    assert (shocked["employment_income"] == 0).all()
+
+
+@pytest.mark.parametrize("rate", [-0.01, 1.01])
+def test_displacement_rate_outside_bounds_raises(rate):
+    with pytest.raises(ValueError, match="between zero and one"):
+        draw_displaced(
+            make_persons(20),
+            ShockScenario("bad", displacement_rate=rate, wage_uplift=0.0),
+        )
+
+
+def test_missing_employee_exposure_raises():
+    persons = make_persons(20)
+    persons.loc[0, "exposure"] = np.nan
+    with pytest.raises(ValueError, match="exposure"):
+        draw_displaced(
+            persons,
+            ShockScenario("missing", displacement_rate=0.07, wage_uplift=0.0),
+        )
+
+
+@pytest.mark.parametrize("bad_weight", [0.0, -1.0, np.nan, np.inf])
+def test_invalid_survey_weight_raises(bad_weight):
+    persons = make_persons(20)
+    persons.loc[0, "weight"] = bad_weight
+    with pytest.raises(ValueError, match="weights"):
+        draw_displaced(
+            persons,
+            ShockScenario("weight", displacement_rate=0.07, wage_uplift=0.0),
+        )
+
+
 def test_survivor_composition_wage_drift():
     """REVISION_PLAN item 2 (code audit #6): with displacement > 0, eq 3.5's
     theta_bar is the employment-weighted mean over ALL baseline workers, but
