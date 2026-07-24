@@ -1,20 +1,20 @@
 
-=== stage presets: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/run_all.py
+=== stage presets: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/run_all.py
 central: exchequer £18.2bn, poverty BHC +1.81pp, gini +0.0104
 low: exchequer £4.3bn, poverty BHC +0.33pp, gini +0.0021
 high: exchequer £46.9bn, poverty BHC +4.05pp, gini +0.0207
-central_youth_tilted: exchequer £15.8bn, poverty BHC +1.91pp, gini +0.0111
+central_youth_tilted: exchequer £15.9bn, poverty BHC +1.91pp, gini +0.0111
 central_ripple: exchequer £28.0bn, poverty BHC +1.95pp, gini +0.0095
 central_ripple_low: exchequer £23.1bn, poverty BHC +1.90pp, gini +0.0099
 central_ripple_high: exchequer £34.4bn, poverty BHC +2.11pp, gini +0.0089
 wage_margin_central: exchequer £26.6bn, poverty BHC +0.10pp, gini -0.0044
 wage_margin_pss: exchequer £26.4bn, poverty BHC +0.17pp, gini -0.0035
 
-=== stage jr16_figs: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/replicate_jr16.py figs
+=== stage jr16_figs: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/replicate_jr16.py figs
 fig 4.4 residual by decile (pp of baseline disposable): [0.04, 0.07, 0.08, 0.16, 0.18, 0.15, 0.32, 0.31, 0.3, 0.36]
 figs 4.1-4.4 written
 
-=== stage jr16_grid: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/replicate_jr16.py grid
+=== stage jr16_grid: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/replicate_jr16.py grid
 u=0 w=0 done
 u=0 w=1 done
 u=0 w=2 done
@@ -83,19 +83,19 @@ u=10 w=4 done
 u=10 w=5 done
 grid complete
 
-=== stage incidence: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/incidence_scenarios.py
+=== stage incidence: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/incidence_scenarios.py
 exposure {'displaced_weighted_m': 1.56, 'exchequer_cost_bn': 18.21, 'poverty_change_bhc_pp': 1.81, 'poverty_change_ahc_pp': 1.85, 'gini_change_pp': 1.04}
-junior {'displaced_weighted_m': 1.54, 'exchequer_cost_bn': 15.85, 'poverty_change_bhc_pp': 1.91, 'poverty_change_ahc_pp': 2.15, 'gini_change_pp': 1.11}
+junior {'displaced_weighted_m': 1.55, 'exchequer_cost_bn': 15.9, 'poverty_change_bhc_pp': 1.91, 'poverty_change_ahc_pp': 2.15, 'gini_change_pp': 1.11}
 compression {'displaced_weighted_m': 1.67, 'exchequer_cost_bn': 22.46, 'poverty_change_bhc_pp': 2.07, 'poverty_change_ahc_pp': 2.26, 'gini_change_pp': 0.97}
 uniform {'displaced_weighted_m': 1.55, 'exchequer_cost_bn': 12.89, 'poverty_change_bhc_pp': 1.88, 'poverty_change_ahc_pp': 2.06, 'gini_change_pp': 1.2}
 compression_compound {'displaced_weighted_m': 1.67, 'exchequer_cost_bn': 23.15, 'poverty_change_bhc_pp': 2.06, 'poverty_change_ahc_pp': 2.24, 'gini_change_pp': 0.94}
 uniform_compound {'displaced_weighted_m': 1.55, 'exchequer_cost_bn': 13.24, 'poverty_change_bhc_pp': 1.88, 'poverty_change_ahc_pp': 2.06, 'gini_change_pp': 1.18}
 
-=== stage measured_incidence: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/measured_incidence.py
+=== stage measured_incidence: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/measured_incidence.py
 klein_top_loaded {'displaced_weighted_m': 1.62, 'exchequer_cost_bn': 34.17, 'poverty_change_bhc_pp': 2.22, 'poverty_change_ahc_pp': 2.51, 'gini_change_pp': 0.99}
 London composition (no tilt) {'london_share_of_displaced_pct': 15.120348930358887, 'london_displacement_rate_pct': 8.270076751708984}
 
-=== stage appendix_fast: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/appendix.py fast
+=== stage appendix_fast: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/appendix.py fast
  soc_major_group                                         title  c_aioe  employment_m  job_loss_pct
                1      Managers, Directors And Senior Officials   0.619          2.45           9.7
                2                      Professional Occupations   0.604          6.46           9.2
@@ -108,7 +108,7 @@ London composition (no tilt) {'london_share_of_displaced_pct': 15.12034893035888
                9                        Elementary Occupations  -0.729          2.05           0.0
 fast appendix outputs written
 
-=== stage appendix_decomp: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/appendix.py decomp
+=== stage appendix_decomp: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/appendix.py decomp
 decomp draw 0 done
 decomp draw 1 done
 decomp draw 2 done
@@ -131,7 +131,7 @@ decomp draw 18 done
 decomp draw 19 done
 decomposition CIs written
 
-=== stage appendix_grids: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/appendix.py grids
+=== stage appendix_grids: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/appendix.py grids
 u=0 w=0 done (both capital variants)
 u=0 w=1 done (both capital variants)
 u=0 w=2 done (both capital variants)
@@ -200,7 +200,7 @@ u=10 w=4 done (both capital variants)
 u=10 w=5 done (both capital variants)
 grids complete
 
-=== stage robustness: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/robustness.py all
+=== stage robustness: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/robustness.py all
 moments written
    frs_share  ashe_2025_share  diff_pp
 1      0.107            0.114   -0.689
@@ -257,7 +257,7 @@ draw 19 done
  }
 }
 
-=== stage monte_carlo: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/monte_carlo_families.py
+=== stage monte_carlo: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/monte_carlo_families.py
 seed 0 family exposure done
 seed 0 family junior done
 seed 0 family compression done
@@ -358,248 +358,794 @@ seed 19 family junior done
 seed 19 family compression done
 seed 19 family uniform done
 seed 19 family klein_top_loaded done
+seed 20 family exposure done
+seed 20 family junior done
+seed 20 family compression done
+seed 20 family uniform done
+seed 20 family klein_top_loaded done
+seed 21 family exposure done
+seed 21 family junior done
+seed 21 family compression done
+seed 21 family uniform done
+seed 21 family klein_top_loaded done
+seed 22 family exposure done
+seed 22 family junior done
+seed 22 family compression done
+seed 22 family uniform done
+seed 22 family klein_top_loaded done
+seed 23 family exposure done
+seed 23 family junior done
+seed 23 family compression done
+seed 23 family uniform done
+seed 23 family klein_top_loaded done
+seed 24 family exposure done
+seed 24 family junior done
+seed 24 family compression done
+seed 24 family uniform done
+seed 24 family klein_top_loaded done
+seed 25 family exposure done
+seed 25 family junior done
+seed 25 family compression done
+seed 25 family uniform done
+seed 25 family klein_top_loaded done
+seed 26 family exposure done
+seed 26 family junior done
+seed 26 family compression done
+seed 26 family uniform done
+seed 26 family klein_top_loaded done
+seed 27 family exposure done
+seed 27 family junior done
+seed 27 family compression done
+seed 27 family uniform done
+seed 27 family klein_top_loaded done
+seed 28 family exposure done
+seed 28 family junior done
+seed 28 family compression done
+seed 28 family uniform done
+seed 28 family klein_top_loaded done
+seed 29 family exposure done
+seed 29 family junior done
+seed 29 family compression done
+seed 29 family uniform done
+seed 29 family klein_top_loaded done
+seed 30 family exposure done
+seed 30 family junior done
+seed 30 family compression done
+seed 30 family uniform done
+seed 30 family klein_top_loaded done
+seed 31 family exposure done
+seed 31 family junior done
+seed 31 family compression done
+seed 31 family uniform done
+seed 31 family klein_top_loaded done
+seed 32 family exposure done
+seed 32 family junior done
+seed 32 family compression done
+seed 32 family uniform done
+seed 32 family klein_top_loaded done
+seed 33 family exposure done
+seed 33 family junior done
+seed 33 family compression done
+seed 33 family uniform done
+seed 33 family klein_top_loaded done
+seed 34 family exposure done
+seed 34 family junior done
+seed 34 family compression done
+seed 34 family uniform done
+seed 34 family klein_top_loaded done
+seed 35 family exposure done
+seed 35 family junior done
+seed 35 family compression done
+seed 35 family uniform done
+seed 35 family klein_top_loaded done
+seed 36 family exposure done
+seed 36 family junior done
+seed 36 family compression done
+seed 36 family uniform done
+seed 36 family klein_top_loaded done
+seed 37 family exposure done
+seed 37 family junior done
+seed 37 family compression done
+seed 37 family uniform done
+seed 37 family klein_top_loaded done
+seed 38 family exposure done
+seed 38 family junior done
+seed 38 family compression done
+seed 38 family uniform done
+seed 38 family klein_top_loaded done
+seed 39 family exposure done
+seed 39 family junior done
+seed 39 family compression done
+seed 39 family uniform done
+seed 39 family klein_top_loaded done
+seed 40 family exposure done
+seed 40 family junior done
+seed 40 family compression done
+seed 40 family uniform done
+seed 40 family klein_top_loaded done
+seed 41 family exposure done
+seed 41 family junior done
+seed 41 family compression done
+seed 41 family uniform done
+seed 41 family klein_top_loaded done
+seed 42 family exposure done
+seed 42 family junior done
+seed 42 family compression done
+seed 42 family uniform done
+seed 42 family klein_top_loaded done
+seed 43 family exposure done
+seed 43 family junior done
+seed 43 family compression done
+seed 43 family uniform done
+seed 43 family klein_top_loaded done
+seed 44 family exposure done
+seed 44 family junior done
+seed 44 family compression done
+seed 44 family uniform done
+seed 44 family klein_top_loaded done
+seed 45 family exposure done
+seed 45 family junior done
+seed 45 family compression done
+seed 45 family uniform done
+seed 45 family klein_top_loaded done
+seed 46 family exposure done
+seed 46 family junior done
+seed 46 family compression done
+seed 46 family uniform done
+seed 46 family klein_top_loaded done
+seed 47 family exposure done
+seed 47 family junior done
+seed 47 family compression done
+seed 47 family uniform done
+seed 47 family klein_top_loaded done
+seed 48 family exposure done
+seed 48 family junior done
+seed 48 family compression done
+seed 48 family uniform done
+seed 48 family klein_top_loaded done
+seed 49 family exposure done
+seed 49 family junior done
+seed 49 family compression done
+seed 49 family uniform done
+seed 49 family klein_top_loaded done
 {
  "incidence": {
   "exposure": {
    "exchequer_cost_bn": {
-    "mean": 17.6826368,
-    "sd": 1.2804567372911881,
+    "mean": 17.6901046272,
+    "sd": 1.2013205470317425,
+    "mcse": 0.16989238103697557,
+    "q025": 15.4741764096,
+    "median": 17.713872896,
+    "q975": 19.785803775999998,
     "min": 15.171321856,
     "max": 20.327923712
    },
    "poverty_change_bhc_pp": {
-    "mean": 1.865101405144431,
-    "sd": 0.16492705843350394,
+    "mean": 1.8745914513951432,
+    "sd": 0.14555495948641786,
+    "mcse": 0.020584579777635854,
+    "q025": 1.6293332007340413,
+    "median": 1.8375984553290787,
+    "q975": 2.182808054724238,
     "min": 1.5014810306185344,
-    "max": 2.199430521335727
+    "max": 2.2040722354114832
+   },
+   "poverty_change_ahc_pp": {
+    "mean": 2.052876731868985,
+    "sd": 0.15983888679458197,
+    "mcse": 0.02260463214995156,
+    "q025": 1.7948258977738107,
+    "median": 2.0532488104300555,
+    "q975": 2.3935779267138164,
+    "min": 1.7544897516090203,
+    "max": 2.4068129216636063
    },
    "gini_change_pp": {
-    "mean": 1.1077605217044846,
-    "sd": 0.10172480992734878,
-    "min": 0.96631443696652,
+    "mean": 1.1140223061766703,
+    "sd": 0.09278428493440571,
+    "mcse": 0.01312167941293262,
+    "q025": 0.966939523856287,
+    "median": 1.1132430816627736,
+    "q975": 1.2913647891255209,
+    "min": 0.9279568624672052,
     "max": 1.3228159040155063
    }
   },
   "junior": {
    "exchequer_cost_bn": {
-    "mean": 17.768384102400002,
-    "sd": 1.6868435745573709,
+    "mean": 17.87600207872,
+    "sd": 1.5585020129520564,
+    "mcse": 0.2204054683702567,
+    "q025": 14.735634432000001,
+    "median": 18.119393279999997,
+    "q975": 20.544120831999997,
     "min": 13.55726848,
-    "max": 20.038582272
+    "max": 21.042413568
    },
    "poverty_change_bhc_pp": {
-    "mean": 1.869998636363561,
-    "sd": 0.1552712140264977,
-    "min": 1.6545818222818285,
+    "mean": 1.8492219993569317,
+    "sd": 0.13839600251788764,
+    "mcse": 0.01957215037390177,
+    "q025": 1.6180944889599433,
+    "median": 1.8442920580720723,
+    "q975": 2.089831152663801,
+    "min": 1.5666179968518352,
     "max": 2.264540103110166
    },
+   "poverty_change_ahc_pp": {
+    "mean": 2.0337829648804204,
+    "sd": 0.13858297218862434,
+    "mcse": 0.0195985918783126,
+    "q025": 1.7783069904806088,
+    "median": 2.059549428412301,
+    "q975": 2.2906275915998338,
+    "min": 1.6974685260175315,
+    "max": 2.470435933710352
+   },
    "gini_change_pp": {
-    "mean": 1.0606182006677056,
-    "sd": 0.06623796616881426,
+    "mean": 1.0782011828936384,
+    "sd": 0.08271068665470814,
+    "mcse": 0.011697057482027961,
+    "q025": 0.9306079562847408,
+    "median": 1.0719334279035873,
+    "q975": 1.2467433991789516,
     "min": 0.9017858038827598,
-    "max": 1.1735985939562044
+    "max": 1.2898033397992892
    }
   },
   "compression": {
    "exchequer_cost_bn": {
-    "mean": 20.690014208,
-    "sd": 2.022670151918649,
+    "mean": 20.63536914432,
+    "sd": 1.7848593860873732,
+    "mcse": 0.25241723507336794,
+    "q025": 17.998770176,
+    "median": 20.213383168,
+    "q975": 24.3963625472,
     "min": 16.827580416,
     "max": 24.520032256
    },
    "poverty_change_bhc_pp": {
-    "mean": 1.9859637198479558,
-    "sd": 0.12443740987151097,
-    "min": 1.766966970065259,
-    "max": 2.2309190973977073
+    "mean": 1.9628610571013863,
+    "sd": 0.15385132911757077,
+    "mcse": 0.021757863622719524,
+    "q025": 1.7369531111717704,
+    "median": 1.9598718121406844,
+    "q975": 2.2861868029773613,
+    "min": 1.7318787237532467,
+    "max": 2.305188105907013
+   },
+   "poverty_change_ahc_pp": {
+    "mean": 2.1527599901094687,
+    "sd": 0.18503712869374855,
+    "mcse": 0.026168201694127497,
+    "q025": 1.8551617858663838,
+    "median": 2.1504509546019444,
+    "q975": 2.487766057457355,
+    "min": 1.8217285357678945,
+    "max": 2.544808027905149
    },
    "gini_change_pp": {
-    "mean": 1.0449676629514628,
-    "sd": 0.09012313746827014,
+    "mean": 1.0429912349360744,
+    "sd": 0.08681444500388849,
+    "mcse": 0.012277416553439228,
+    "q025": 0.8838738368590449,
+    "median": 1.0307463120934335,
+    "q975": 1.1967321883777997,
     "min": 0.845948730903745,
-    "max": 1.2002185040327906
+    "max": 1.2959208192627747
    }
   },
   "uniform": {
    "exchequer_cost_bn": {
-    "mean": 14.299421081599998,
-    "sd": 1.7286109656764064,
-    "min": 10.548772864,
+    "mean": 13.853087498240003,
+    "sd": 1.7144398216810874,
+    "mcse": 0.24245840476939043,
+    "q025": 10.6016284672,
+    "median": 13.912981504000001,
+    "q975": 16.73759744,
+    "min": 10.494066688,
     "max": 17.369104384
    },
    "poverty_change_bhc_pp": {
-    "mean": 1.8659807056743631,
-    "sd": 0.13106730301689284,
-    "min": 1.7030975370725647,
-    "max": 2.1866553382400316
+    "mean": 1.873770888758173,
+    "sd": 0.16962765070850153,
+    "mcse": 0.0239889724185449,
+    "q025": 1.669304874817729,
+    "median": 1.8330050606706185,
+    "q975": 2.316832641530646,
+    "min": 1.5006757302673672,
+    "max": 2.350002681506619
+   },
+   "poverty_change_ahc_pp": {
+    "mean": 2.038540638003872,
+    "sd": 0.17559412539548994,
+    "mcse": 0.024832759360734376,
+    "q025": 1.7422764619927082,
+    "median": 2.0161054557687255,
+    "q975": 2.4674732209315153,
+    "min": 1.7001131057349297,
+    "max": 2.518589264648377
    },
    "gini_change_pp": {
-    "mean": 1.159805529398539,
-    "sd": 0.07498655993646344,
-    "min": 1.0080965530160355,
-    "max": 1.2966407544604652
+    "mean": 1.1586212731999703,
+    "sd": 0.09897953819446986,
+    "mcse": 0.013997820531204505,
+    "q025": 1.0118870041831884,
+    "median": 1.1555005828402243,
+    "q975": 1.3748611235775334,
+    "min": 0.8791660279963254,
+    "max": 1.4599927555353551
    }
   },
   "klein_top_loaded": {
    "exchequer_cost_bn": {
-    "mean": 32.62843166719999,
-    "sd": 1.858551832882838,
+    "mean": 32.783500410879995,
+    "sd": 2.2446838451273385,
+    "mcse": 0.317446233701887,
+    "q025": 29.3500727296,
+    "median": 32.560955392,
+    "q975": 37.2103467008,
     "min": 28.588490752,
-    "max": 35.722862592
+    "max": 38.666256384
    },
    "poverty_change_bhc_pp": {
-    "mean": 2.247644812548043,
-    "sd": 0.12739818356064603,
-    "min": 1.969445138468076,
-    "max": 2.4541963919428116
+    "mean": 2.2375485748564015,
+    "sd": 0.13532970404951356,
+    "mcse": 0.01913851028587592,
+    "q025": 1.947219605600243,
+    "median": 2.242972740102643,
+    "q975": 2.4504562497838216,
+    "min": 1.904079469214706,
+    "max": 2.4544009522573713
+   },
+   "poverty_change_ahc_pp": {
+    "mean": 2.4436797450237506,
+    "sd": 0.1619762146330673,
+    "mcse": 0.022906895951593915,
+    "q025": 2.1224067696444058,
+    "median": 2.466291901890788,
+    "q975": 2.7088616961448277,
+    "min": 2.087597805377392,
+    "max": 2.826609214867251
    },
    "gini_change_pp": {
-    "mean": 0.9864282884058119,
-    "sd": 0.08786807745861647,
-    "min": 0.8047820211183665,
-    "max": 1.1342139860930578
+    "mean": 0.9726065069763601,
+    "sd": 0.12067100304995707,
+    "mcse": 0.017065456909841438,
+    "q025": 0.7615689011962268,
+    "median": 0.9726186925151592,
+    "q975": 1.2314144410402978,
+    "min": 0.7375643484977545,
+    "max": 1.2498163529199524
+   }
+  },
+  "_metadata": {
+   "draws": 50,
+   "seeds": [
+    0,
+    49
+   ],
+   "interval_interpretation": "Quantiles, SDs and MCSEs describe assignment-draw variation only; they are not survey-sampling confidence intervals.",
+   "convergence_vs_20_draws": {
+    "exposure": {
+     "exchequer_cost_bn": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 17.6826368,
+      "full_mean": 17.6901046272,
+      "mean_change": 0.007467827199999277,
+      "full_mcse": 0.16989238103697557,
+      "passes_two_mcse": true
+     },
+     "poverty_change_bhc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.865101405144431,
+      "full_mean": 1.8745914513951432,
+      "mean_change": 0.009490046250712147,
+      "full_mcse": 0.020584579777635854,
+      "passes_two_mcse": true
+     },
+     "poverty_change_ahc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 2.0332942798359235,
+      "full_mean": 2.052876731868985,
+      "mean_change": 0.019582452033061415,
+      "full_mcse": 0.02260463214995156,
+      "passes_two_mcse": true
+     },
+     "gini_change_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.1077605217044846,
+      "full_mean": 1.1140223061766703,
+      "mean_change": 0.006261784472185727,
+      "full_mcse": 0.01312167941293262,
+      "passes_two_mcse": true
+     }
+    },
+    "junior": {
+     "exchequer_cost_bn": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 17.771094016000003,
+      "full_mean": 17.87600207872,
+      "mean_change": 0.10490806271999631,
+      "full_mcse": 0.2204054683702567,
+      "passes_two_mcse": true
+     },
+     "poverty_change_bhc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.8697451299682388,
+      "full_mean": 1.8492219993569317,
+      "mean_change": -0.020523130611307172,
+      "full_mcse": 0.01957215037390177,
+      "passes_two_mcse": true
+     },
+     "poverty_change_ahc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 2.031044693186845,
+      "full_mean": 2.0337829648804204,
+      "mean_change": 0.0027382716935755447,
+      "full_mcse": 0.0195985918783126,
+      "passes_two_mcse": true
+     },
+     "gini_change_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.0605059961289232,
+      "full_mean": 1.0782011828936384,
+      "mean_change": 0.017695186764715265,
+      "full_mcse": 0.011697057482027961,
+      "passes_two_mcse": true
+     }
+    },
+    "compression": {
+     "exchequer_cost_bn": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 20.690014208,
+      "full_mean": 20.63536914432,
+      "mean_change": -0.05464506368000244,
+      "full_mcse": 0.25241723507336794,
+      "passes_two_mcse": true
+     },
+     "poverty_change_bhc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.9859637198479558,
+      "full_mean": 1.9628610571013863,
+      "mean_change": -0.02310266274656958,
+      "full_mcse": 0.021757863622719524,
+      "passes_two_mcse": true
+     },
+     "poverty_change_ahc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 2.1956624686573227,
+      "full_mean": 2.1527599901094687,
+      "mean_change": -0.042902478547854006,
+      "full_mcse": 0.026168201694127497,
+      "passes_two_mcse": true
+     },
+     "gini_change_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.0449676629514628,
+      "full_mean": 1.0429912349360744,
+      "mean_change": -0.001976428015388443,
+      "full_mcse": 0.012277416553439228,
+      "passes_two_mcse": true
+     }
+    },
+    "uniform": {
+     "exchequer_cost_bn": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 14.299421081599998,
+      "full_mean": 13.853087498240003,
+      "mean_change": -0.44633358335999596,
+      "full_mcse": 0.24245840476939043,
+      "passes_two_mcse": true
+     },
+     "poverty_change_bhc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.8659807056743631,
+      "full_mean": 1.873770888758173,
+      "mean_change": 0.007790183083809854,
+      "full_mcse": 0.0239889724185449,
+      "passes_two_mcse": true
+     },
+     "poverty_change_ahc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 2.0493420082775637,
+      "full_mean": 2.038540638003872,
+      "mean_change": -0.010801370273691546,
+      "full_mcse": 0.024832759360734376,
+      "passes_two_mcse": true
+     },
+     "gini_change_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 1.159805529398539,
+      "full_mean": 1.1586212731999703,
+      "mean_change": -0.0011842561985686562,
+      "full_mcse": 0.013997820531204505,
+      "passes_two_mcse": true
+     }
+    },
+    "klein_top_loaded": {
+     "exchequer_cost_bn": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 32.62843166719999,
+      "full_mean": 32.783500410879995,
+      "mean_change": 0.15506874368000467,
+      "full_mcse": 0.317446233701887,
+      "passes_two_mcse": true
+     },
+     "poverty_change_bhc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 2.247644812548043,
+      "full_mean": 2.2375485748564015,
+      "mean_change": -0.010096237691641363,
+      "full_mcse": 0.01913851028587592,
+      "passes_two_mcse": true
+     },
+     "poverty_change_ahc_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 2.4372286989329397,
+      "full_mean": 2.4436797450237506,
+      "mean_change": 0.00645104609081093,
+      "full_mcse": 0.022906895951593915,
+      "passes_two_mcse": true
+     },
+     "gini_change_pp": {
+      "checkpoint_draws": 20,
+      "full_draws": 50,
+      "checkpoint_mean": 0.9864282884058119,
+      "full_mean": 0.9726065069763601,
+      "mean_change": -0.013821781429451785,
+      "full_mcse": 0.017065456909841438,
+      "passes_two_mcse": true
+     }
+    }
    }
   }
  },
  "policy": {
   "R1_wage_insurance_exposure": {
    "exchequer_cost_bn": {
-    "mean": 21.430065448361425,
-    "sd": 0.46026666292707513,
-    "min": 20.60165794493628,
-    "max": 22.19889665266431
+    "mean": 21.40144357603268,
+    "sd": 0.5126487732244293,
+    "mcse": 0.0724994847827917,
+    "q025": 20.48720950142131,
+    "median": 21.36188627225546,
+    "q975": 22.39123842097694,
+    "min": 20.432616917283408,
+    "max": 22.950371681671584
    },
    "poverty_change_bhc_pp": {
-    "mean": -1.4977197417470203,
-    "sd": 0.10881236942968323,
-    "min": -1.7234634005122125,
+    "mean": -1.5202940035145065,
+    "sd": 0.10152640548131936,
+    "mcse": 0.014358001957067197,
+    "q025": -1.719758769841592,
+    "median": -1.5092843204822626,
+    "q975": -1.3210366576847425,
+    "min": -1.7953680639125391,
     "max": -1.2886596627840334
    },
    "gini_change_pp": {
-    "mean": -0.960546415621802,
-    "sd": 0.04293882672843754,
-    "min": -1.0664055791746674,
+    "mean": -0.9654202334040096,
+    "sd": 0.045181012918199336,
+    "mcse": 0.006389560123067151,
+    "q025": -1.0627699381733184,
+    "median": -0.9671634796173223,
+    "q975": -0.8823423257185703,
+    "min": -1.0705145005590722,
     "max": -0.8744268798902444
    }
   },
   "R1_wage_insurance_junior": {
    "exchequer_cost_bn": {
-    "mean": 21.415982107350228,
-    "sd": 0.6342428488667002,
+    "mean": 21.465193462651477,
+    "sd": 0.5653812438052264,
+    "mcse": 0.07995698229007205,
+    "q025": 20.459087140536095,
+    "median": 21.426875556955086,
+    "q975": 22.45498860327657,
     "min": 20.042182006445262,
-    "max": 22.485768826961426
+    "max": 22.57382937552026
    },
    "poverty_change_bhc_pp": {
-    "mean": -1.5409015922780829,
-    "sd": 0.10671664828906853,
+    "mean": -1.5292293780938118,
+    "sd": 0.10639475297495739,
+    "mcse": 0.015046490262251994,
+    "q025": -1.7349274330516917,
+    "median": -1.5166946272138477,
+    "q975": -1.3706300514214693,
     "min": -1.7563805780718171,
-    "max": -1.3689699806075013
+    "max": -1.3156820958408892
    },
    "gini_change_pp": {
-    "mean": -0.9471204183475941,
-    "sd": 0.0326080740093832,
-    "min": -1.0001241721248388,
-    "max": -0.8844503109699309
+    "mean": -0.9530890467433544,
+    "sd": 0.039180990932805616,
+    "mcse": 0.005541028876439097,
+    "q025": -1.0185091772335007,
+    "median": -0.962212743484081,
+    "q975": -0.8805942344396087,
+    "min": -1.0323656582757246,
+    "max": -0.8685749797504472
    }
   },
   "R1_wage_insurance_uniform": {
    "exchequer_cost_bn": {
-    "mean": 20.63168006040006,
-    "sd": 0.4304304233215521,
-    "min": 19.874710166998696,
-    "max": 21.53644744619523
+    "mean": 20.506819274842684,
+    "sd": 0.5266158020773969,
+    "mcse": 0.07447472094578401,
+    "q025": 19.465716034678675,
+    "median": 20.46504621915942,
+    "q975": 21.50047745761827,
+    "min": 19.353134621668865,
+    "max": 21.59835774144384
    },
    "poverty_change_bhc_pp": {
-    "mean": -1.4921033023891157,
-    "sd": 0.08153701286599299,
-    "min": -1.7288669257012723,
-    "max": -1.3698010473605304
+    "mean": -1.5073878213098837,
+    "sd": 0.11601811553157451,
+    "mcse": 0.01640743924657213,
+    "q025": -1.7261135453043457,
+    "median": -1.4859912034289076,
+    "q975": -1.325910409528565,
+    "min": -1.769944943176058,
+    "max": -1.1995330021679518
    },
    "gini_change_pp": {
-    "mean": -0.9504669466007348,
-    "sd": 0.037130292820769906,
-    "min": -1.030904383072695,
-    "max": -0.88712737112705
+    "mean": -0.9473407941784932,
+    "sd": 0.04912142475833846,
+    "mcse": 0.006946818509633178,
+    "q025": -1.0657979394533903,
+    "median": -0.9448703937907366,
+    "q975": -0.8662261460127685,
+    "min": -1.0994003013478415,
+    "max": -0.8488374176228608
    }
   },
   "R2_uc_circuit_breaker_exposure": {
    "exchequer_cost_bn": {
-    "mean": 5.736644608,
-    "sd": 0.03411261454189135,
-    "min": 5.678825472,
-    "max": 5.814697984
+    "mean": 5.745330094080001,
+    "sd": 0.03521555458312533,
+    "mcse": 0.004980231489794584,
+    "q025": 5.682239078399999,
+    "median": 5.74685184,
+    "q975": 5.8122944512000005,
+    "min": 5.664636928,
+    "max": 5.818302464
    },
    "poverty_change_bhc_pp": {
-    "mean": -0.6762417646511729,
-    "sd": 0.04503843920379625,
+    "mean": -0.6668253548564641,
+    "sd": 0.04097735529387716,
+    "mcse": 0.005795073160678202,
+    "q025": -0.7569585887528287,
+    "median": -0.6707982220291995,
+    "q975": -0.5867432986234148,
     "min": -0.7665749996993126,
-    "max": -0.5912867641475056
+    "max": -0.5853565814594758
    },
    "gini_change_pp": {
-    "mean": -0.3049146914186751,
-    "sd": 0.0028798543600757763,
-    "min": -0.3115419356600202,
-    "max": -0.3002793179179952
+    "mean": -0.30563559440312527,
+    "sd": 0.0031694608631803217,
+    "mcse": 0.00044822945381203474,
+    "q025": -0.31141834401857665,
+    "median": -0.30553020428404354,
+    "q975": -0.3004156308626421,
+    "min": -0.3123552882588698,
+    "max": -0.2979263020094769
    }
   },
   "R3_cap_suspension_taper_cut_exposure": {
    "exchequer_cost_bn": {
-    "mean": 4.5670555647999995,
-    "sd": 0.04475653961337181,
-    "min": 4.482056192,
-    "max": 4.627841024
+    "mean": 4.56168275968,
+    "sd": 0.05660774728620504,
+    "mcse": 0.008005544394753993,
+    "q025": 4.469242675199999,
+    "median": 4.561338368,
+    "q975": 4.6557159424000005,
+    "min": 4.46398464,
+    "max": 4.714348544
    },
    "poverty_change_bhc_pp": {
-    "mean": -0.4693255404603667,
-    "sd": 0.04485281761381669,
+    "mean": -0.4664931943544333,
+    "sd": 0.03864137150210521,
+    "mcse": 0.005464715164697441,
+    "q025": -0.5505445430360894,
+    "median": -0.4615789394979808,
+    "q975": -0.40140519455121204,
     "min": -0.5747605276001044,
-    "max": -0.3991131281207483
+    "max": -0.390734855920169
    },
    "gini_change_pp": {
-    "mean": -0.21985955203458135,
-    "sd": 0.004312955440754839,
+    "mean": -0.21880547200088518,
+    "sd": 0.004700365655748172,
+    "mcse": 0.000664732085847177,
+    "q025": -0.22617089330417392,
+    "median": -0.21832300344878375,
+    "q975": -0.20964385448927755,
     "min": -0.2282043441832471,
-    "max": -0.2120264177297826
+    "max": -0.209176858032356
    }
   }
  },
  "central": {
   "exchequer_cost_bn": {
-   "mean": 17.6826368,
-   "sd": 1.2804567372911881,
+   "mean": 17.6901046272,
+   "sd": 1.2013205470317425,
+   "mcse": 0.16989238103697557,
+   "q025": 15.4741764096,
+   "median": 17.713872896,
+   "q975": 19.785803775999998,
    "min": 15.171321856,
    "max": 20.327923712
   },
   "poverty_change_bhc_pp": {
-   "mean": 1.865101405144431,
-   "sd": 0.16492705843350394,
+   "mean": 1.8745914513951432,
+   "sd": 0.14555495948641786,
+   "mcse": 0.020584579777635854,
+   "q025": 1.6293332007340413,
+   "median": 1.8375984553290787,
+   "q975": 2.182808054724238,
    "min": 1.5014810306185344,
-   "max": 2.199430521335727
+   "max": 2.2040722354114832
+  },
+  "poverty_change_ahc_pp": {
+   "mean": 2.052876731868985,
+   "sd": 0.15983888679458197,
+   "mcse": 0.02260463214995156,
+   "q025": 1.7948258977738107,
+   "median": 2.0532488104300555,
+   "q975": 2.3935779267138164,
+   "min": 1.7544897516090203,
+   "max": 2.4068129216636063
   },
   "gini_change_pp": {
-   "mean": 1.1077605217044846,
-   "sd": 0.10172480992734878,
-   "min": 0.96631443696652,
+   "mean": 1.1140223061766703,
+   "sd": 0.09278428493440571,
+   "mcse": 0.01312167941293262,
+   "q025": 0.966939523856287,
+   "median": 1.1132430816627736,
+   "q975": 1.2913647891255209,
+   "min": 0.9279568624672052,
    "max": 1.3228159040155063
   },
   "relative_poverty_change_bhc_pp": {
-   "mean": 0.6980093384685191,
-   "sd": 0.1850988230746391,
+   "mean": 0.7136868091583569,
+   "sd": 0.16075330126479875,
+   "mcse": 0.02273394988449264,
+   "q025": 0.40406331558455494,
+   "median": 0.7231076802283354,
+   "q975": 1.053920803069864,
    "min": 0.2796075864633762,
-   "max": 1.065177839524195
+   "max": 1.079774590963592
   },
   "baseline_relative_poverty_bhc_rate": 0.1729447214966578
  }
 }
 
-=== stage index_sensitivity: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/index_sensitivity.py
+=== stage index_sensitivity: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/index_sensitivity.py
 c_aioe {'exchequer_cost_bn': 18.21, 'poverty_change_bhc_pp': 1.807, 'gini_change_pp': 1.038, 'transition_share_decile1_pct': 0.639, 'transition_share_decile10_pct': 5.342, 'displaced_weighted_m': 1.557}
 felten_aioe {'exchequer_cost_bn': 18.138, 'poverty_change_bhc_pp': 1.835, 'gini_change_pp': 1.053, 'transition_share_decile1_pct': 0.498, 'transition_share_decile10_pct': 5.44, 'displaced_weighted_m': 1.574}
 eloundou_beta {'exchequer_cost_bn': 20.382, 'poverty_change_bhc_pp': 2.026, 'gini_change_pp': 1.1, 'transition_share_decile1_pct': 0.319, 'transition_share_decile10_pct': 4.786, 'displaced_weighted_m': 1.616}
 dsit_aioe {'exchequer_cost_bn': 18.186, 'poverty_change_bhc_pp': 2.045, 'gini_change_pp': 1.18, 'transition_share_decile1_pct': 0.363, 'transition_share_decile10_pct': 4.89, 'displaced_weighted_m': 1.645}
 dsit_llm {'exchequer_cost_bn': 16.668, 'poverty_change_bhc_pp': 1.83, 'gini_change_pp': 0.942, 'transition_share_decile1_pct': 0.428, 'transition_share_decile10_pct': 5.799, 'displaced_weighted_m': 1.602}
 
-=== stage duration_takeup: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/sensitivity_duration_takeup.py
+=== stage duration_takeup: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/sensitivity_duration_takeup.py
 half_earnings_retention seed 0 done
 takeup_70 seed 0 done
 half_earnings_retention seed 1 done
@@ -672,16 +1218,16 @@ takeup_70 seed 19 done
   },
   "convex_combination_comparator_0.5x_full_year": {
    "exchequer_cost_bn": {
-    "mean": 8.8413184,
-    "sd": 0.6402283686455941
+    "mean": 8.8450523136,
+    "sd": 0.6006602735158713
    },
    "poverty_change_bhc_pp": {
-    "mean": 0.9325507025722155,
-    "sd": 0.08246352921675197
+    "mean": 0.9372957256975716,
+    "sd": 0.07277747974320893
    },
    "gini_change_pp": {
-    "mean": 0.5538802608522423,
-    "sd": 0.05086240496367439
+    "mean": 0.5570111530883352,
+    "sd": 0.04639214246720286
    }
   }
  },
@@ -717,7 +1263,7 @@ takeup_70 seed 19 done
  }
 }
 
-=== stage duration_reforms: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/sensitivity_duration_reforms.py
+=== stage duration_reforms: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/sensitivity_duration_reforms.py
 duration reforms seed 0 done
 duration reforms seed 1 done
 duration reforms seed 2 done
@@ -752,7 +1298,7 @@ duration reforms seed 4 done
  }
 }
 
-=== stage wage_tier: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/sensitivity_wage_tier.py
+=== stage wage_tier: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/sensitivity_wage_tier.py
 wage-tier 3_0.8 seed 0 done
 wage-tier 6_0.7 seed 0 done
 wage-tier 9.6_0.6 seed 0 done
@@ -814,7 +1360,7 @@ wage-tier 3_0.8 seed 19 done
 wage-tier 6_0.7 seed 19 done
 wage-tier 9.6_0.6 seed 19 done
 {
- "description": "Measured family (Klein Teeselink) with alternative high/low wage-tier displacement multipliers; junior 5.8/4.5 and London 1.5 tilts and central aggregate shock held fixed; 20 draws (seeds 0-19).",
+ "description": "Measured family (Klein Teeselink) with alternative high/low wage-tier displacement multipliers; junior 5.8/4.5 junior tilt, neutral London multiplier, and central aggregate shock held fixed; 20 draws (seeds 0-19).",
  "n_draws": 20,
  "3_0.8": {
   "exchequer_cost_bn": {
@@ -896,7 +1442,7 @@ wage-tier 9.6_0.6 seed 19 done
  }
 }
 
-=== stage mixed_wage_adjustment: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/sensitivity_mixed_wage_adjustment.py
+=== stage mixed_wage_adjustment: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/sensitivity_mixed_wage_adjustment.py
 {'scenario': 'mixed_lambda_0', 'displaced_weighted_m': 0.0, 'net_employment_income_change_pct': -5.114946609927976, 'exchequer_cost_bn': 26.611761152, 'poverty_change_bhc_pp': 0.10391829504449723, 'poverty_change_ahc_pp': 0.26522019797750873, 'gini_change_pp': -0.43665382812054787, 'lambda_displacement_share': 0.0, 'gross_earnings_loss_pct': 7.773605792581166, 'gross_displacement_loss_pct': 0.0, 'gross_wage_cut_loss_pct': 7.773605792581166}
 {'scenario': 'mixed_lambda_0.25', 'displaced_weighted_m': 0.42099583682250974, 'net_employment_income_change_pct': -5.168758517459564, 'exchequer_cost_bn': 24.450023424, 'poverty_change_bhc_pp': 0.6076921988336814, 'poverty_change_ahc_pp': 0.69735518829461, 'gini_change_pp': -0.027772316722762813, 'lambda_displacement_share': 0.25, 'gross_earnings_loss_pct': 7.77360579258117, 'gross_displacement_loss_pct': 2.010159253600815, 'gross_wage_cut_loss_pct': 5.7634465389803555}
 {'scenario': 'mixed_lambda_0.5', 'displaced_weighted_m': 0.7678965120849609, 'net_employment_income_change_pct': -5.212999580225504, 'exchequer_cost_bn': 22.654877696, 'poverty_change_bhc_pp': 1.0194758160792765, 'poverty_change_ahc_pp': 1.1090486108826791, 'gini_change_pp': 0.28515367991206464, 'lambda_displacement_share': 0.5, 'gross_earnings_loss_pct': 7.77360579258117, 'gross_displacement_loss_pct': 3.6554171441359977, 'gross_wage_cut_loss_pct': 4.118188648445172}
@@ -908,25 +1454,25 @@ wage-tier 9.6_0.6 seed 19 done
 {'scenario': 'survivor_wage_+0.026', 'displaced_weighted_m': 1.557257138671875, 'net_employment_income_change_pct': -5.3242146037627105, 'exchequer_cost_bn': 18.209980416, 'poverty_change_bhc_pp': 1.8069433542672653, 'poverty_change_ahc_pp': 1.8530931099270758, 'gini_change_pp': 1.0383741096702703, 'survivor_wage_effect_pct': 2.6}
 {'scenario': 'survivor_wage_+0.050', 'displaced_weighted_m': 1.557257138671875, 'net_employment_income_change_pct': -3.0632381217764406, 'exchequer_cost_bn': 5.775507456, 'poverty_change_bhc_pp': 1.6752295491308327, 'poverty_change_ahc_pp': 1.6662086452458174, 'gini_change_pp': 1.1855923210505992, 'survivor_wage_effect_pct': 5.0}
 
-=== stage enhanced_dataset: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/sensitivity_enhanced_dataset.py
-enhanced_2026 {'poverty_change_bhc_pp': 2.947655506864892, 'baseline_poverty_bhc_pct': 9.429371637563193, 'exchequer_cost_bn': 29.432348672, 'displaced_weighted_m': 2.971003532409668}
-enhanced_2025 {'poverty_change_bhc_pp': 2.948810372742973, 'baseline_poverty_bhc_pct': 10.10425581009954, 'exchequer_cost_bn': 29.126393856, 'displaced_weighted_m': 2.9862473011016846}
+=== stage enhanced_dataset: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/sensitivity_enhanced_dataset.py
+enhanced_2026 {'poverty_change_bhc_pp': 2.9682356109222945, 'baseline_poverty_bhc_pct': 9.429371637563193, 'exchequer_cost_bn': 29.51790592, 'displaced_weighted_m': 2.9756269454956055}
+enhanced_2025 {'poverty_change_bhc_pp': 2.9503802761120452, 'baseline_poverty_bhc_pct': 10.10425581009954, 'exchequer_cost_bn': 29.126656, 'displaced_weighted_m': 2.9864065647125244}
 plain_2025 {'poverty_change_bhc_pp': 1.907548667877354, 'exchequer_cost_bn': 17.212997632, 'displaced_weighted_m': 1.551361875}
 {
  "description": "Central scenario, seed 0; enhanced FRS 2023-24 with geo_impact.py's SOC imputation (route B). Decomposes the geography-section (+enhanced, 2025) vs main (+plain, 2026) BHC poverty-change gap.",
- "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-o820y5vl/worktree/data/enhanced_frs_2023_24.h5",
+ "enhanced_dataset_path": "/private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-4o0ffk2y/worktree/data/enhanced_frs_2023_24.h5",
  "cells": {
   "enhanced_2026": {
-   "poverty_change_bhc_pp": 2.947655506864892,
+   "poverty_change_bhc_pp": 2.9682356109222945,
    "baseline_poverty_bhc_pct": 9.429371637563193,
-   "exchequer_cost_bn": 29.432348672,
-   "displaced_weighted_m": 2.971003532409668
+   "exchequer_cost_bn": 29.51790592,
+   "displaced_weighted_m": 2.9756269454956055
   },
   "enhanced_2025": {
-   "poverty_change_bhc_pp": 2.948810372742973,
+   "poverty_change_bhc_pp": 2.9503802761120452,
    "baseline_poverty_bhc_pct": 10.10425581009954,
-   "exchequer_cost_bn": 29.126393856,
-   "displaced_weighted_m": 2.9862473011016846
+   "exchequer_cost_bn": 29.126656,
+   "displaced_weighted_m": 2.9864065647125244
   },
   "plain_2025": {
    "poverty_change_bhc_pp": 1.907548667877354,
@@ -941,38 +1487,38 @@ plain_2025 {'poverty_change_bhc_pp': 1.907548667877354, 'exchequer_cost_bn': 17.
   }
  },
  "decomposition_bhc_poverty_pp": {
-  "total_gap_enhanced2025_minus_plain2026": 1.1418670184757076,
-  "dataset_component_at_2026": 1.1407121525976267,
-  "period_component_on_enhanced": 0.0011548658780808907,
+  "total_gap_enhanced2025_minus_plain2026": 1.14343692184478,
+  "dataset_component_at_2026": 1.1612922566550292,
+  "period_component_on_enhanced": -0.017855334810249257,
   "period_component_on_plain": 0.10060531361008884,
-  "interaction": -0.09945044773200795,
+  "interaction": -0.1184606484203381,
   "note": "single seed-0 run per cell; imputation noise not separately varied (imputation seed fixed at 0)."
  }
 }
 
-=== stage paper_scenarios: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/paper_scenarios.py
+=== stage paper_scenarios: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/paper_scenarios.py
 klein_teeselink_2025: displaced 0.95m (4.1% of employees), exchequer £20.4bn, poverty +1.11pp, gini +0.35pp
 hosseini_lichtinger_2026: displaced 0.10m (0.5% of employees), exchequer £1.3bn, poverty +0.11pp, gini +0.04pp
 hosseini_lichtinger_2026_adopter_scaled: displaced 0.02m (0.1% of employees), exchequer £0.1bn, poverty +0.01pp, gini +0.01pp
 brynjolfsson_canaries_2025: displaced 0.02m (0.1% of employees), exchequer £0.2bn, poverty +0.02pp, gini +0.01pp
 
-=== stage policy: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/policy_counterfactuals.py
+=== stage policy: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/policy_counterfactuals.py
 R1_wage_insurance exposure cost £20.64bn dpov_ahc -1.490pp dgini -0.922pp
 R2_uc_circuit_breaker exposure cost £5.72bn dpov_ahc -0.579pp dgini -0.300pp
 R3_cap_suspension_taper_cut exposure cost £4.57bn dpov_ahc -0.510pp dgini -0.217pp
-R1_wage_insurance junior cost £20.38bn dpov_ahc -1.772pp dgini -0.924pp
+R1_wage_insurance junior cost £20.42bn dpov_ahc -1.767pp dgini -0.925pp
 R1_wage_insurance uniform cost £19.87bn dpov_ahc -1.776pp dgini -0.917pp
 
-=== stage caseloads: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/caseloads.py
+=== stage caseloads: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/caseloads.py
 central {'displaced_weighted_m': 1.56, 'new_uc_benunits_thousands': 369.58, 'exiting_uc_benunits_thousands': 58.99, 'net_new_uc_benunits_thousands': 310.59, 'new_uc_households_thousands': 352.9, 'new_uc_persons_thousands': 773.86, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 43.94, 'uc_spend_change_bn': 2.58, 'uc_housing_element_gross_entitlement_change_bn': 0.44, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
 high {'displaced_weighted_m': 3.04, 'new_uc_benunits_thousands': 731.2, 'exiting_uc_benunits_thousands': 57.38, 'net_new_uc_benunits_thousands': 673.83, 'new_uc_households_thousands': 678.02, 'new_uc_persons_thousands': 1733.82, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 47.62, 'uc_spend_change_bn': 6.25, 'uc_housing_element_gross_entitlement_change_bn': 1.32, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
 low {'displaced_weighted_m': 0.24, 'new_uc_benunits_thousands': 48.4, 'exiting_uc_benunits_thousands': 18.27, 'net_new_uc_benunits_thousands': 30.13, 'new_uc_households_thousands': 48.4, 'new_uc_persons_thousands': 126.58, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 41.69, 'uc_spend_change_bn': 0.32, 'uc_housing_element_gross_entitlement_change_bn': 0.07, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
 incidence_exposure {'displaced_weighted_m': 1.56, 'new_uc_benunits_thousands': 369.58, 'exiting_uc_benunits_thousands': 58.99, 'net_new_uc_benunits_thousands': 310.59, 'new_uc_households_thousands': 352.9, 'new_uc_persons_thousands': 773.86, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 43.94, 'uc_spend_change_bn': 2.58, 'uc_housing_element_gross_entitlement_change_bn': 0.44, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
-incidence_junior {'displaced_weighted_m': 1.54, 'new_uc_benunits_thousands': 314.36, 'exiting_uc_benunits_thousands': 61.43, 'net_new_uc_benunits_thousands': 252.93, 'new_uc_households_thousands': 297.66, 'new_uc_persons_thousands': 697.75, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 43.76, 'uc_spend_change_bn': 2.4, 'uc_housing_element_gross_entitlement_change_bn': 0.44, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
+incidence_junior {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 312.77, 'exiting_uc_benunits_thousands': 61.43, 'net_new_uc_benunits_thousands': 251.33, 'new_uc_households_thousands': 296.07, 'new_uc_persons_thousands': 694.57, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 43.74, 'uc_spend_change_bn': 2.38, 'uc_housing_element_gross_entitlement_change_bn': 0.43, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
 incidence_compression {'displaced_weighted_m': 1.67, 'new_uc_benunits_thousands': 381.07, 'exiting_uc_benunits_thousands': 60.67, 'net_new_uc_benunits_thousands': 320.39, 'new_uc_households_thousands': 350.21, 'new_uc_persons_thousands': 770.5, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 44.42, 'uc_spend_change_bn': 3.05, 'uc_housing_element_gross_entitlement_change_bn': 0.49, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
 incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 414.27, 'exiting_uc_benunits_thousands': 57.29, 'net_new_uc_benunits_thousands': 356.98, 'new_uc_households_thousands': 376.25, 'new_uc_persons_thousands': 960.36, 'uc_spend_baseline_bn': 41.36, 'uc_spend_shocked_bn': 44.53, 'uc_spend_change_bn': 3.17, 'uc_housing_element_gross_entitlement_change_bn': 0.91, 'context_dwp_welfare_spend_2025_26_bn': 334.0}
 
-=== stage tax_composition: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/tax_composition.py
+=== stage tax_composition: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/tax_composition.py
 {
   "central_w_lost_bn": 78.027636736,
   "central_effective_labour_tax_rate": 0.25622381204005895,
@@ -986,7 +1532,7 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
   }
 }
 
-=== stage gender: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/gender.py
+=== stage gender: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/gender.py
 {
  "female_mean_exposure": 0.32587502817933,
  "male_mean_exposure": 0.18006004058204528,
@@ -998,7 +1544,7 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
  "male_income_change_pct": -2.8807051181793213
 }
 
-=== stage geo_impact: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/geo_impact.py
+=== stage geo_impact: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/geo_impact.py
 {
   "notes": {
     "method": "route B: SOC imputation on enhanced FRS 2023-24",
@@ -1015,11 +1561,11 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
       "marginal": 0.0011398714279851267
     },
     "enhanced_frs_employees": 55764,
-    "w_universe_realised_displacement_rate": 0.06718901544809341,
+    "w_universe_realised_displacement_rate": 0.06716436892747879,
     "w_displacement_draw_universe": "national household weights obtained by summing all 650 constituency-matrix rows; no post-hoc outcome rescaling"
   },
-  "national_income_change_pct": 0.10550131648778915,
-  "national_displaced_per_1000": 67.1890096114127,
+  "national_income_change_pct": 0.10713768750429153,
+  "national_displaced_per_1000": 67.16436660017197,
   "national_poverty_headcount_change": 1679121.310025225,
   "top10_income_change": [
     {
@@ -1040,7 +1586,7 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
     {
       "code": "E14001105",
       "name": "Blackpool South",
-      "income_change_pct": 3.0999999046325684
+      "income_change_pct": 3.200000047683716
     },
     {
       "code": "E14001127",
@@ -1107,7 +1653,7 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
     {
       "code": "E14001162",
       "name": "Chesham and Amersham",
-      "income_change_pct": -3.5999999046325684
+      "income_change_pct": -3.5
     },
     {
       "code": "E14001592",
@@ -1127,15 +1673,22 @@ incidence_uniform {'displaced_weighted_m': 1.55, 'new_uc_benunits_thousands': 41
   ]
 }
 
-=== stage geo_choropleth: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/geo_choropleth.py
-wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-o820y5vl/worktree/results/geo/map_income_change.png
-wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-o820y5vl/worktree/results/geo/map_displacement.png
+=== stage geo_choropleth: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/geo_choropleth.py
+wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-4o0ffk2y/worktree/results/geo/map_income_change.png
+wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-4o0ffk2y/worktree/results/geo/map_displacement.png
 
-=== stage figures: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/figures.py
+=== stage figures: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/figures.py
 figures written to results/jr16, results/appendix and results/incidence
 
-=== stage tex_values: /Users/janansadeqian/uk-ai-study/.venv/bin/python analysis/emit_tex_values.py
-wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-o820y5vl/worktree/paper/values_generated.tex (111 macros)
+=== stage tex_values: /Users/janansadeqian/uk-ai-study/.venv/bin/python3 analysis/emit_tex_values.py
+wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-4o0ffk2y/worktree/paper/values_generated.tex (111 macros)
+WARNING: 6 macros missing canonical sources:
+  genIncFamilyCostMeanMinBn (robustness/incidence_monte_carlo.json: 'exchequer_cost_bn')
+  genIncFamilyCostMeanMaxBn (robustness/incidence_monte_carlo.json: 'exchequer_cost_bn')
+  genIncFamilyPovBhcMeanMinPp (robustness/incidence_monte_carlo.json: 'poverty_change_bhc_pp')
+  genIncFamilyPovBhcMeanMaxPp (robustness/incidence_monte_carlo.json: 'poverty_change_bhc_pp')
+  genIncFamilyGiniMeanMinPp (robustness/incidence_monte_carlo.json: 'gini_change_pp')
+  genIncFamilyGiniMeanMaxPp (robustness/incidence_monte_carlo.json: 'gini_change_pp')
 
 === stage paper_pdf: latexmk -pdf -interaction=nonstopmode -halt-on-error -cd paper/main.tex
 Rc files read:
@@ -1148,35 +1701,133 @@ Changed files or newly in use/created:
   ../results/geo/map_displacement.png
   ../results/geo/map_income_change.png
   ../results/incidence/incidence_families.png
-  ../results/jr16/fig4_1_transition.png
-  ../results/jr16/fig4_2_wages.png
-  ../results/jr16/fig4_4_decomposition.png
-  ../results/jr16/fig4_5_disposable_grid.png
-  ../results/jr16/fig4_6_exchequer_grid.png
-  ../results/jr16/fig4_7_gini_grid.png
   ../results/policy/policy_reforms.png
-  ../results/tax_composition/revenue_shortfall_phi.png
-  sections/discussion.tex
+  main.tex
   sections/methodology.tex
-  sections/policy.tex
   sections/results.tex
   values_generated.tex
 Category 'changed_user':
   ../results/geo/map_displacement.png
   ../results/geo/map_income_change.png
   ../results/incidence/incidence_families.png
-  ../results/jr16/fig4_1_transition.png
-  ../results/jr16/fig4_2_wages.png
-  ../results/jr16/fig4_4_decomposition.png
-  ../results/jr16/fig4_5_disposable_grid.png
-  ../results/jr16/fig4_6_exchequer_grid.png
-  ../results/jr16/fig4_7_gini_grid.png
   ../results/policy/policy_reforms.png
-  ../results/tax_composition/revenue_shortfall_phi.png
-  sections/discussion.tex
+  main.tex
   sections/methodology.tex
-  sections/policy.tex
   sections/results.tex
+  values_generated.tex
+
+------------
+Run number 1 of rule 'pdflatex'
+------------
+------------
+Running 'pdflatex  -interaction=nonstopmode -halt-on-error -recorder  "main.tex"'
+------------
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./main.tex
+LaTeX2e <2022-11-01> patch level 1
+L3 programming layer <2023-02-22>
+(/usr/local/texlive/2023/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2023/texmf-dist/tex/latex/base/size11.clo))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/local/texlive/2023/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/booktabs/booktabs.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/sectsty/sectsty.sty
+
+LaTeX Warning: Command \underbar  has changed.
+               Check if current package is valid.
+
+
+LaTeX Warning: Command \underline  has changed.
+               Check if current package is valid.
+
+) (/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2023/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/local/texlive/2023/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty (/usr/local/texlive/2023/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/url/url.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/local/texlive/2023/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2023/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+
+(/usr/local/texlive/2023/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+))) (/usr/local/texlive/2023/texmf-dist/tex/latex/footmisc/footmisc.sty)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty)
+(./values_generated.tex)
+(/usr/local/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./main.aux)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+(/usr/local/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2023/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(./main.out) (./main.out) [1{/usr/local/texlive/2023/texmf-var/fonts/map/pdftex
+/updmap/pdftex.map}{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super
+/cm-super-ts1.enc}] (./sections/intro.tex
+! emit_tex_values: missing canonical result.
+\GENMISSING ...x_values: missing canonical result}
+
+l.9 ...means range from \genIncFamilyGiniMeanMinPp
+                                                  {} to \genIncFamilyGiniMea...
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on main.log.
+Latexmk: If appropriate, the -f option can be used to get latexmk
+  to try to force complete processing.
+Latexmk: Getting log file 'main.log'
+Latexmk: Examining 'main.fls'
+Latexmk: Examining 'main.log'
+Latexmk: Errors, so I did not complete making targets
+Collected error summary (may duplicate other messages):
+  pdflatex: Command for 'pdflatex' gave return code 1
+      Refer to 'main.log' and/or above output for details
+Latexmk: Undoing directory change
+
+wrote /private/var/folders/vj/qc1d1nbd409ct142dvm7qp700000gn/T/uk-ai-rebuild-4o0ffk2y/worktree/paper/values_generated.tex (111 macros)
+Rc files read:
+  NONE
+Latexmk: This is Latexmk, John Collins, 7 Jan. 2023. Version 4.79.
+Latexmk: Changing directory to 'paper/'
+Latexmk: applying rule 'pdflatex'...
+Rule 'pdflatex':  Reasons for rerun
+Changed files or newly in use/created:
+  values_generated.tex
+Category 'changed_user':
   values_generated.tex
 
 ------------
@@ -1319,158 +1970,7 @@ dist/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2023/texmf-di
 st/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2023/texmf-dist
 /fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2023/texmf-dist/f
 onts/type1/public/cm-super/sfrm1200.pfb>
-Output written on main.pdf (44 pages, 2545967 bytes).
-Transcript written on main.log.
-Latexmk: Getting log file 'main.log'
-Latexmk: Examining 'main.fls'
-Latexmk: Examining 'main.log'
-Latexmk: Log file says output to 'main.pdf'
-Latexmk: applying rule 'pdflatex'...
-Rule 'pdflatex':  Reasons for rerun
-Changed files or newly in use/created:
-  main.aux
-
-------------
-Run number 2 of rule 'pdflatex'
-------------
-------------
-Running 'pdflatex  -interaction=nonstopmode -halt-on-error -recorder  "main.tex"'
-------------
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex)
- restricted \write18 enabled.
-entering extended mode
-(./main.tex
-LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2023-02-22>
-(/usr/local/texlive/2023/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
-(/usr/local/texlive/2023/texmf-dist/tex/latex/base/size11.clo))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/geometry/geometry.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/keyval.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/iftex/ifvtex.sty
-(/usr/local/texlive/2023/texmf-dist/tex/generic/iftex/iftex.sty)))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/booktabs/booktabs.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsmath.sty
-For additional information on amsmath, use the `?' option.
-(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amstext.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsgen.sty))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsbsy.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/amsmath/amsopn.sty))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/graphicx.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/graphics.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/trig.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-def/pdftex.def)))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/xcolor/xcolor.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-cfg/color.cfg)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/graphics/mathcolor.ltx))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/sectsty/sectsty.sty
-
-LaTeX Warning: Command \underbar  has changed.
-               Check if current package is valid.
-
-
-LaTeX Warning: Command \underline  has changed.
-               Check if current package is valid.
-
-) (/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/hyperref.sty
-(/usr/local/texlive/2023/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
-(/usr/local/texlive/2023/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/hycolor/hycolor.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/auxhook/auxhook.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/nameref.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/refcount/refcount.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
-ty (/usr/local/texlive/2023/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/pd1enc.def)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/intcalc/intcalc.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/puenc.def)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/url/url.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/generic/bitset/bitset.sty
-(/usr/local/texlive/2023/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
-(/usr/local/texlive/2023/texmf-dist/tex/latex/hyperref/hpdftex.def
-(/usr/local/texlive/2023/texmf-dist/tex/latex/base/atveryend-ltx.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
-
-(/usr/local/texlive/2023/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
-))) (/usr/local/texlive/2023/texmf-dist/tex/latex/footmisc/footmisc.sty)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty)
-(./values_generated.tex)
-(/usr/local/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(./main.aux)
-*geometry* driver: auto-detecting
-*geometry* detected driver: pdftex
-(/usr/local/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
-[Loading MPS to PDF converter (version 2006.09.02).]
-) (/usr/local/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
-(/usr/local/texlive/2023/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
-(./main.out) (./main.out) [1{/usr/local/texlive/2023/texmf-var/fonts/map/pdftex
-/updmap/pdftex.map}{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super
-/cm-super-ts1.enc}] (./sections/intro.tex [2]) (./sections/literature.tex
-[3] [4] [5]) (./sections/methodology.tex [6] [7] [8] [9]
-Overfull \hbox (8.98306pt too wide) in paragraph at lines 65--66
-\OT1/cmr/m/n/10.95 loosely an-chored to the UK firm-level ev-i-dence of [][]Kle
-in Teeselink[][] ([][]2025[][]) (named \OT1/cmtt/m/n/10.95 klein[]top[]loaded
-[10] [11]) (./sections/results.tex [12] [13 <../results/jr16/fig4_1_transition.
-png>] [14 <../results/jr16/fig4_2_wages.png>] [15 <../results/jr16/fig4_3_capit
-al.png>] [16 <../results/jr16/fig4_4_decomposition.png>] [17 <../results/jr16/f
-ig4_5_disposable_grid.png>] [18 <../results/jr16/fig4_6_exchequer_grid.png>]
-[19 <../results/jr16/fig4_7_gini_grid.png>] [20 <../results/incidence/incidence
-_families.png>] [21] [22] [23] [24 <../results/geo/map_income_change.png> <../r
-esults/geo/map_displacement.png>]) (./sections/policy.tex [25] [26] [27 <../res
-ults/policy/policy_reforms.png>]) (./sections/discussion.tex [28 <../results/ta
-x_composition/revenue_shortfall_phi.png>] [29] [30] [31])
-(./sections/references.tex [32] [33]) (./sections/appendix.tex
-Overfull \hbox (2.74493pt too wide) in paragraph at lines 8--22
-\OT1/cmr/m/n/10.95 Displacement is a ran-dom draw of which ex-posed work-ers lo
-se em-ploy-ment, sub-ject to occupation-
-[34] [35] [36 <../results/appendix/b1_market_income_less_capital.png> <../resul
-ts/appendix/b2_capital_income.png>] [37 <../results/appendix/b3_benefits.png> <
-../results/appendix/b4_tax_and_ni.png>] [38 <../results/appendix/b5_disposable_
-income.png> <../results/appendix/exposure_incidence_by_decile.png>] [39 <../res
-ults/appendix/complementarity_incidence_by_decile.png> <../results/appendix/dec
-omposition_ci.png>] [40 <../results/appendix/b7_uniform_vs_ai_decile.png>]
-[41 <../results/appendix/b8_alternative_index_decile.png> <../results/robustnes
-s/index_sensitivity.png>] [42]) [43] [44 <../results/appendix/b9_grid_by_decile
-.png> <../results/appendix/b11_grid_no_capital.png>] (./main.aux) )
-(see the transcript file for additional information)
-pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
-, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exist
-, replaced by a fixed one
-
-</usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><
-/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></
-usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></us
-r/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr
-/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/
-local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/lo
-cal/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/loca
-l/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/
-texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/te
-xlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texli
-ve/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/
-2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2
-023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/202
-3/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2023
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2023/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2023/te
-xmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2023/texm
-f-dist/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2023/texmf-
-dist/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2023/texmf-di
-st/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2023/texmf-dist
-/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2023/texmf-dist/f
-onts/type1/public/cm-super/sfrm1200.pfb>
-Output written on main.pdf (44 pages, 2545967 bytes).
+Output written on main.pdf (44 pages, 2546513 bytes).
 Transcript written on main.log.
 Latexmk: Getting log file 'main.log'
 Latexmk: Examining 'main.fls'

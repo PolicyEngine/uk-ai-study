@@ -26,7 +26,7 @@ Macros emitted (grouped by source):
     \\genWageMarginCentralCostBn \\genWageMarginPssCostBn
     \\genWageMarginPssGiniChangePp \\genCentralRippleCostBn
 
-  central 20-draw Monte Carlo (results/robustness/central_monte_carlo.json):
+  central 50-draw Monte Carlo (results/robustness/central_monte_carlo.json):
     \\genCentralMcCostMeanBn \\genCentralMcCostSdBn \\genCentralMcCostMinBn
     \\genCentralMcCostMaxBn \\genCentralMcPovBhcMeanPp \\genCentralMcPovBhcSdPp
     \\genCentralMcGiniMeanPp \\genCentralMcGiniSdPp
@@ -186,7 +186,7 @@ def main() -> None:
 
     def fam_span(key, agg):
         d = jload(imc)
-        return agg(d[f][key]["mean"] for f in d)
+        return agg(d[f][key]["mean"] for f in FAMILY_MACRO)
 
     emit("genIncFamilyCostMeanMinBn",
          lambda: fam_span("exchequer_cost_bn", min), "{:.1f}", imc)

@@ -1,15 +1,15 @@
 {
   "scenario": "incidence_junior",
-  "displaced_weighted_m": 1.5430988073349,
-  "new_uc_benunits_thousands": 314.35675048828125,
+  "displaced_weighted_m": 1.5456647872924805,
+  "new_uc_benunits_thousands": 312.7653503417969,
   "exiting_uc_benunits_thousands": 61.4310302734375,
-  "net_new_uc_benunits_thousands": 252.92572021484375,
-  "new_uc_households_thousands": 297.6606140136719,
-  "new_uc_persons_thousands": 697.7534790039062,
+  "net_new_uc_benunits_thousands": 251.33432006835938,
+  "new_uc_households_thousands": 296.0692443847656,
+  "new_uc_persons_thousands": 694.5707397460938,
   "uc_spend_baseline_bn": 41.361952768,
-  "uc_spend_shocked_bn": 43.758968832,
-  "uc_spend_change_bn": 2.397016064,
-  "uc_housing_element_gross_entitlement_change_bn": 0.438506496,
+  "uc_spend_shocked_bn": 43.738382336,
+  "uc_spend_change_bn": 2.376429568,
+  "uc_housing_element_gross_entitlement_change_bn": 0.43062784,
   "passported_change_bn": {
     "free_school_meals": 0.0,
     "council_tax_benefit": 0.024435456

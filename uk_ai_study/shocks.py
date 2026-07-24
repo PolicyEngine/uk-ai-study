@@ -132,14 +132,23 @@ def draw_displaced(
     seed: int = 0,
 ) -> np.ndarray:
     """Boolean displaced mask per eq 3.4 (employees only)."""
+    if not 0.0 <= scenario.displacement_rate <= 1.0:
+        raise ValueError("displacement_rate must be between zero and one")
     rng = np.random.default_rng(seed)
-    employed = persons["employment_income"].to_numpy() > 0
-    exposure = persons["exposure"].to_numpy()
+    earnings = persons["employment_income"].to_numpy(dtype=float)
+    weight = persons["weight"].to_numpy(dtype=float)
+    if np.any(~np.isfinite(weight)) or np.any(weight <= 0):
+        raise ValueError("weights must be finite and positive")
+    employed = earnings > 0
+    if not employed.any():
+        return np.zeros(len(persons), dtype=bool)
+    exposure = persons["exposure"].to_numpy(dtype=float)
+    if np.any(~np.isfinite(exposure[employed])):
+        raise ValueError("exposure must be present and finite for every employee")
     # JR16 normalises C-AIOE so the least-exposed sector scores 0 (and thus
     # receives no eq 3.4 job losses); the raw standardised score is negative
     # for low-exposure groups, which would corrupt the quota weights.
     exposure = exposure - exposure[employed].min()
-    weight = persons["weight"].to_numpy()
     # Employees without an observed SOC code form their own pseudo-group
     # (carrying their mean-imputed exposure), so the displacement universe is
     # ALL employees and matches the wage-uplift universe (#1, finding 7).
@@ -209,6 +218,13 @@ def apply_shocks(
     theta = shocked["complementarity"].to_numpy(dtype=float)
     weight = shocked["weight"].to_numpy(dtype=float)
     baseline_workers = employment > 0
+    if not baseline_workers.any():
+        capital_factor = (
+            BASELINE_CAPITAL_RETURN + scenario.capital_return_increase
+        ) / BASELINE_CAPITAL_RETURN
+        for column in ("savings_interest_income", "dividend_income"):
+            shocked[column] = shocked[column].to_numpy(dtype=float) * capital_factor
+        return shocked
     theta_bar = float(
         (theta * weight)[baseline_workers].sum() / weight[baseline_workers].sum()
     )

@@ -19,11 +19,12 @@ seed 0, period 2025 (the weights' calibration year).
 
 IMPORTANT (R2-9): constituency-level outputs are SYNTHETIC demographic/
 income projections — calibrated survey weights over imputed-SOC enhanced-FRS
-households under a stylised shock — not observed local data. Single-seed
-point estimates; constituency-level sampling/imputation uncertainty is not
-quantified here.
-TODO(R2-9, rebuild-time): nested Monte Carlo over the SOC-imputation draw
-and the displacement draw to attach constituency-level uncertainty bands.
+households under a stylised shock — not observed local data. They are
+single-seed point estimates and constituency-level sampling/imputation
+uncertainty is not quantified. Geography is therefore confined to the
+appendix and excluded from headline inference; a nested imputation and
+displacement Monte Carlo would be required before promoting these estimates
+to headline results.
 
 Outputs (results/geo/):
   constituency_impacts.csv   code, name, region, metrics
