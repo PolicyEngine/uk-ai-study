@@ -186,7 +186,7 @@ def main() -> None:
 
     def fam_span(key, agg):
         d = jload(imc)
-        return agg(d[f][key]["mean"] for f in d)
+        return agg(d[f][key]["mean"] for f in FAMILY_MACRO)
 
     emit("genIncFamilyCostMeanMinBn",
          lambda: fam_span("exchequer_cost_bn", min), "{:.1f}", imc)

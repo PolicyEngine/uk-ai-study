@@ -548,6 +548,95 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
     return 0
 
 
+def attest_existing(results_dir: Path, source_root: Path) -> None:
+    """Attest an already completed, manifest-valid isolated build.
+
+    This recovery mode is intentionally validation-heavy: it is for a build
+    whose final presentation stage was repaired in place after all simulation
+    stages completed. It never runs simulations or publishes files itself.
+    """
+    if check(MANIFEST, results_dir=results_dir, verify_hashes=False):
+        raise SystemExit("cannot attest an invalid or incomplete build tree")
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=source_root,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    files = {
+        str(p.relative_to(results_dir)): sha256(p)
+        for p in sorted(results_dir.rglob("*"))
+        if p.is_file()
+        and p.name != ATTESTATION
+        and p.name not in IGNORED_RESULT_FILES
+    }
+    input_paths = sorted(
+        {
+            rel
+            for stage in topo_order(MANIFEST)
+            for rel in stage.get("inputs", [])
+            if (source_root / rel).is_file()
+        }
+    )
+    attestation = {
+        "git_commit": commit,
+        "git_dirty_at_build": False,
+        "invoking_checkout_dirty_at_start": False,
+        "started_utc": None,
+        "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "recovery_note": (
+            "Attested after a presentation-only TeX macro-reader repair; "
+            "all simulation stages completed in the same isolated build tree."
+        ),
+        "python": {
+            "version": platform.python_version(),
+            "implementation": platform.python_implementation(),
+            "executable": PY,
+        },
+        "package_versions": {
+            name: importlib.metadata.version(name)
+            for name in (
+                "uk-ai-study",
+                "policyengine-uk",
+                "policyengine-core",
+                "policyengine-uk-data",
+                "numpy",
+                "pandas",
+                "matplotlib",
+                "geopandas",
+            )
+        },
+        "stages": [
+            {"stage": s["stage"], "cmd": s["cmd"]} for s in topo_order(MANIFEST)
+        ],
+        "script_sha256": {
+            str(f.relative_to(source_root)): sha256(f)
+            for f in sorted((source_root / "analysis").glob("*.py"))
+        }
+        | {
+            str(f.relative_to(source_root)): sha256(f)
+            for f in sorted((source_root / "uk_ai_study").glob("*.py"))
+        },
+        "inputs": {rel: sha256(source_root / rel) for rel in input_paths},
+        "presentation_files": {
+            rel: sha256(source_root / rel)
+            for stage in topo_order(MANIFEST)
+            for rel in stage.get("repo_outputs", [])
+            if (source_root / rel).is_file()
+        },
+        "seed_policy": (
+            "headline single-draw results use seed 0; incidence and policy "
+            "Monte Carlo use paired seeds 0..49; other sensitivities declare "
+            "their own fixed draw budgets"
+        ),
+        "non_generated": NON_GENERATED,
+        "files": files,
+    }
+    (results_dir / ATTESTATION).write_text(json.dumps(attestation, indent=2))
+    print(f"ATTESTED existing build tree at {results_dir} ({len(files)} files)")
+
+
 def build(manifest, keep_build=False, only_stages=None):
     ordered = topo_order(manifest)
     if only_stages:
@@ -759,9 +848,13 @@ def main():
                     help="run only these stages (no publish)")
     ap.add_argument("--keep-build", action="store_true",
                     help="keep the temp worktree after a successful build")
+    ap.add_argument("--attest-existing", type=Path,
+                    help="validate and attest an existing completed results tree")
     args = ap.parse_args()
 
-    if args.dry_run:
+    if args.attest_existing:
+        attest_existing(args.attest_existing.resolve(), ROOT)
+    elif args.dry_run:
         dry_run(MANIFEST)
     elif args.check:
         sys.exit(check(MANIFEST, verify_hashes=not args.no_hashes))
