@@ -1,0 +1,92 @@
+{
+  "scenario": {
+    "name": "recession_2008_style",
+    "displacement_rate": 0.026,
+    "incidence": "uniform (no exposure gradient)",
+    "wage_uplift": 0.0,
+    "capital_return_increase": 0.0,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "baseline_levels_pct": {
+    "poverty_bhc": 14.607251204109343,
+    "poverty_ahc": 18.690132778805474,
+    "relative_poverty_bhc": 18.45820824682482,
+    "gini": 30.908967456288927
+  },
+  "draws": [
+    {
+      "seed": 0,
+      "displaced_weighted_m": 0.5949339866638184,
+      "poverty_change_bhc_pp": 0.7616143923213192,
+      "poverty_change_ahc_pp": 0.8533308797314537,
+      "relative_poverty_change_bhc_pp": 0.2491320447106926,
+      "gini_change_pp": 0.3871214242073928
+    },
+    {
+      "seed": 1,
+      "displaced_weighted_m": 0.6010416150093079,
+      "poverty_change_bhc_pp": 0.7197101363526415,
+      "poverty_change_ahc_pp": 0.8237975432200173,
+      "relative_poverty_change_bhc_pp": 0.19607930349508362,
+      "gini_change_pp": 0.35589843739360916
+    },
+    {
+      "seed": 2,
+      "displaced_weighted_m": 0.5740764737129211,
+      "poverty_change_bhc_pp": 0.8392962258722936,
+      "poverty_change_ahc_pp": 0.9256269102973724,
+      "relative_poverty_change_bhc_pp": 0.31558486620280324,
+      "gini_change_pp": 0.35560923825278534
+    },
+    {
+      "seed": 3,
+      "displaced_weighted_m": 0.6257177591323853,
+      "poverty_change_bhc_pp": 0.9022218611869054,
+      "poverty_change_ahc_pp": 0.9785443588946952,
+      "relative_poverty_change_bhc_pp": 0.44270366642649994,
+      "gini_change_pp": 0.4392991377510924
+    },
+    {
+      "seed": 4,
+      "displaced_weighted_m": 0.5910415649414062,
+      "poverty_change_bhc_pp": 0.807978353486638,
+      "poverty_change_ahc_pp": 0.7433616039782986,
+      "relative_poverty_change_bhc_pp": 0.23452723351660432,
+      "gini_change_pp": 0.3383938992271962
+    }
+  ],
+  "mean": {
+    "displaced_weighted_m": 0.5973622798919678,
+    "poverty_change_bhc_pp": 0.8061641938439597,
+    "poverty_change_ahc_pp": 0.8649322592243675,
+    "relative_poverty_change_bhc_pp": 0.28760542287033675,
+    "gini_change_pp": 0.3752644273664152
+  },
+  "sd_across_seeds": {
+    "displaced_weighted_m": 0.018745983068084834,
+    "poverty_change_bhc_pp": 0.07033329056947801,
+    "poverty_change_ahc_pp": 0.09110108526278647,
+    "relative_poverty_change_bhc_pp": 0.09684115853212977,
+    "gini_change_pp": 0.0398805603650474
+  },
+  "per_pp_of_displacement": {
+    "poverty_change_bhc_pp": 0.310063151478446,
+    "poverty_change_ahc_pp": 0.33266625354783363,
+    "relative_poverty_change_bhc_pp": 0.1106174703347449,
+    "gini_change_pp": 0.14433247206400585
+  },
+  "observed_hbai_2007_08_to_2010_11": {
+    "absolute_poverty_bhc_pp": -1.0,
+    "relative_poverty_bhc_pp": -2.0,
+    "relative_poverty_ahc_pp": -1.0,
+    "gini_pp": -1.0,
+    "note": "DWP HBAI / IFS: absolute BHC poverty roughly flat to slightly falling over 2007/08-2010/11; relative poverty FELL because the median fell while benefits were uprated with high RPI inflation; Gini roughly flat through 2009/10 then fell in 2010/11."
+  },
+  "interpretation": "The framework is an impact-effect calculator: it models the first-year mechanical income loss from displacement with the poverty line frozen, no benefit uprating, no unemployment-duration dynamics and no behavioural response. History over 2008-10 combined a similar-sized employment shock with inflation-uprated benefits and a falling median, so measured poverty and inequality did not rise. The gap between the simulated and observed changes quantifies what those absorbing channels delivered."
+}
