@@ -642,7 +642,6 @@ INPUT sections/methodology.tex
 INPUT ./sections/methodology.tex
 INPUT ./sections/methodology.tex
 INPUT sections/methodology.tex
-INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT ./sections/results.tex
 INPUT ./sections/results.tex
 INPUT ./sections/results.tex
@@ -729,6 +728,7 @@ INPUT sections/references.tex
 INPUT ./sections/references.tex
 INPUT ./sections/references.tex
 INPUT sections/references.tex
+INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT ./sections/appendix.tex
 INPUT ./sections/appendix.tex
 INPUT ./sections/appendix.tex
