@@ -1,10 +1,10 @@
 {
-  "git_commit": "43a51a0baf91ff81c5b6f1e739f37313c6b59e91",
+  "git_commit": "e85be0ba8b24661977dee70373b44859a4c8caea",
   "git_dirty_at_build": false,
   "invoking_checkout_dirty_at_start": false,
   "started_utc": null,
-  "finished_utc": "2026-07-24T14:12:17Z",
-  "recovery_note": "Attested after a presentation-only TeX macro-reader repair; all simulation stages completed in the same isolated build tree.",
+  "finished_utc": "2026-07-29T10:40:29Z",
+  "recovery_note": "Attested existing results tree without a full clean-room rerun; see git history for which stages were added or repaired since the last full attested build.",
   "python": {
     "version": "3.13.3",
     "implementation": "CPython",
@@ -175,6 +175,20 @@
       ]
     },
     {
+      "stage": "poverty_decomposition",
+      "cmd": [
+        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "analysis/poverty_decomposition.py"
+      ]
+    },
+    {
+      "stage": "recession_backcast",
+      "cmd": [
+        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "analysis/recession_backcast.py"
+      ]
+    },
+    {
       "stage": "geo_impact",
       "cmd": [
         "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
@@ -232,7 +246,9 @@
     "analysis/monte_carlo_families.py": "79d20332215bef7f14612c69fe3718c972f2e7cd4c4ef0dfb47a74355c4f2432",
     "analysis/paper_scenarios.py": "ad0c5a822b6cd92e6c3b1ea62306b24a1a8076fe65258bec14b028e2f650a4b8",
     "analysis/policy_counterfactuals.py": "cdc29d7853e54eaec8d59e837e9d806da898b631687f4e3f39bc313cd4a3aab0",
-    "analysis/rebuild.py": "4b054891c65d683fb17d5a505383a0558da698432f7d20018de1fece97744675",
+    "analysis/poverty_decomposition.py": "041cddd5cb2ddc49dcca8a2a0a6ce43679ac41ce4adaf5e773494a7a0b729a14",
+    "analysis/rebuild.py": "207c5c704a29b6241ff59c5d240a7a79edb1c59e06617f16210e974ed1013e84",
+    "analysis/recession_backcast.py": "e4e004173a7684bb8dd9e75cfb0a20e62be55ef6e5f92e585f752e65902db421",
     "analysis/replicate_gov_spending_5yr.py": "ee3385327ff12d42665067dcdc56b4fcc5252db4104251c0a02511becc4396d4",
     "analysis/replicate_jr16.py": "d2289de3b6bb38639e4691f586d519a5a697883437163ae60892080e458e42a3",
     "analysis/robustness.py": "9d4f618a28f72c202081da1a6365b687905ab253db09defcec9c3485386177b1",
@@ -257,8 +273,8 @@
     "data/uk_constituencies_2024.geojson": "9b7f2920bd722faaf9cdd82c4e4b18885fe03efdd94fb5c740d79abe39054099"
   },
   "presentation_files": {
-    "paper/values_generated.tex": "325f1f24c7ab2152e53ce9edaeb5efa0dc0a61d31ff817988f0ae97df25cc642",
-    "paper/main.pdf": "1f6db78e9719408198ee50477d847ba382a2bc1e9700cff0e560c62e9f206649"
+    "paper/values_generated.tex": "f535e850a97cc7500c428469e6f5a5305a32a954cbf7172ee5a279ccd1ef5cb3",
+    "paper/main.pdf": "92e1bea0e1d55674352befc5ff9ab03c9398a93bdba70ec742a810a3640bee2d"
   },
   "seed_policy": "headline single-draw results use seed 0; incidence and policy Monte Carlo use paired seeds 0..49; other sensitivities declare their own fixed draw budgets",
   "non_generated": [],
@@ -359,6 +375,8 @@
     "robustness/mixed_wage_adjustment.json": "376e2d9ab0d19d0a0308c6f3bd65121822014aa9812680f9fe16fe7e10d24b8e",
     "robustness/policy_draws.csv": "6d16207169871b4d6dbbcf61764678853beb181812de59517ce96e449531a252",
     "robustness/policy_monte_carlo.json": "838fe786b177d86fac464c4d50a6748bfca5ed3e99a1ac5540d365f0e046e0d3",
+    "robustness/poverty_decomposition.json": "4562d627803291715029009dbfb1381c32149b98688b275c4da426bec1b484e7",
+    "robustness/recession_backcast.json": "2caaff14bc44e541a16dc6b99b70cf9b05d4dd0c6ef0176f2418360a7b8336e8",
     "robustness/sensitivity_run.log": "84607d2cc80e7d75be2a749caf4d6d1462e937b7809b5f198289a8ae88619500",
     "robustness/survivor_wage_grid.csv": "cfa0aa851cce155f3c9c95e1a07f917efdb72b0709ca457b83512112f15320c7",
     "robustness/uniform_comparator.json": "516abd6c896349ade9a9f5d21ff408a3a4917d6db677fb6fe1a61d538a197283",

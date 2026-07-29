@@ -343,6 +343,20 @@ MANIFEST = [
         "after": [],
     },
     {
+        "stage": "poverty_decomposition",
+        "cmd": [PY, "analysis/poverty_decomposition.py"],
+        "outputs": ["robustness/poverty_decomposition.json"],
+        "inputs": FRS_INPUTS,
+        "after": [],
+    },
+    {
+        "stage": "recession_backcast",
+        "cmd": [PY, "analysis/recession_backcast.py"],
+        "outputs": ["robustness/recession_backcast.json"],
+        "inputs": FRS_INPUTS,
+        "after": [],
+    },
+    {
         "stage": "geo_impact",
         "cmd": [PY, "analysis/geo_impact.py"],
         "outputs": [
@@ -597,8 +611,9 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
         "started_utc": None,
         "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "recovery_note": (
-            "Attested after a presentation-only TeX macro-reader repair; "
-            "all simulation stages completed in the same isolated build tree."
+            "Attested existing results tree without a full clean-room rerun; "
+            "see git history for which stages were added or repaired since "
+            "the last full attested build."
         ),
         "python": {
             "version": platform.python_version(),
