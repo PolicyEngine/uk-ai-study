@@ -13,7 +13,7 @@ variants below), the decomposition in Figure~\ref{fig:decomp} and the preset
 scenarios are single draws at seed~0, while the five incidence families
 report means over 50 draws (seeds 0--49). The
 decile transition and wage-gain profiles (Figures~\ref{fig:transition}
-and~\ref{fig:wages}) are means over 50 independent draws. The robustness
+and~\ref{fig:wages}) are means over the same 50 paired draws. The robustness
 summary and the assignment-draw intervals in Figure~\ref{fig:decomp-ci} are
 20-draw Monte Carlo runs, with $\pm$ values reported as standard deviations
 across draws. Within each draw, ordering keys are uniform within occupation
@@ -305,50 +305,20 @@ the middle and upper deciles. Adding this particular ripple raises the
 simulated fiscal cost; other routing and wage-response assumptions could
 produce different results.
 
-\subsection{Data appendix: constituency-level occupation imputation}
-\label{app:geo-imputation}
+\subsection{Enhanced-dataset sensitivity}
+\label{app:enhanced-dataset}
 
-The constituency results use PolicyEngine's 650-constituency weight
-matrix, which indexes the enhanced FRS 2023--24 dataset (55,764 employee
-records); on that dataset the serial-number join to observed SOC major
-group is invalid, so occupation had to be imputed. I drew each enhanced
-record's SOC major group from the survey-weighted occupation distribution
-of the plain FRS 2024--25 (12,800 employees, 99.6 per cent with observed
-SOC) within cells defined by age band $\times$ gender $\times$ region
-$\times$ individual-earnings decile, at seed~0. On a weighted basis 98.9
-per cent of employees were imputed from the full four-way cell, 1.0 per
-cent from an age--gender--decile fallback and 0.1 per cent from the
-marginal distribution. % results/geo/imputation_notes.json
-As stressed in the main text, occupation is
-therefore imputed rather than observed at the constituency level:
-cross-constituency variation reflects demographic and earnings
-composition (plus one seed-0 draw), not directly measured local
-occupation mixes, and the enhanced-dataset results are not directly
-comparable to the plain-FRS poverty numbers elsewhere in the paper.
-
-\medskip\noindent\emph{Why the poverty response is larger.} On the
-enhanced FRS 2023--24 dataset the national BHC poverty response to the
-central scenario is $+2.9$ percentage points, roughly 1.6 times the $+1.81$
-points of the plain-FRS central run. Running the central scenario on the
-enhanced dataset at the main analysis's period attributes essentially the
-whole gap ($+1.14$ of $+1.14$ points) to the dataset itself, with the
-period contributing almost nothing on the enhanced data ($+0.001$ points).
+On PolicyEngine's enhanced FRS 2023--24 dataset the national BHC poverty
+response to the central scenario is $+3.0$ percentage points, roughly 1.6
+times the $+1.81$ points of the plain-FRS central run. A decomposition of
+the gap attributes essentially all of it to the dataset itself ($+1.16$
+of the $+1.14$-point total, evaluated at the main analysis's period), with
+a small negative period component on the enhanced data ($-0.02$ points). The enhanced dataset's calibrated weights and incomes
+gross to a substantially different employee base (2.97 million rather than
+1.56 million workers displaced at the same 7 per cent rate), so its fiscal
+aggregates are not comparable with the plain-FRS numbers elsewhere in the
+paper.
 % results/robustness/enhanced_dataset_central.json decomposition_bhc_poverty_pp
-
-\medskip\noindent\emph{Constituency ranking.} Because the constituency
-weights are calibrated to demographic and income targets that contain no
-local occupation mix, the constituency figures are synthetic
-demographic/income projections of the national scenario. The pattern of
-simulated losses is concentrated in high-exposure London, South East and
-Eastern commuter-belt seats (worst around $-6$ per cent of household
-income), while a minority of constituencies (81 of 650, gaining up to
-$+2.9$ per cent) gain on net where wage and capital gains outweigh
-displacement losses. % results/geo/constituency_impacts.csv
-Individual named rankings rest on a single occupation imputation
-and a single seed-0 displacement draw; their stability has not been
-established, so I report the pattern rather than a precise league table.
-A nested Monte Carlo over imputation draws and displacement draws is
-left to future work.
 
 \subsection{The scenario grid by decile, and without the capital shock}
 
