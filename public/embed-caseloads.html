@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+p{margin:16px 0}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/caseloads.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows={};
+  csv.trim().split('\n').slice(1).forEach(l=>{
+    const c=l.split(',');
+    rows[c[0]]={netNew:parseFloat(c[4]),spendChange:parseFloat(c[9]),baseline:parseFloat(c[7])};
+  });
+  const c=rows['central'],h=rows['high'],l=rows['low'];
+  let html=`<p>Read on the delivery side, the central shock draws a net ${Math.round(c.netNew)},000 benefit units into Universal Credit and raises annual UC spending by £${c.spendChange.toFixed(1)} billion from a baseline of £${c.baseline.toFixed(1)} billion — about 1% of DWP's roughly £334 billion of welfare spending.`;
+  if(h) html+=` The high scenario roughly doubles this (${Math.round(h.netNew)},000 net new benefit units, +£${h.spendChange.toFixed(1)} billion)`;
+  if(l) html+=`, while the low scenario adds only ${Math.round(l.netNew)},000 benefit units and £${l.spendChange.toFixed(1)} billion.`;
+  html+=`</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>

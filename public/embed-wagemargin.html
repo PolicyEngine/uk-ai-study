@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+.note{font-size:14px;color:#6B7280}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/wage_margin.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{
+    const c=l.split(',');
+    return{scenario:c[0],displaced:parseFloat(c[1]),cost:parseFloat(c[3]),pov:parseFloat(c[4]),gini:parseFloat(c[6]),lambda:parseFloat(c[7])};
+  }).filter(r=>r.scenario.startsWith('mixed_lambda')).sort((a,b)=>a.lambda-b.lambda);
+  const w=rows[0],d=rows[rows.length-1];
+  let html=`<p>Whether AI adjusts through job losses or wage cuts matters as much as the size of the shock. Holding the same gross earnings loss fixed (7.77% of the baseline wage bill) and moving it from pure wage cuts (λ = 0) to pure displacement (λ = 1) lowers the simulated Exchequer cost from £${w.cost.toFixed(1)} billion to £${d.cost.toFixed(1)} billion, while raising the poverty increase from +${w.pov.toFixed(2)} to +${d.pov.toFixed(2)} percentage points — and flipping the sign of the inequality effect, from ${w.gini.toFixed(2)} to +${d.gini.toFixed(2)} Gini points. Wage cuts shave earnings at marginal tax rates and compress pay from above; displacement removes whole earnings blocks, partly offset by means-tested benefits.</p>`;
+    html+=`<table><tr><th>Displacement share (λ)</th><th>Displaced (m)</th><th>Exchequer cost (£bn/yr)</th><th>Poverty change, BHC (pp)</th><th>Gini change (pp)</th></tr>`;
+  rows.forEach(r=>{
+    html+=`<tr><td>${r.lambda.toFixed(2)}</td><td>${r.displaced.toFixed(2)}</td><td>£${r.cost.toFixed(1)}</td><td>+${r.pov.toFixed(2)}</td><td>${r.gini>=0?'+':'−'}${Math.abs(r.gini).toFixed(2)}</td></tr>`;
+  });
+  html+=`</table>`;
+  html+=`<p class="caption">Table 3: The same earnings loss on two adjustment margins</p>`;
+  html+=`<p class="note">λ = 0: all adjustment through occupation-level wage cuts proportional to AI exposure; λ = 1: all through job loss. Every row applies the same 2.6% survivor wage uplift and capital shock. Seed-0 comparisons, not equilibrium wage estimates.</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>

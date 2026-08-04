@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+.note{font-size:14px;color:#6B7280}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+const LABELS={
+  R1_wage_insurance:'R1: Wage insurance (50% of lost earnings, £15k cap)',
+  R2_uc_circuit_breaker:'R2: Universal Credit standard allowance +20%',
+  R3_cap_suspension_taper_cut:'R3: Benefit cap suspension + UC taper 55% → 45%'
+};
+fetch('./data/policy.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{
+    const c=l.match(/(".*?"|[^,]+)/g);
+    return{reform:c[0],family:c[1],cost:parseFloat(c[2]),povBhc:parseFloat(c[3]),povAhc:parseFloat(c[4]),gini:parseFloat(c[5]),perBhc:parseFloat(c[6]),perAhc:parseFloat(c[7])};
+  }).filter(r=>r.family==='exposure');
+  const r1=rows.find(r=>r.reform==='R1_wage_insurance');
+  const r2=rows.find(r=>r.reform==='R2_uc_circuit_breaker');
+  let html=`<p>We simulate three stylised policy responses on top of the central shock, each in force for 2026 only. Wage insurance buys roughly twice the total poverty reduction of either Universal Credit reform, but at roughly three-and-a-half to four times the cost: because the exposure-proportional shock displaces workers concentrated in the upper half of the distribution, most wage-insurance pounds flow to households in the top three baseline deciles, while the UC-side instruments concentrate spending in the bottom half.</p>`;
+    html+=`<table><tr><th>Reform</th><th>Annual cost (£bn)</th><th>Poverty change, BHC (pp)</th><th>Gini change (pp)</th><th>Cost per pp averted, AHC (£bn)</th></tr>`;
+  rows.forEach(r=>{
+    html+=`<tr><td>${LABELS[r.reform]||r.reform}</td><td>£${r.cost.toFixed(1)}</td><td>${r.povBhc.toFixed(2)}</td><td>${r.gini.toFixed(2)}</td><td>£${r.perAhc.toFixed(1)}</td></tr>`;
+  });
+  html+=`</table>`;
+  html+=`<p class="caption">Table 6: Policy reforms on top of the central shock, 2026</p>`;
+  html+=`<p>Using poverty averted per pound as the sole criterion, the UC-side reforms (£${r2.perAhc.toFixed(1)} billion per point) outperform this wage-insurance design (£${r1.perAhc.toFixed(1)} billion per point). Wage insurance serves different aims — earnings-loss compensation and consumption smoothing — so this is not a complete instrument ranking.</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>

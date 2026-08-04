@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Roboto',-apple-system,sans-serif;background:#fff}
+.controls{display:flex;justify-content:center;padding:12px 0 4px}
+.toggle-group{display:flex;background:#F2F4F7;border-radius:8px;padding:3px}
+.toggle-btn{padding:8px 20px;border:none;background:transparent;font-family:'Roboto',sans-serif;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;border-radius:6px;transition:all .2s}
+.toggle-btn:hover{background:#E2E8F0}
+.toggle-btn.active{background:#319795;color:#fff}
+#chart{width:100%;height:380px}
+.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="controls"><div class="toggle-group" id="toggles"></div></div>
+<div id="chart"></div>
+<div class="figcaption">Figure 8: Displacement share and income change by age band (central scenario)</div>
+<script>
+const SCENARIOS=[
+  {key:'central',label:'Central'},
+  {key:'central_youth_tilted',label:'Youth-tilted'}
+];
+fetch('./data/age_bands.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{
+    const c=l.split(',');
+    return{scenario:c[0],band:c[1].replace('65-+','65+'),share:+c[2]*100,change:+c[3]};
+  });
+  let sel='central';
+  const tg=document.getElementById('toggles');
+  SCENARIOS.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='toggle-btn'+(s.key===sel?' active':'');
+    b.textContent=s.label;
+    b.onclick=()=>{sel=s.key;render();document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.toggle('active',x===b))};
+    tg.appendChild(b);
+  });
+  function render(){
+    const d=rows.filter(r=>r.scenario===sel).reverse();
+    const y=d.map(r=>r.band);
+    Plotly.newPlot('chart',[
+      {y,x:d.map(r=>r.share),xaxis:'x',yaxis:'y',type:'bar',orientation:'h',
+       marker:{color:'#319795'},
+       text:d.map(r=>r.share.toFixed(1)+'%'),textposition:'auto',textfont:{size:12},
+       hovertemplate:'%{y}: %{x:.1f}% of displaced workers<extra></extra>',showlegend:false},
+      {y,x:d.map(r=>r.change),xaxis:'x2',yaxis:'y2',type:'bar',orientation:'h',
+       marker:{color:d.map(r=>r.change>=0?'#319795':'#4B5563')},
+       text:d.map(r=>(r.change<0?'−':'+')+'£'+Math.abs(r.change).toFixed(0)),textposition:'auto',textfont:{size:12},
+       hovertemplate:'%{y}: £%{x:,.0f} per year<extra></extra>',showlegend:false}
+    ],{
+      grid:{rows:1,columns:2,pattern:'independent'},
+      annotations:[
+        {text:'<b>Share of displaced workers (%)</b>',xref:'paper',yref:'paper',x:0.14,y:-0.16,showarrow:false,font:{size:13,color:'#344054'}},
+        {text:'<b>Average annual income change (£)</b>',xref:'paper',yref:'paper',x:0.9,y:-0.16,showarrow:false,font:{size:13,color:'#344054'}}
+      ],
+      xaxis:{zeroline:false,showgrid:true,gridcolor:'#F2F4F7'},
+      xaxis2:{zeroline:true,zerolinecolor:'#CBD5E1',showgrid:true,gridcolor:'#F2F4F7'},
+      yaxis:{automargin:true,tickfont:{size:13}},
+      yaxis2:{showticklabels:false},
+      margin:{t:16,r:20,b:60,l:10},
+      font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+    },{displayModeBar:false,responsive:true});
+  }
+  render();
+});
+</script>
+</body>
+</html>
