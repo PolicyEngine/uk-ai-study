@@ -33,14 +33,14 @@ fetch('./data/policy.csv')
   }).filter(r=>r.family==='exposure');
   const r1=rows.find(r=>r.reform==='R1_wage_insurance');
   const r2=rows.find(r=>r.reform==='R2_uc_circuit_breaker');
-  let html=`<p>We simulate three stylised policy responses on top of the central shock, each in force for 2026 only. Wage insurance buys roughly twice the total poverty reduction of either Universal Credit reform, but at roughly three-and-a-half to four times the cost: because the exposure-proportional shock displaces workers concentrated in the upper half of the distribution, most wage-insurance pounds flow to households in the top three baseline deciles, while the UC-side instruments concentrate spending in the bottom half.</p>`;
+  let html=`<p>Wage insurance produces roughly twice the total poverty reduction of either Universal Credit reform, but at roughly three-and-a-half to four times the cost: because the exposure-proportional shock displaces workers concentrated in the upper half of the distribution, most wage-insurance pounds flow to households in the top three baseline deciles, while the UC-side instruments concentrate spending in the bottom half.</p>`;
     html+=`<table><tr><th>Reform</th><th>Annual cost (£bn)</th><th>Poverty change, BHC (pp)</th><th>Gini change (pp)</th><th>Cost per pp averted, AHC (£bn)</th></tr>`;
   rows.forEach(r=>{
     html+=`<tr><td>${LABELS[r.reform]||r.reform}</td><td>£${r.cost.toFixed(1)}</td><td>${r.povBhc.toFixed(2)}</td><td>${r.gini.toFixed(2)}</td><td>£${r.perAhc.toFixed(1)}</td></tr>`;
   });
   html+=`</table>`;
   html+=`<p class="caption">Table 6: Policy reforms on top of the central shock, 2026</p>`;
-  html+=`<p>Using poverty averted per pound as the sole criterion, the UC-side reforms (£${r2.perAhc.toFixed(1)} billion per point) outperform this wage-insurance design (£${r1.perAhc.toFixed(1)} billion per point). Wage insurance serves different aims — earnings-loss compensation and consumption smoothing — so this is not a complete instrument ranking.</p>`;
+  html+=`<p>Using poverty averted per pound as the sole criterion, the UC-side reforms avert a percentage point of AHC poverty for £${r2.perAhc.toFixed(1)} billion, against £${r1.perAhc.toFixed(1)} billion for this wage-insurance design. Wage insurance serves different aims — earnings-loss compensation and consumption smoothing — so this is not a complete instrument ranking.</p>`;
   document.getElementById('content').innerHTML=html;
 });
 </script>

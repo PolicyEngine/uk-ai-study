@@ -45,7 +45,7 @@ fetch('./data/deciles.csv')
       marker:{color:d.map(r=>r.change>=0?'#319795':'#616161')},
       hovertemplate:'Decile %{x}: £%{y:,.0f}<extra></extra>'
     }],{
-      xaxis:{title:'Equivalised household income decile',dtick:1},
+      xaxis:{dtick:1},
       yaxis:{title:'Average annual household income change (£)',tickformat:',.0f'},
       margin:{t:20,r:20,b:60,l:80},
       font:{family:'Roboto, sans-serif'},

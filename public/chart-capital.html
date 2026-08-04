@@ -22,7 +22,7 @@ fetch('./data/capital.csv')
     type:'bar',marker:{color:'#319795'},
     hovertemplate:'Decile %{x}: %{y:.1f}% of all capital income (£%{customdata:.1f}bn)<extra></extra>'
   }],{
-    xaxis:{title:'Equivalised disposable income decile',dtick:1},
+    xaxis:{dtick:1},
     yaxis:{title:'Share of all capital income (%)',ticksuffix:'%'},
     margin:{t:20,r:20,b:60,l:80},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
   },{displayModeBar:false,responsive:true});

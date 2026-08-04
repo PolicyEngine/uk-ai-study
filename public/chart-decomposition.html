@@ -24,7 +24,7 @@ fetch('./data/decomposition.csv')
     {x,y:rows.map(r=>r.disp),name:'Disposable income',type:'scatter',mode:'lines+markers',line:{color:'#1A202C',width:2.5,shape:'spline',smoothing:1.0},marker:{color:'#1A202C',size:9,symbol:'diamond'},hovertemplate:'%{y:.2f}%<extra>Disposable income</extra>'}
   ],{
     barmode:'relative',
-    xaxis:{title:'Equivalised disposable income decile',dtick:1},
+    xaxis:{dtick:1},
     yaxis:{title:'Change as % of baseline disposable income',ticksuffix:'%'},
     legend:{orientation:'h',y:-0.22,x:0.5,xanchor:'center'},
     margin:{t:20,r:20,b:90,l:80},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'

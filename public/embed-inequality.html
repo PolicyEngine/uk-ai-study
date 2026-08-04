@@ -24,7 +24,7 @@ fetch('./data/scenarios.csv')
   });
   const c=rows['central'],hi=rows['high'];
   document.getElementById('content').innerHTML=
-    `<p>Measured income inequality would rise in every scenario modelled. In the central scenario, the Gini coefficient of equivalised household disposable income increases from ${c.base.toFixed(3)} to ${c.shocked.toFixed(3)}, a rise of ${((c.shocked-c.base)*100).toFixed(1)} percentage points. In the high scenario it reaches ${hi.shocked.toFixed(3)}. The baseline Gini sits below the official 0.34 because the study uses the plain Family Resources Survey without the SPI top-income adjustment, so levels are not comparable to official statistics, though changes are computed on a consistent basis.</p>`;
+    `<p>Measured income inequality would rise in every scenario modelled. In the central scenario, the Gini coefficient of equivalised (household-size-adjusted) disposable income increases from ${c.base.toFixed(3)} to ${c.shocked.toFixed(3)}, a rise of ${((c.shocked-c.base)*100).toFixed(1)} percentage points. In the high scenario it reaches ${hi.shocked.toFixed(3)}. The baseline Gini sits below the official 0.34 because the study uses the plain Family Resources Survey without the Survey of Personal Incomes (SPI) top-income adjustment used in official statistics, so levels are not comparable to official statistics, though changes are computed on a consistent basis.</p>`;
 });
 </script>
 </body>

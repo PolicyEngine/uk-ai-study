@@ -34,7 +34,7 @@ fetch('./data/grid.csv')
   const rows=csv.trim().split('\n').slice(1).map(l=>l.split(',').map(Number));
   const unemp=[...new Set(rows.map(r=>r[0]))].sort((a,b)=>a-b);
   const wage=[...new Set(rows.map(r=>r[1]))].sort((a,b)=>a-b);
-  let sel=METRICS[2];
+  let sel=METRICS[0];
   const tg=document.getElementById('toggles');
   METRICS.forEach(m=>{
     const b=document.createElement('button');

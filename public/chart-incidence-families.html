@@ -75,7 +75,7 @@ fetch('./data/incidence_deciles.csv')
       };
     });
     Plotly.newPlot('chart',traces,{
-      xaxis:{title:'Equivalised disposable income decile (1 = poorest, 10 = richest)',dtick:1},
+      xaxis:{dtick:1},
       yaxis:{title:sel.ytitle,ticksuffix:'%',zeroline:true,zerolinecolor:'#CBD5E1',zerolinewidth:1.5},
       hovermode:'x unified',showlegend:false,
       margin:{t:10,r:20,b:60,l:70},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'

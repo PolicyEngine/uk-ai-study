@@ -22,7 +22,7 @@ fetch('./data/caseloads.csv')
     rows[c[0]]={netNew:parseFloat(c[4]),spendChange:parseFloat(c[9]),baseline:parseFloat(c[7])};
   });
   const c=rows['central'],h=rows['high'],l=rows['low'];
-  let html=`<p>Read on the delivery side, the central shock draws a net ${Math.round(c.netNew)},000 benefit units into Universal Credit and raises annual UC spending by £${c.spendChange.toFixed(1)} billion from a baseline of £${c.baseline.toFixed(1)} billion — about 1% of DWP's roughly £334 billion of welfare spending.`;
+  let html=`<p>Read on the delivery side, the central shock draws a net ${Math.round(c.netNew)},000 benefit units (a single adult or couple, plus any dependent children — the unit at which Universal Credit is assessed) into Universal Credit and raises annual UC spending by £${c.spendChange.toFixed(1)} billion from a baseline of £${c.baseline.toFixed(1)} billion — about 1% of DWP's roughly £334 billion of welfare spending.`;
   if(h) html+=` The high scenario roughly doubles this (${Math.round(h.netNew)},000 net new benefit units, +£${h.spendChange.toFixed(1)} billion)`;
   if(l) html+=`, while the low scenario adds only ${Math.round(l.netNew)},000 benefit units and £${l.spendChange.toFixed(1)} billion.`;
   html+=`</p>`;
