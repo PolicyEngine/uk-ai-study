@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+.note{font-size:14px;color:#6B7280}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/incidence.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{
+    const c=l.split(',');
+    return{family:c[0],label:c[1],displaced:parseFloat(c[2]),cost:parseFloat(c[3]),costSd:parseFloat(c[4]),pov:parseFloat(c[5]),povSd:parseFloat(c[6]),gini:parseFloat(c[7]),giniSd:parseFloat(c[8])};
+  });
+  const uni=rows.find(r=>r.family==='uniform'),klein=rows.find(r=>r.family==='klein_top_loaded');
+  let html=`<p>Everything above conditions on exposure-proportional incidence, but who bears the shock is at least as uncertain as its size. We reallocate the same central calibration across five incidence families. Holding the aggregate displacement quota fixed, the mean Exchequer cost ranges from £${uni.cost.toFixed(1)} billion under uniform incidence to £${klein.cost.toFixed(1)} billion under an author-designed top-loaded stress test: within these calibrations, who bears the shock materially changes its simulated cost. These are comparisons using identical random draws across families, not estimates of which pattern will occur.</p>`;
+    html+=`<table><tr><th>Incidence family</th><th>Displaced (m)</th><th>Exchequer cost (£bn/yr)</th><th>Poverty change, BHC (pp)</th><th>Gini change (pp)</th></tr>`;
+  rows.forEach(r=>{
+    html+=`<tr><td>${r.label}</td><td>${r.displaced.toFixed(2)}</td><td>£${r.cost.toFixed(1)} ± ${r.costSd.toFixed(1)}</td><td>+${r.pov.toFixed(2)} ± ${r.povSd.toFixed(2)}</td><td>+${r.gini.toFixed(2)} ± ${r.giniSd.toFixed(2)}</td></tr>`;
+  });
+  html+=`</table>`;
+  html+=`<p class="caption">Table 2: The central shock under five incidence calibrations (means ± sd over 50 paired draws)</p>`;
+  html+=`<p>Top-loaded incidence has a larger fiscal cost because displaced high earners take larger income tax and National Insurance liabilities with them; uniform incidence has a lower fiscal cost but produces a reliably larger inequality effect. The Gini rises in all five families.</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>

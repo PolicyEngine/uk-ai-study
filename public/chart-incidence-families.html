@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Roboto',-apple-system,sans-serif;background:#fff}
+.controls{display:flex;justify-content:center;padding:12px 0 4px}
+.toggle-group{display:flex;background:#F2F4F7;border-radius:8px;padding:3px}
+.toggle-btn{padding:8px 20px;border:none;background:transparent;font-family:'Roboto',sans-serif;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;border-radius:6px;transition:all .2s}
+.toggle-btn:hover{background:#E2E8F0}
+.toggle-btn.active{background:#319795;color:#fff}
+.chips{display:flex;justify-content:center;gap:8px;padding:10px 8px 0;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:16px;border:1.5px solid #E2E8F0;background:#fff;font-family:'Roboto',sans-serif;font-size:12.5px;font-weight:500;color:#344054;cursor:pointer;transition:all .15s;user-select:none}
+.chip .dot{width:10px;height:10px;border-radius:50%}
+.chip.off{opacity:.35;border-style:dashed}
+.chip:hover{border-color:#94A3B8}
+.subtitle{text-align:center;font-size:13px;color:#5A5A5A;padding:6px 16px 0}
+#chart{width:100%;height:430px}
+.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="controls"><div class="toggle-group" id="toggles"></div></div>
+<div class="chips" id="chips"></div>
+<div class="subtitle" id="subtitle"></div>
+<div id="chart"></div>
+<div class="figcaption">Figure 6: Decile incidence of the same aggregate shock under five incidence families</div>
+<script>
+const FAMILIES={
+  exposure:{label:'Exposure-proportional',color:'#319795',dash:'solid'},
+  junior:{label:'Junior-concentrated',color:'#81E6D9',dash:'solid'},
+  compression:{label:'Expertise-compression',color:'#234E52',dash:'solid'},
+  uniform:{label:'Uniform',color:'#94A3B8',dash:'solid'},
+  klein_top_loaded:{label:'Klein-anchored stress test',color:'#FEC601',dash:'dot'}
+};
+const METRICS=[
+  {key:'transition',label:'Share displaced',col:2,subtitle:'Share of each income decile transitioning from employment to unemployment (%). Click a family to show or hide it.',ytitle:'Share transitioning (%)'},
+  {key:'income',label:'Income change',col:3,subtitle:'Change in household disposable income by decile (%). Click a family to show or hide it.',ytitle:'Income change (%)'}
+];
+fetch('./data/incidence_deciles.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>l.split(','));
+  let sel=METRICS[0];
+  const visible=Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,true]));
+  const tg=document.getElementById('toggles');
+  METRICS.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='toggle-btn'+(m===sel?' active':'');
+    b.textContent=m.label;
+    b.onclick=()=>{sel=m;render();document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.toggle('active',x===b))};
+    tg.appendChild(b);
+  });
+  const chips=document.getElementById('chips');
+  Object.entries(FAMILIES).forEach(([key,f])=>{
+    const c=document.createElement('button');
+    c.className='chip';
+    c.innerHTML=`<span class="dot" style="background:${f.color}"></span>${f.label}`;
+    c.onclick=()=>{visible[key]=!visible[key];c.classList.toggle('off',!visible[key]);render()};
+    chips.appendChild(c);
+  });
+  function render(){
+    document.getElementById('subtitle').textContent=sel.subtitle;
+    const traces=Object.entries(FAMILIES).filter(([k])=>visible[k]).map(([key,f])=>{
+      const d=rows.filter(r=>r[0]===key).sort((a,b)=>+a[1]-+b[1]);
+      return{
+        x:d.map(r=>r[1]),y:d.map(r=>+r[sel.col]),
+        name:f.label,type:'scatter',mode:'lines+markers',
+        line:{color:f.color,width:2.5,shape:'spline',smoothing:0.8,dash:f.dash},
+        marker:{color:f.color,size:7},
+        hovertemplate:'%{y:.2f}%<extra>'+f.label+'</extra>'
+      };
+    });
+    Plotly.newPlot('chart',traces,{
+      xaxis:{dtick:1},
+      yaxis:{title:sel.ytitle,ticksuffix:'%',zeroline:true,zerolinecolor:'#CBD5E1',zerolinewidth:1.5},
+      hovermode:'x unified',showlegend:false,
+      margin:{t:10,r:20,b:60,l:70},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+    },{displayModeBar:false,responsive:true});
+  }
+  render();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+family,label,displaced_m,cost_mean_bn,cost_sd_bn,pov_bhc_mean_pp,pov_bhc_sd_pp,gini_mean_pp,gini_sd_pp
+exposure,Exposure-proportional,1.56,17.7,1.2,1.87,0.15,1.11,0.09
+junior,Junior-concentrated,1.55,17.9,1.6,1.85,0.14,1.08,0.08
+compression,Expertise-compression,1.67,20.6,1.8,1.96,0.15,1.04,0.09
+uniform,Uniform,1.55,13.9,1.7,1.87,0.17,1.16,0.1
+klein_top_loaded,Klein-anchored stress test,1.62,32.8,2.2,2.24,0.14,0.97,0.12

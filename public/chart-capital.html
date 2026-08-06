@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Roboto',sans-serif;background:#fff}#chart{width:100%;height:440px}.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<div class="figcaption">Figure 2: Capital income channel by decile</div>
+<script>
+fetch('./data/capital.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{const c=l.split(',');return{decile:c[0],share:+c[3]*100,agg:+c[2]/1e9}});
+  Plotly.newPlot('chart',[{
+    x:rows.map(r=>r.decile),
+    y:rows.map(r=>r.share),
+    customdata:rows.map(r=>r.agg),
+    type:'bar',marker:{color:'#319795'},
+    hovertemplate:'Decile %{x}: %{y:.1f}% of all capital income (£%{customdata:.1f}bn)<extra></extra>'
+  }],{
+    xaxis:{dtick:1},
+    yaxis:{title:'Share of all capital income (%)',ticksuffix:'%'},
+    margin:{t:20,r:20,b:60,l:80},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+  },{displayModeBar:false,responsive:true});
+});
+</script>
+</body>
+</html>

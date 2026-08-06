@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+p{margin:16px 0}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/scenarios.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const lines=csv.trim().split('\n').slice(1);
+  const rows={};
+  lines.forEach(l=>{
+    const c=l.match(/(".*?"|[^,]+)/g);
+    rows[c[0]]={base:parseFloat(c[8]),shocked:parseFloat(c[9])};
+  });
+  const c=rows['central'],hi=rows['high'];
+  document.getElementById('content').innerHTML=
+    `<p>Measured income inequality would rise in every scenario modelled. In the central scenario, the Gini coefficient of equivalised (household-size-adjusted) disposable income rises by ${((c.shocked-c.base)*100).toFixed(1)} percentage points; in the high scenario, by ${((hi.shocked-hi.base)*100).toFixed(1)} percentage points.</p>`;
+});
+</script>
+</body>
+</html>

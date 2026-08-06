@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/scenarios.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const lines=csv.trim().split('\n').slice(1);
+  let html='';
+  html+=`<table><tr><th>Scenario</th><th>Displaced workers</th><th>Exchequer cost (£bn/yr)</th><th>Poverty change, AHC (pp)</th><th>Gini change (pp)</th></tr>`;
+  lines.forEach(l=>{
+    const c=l.match(/(".*?"|[^,]+)/g);
+    const label=c[1].replace(/"/g,'');
+    const displaced=parseInt(c[4]);
+    const disp=displaced>=1e6?(displaced/1e6).toFixed(2)+'m':(displaced/1e3).toFixed(0)+'k';
+    html+=`<tr><td>${label}</td><td>${disp}</td><td>£${parseFloat(c[5]).toFixed(1)}</td><td>+${parseFloat(c[7]).toFixed(1)}</td><td>+${((parseFloat(c[9])-parseFloat(c[8]))*100).toFixed(2)}</td></tr>`;
+  });
+  html+=`</table>`;
+  html+=`<p class="caption">Table 1: Headline impacts by scenario, 2026 tax year (annual effects)</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>
