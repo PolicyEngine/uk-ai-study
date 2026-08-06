@@ -17,7 +17,7 @@ FAMILIES = [
     ("junior", "Junior-concentrated", "#3fc1c9"),
     ("compression", "Expertise compression", "#1f6f6b"),
     ("uniform", "Uniform", "#6a994e"),
-    ("klein_top_loaded", "Klein-anchored top-loaded stress test", "#101828"),
+    ("klein_top_loaded", "Top-loaded stress test (Klein Teeselink, 2025)", "#101828"),
 ]
 FILES = {
     "exposure": "exposure.json",
