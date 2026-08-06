@@ -32,7 +32,7 @@ fetch('./data/scenarios.csv')
     html+=`<tr><td>${label}</td><td>${disp}</td><td>£${parseFloat(c[5]).toFixed(1)}</td><td>+${parseFloat(c[7]).toFixed(1)}</td><td>+${((parseFloat(c[9])-parseFloat(c[8]))*100).toFixed(2)}</td></tr>`;
   });
   html+=`</table>`;
-  html+=`<p class="caption">Table 1: Headline impacts by scenario</p>`;
+  html+=`<p class="caption">Table 1: Headline impacts by scenario, 2026 tax year (annual effects)</p>`;
   document.getElementById('content').innerHTML=html;
 });
 </script>
