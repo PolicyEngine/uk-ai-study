@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Roboto',sans-serif;background:#fff}#chart{width:100%;height:480px}.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<div class="figcaption">Figure 3: Decomposition of the income change by decile into market income, benefits, and taxes</div>
+<script>
+fetch('./data/decomposition.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{const c=l.split(',');return{decile:c[0],market:+c[1]*100,benefits:+c[2]*100,tax:+c[3]*100,disp:+c[4]*100,resid:+c[5]*100}});
+  const x=rows.map(r=>r.decile);
+  Plotly.newPlot('chart',[
+    {x,y:rows.map(r=>r.market),name:'Market income',type:'bar',marker:{color:'#616161'},hovertemplate:'%{y:.2f}%<extra>Market income</extra>'},
+    {x,y:rows.map(r=>r.benefits),name:'Benefits',type:'bar',marker:{color:'#319795'},hovertemplate:'%{y:.2f}%<extra>Benefits</extra>'},
+    {x,y:rows.map(r=>r.tax),name:'Taxes and contributions',type:'bar',marker:{color:'#81E6D9'},hovertemplate:'%{y:.2f}%<extra>Taxes and contributions</extra>'},
+    {x,y:rows.map(r=>r.resid),name:'Residual',type:'bar',marker:{color:'#CBD5E0'},hovertemplate:'%{y:.2f}%<extra>Residual</extra>'},
+    {x,y:rows.map(r=>r.disp),name:'Disposable income',type:'scatter',mode:'lines+markers',line:{color:'#1A202C',width:2.5,shape:'spline',smoothing:1.0},marker:{color:'#1A202C',size:9,symbol:'diamond'},hovertemplate:'%{y:.2f}%<extra>Disposable income</extra>'}
+  ],{
+    barmode:'relative',
+    xaxis:{dtick:1},
+    yaxis:{title:'Change as % of baseline disposable income',ticksuffix:'%'},
+    legend:{orientation:'h',y:-0.22,x:0.5,xanchor:'center'},
+    margin:{t:20,r:20,b:90,l:80},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+  },{displayModeBar:false,responsive:true});
+});
+</script>
+</body>
+</html>

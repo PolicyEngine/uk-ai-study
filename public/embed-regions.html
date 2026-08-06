@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/regions.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{
+    const c=l.split(',');
+    return{region:c[0],income:parseFloat(c[1]),displaced:parseFloat(c[2]),poverty:parseFloat(c[4])};
+  }).sort((a,b)=>b.displaced-a.displaced);
+  let html=`<table><tr><th>Region</th><th>Displaced per 1,000 workers</th><th>Poverty rate change (pp)</th></tr>`;
+  rows.forEach(r=>{
+    html+=`<tr><td>${r.region}</td><td>${r.displaced.toFixed(0)}</td><td>+${r.poverty.toFixed(1)}</td></tr>`;
+  });
+  html+=`</table>`;
+  html+=`<p class="caption">Table 5: Regional impacts (central scenario)</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>

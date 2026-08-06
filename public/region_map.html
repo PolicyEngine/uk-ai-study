@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Roboto',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;overflow:hidden}
+svg{display:block}
+.controls{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;background:#F2F4F7;border-radius:8px;padding:3px;z-index:1000}
+.toggle-btn{padding:8px 16px;border:none;background:transparent;font-family:'Roboto',sans-serif;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;border-radius:6px;transition:all .2s;white-space:nowrap}
+.toggle-btn:hover{background:#E2E8F0}
+.toggle-btn.active{background:#319795;color:#fff}
+.tooltip{position:fixed;background:#fff;padding:10px 14px;border-radius:6px;box-shadow:0 2px 12px rgba(16,24,40,.2);pointer-events:none;opacity:0;font-size:13px;z-index:1001;max-width:260px}
+.tooltip strong{display:block;margin-bottom:4px}
+.legend{position:absolute;bottom:44px;right:16px;font-size:12px;color:#5A5A5A;z-index:1000;background:rgba(255,255,255,.9);padding:8px;border-radius:6px}
+.legend-bar{width:140px;height:12px;border-radius:2px}
+.legend-labels{display:flex;justify-content:space-between;margin-top:2px}
+.figcaption{position:absolute;bottom:0;left:0;right:0;text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;padding:6px 16px;background:#fff}
+</style>
+</head>
+<body>
+<div class="controls" id="toggles"></div>
+<div class="legend"><div class="legend-bar" id="legend-bar"></div><div class="legend-labels"><span id="legend-min"></span><span id="legend-max"></span></div></div>
+<svg id="map"></svg>
+<div class="tooltip" id="tooltip"></div>
+<div class="figcaption">Figure 9: Regional impacts of the central scenario</div>
+<script>
+const METRICS=[
+  {key:'displaced',col:'displaced_per_1000_workers',label:'Displaced per 1,000 workers',fmt:v=>v.toFixed(0)+' per 1,000',diverging:false},
+  {key:'poverty',col:'poverty_rate_change_pp',label:'Poverty rate change',fmt:v=>'+'+v.toFixed(1)+' pp',diverging:false},
+  {key:'income',col:'income_change_pct',label:'Income change',fmt:v=>(v>=0?'+':'−')+Math.abs(v).toFixed(1)+'%',diverging:true}
+];
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  const heads=lines[0].split(',');
+  return lines.slice(1).map(l=>{
+    const cols=[];let cur='',q=false;
+    for(const ch of l){if(ch==='"'){q=!q}else if(ch===','&&!q){cols.push(cur);cur=''}else cur+=ch}
+    cols.push(cur);
+    return Object.fromEntries(heads.map((h,i)=>[h,cols[i]]));
+  });
+}
+async function init(){
+  const [regText,constText,geojson]=await Promise.all([
+    fetch('./data/regions.csv').then(r=>r.text()),
+    fetch('./data/constituency_impacts.csv').then(r=>r.text()),
+    fetch('./data/constituencies.geojson').then(r=>r.json())
+  ]);
+  const regions={};
+  parseCSV(regText).forEach(r=>{regions[r.region]={vals:METRICS.map(m=>parseFloat(r[m.col]))}});
+  const codeToRegion={};
+  parseCSV(constText).forEach(r=>{codeToRegion[r.code]=r.region});
+  let sel=0;
+  const tg=document.getElementById('toggles');
+  METRICS.forEach((m,i)=>{
+    const b=document.createElement('button');
+    b.className='toggle-btn'+(i===sel?' active':'');
+    b.textContent=m.label;
+    b.onclick=()=>{sel=i;paint();document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.toggle('active',x===b))};
+    tg.appendChild(b);
+  });
+  const w=window.innerWidth,h=window.innerHeight-34;
+  const svg=d3.select('#map').attr('width',w).attr('height',h);
+  const g=svg.append('g');
+  const tooltip=d3.select('#tooltip');
+  const coords=geojson.features.flatMap(f=>{
+    const geom=f.geometry;
+    if(geom.type==='Polygon')return geom.coordinates[0];
+    if(geom.type==='MultiPolygon')return geom.coordinates.flatMap(p=>p[0]);
+    return [];
+  });
+  const xMin=d3.min(coords,d=>d[0]),xMax=d3.max(coords,d=>d[0]);
+  const yMin=d3.min(coords,d=>d[1]),yMax=d3.max(coords,d=>d[1]);
+  const s=Math.min((w-40)/(xMax-xMin),(h-60)/(yMax-yMin));
+  const ox=(w-(xMax-xMin)*s)/2,oy=(h-(yMax-yMin)*s)/2;
+  const proj=d3.geoTransform({point:function(x,y){this.stream.point((x-xMin)*s+ox,h-((y-yMin)*s+oy))}});
+  const path=d3.geoPath().projection(proj);
+  const regionOf=f=>codeToRegion[f.properties.c]||null;
+  const paths=g.selectAll('path').data(geojson.features).enter().append('path')
+    .attr('d',path).attr('stroke','none')
+    .on('mouseover',function(event,d){
+      const reg=regionOf(d);
+      const info=reg?regions[reg]:null;
+      const m=METRICS[sel];
+      let html=`<strong>${reg||d.properties.n}</strong>`;
+      if(info&&!isNaN(info.vals[sel])) html+=`${m.label}: <b>${m.fmt(info.vals[sel])}</b>`;
+      else html+='No data';
+      tooltip.html(html).style('opacity',1);
+      g.selectAll('path').attr('opacity',p=>regionOf(p)===reg?1:0.45);
+    })
+    .on('mousemove',e=>tooltip.style('left',(e.clientX+14)+'px').style('top',(e.clientY+14)+'px'))
+    .on('mouseout',function(){tooltip.style('opacity',0);g.selectAll('path').attr('opacity',1)});
+  function paint(){
+    const m=METRICS[sel];
+    const vals=Object.values(regions).map(r=>r.vals[sel]).filter(v=>!isNaN(v));
+    let scale;
+    if(m.diverging){
+      const ext=Math.max(Math.abs(d3.min(vals)),Math.abs(d3.max(vals)));
+      scale=d3.scaleLinear().domain([-ext,0,ext]).range(['#344054','#ffffff','#319795']).clamp(true);
+      document.getElementById('legend-bar').style.background='linear-gradient(to right, #344054, #ffffff, #319795)';
+      document.getElementById('legend-min').textContent='−'+ext.toFixed(1)+'%';
+      document.getElementById('legend-max').textContent='+'+ext.toFixed(1)+'%';
+    }else{
+      const lo=d3.min(vals),hi=d3.max(vals);
+      scale=d3.scaleLinear().domain([lo,hi]).range(['#B2F5EA','#234E52']).clamp(true);
+      document.getElementById('legend-bar').style.background='linear-gradient(to right, #B2F5EA, #234E52)';
+      document.getElementById('legend-min').textContent=m.fmt(lo);
+      document.getElementById('legend-max').textContent=m.fmt(hi);
+    }
+    paths.attr('fill',d=>{
+      const reg=regionOf(d);
+      const info=reg?regions[reg]:null;
+      return info&&!isNaN(info.vals[sel])?scale(info.vals[sel]):'#F2F4F7';
+    });
+  }
+  paint();
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Roboto',-apple-system,sans-serif;background:#fff}#chart{width:100%;height:420px}.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<div class="figcaption">Figure 9: Fiscal cost, poverty averted and cost per point for each reform</div>
+<script>
+const LABELS={
+  R1_wage_insurance:'R1: Wage<br>insurance',
+  R2_uc_circuit_breaker:'R2: UC allowance<br>+20%',
+  R3_cap_suspension_taper_cut:'R3: Cap suspension<br>+ taper cut'
+};
+const COLORS=['#319795','#4FD1C5','#81E6D9'];
+fetch('./data/policy.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>l.match(/(".*?"|[^,]+)/g)).filter(c=>c[1]==='exposure');
+  const y=rows.map(c=>LABELS[c[0]]||c[0]).reverse();
+  const colors=COLORS.slice(0,rows.length).reverse();
+  const panels=[
+    {title:'Annual cost (£bn)',vals:rows.map(c=>+c[2]).reverse(),fmt:v=>'£'+v.toFixed(1)+'bn',ax:''},
+    {title:'Poverty averted, AHC (pp)',vals:rows.map(c=>-c[4]).reverse(),fmt:v=>v.toFixed(2)+'pp',ax:'2'},
+    {title:'Cost per pp averted (£bn)',vals:rows.map(c=>+c[7]).reverse(),fmt:v=>'£'+v.toFixed(1)+'bn',ax:'3'}
+  ];
+  const traces=panels.map((p,i)=>({
+    y,x:p.vals,xaxis:'x'+p.ax,yaxis:i===0?'y':'y'+p.ax,
+    type:'bar',orientation:'h',
+    marker:{color:colors},
+    text:p.vals.map(p.fmt),textposition:'auto',textfont:{size:12,color:'#101828'},
+    hovertemplate:'%{y}: '+'%{x:.2f}<extra>'+p.title+'</extra>',
+    showlegend:false
+  }));
+  const annotations=panels.map((p,i)=>({
+    text:'<b>'+p.title+'</b>',xref:'paper',yref:'paper',
+    x:[0.13,0.5,0.87][i],y:-0.14,showarrow:false,
+    font:{size:13,family:'Roboto, sans-serif',color:'#344054'}
+  }));
+  Plotly.newPlot('chart',traces,{
+    grid:{rows:1,columns:3,pattern:'independent'},
+    annotations,
+    xaxis:{zeroline:false,showgrid:true,gridcolor:'#F2F4F7'},
+    xaxis2:{zeroline:false,showgrid:true,gridcolor:'#F2F4F7'},
+    xaxis3:{zeroline:false,showgrid:true,gridcolor:'#F2F4F7'},
+    yaxis:{automargin:true,tickfont:{size:12}},
+    yaxis2:{showticklabels:false},
+    yaxis3:{showticklabels:false},
+    margin:{t:16,r:20,b:70,l:10},
+    font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+  },{displayModeBar:false,responsive:true});
+});
+</script>
+</body>
+</html>

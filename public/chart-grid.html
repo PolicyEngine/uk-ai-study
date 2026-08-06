@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Roboto',-apple-system,sans-serif;background:#fff}
+.controls{display:flex;justify-content:center;padding:16px 0 4px}
+.toggle-group{display:flex;background:#F2F4F7;border-radius:8px;padding:3px}
+.toggle-btn{padding:8px 20px;border:none;background:transparent;font-family:'Roboto',sans-serif;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;border-radius:6px;transition:all .2s}
+.toggle-btn:hover{background:#E2E8F0}
+.toggle-btn.active{background:#319795;color:#fff}
+.subtitle{text-align:center;font-size:14px;color:#5A5A5A;padding:8px 16px 0}
+#chart{width:100%;height:460px}
+.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="controls"><div class="toggle-group" id="toggles"></div></div>
+<div class="subtitle" id="subtitle"></div>
+<div id="chart"></div>
+<div class="figcaption">Figure 5: The 66-cell scenario grid</div>
+<script>
+const METRICS=[
+  {key:'disp',label:'Disposable income',col:2,subtitle:'Change in average household disposable income (%)',fmt:v=>v.toFixed(1)+'%',unit:'%'},
+  {key:'rev',label:'Exchequer revenue',col:4,subtitle:'Net revenue change (% of income tax + National Insurance receipts)',fmt:v=>v.toFixed(1)+'%',unit:'%'},
+  {key:'gini',label:'Inequality (Gini)',col:5,subtitle:'Change in the Gini coefficient (percentage points)',fmt:v=>(v>=0?'+':'')+v.toFixed(2),unit:'pp'}
+];
+fetch('./data/grid.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>l.split(',').map(Number));
+  const unemp=[...new Set(rows.map(r=>r[0]))].sort((a,b)=>a-b);
+  const wage=[...new Set(rows.map(r=>r[1]))].sort((a,b)=>a-b);
+  let sel=METRICS[0];
+  const tg=document.getElementById('toggles');
+  METRICS.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='toggle-btn'+(m===sel?' active':'');
+    b.textContent=m.label;
+    b.onclick=()=>{sel=m;render();document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.toggle('active',x===b))};
+    tg.appendChild(b);
+  });
+  function render(){
+    document.getElementById('subtitle').textContent=sel.subtitle;
+    const z=unemp.map(u=>wage.map(w=>{
+      const row=rows.find(r=>r[0]===u&&r[1]===w);
+      return row?row[sel.col]:null;
+    }));
+    const allPos=z.flat().every(v=>v>=0);
+    const colorscale=allPos
+      ?[[0,'#E6FFFA'],[1,'#234E52']]
+      :[[0,'#344054'],[0.5,'#ffffff'],[1,'#319795']];
+    const annotations=[];
+    unemp.forEach((u,i)=>wage.forEach((w,j)=>{
+      const v=z[i][j];
+      if(v===null)return;
+      const range=Math.max(...z.flat().map(Math.abs));
+      annotations.push({
+        x:w,y:u,text:sel.fmt(v),showarrow:false,
+        font:{size:10,family:'Roboto, sans-serif',color:Math.abs(v)>range*0.6?'#fff':'#101828'}
+      });
+    }));
+    Plotly.newPlot('chart',[{
+      x:wage,y:unemp,z,type:'heatmap',
+      colorscale,zmid:allPos?undefined:0,
+      xgap:2,ygap:2,
+      hovertemplate:'Displacement %{y}% · wage uplift %{x}%<br>%{z:.2f} '+sel.unit+'<extra></extra>',
+      showscale:false
+    }],{
+      annotations,
+      xaxis:{title:'Wage uplift (%)',dtick:1,side:'bottom'},
+      yaxis:{title:'Displacement rate (%)',dtick:1,autorange:'reversed'},
+      margin:{t:10,r:20,b:60,l:70},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+    },{displayModeBar:false,responsive:true});
+  }
+  render();
+});
+</script>
+</body>
+</html>
