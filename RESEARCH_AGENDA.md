@@ -58,20 +58,34 @@ Three things have to be built or decided before this runs:
 
 ### Pre-registered expected results
 
-Anchored on `results/central.json` (7% displacement = 1.557m workers, +2.6% wage
-uplift, GBP 18.2bn Exchequer cost, +1.81pp BHC poverty, Gini 0.309 -> 0.319).
-Displacement-equivalents assume ~22.2m employees and knowledge work at ~45% of
-employment (~10m).
+> **These are hand-derived hypotheses, not model output.** Nothing in this table
+> has been through `apply_shocks` or PolicyEngine. They are arithmetic on
+> published aggregates, written down before the run so that the comparison
+> against real output means something. The derivation is shown below so it can
+> be checked and disagreed with.
+
+**Derivation.** From `results/central.json`: 7% displacement = 1.557m displaced,
+so the employee base is ~22.2m. Knowledge work is ~45% of UK employment (~10.0m)
+against Anthropic's 62% of the *wage bill* — knowledge workers are better paid,
+so the employment share is lower than the wage-bill share. Excess knowledge
+unemployment over their near-baseline modest case (2.9%) is +1.6pp under
+substantial and +15.0pp under extreme, giving stocks of ~160k and ~1.50m, i.e.
+0.7% and 6.7% of employees. Exchequer and poverty ranges are then scaled off the
+central case (7% displacement, +2.6% uplift -> GBP 18.2bn, +1.81pp) with a
+judgement adjustment for the wage-divergence channel, which the central case does
+not contain. That adjustment is the weakest link and is why these are ranges.
 
 | Scenario | Displacement equiv. | Exchequer (GBP bn, + = cost) | BHC poverty (pp) | Gini change | Labour-share shift |
 |---|---|---|---|---|---|
 | Modest | ~0 (below baseline churn) | −1 to −3 (net gain) | −0.05 to 0.00 | +0.001 | −0.6pp |
 | Substantial | ~0.7% (160k) | −3 to −6 (net gain) | −0.10 to +0.10 | +0.003 | −3.9pp |
 | Extreme | ~6.7% (1.50m) | **+30 to +55** | **−0.5 to +0.5** | **+0.020 to +0.035** | −14.8pp |
-| *memo:* existing central | 7.0% (1.56m) | +18.2 | +1.81 | +0.010 | n/a |
+| *memo:* existing central (**actual model output**) | 7.0% (1.56m) | +18.2 | +1.81 | +0.010 | n/a |
 
-The two predictions worth pre-registering, because they are the ones that could
-be wrong in an interesting way:
+Only the memo row is a real result. The three above it are predictions.
+
+The two worth pre-registering, because they are the ones that could be wrong in
+an interesting way:
 
 - **Extreme has roughly the same headline job loss as the existing central case
   (~1.5m) but a much larger Exchequer cost.** If that holds, the entire
@@ -86,6 +100,23 @@ be wrong in an interesting way:
 If poverty moves sharply *up* instead, the prediction is wrong and that is the
 more publishable outcome — it would mean UK exposure reaches further down the
 distribution than the US case implies.
+
+### What the code already supports, and what it does not
+
+Checked against `uk_ai_study/shocks.py` (738 lines):
+
+- **Already there.** `WageMarginScenario` applies a C-AIOE-graded *cut* with the
+  eq 3.5 uplift on top, so net change is `uplift_i - cut_i` and can already be
+  negative for high-exposure, low-complementarity workers.
+  `MixedMarginScenario` mixes the displacement and wage-cut margins at fixed
+  gross loss. The negative-survivor-wage channel is therefore closer to existing
+  than first assumed.
+- **Not there.** Nothing targets *group-level* wage changes. Anthropic specifies
+  two numbers (−11.5% knowledge, +33.6% other) and the existing scenarios take a
+  single aggregate plus a gradient. A scenario type that solves for the gradient
+  parameters hitting two group targets is the actual new code required.
+- **Also not there.** A stock-to-flow translation, and the knowledge-work to
+  SOC2020 boundary with its sensitivity.
 
 ### Where this stops
 
