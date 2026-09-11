@@ -9,6 +9,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from uk_ai_study.anthropic import (
+    ANTHROPIC_PRESETS,
+    AnthropicScenario,
+    apply_anthropic_shock,
+)
 from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
 from uk_ai_study.shocks import (
     PRESETS,
@@ -176,6 +181,7 @@ def run_scenario(
         scenario = (
             PRESETS.get(scenario)
             or RIPPLE_PRESETS.get(scenario)
+            or ANTHROPIC_PRESETS.get(scenario)
             or WAGE_MARGIN_PRESETS[scenario]
         )
 
@@ -184,7 +190,9 @@ def run_scenario(
 
     persons = build_person_table(baseline, period, adult_tab_path)
 
-    if isinstance(scenario, WageMarginScenario):
+    if isinstance(scenario, AnthropicScenario):
+        shocked_table = apply_anthropic_shock(persons, scenario, seed=seed)
+    elif isinstance(scenario, WageMarginScenario):
         # the seed drives the paired central displacement draw the gross cut
         # is calibrated to (R2-2)
         shocked_table = apply_wage_margin_shock(persons, scenario, seed=seed)
@@ -226,8 +234,12 @@ def run_scenario(
 
     return ScenarioResult(
         scenario=scenario.name,
-        displacement_rate=getattr(scenario, "displacement_rate", 0.0),
-        wage_uplift=scenario.wage_uplift,
+        displacement_rate=getattr(
+            scenario,
+            "displacement_rate",
+            getattr(scenario, "knowledge_displacement_flow", 0.0),
+        ),
+        wage_uplift=getattr(scenario, "wage_uplift", float("nan")),
         exchequer_cost=base["gov_balance"] - shock["gov_balance"],
         poverty_rate_change_bhc=shock["poverty_bhc"] - base["poverty_bhc"],
         poverty_rate_change_ahc=shock["poverty_ahc"] - base["poverty_ahc"],

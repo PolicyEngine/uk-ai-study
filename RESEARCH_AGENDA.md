@@ -56,67 +56,99 @@ Three things have to be built or decided before this runs:
    to map onto SOC2020 major groups. Groups 1–3 is the natural candidate; the
    boundary choice needs a sensitivity.
 
-### Pre-registered expected results
+### Results
 
-> **These are hand-derived hypotheses, not model output.** Nothing in this table
-> has been through `apply_shocks` or PolicyEngine. They are arithmetic on
-> published aggregates, written down before the run so that the comparison
-> against real output means something. The derivation is shown below so it can
-> be checked and disagreed with.
+Run on the pinned June 2026 FRS build (`frs_2024_25.h5`, sha256 `623802aa...`),
+period 2026, seed 0, via `analysis/anthropic_scenarios.py`. The `central`
+preset reproduces `results/central.json` bit-exactly on this build, so the
+environment is validated.
 
-**Derivation.** From `results/central.json`: 7% displacement = 1.557m displaced,
-so the employee base is ~22.2m. Knowledge work is ~45% of UK employment (~10.0m)
-against Anthropic's 62% of the *wage bill* — knowledge workers are better paid,
-so the employment share is lower than the wage-bill share. Excess knowledge
-unemployment over their near-baseline modest case (2.9%) is +1.6pp under
-substantial and +15.0pp under extreme, giving stocks of ~160k and ~1.50m, i.e.
-0.7% and 6.7% of employees. Exchequer and poverty ranges are then scaled off the
-central case (7% displacement, +2.6% uplift -> GBP 18.2bn, +1.81pp) with a
-judgement adjustment for the wage-divergence channel, which the central case does
-not contain. That adjustment is the weakest link and is why these are ranges.
+| Scenario | Displaced | Exchequer (GBP bn, + = cost) | BHC poverty (pp) | Gini change |
+|---|---|---|---|---|
+| Modest | 0 | -3.3 | -0.08 | +0.0001 |
+| Substantial | 0.39m | +1.8 | +0.23 | +0.0012 |
+| Extreme | 3.57m | **+67.3** | **+4.18** | +0.0129 |
+| *memo:* JR16 central | 1.56m | +18.2 | +1.81 | +0.0104 |
 
-| Scenario | Displacement equiv. | Exchequer (GBP bn, + = cost) | BHC poverty (pp) | Gini change | Labour-share shift |
-|---|---|---|---|---|---|
-| Modest | ~0 (below baseline churn) | −1 to −3 (net gain) | −0.05 to 0.00 | +0.001 | −0.6pp |
-| Substantial | ~0.7% (160k) | −3 to −6 (net gain) | −0.10 to +0.10 | +0.003 | −3.9pp |
-| Extreme | ~6.7% (1.50m) | **+30 to +55** | **−0.5 to +0.5** | **+0.020 to +0.035** | −14.8pp |
-| *memo:* existing central (**actual model output**) | 7.0% (1.56m) | +18.2 | +1.81 | +0.010 | n/a |
+**The pre-registered prediction was wrong, in the way that was flagged as the
+more publishable outcome.** The prediction was that extreme would leave UK
+poverty "flat or falling" while the Gini rose sharply, on the reasoning that
+the losers are middle-to-upper earners with weak means-tested entitlement.
+Poverty instead rises +4.18pp — more than twice the JR16 central case — while
+the Gini rises LESS than predicted (+0.0129 against a predicted +0.020 to
++0.035). UK exposure reaches further down the distribution than the US framing
+implies.
 
-Only the memo row is a real result. The three above it are predictions.
+The decomposition (`analysis/anthropic_decomposition.py`) shows why, and the
+channels are close to additive (they sum to +4.25pp against +4.18pp for the
+full scenario):
 
-The two worth pre-registering, because they are the ones that could be wrong in
-an interesting way:
+| Channel | Exchequer (GBP bn) | BHC poverty (pp) | Gini change |
+|---|---|---|---|
+| Displacement only | +92.1 | +5.49 | +0.0170 |
+| Wage divergence only | -9.7 | -1.14 | -0.0095 |
+| Capital shock only | -1.7 | -0.10 | +0.0005 |
+| **Full** | **+67.3** | **+4.18** | **+0.0129** |
 
-- **Extreme has roughly the same headline job loss as the existing central case
-  (~1.5m) but a much larger Exchequer cost.** If that holds, the entire
-  difference is incidence and wage divergence, not the size of the job loss —
-  which is the thesis of this repo, tested against an external calibration.
-- **Extreme may leave UK poverty flat or falling while the Gini rises sharply.**
-  The losers are middle-to-upper earners with weak means-tested entitlement; the
-  +33.6% to non-exposed workers lifts low earners. A scenario that costs tens of
-  billions and barely moves the poverty rate would mirror the sign flip Max found
-  in the US income-shift work, and would be the paper's headline.
+The reasoning behind the prediction was right, and was simply outweighed. Wage
+divergence on its own IS strongly poverty-reducing (-1.14pp) and
+inequality-reducing (-0.0095), because the +33.6% accruing to non-knowledge
+workers reaches lower-paid households while the -11.5% falls on households
+with little means-tested entitlement. That effect is real but is swamped by
+displacement, which alone would raise poverty +5.49pp. The capital shock is
+close to irrelevant to poverty (-0.10pp) because capital income is thin in the
+FRS at the bottom of the distribution.
 
-If poverty moves sharply *up* instead, the prediction is wrong and that is the
-more publishable outcome — it would mean UK exposure reaches further down the
-distribution than the US case implies.
+**The Exchequer number is dominated by the same channel.** Displacement alone
+costs GBP 92bn; wage divergence returns GBP 10bn of that, because the
+non-knowledge wage gain is taxed. The net GBP 67bn is roughly 3.7x the JR16
+central case for roughly 2.3x the job loss.
 
-### What the code already supports, and what it does not
+#### The stock-to-flow sensitivity dominates everything
 
-Checked against `uk_ai_study/shocks.py` (738 lines):
+Their 17.9% is a 2030 unemployment STOCK; the model needs an annual FLOW.
+Little's law (`u = f x d`) converts one to the other, and the assumed duration
+drives the result more than the choice of scenario does:
 
-- **Already there.** `WageMarginScenario` applies a C-AIOE-graded *cut* with the
-  eq 3.5 uplift on top, so net change is `uplift_i - cut_i` and can already be
-  negative for high-exposure, low-complementarity workers.
-  `MixedMarginScenario` mixes the displacement and wage-cut margins at fixed
-  gross loss. The negative-survivor-wage channel is therefore closer to existing
-  than first assumed.
-- **Not there.** Nothing targets *group-level* wage changes. Anthropic specifies
-  two numbers (−11.5% knowledge, +33.6% other) and the existing scenarios take a
-  single aggregate plus a gradient. A scenario type that solves for the gradient
-  parameters hitting two group targets is the actual new code required.
-- **Also not there.** A stock-to-flow translation, and the knowledge-work to
-  SOC2020 boundary with its sensitivity.
+| Expected duration | Implied knowledge flow | Exchequer (GBP bn) | BHC poverty (pp) |
+|---|---|---|---|
+| 6 months (survey median) | 30.0% | +67.3 | +4.18 |
+| 1 year | 15.0% | +28.1 | +1.54 |
+| 2 years | 7.5% | +6.2 | -0.06 |
+
+At two years the extreme scenario's poverty effect turns slightly NEGATIVE
+(-0.06pp) and the Exchequer cost falls by an order of magnitude. **Any scoring
+of these scenarios is really a statement about assumed unemployment duration**,
+and a paper that does not say so is not reporting a result. This is the single
+most important methodological finding of the exercise.
+
+#### Translation decisions, each a live sensitivity
+
+1. **Knowledge work = SOC2020 major groups 1-3.** That is 52.3% of UK
+   employees, against Korinek et al.'s 62% of the WAGE BILL — consistent,
+   since knowledge workers are better paid. Group 4 (administrative and
+   secretarial) is the boundary case: it has the HIGHEST C-AIOE of any group
+   (0.744) but is not conventionally called knowledge work. `knowledge_groups`
+   is a scenario field so this can be varied; it has not been yet.
+2. **Modest is the counterfactual, not a scenario.** Korinek et al. describe it
+   as near-business-as-usual, so its 2030 rates are the no-AI baseline and it
+   displaces nobody by construction. Its nonzero rows above are the wage and
+   capital channels alone. Using a single economy-wide baseline instead
+   produces the perverse result that modest displaces MORE non-knowledge
+   workers than substantial.
+3. **Capital from the labour share.** Rather than JR16's +0.4pp, capital income
+   is scaled by the labour-share move their scenarios state (60c -> 45.2c in
+   extreme, a factor of 1.37).
+
+#### What has not been done
+
+- No Monte Carlo: every figure above is a single seed-0 draw. Given
+  `REVISION_PLAN.md` item 6 (seed noise flips decile signs), the poverty and
+  Exchequer headlines need 20-50 paired draws before they go in a paper.
+- No knowledge-boundary sensitivity (groups 1-4 vs 1-3).
+- No decile or age breakdown of the Anthropic scenarios.
+- Their US calibration is applied to UK microdata unchanged; whether US
+  occupational exposure transfers to the UK is assumed, not tested.
 
 ### Where this stops
 

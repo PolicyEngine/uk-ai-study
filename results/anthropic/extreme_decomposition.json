@@ -1,0 +1,32 @@
+{
+  "full": {
+    "exchequer_cost": 67295371264.0,
+    "poverty_rate_change_bhc": 0.04178632597510473,
+    "gini_change": 0.012900337410131635,
+    "displaced_weighted": 3574818.0
+  },
+  "displacement_only": {
+    "exchequer_cost": 92055699456.0,
+    "poverty_rate_change_bhc": 0.0549257525893819,
+    "gini_change": 0.016951571116798125,
+    "displaced_weighted": 3574818.0
+  },
+  "wage_only": {
+    "exchequer_cost": -9656696832.0,
+    "poverty_rate_change_bhc": -0.01143784145222626,
+    "gini_change": -0.009541246431435946,
+    "displaced_weighted": 0.0
+  },
+  "capital_only": {
+    "exchequer_cost": -1651392512.0,
+    "poverty_rate_change_bhc": -0.000997613701551353,
+    "gini_change": 0.0005089114463867617,
+    "displaced_weighted": 0.0
+  },
+  "no_capital": {
+    "exchequer_cost": 68871585792.0,
+    "poverty_rate_change_bhc": 0.04283960156854344,
+    "gini_change": 0.012449171230859202,
+    "displaced_weighted": 3574818.0
+  }
+}
