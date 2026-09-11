@@ -1,0 +1,58 @@
+{
+  "anthropic_modest_d0.5": {
+    "duration_years": 0.5,
+    "knowledge_flow": 0.0,
+    "exchequer_cost": -3336601600.0,
+    "poverty_rate_change_bhc": -0.0008063726023368745,
+    "gini_change": 0.00012207963042987213,
+    "displaced_weighted": 0.0
+  },
+  "anthropic_substantial_d0.5": {
+    "duration_years": 0.5,
+    "knowledge_flow": 0.031999999999999994,
+    "exchequer_cost": 1807450112.0,
+    "poverty_rate_change_bhc": 0.002276645278716044,
+    "gini_change": 0.0012126004959144288,
+    "displaced_weighted": 391521.375
+  },
+  "anthropic_extreme_d0.5": {
+    "duration_years": 0.5,
+    "knowledge_flow": 0.3,
+    "exchequer_cost": 67295371264.0,
+    "poverty_rate_change_bhc": 0.04178632597510473,
+    "gini_change": 0.012900337410131635,
+    "displaced_weighted": 3574818.0
+  },
+  "anthropic_substantial_d1.0": {
+    "duration_years": 1.0,
+    "knowledge_flow": 0.015999999999999997,
+    "exchequer_cost": -3219652608.0,
+    "poverty_rate_change_bhc": -0.0016334090570117865,
+    "gini_change": 0.00033180871766747,
+    "displaced_weighted": 218792.390625
+  },
+  "anthropic_extreme_d1.0": {
+    "duration_years": 1.0,
+    "knowledge_flow": 0.15,
+    "exchequer_cost": 28111437824.0,
+    "poverty_rate_change_bhc": 0.01540993558623674,
+    "gini_change": 0.0029893196475025974,
+    "displaced_weighted": 1800099.75
+  },
+  "anthropic_substantial_d2.0": {
+    "duration_years": 2.0,
+    "knowledge_flow": 0.007999999999999998,
+    "exchequer_cost": -5554274304.0,
+    "poverty_rate_change_bhc": -0.002801181280018633,
+    "gini_change": -0.0007101892320683367,
+    "displaced_weighted": 87761.2265625
+  },
+  "anthropic_extreme_d2.0": {
+    "duration_years": 2.0,
+    "knowledge_flow": 0.075,
+    "exchequer_cost": 6203604992.0,
+    "poverty_rate_change_bhc": -0.0005736106165488697,
+    "gini_change": -0.003337117578008808,
+    "displaced_weighted": 917897.5625
+  }
+}
