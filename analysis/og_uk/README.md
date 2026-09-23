@@ -100,12 +100,29 @@ growth and factor shares, PolicyEngine owns who bears it.
    Anthropic's horizon, but gives no long-run answer. Six hypotheses eliminated; see
    PolicyEngine/og-model-dashboard#2.
 
-## Running
+## Replicating every number
 
 ```bash
+# 1. the paired baseline-vs-AI transition (~14 min, needs an OG-UK checkout)
 cd /path/to/OG-UK
-HDF5_USE_FILE_LOCKING=FALSE uv run python analysis/og_uk/run_ai_scenario.py
+HDF5_USE_FILE_LOCKING=FALSE uv run python /path/to/uk-ai-study/analysis/og_uk/run_ai_scenario.py
+
+# 2. the result tables — % gaps, growth, labour share, vs Anthropic (instant)
+python analysis/og_uk/report_results.py
+
+# 3. the OBR baseline comparison and component decomposition (instant)
+python analysis/og_uk/compare_obr_baseline.py
 ```
+
+Steps 2 and 3 read `results/ai_scenario_1sector.json`, which is committed, so they run
+without re-solving. Both take `--oguk-dir` if OG-UK is not at `~/ogmodels/OG-UK`.
+
+| script | reproduces |
+|---|---|
+| `run_ai_scenario.py` | the paired transition; writes `results/ai_scenario_1sector.json` |
+| `report_results.py` | the % gap table, GDP growth, the labour-share path, and the Anthropic comparison |
+| `compare_obr_baseline.py` | 1.67% vs OBR's 1.60%, and the productivity / labour-supply / potential-output decomposition |
+| `run_gamma_ramp.py` | the time-varying-`gamma` test — **requires the `ogcore/firm.py` patch** |
 
 Roughly 14 minutes for the pair. Two environment gotchas: the default Dask client fails
 (`Nanny failed to start`) so a `LocalCluster(processes=False)` is passed explicitly, and
