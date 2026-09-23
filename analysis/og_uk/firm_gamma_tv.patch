@@ -1,0 +1,51 @@
+Backward-compatible time-varying gamma for OG-Core's firm block.
+
+Problem
+-------
+`p.gamma` is indexed `[m]` at ~14 sites in `ogcore/firm.py` and has no time
+dimension, so automation can only STEP, never ramp. Anthropic's scenarios build
+kappa/alpha/theta to 2030; Moll & Imas (2026) raise alpha from 1/3 to 1 over
+twenty years. Neither experiment is representable.
+
+Approach
+--------
+Add a `_tv()` helper that indexes a production parameter which may be either
+shape. Legacy `(M,)` is returned exactly as before, so existing calibrations are
+bit-identical; `(T, M)` is treated as a path using the convention `Z` already
+uses -- `[-1]` in the steady state, `[: p.T]` along the transition.
+
+    def _tv(x, p, method, m=None):
+        x = np.asarray(x)
+        if x.ndim <= 1:                       # (M,) -- time-invariant
+            return x[m] if m is not None else x
+        if method == "SS":                    # (T, M) -- time-varying
+            return x[-1, m] if m is not None else x[-1]
+        return x[: p.T, m] if m is not None else x[: p.T]
+
+Then replace every `p.gamma[m]` / `p.gamma_g[m]` / bare `p.gamma` with
+`_tv(p.gamma, p, method, m)`.
+
+One further fix is required. `get_MPx` reshapes `Y` and `x` to `(T, 1)` for the
+transition and documents `share` as a scalar. A time-varying share arrives as
+`(T,)`, so `share * Y` forms a `(T, T)` outer product and `get_pm` then fails
+with "cannot reshape array of size 3600 into shape (60,)". Give `share` the same
+column shape:
+
+        share = np.asarray(share)
+        if share.ndim == 1 and share.size >= p.T:
+            share = share[: p.T].reshape(p.T, 1)
+
+Verification
+------------
+Regression: the 1-sector scenario with legacy 1-D gamma reproduces exactly --
+SS labour shares 0.6500 / 0.6110 and RC errors 6.71e-03 / 7.91e-03, identical to
+three significant figures.
+
+New capability: gamma ramping 0.35 -> 0.389 over 2026-2030 solves cleanly
+(RC 6.71e-03 / 7.80e-03) and produces a labour-share PATH
+0.6500 -> 0.6402 -> 0.6305 -> 0.6207 -> 0.6110 instead of a step.
+
+`epsilon` has the same limitation at 20 sites in the same file and could take the
+same treatment.
+
+Status: applied locally, NOT yet upstream. Needs a PR to PSLmodels/OG-Core.

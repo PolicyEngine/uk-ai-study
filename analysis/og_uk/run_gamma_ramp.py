@@ -20,7 +20,7 @@ from ogcore import SS
 import oguk.api as api
 
 EPS, G0, G1, Z1, YEARS = 1.0, 0.35, 0.389, 1.031, 4
-OUT = str(RESULTS / "gramp.json")
+OUT = str(RESULTS / "ai_scenario_gamma_ramp.json")
 
 cluster = LocalCluster(processes=False, n_workers=1, threads_per_worker=4, dashboard_address=None)
 client = Client(cluster)
