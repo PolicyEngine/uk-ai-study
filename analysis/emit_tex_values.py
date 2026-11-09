@@ -88,6 +88,7 @@ import json
 import time
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -126,6 +127,518 @@ def emit(name: str, value, fmt: str = "{:.1f}", source: str = ""):
 
 def jload(rel: str) -> dict:
     return json.loads((R / rel).read_text())
+
+# ---------------------------------------------------------------------------
+# Extended macros (Microcosm revision): every number the paper states, so the
+# prose and tables are generated from results/ rather than transcribed.
+# Signed values are emitted with an explicit sign ("+1.81", "-0.44") and are
+# meant to be typeset in math mode ($\gen...$).
+# ---------------------------------------------------------------------------
+SIGNED2 = "{:+.2f}"
+SIGNED1 = "{:+.1f}"
+
+
+def csv(rel: str) -> pd.DataFrame:
+    return pd.read_csv(R / rel)
+
+
+def row_tex(cells) -> str:
+    return " & ".join(cells) + r" \\"
+
+
+def m(x: float, fmt: str) -> str:
+    """Number for a table cell, typeset in math mode so minus signs render."""
+    return "$" + fmt.format(x) + "$"
+
+
+def emit_extended() -> None:
+    # --- presets table and preset prose -----------------------------------
+    for rel, P in [("low.json", "Low"), ("central.json", "Central"), ("high.json", "High")]:
+        emit(f"gen{P}DisplacedTwoM", lambda rel=rel: jload(rel)["displaced_weighted"] / 1e6, "{:.2f}", rel)
+        emit(f"gen{P}PovBhcSignedPp", lambda rel=rel: jload(rel)["poverty_rate_change_bhc"] * 100, SIGNED2, rel)
+        emit(f"gen{P}PovAhcSignedPp", lambda rel=rel: jload(rel)["poverty_rate_change_ahc"] * 100, SIGNED2, rel)
+        emit(f"gen{P}GiniSignedPp",
+             lambda rel=rel: (jload(rel)["gini_shocked"] - jload(rel)["gini_baseline"]) * 100, SIGNED2, rel)
+        emit(f"gen{P}CostSignedBn", lambda rel=rel: jload(rel)["exchequer_cost"] / 1e9, SIGNED1, rel)
+    emit("genLowGainBn", lambda: -jload("low.json")["exchequer_cost"] / 1e9, "{:.1f}", "low.json")
+
+    def preset_rows():
+        out = []
+        for rel, label in [("low.json", "Low"), ("central.json", "Central"), ("high.json", "High")]:
+            d = jload(rel)
+            out.append(row_tex([
+                label, f"{d['displaced_weighted'] / 1e6:.2f}",
+                m(d["exchequer_cost"] / 1e9, "{:.1f}"),
+                m(d["poverty_rate_change_bhc"] * 100, SIGNED2),
+                m(d["poverty_rate_change_ahc"] * 100, SIGNED2),
+                m((d["gini_shocked"] - d["gini_baseline"]) * 100, SIGNED2),
+            ]))
+        return "\n".join(out)
+    emit("genPresetRows", preset_rows, "{}", "presets")
+
+    # --- age bands ---------------------------------------------------------
+    for rel, P in [("central.json", "Central"), ("central_youth_tilted.json", "Youth")]:
+        for band, B in [("16-24", "Young"), ("35-44", "Prime"), ("55-64", "Older")]:
+            emit(f"genAge{P}{B}SharePct",
+                 lambda rel=rel, band=band: jload(rel)["age_band_displacement_share"][band] * 100,
+                 "{:.1f}", rel)
+
+    # --- channel profiles (50-draw means) ---------------------------------
+    t = "jr16/fig4_1_transition_by_decile.csv"
+    emit("genTransDOnePct", lambda: csv(t).set_index("decile").loc[1, "share_transitioning"] * 100, "{:.2f}", t)
+    emit("genTransDTenPct", lambda: csv(t).set_index("decile").loc[10, "share_transitioning"] * 100, "{:.2f}", t)
+    emit("genTransMonotone",
+         lambda: "strictly monotone" if csv(t)["share_transitioning"].is_monotonic_increasing else "not monotone",
+         "{}", t)
+    wg = "jr16/fig4_2_wage_gain_by_decile.csv"
+    emit("genWageGainDOnePct", lambda: csv(wg).set_index("decile").loc[1, "pct_change_employment_income"] * 100, "{:.2f}", wg)
+    emit("genWageGainDTenPct", lambda: csv(wg).set_index("decile").loc[10, "pct_change_employment_income"] * 100, "{:.2f}", wg)
+    emit("genWageGainMinPct", lambda: csv(wg)["pct_change_employment_income"].min() * 100, "{:.2f}", wg)
+    emit("genWageGainMaxPct", lambda: csv(wg)["pct_change_employment_income"].max() * 100, "{:.2f}", wg)
+    cp = "jr16/fig4_3_capital_by_decile.csv"
+    emit("genCapTopSharePct", lambda: csv(cp).set_index("decile").loc[10, "share_of_all_capital_income"] * 100, "{:.1f}", cp)
+    emit("genCapTopTwoSharePct",
+         lambda: csv(cp).set_index("decile").loc[[9, 10], "share_of_all_capital_income"].sum() * 100, "{:.1f}", cp)
+    emit("genCapBottomSharePct", lambda: csv(cp).set_index("decile").loc[1, "share_of_all_capital_income"] * 100, "{:.1f}", cp)
+    emit("genCapTopBn", lambda: csv(cp).set_index("decile").loc[10, "aggregate_capital_income"] / 1e9, "{:.1f}", cp)
+    emit("genCapTotalBn", lambda: csv(cp)["aggregate_capital_income"].sum() / 1e9, "{:.0f}", cp)
+
+    # --- household mediation (seed-0 decomposition; 20-draw means) ---------
+    dc = "jr16/fig4_4_decomposition.csv"
+    for d, D in [(1, "One"), (5, "Five"), (10, "Ten")]:
+        for col, C in [("market_income", "Market"), ("disposable_income", "Disp"),
+                       ("benefits", "Ben"), ("tax_and_contributions", "Tax")]:
+            emit(f"genDecomp{C}D{D}Pct",
+                 lambda d=d, col=col: csv(dc).set_index("decile").loc[d, col] * 100, "{:.1f}", dc)
+    emit("genDecompResidualMaxPct", lambda: csv(dc)["residual"].abs().max() * 100, "{:.1f}", dc)
+    emit("genDecompAbsorbedDTenPct",
+         lambda: 100 * (1 - csv(dc).set_index("decile").loc[10, "disposable_income"]
+                        / csv(dc).set_index("decile").loc[10, "market_income"]), "{:.0f}", dc)
+    ci = "appendix/decomposition_ci.csv"
+    emit("genDecompCiDOnePct", lambda: -csv(ci).set_index("decile").loc[1, "disposable_change_pct"], "{:.2f}", ci)
+    emit("genDecompCiDTenPct", lambda: -csv(ci).set_index("decile").loc[10, "disposable_change_pct"], "{:.2f}", ci)
+    emit("genDecompCiMaxLossPct", lambda: -csv(ci)["disposable_change_pct"].min(), "{:.2f}", ci)
+    emit("genDecompCiMaxLossDecile",
+         lambda: int(csv(ci).set_index("decile")["disposable_change_pct"].idxmin()), "{:d}", ci)
+
+    # --- central Monte Carlo: relative line and AHC ------------------------
+    mc = "robustness/central_monte_carlo.json"
+    emit("genCentralMcRelPovBhcMeanPp", lambda: jload(mc)["relative_poverty_change_bhc_pp"]["mean"], "{:.2f}", mc)
+    emit("genCentralMcRelPovBhcSdPp", lambda: jload(mc)["relative_poverty_change_bhc_pp"]["sd"], "{:.2f}", mc)
+    emit("genCentralMcPovAhcMeanPp", lambda: jload(mc)["poverty_change_ahc_pp"]["mean"], "{:.2f}", mc)
+    emit("genCentralMcPovAhcSdPp", lambda: jload(mc)["poverty_change_ahc_pp"]["sd"], "{:.2f}", mc)
+    emit("genCentralMcCostCv", lambda: 100 * jload(mc)["exchequer_cost_bn"]["sd"]
+         / jload(mc)["exchequer_cost_bn"]["mean"], "{:.0f}", mc)
+    emit("genCentralMcCostHalfBn", lambda: jload(mc)["exchequer_cost_bn"]["mean"] / 2, "{:.1f}", mc)
+
+    # --- poverty decomposition --------------------------------------------
+    pd_ = "robustness/poverty_decomposition.json"
+    emit("genPovNetPp", lambda: jload(pd_)["net_poverty_change_pp"], "{:.2f}", pd_)
+    emit("genPovInflowM", lambda: jload(pd_)["gross_inflow_persons"] / 1e6, "{:.2f}", pd_)
+    emit("genPovInflowPp", lambda: jload(pd_)["gross_inflow_pp"], "{:.2f}", pd_)
+    emit("genPovOutflowM", lambda: jload(pd_)["gross_outflow_persons"] / 1e6, "{:.2f}", pd_)
+    emit("genPovOutflowPp", lambda: jload(pd_)["gross_outflow_pp"], "{:.2f}", pd_)
+    emit("genPovInDisplacedHhPct", lambda: 100 * jload(pd_)["newly_poor_share_in_displaced_worker_household"], "{:.0f}", pd_)
+    emit("genPovTopDecilePct",
+         lambda: 100 * jload(pd_)["newly_poor_decile_shares_baseline_equiv_income"]["10"], "{:.0f}", pd_)
+    emit("genPovEntrantRatio", lambda: jload(pd_)["newly_poor_median_baseline_income_to_line_ratio"], "{:.2f}", pd_)
+    emit("genPovEntrantShortfallPct", lambda: jload(pd_)["newly_poor_median_postshock_shortfall_pct_of_line"], "{:.0f}", pd_)
+    emit("genPovSoleEarnerPct",
+         lambda: 100 * (1 - jload(pd_)["newly_poor_share_displaced_hh_with_other_earner"]), "{:.0f}", pd_)
+    emit("genPovBaselineBhcPct", lambda: 100 * jload(pd_)["poverty_rate_bhc_baseline"], "{:.1f}", pd_)
+
+    # --- index sensitivity -------------------------------------------------
+    ix = "robustness/index_sensitivity_full.json"
+    labels = [("c_aioe", "C-AIOE (central)"), ("felten_aioe", "Felten AIOE"),
+              ("eloundou_beta", "Eloundou beta"), ("dsit_aioe", "DSIT AIOE"), ("dsit_llm", "DSIT LLM")]
+
+    def index_rows():
+        d = jload(ix)["results"]
+        return "\n".join(row_tex([
+            lab, m(d[k]["exchequer_cost_bn"], "{:.1f}"), m(d[k]["poverty_change_bhc_pp"], SIGNED2),
+            m(d[k]["gini_change_pp"], SIGNED2), f"{d[k]['transition_share_decile1_pct']:.2f}",
+            f"{d[k]['transition_share_decile10_pct']:.2f}"]) for k, lab in labels)
+    emit("genIndexRows", index_rows, "{}", ix)
+
+    def ix_dev():
+        d = jload(ix)["results"]
+        c = d["c_aioe"]["exchequer_cost_bn"]
+        return max((v["exchequer_cost_bn"] / c - 1) * 100 for v in d.values())
+    emit("genIndexMaxDevPct", ix_dev, "{:+.1f}", ix)
+    emit("genIndexEloundouDiffBn", lambda: jload(ix)["results"]["eloundou_beta"]["exchequer_cost_bn"]
+         - jload(ix)["results"]["c_aioe"]["exchequer_cost_bn"], SIGNED1, ix)
+    emit("genIndexDsitDiffBn", lambda: jload(ix)["results"]["dsit_aioe"]["exchequer_cost_bn"]
+         - jload(ix)["results"]["c_aioe"]["exchequer_cost_bn"], SIGNED1, ix)
+
+    def ix_ratio(agg):
+        d = jload(ix)["results"]
+        return agg(v["transition_share_decile10_pct"] / v["transition_share_decile1_pct"] for v in d.values())
+    emit("genIndexRatioMin", lambda: ix_ratio(min), "{:.1f}", ix)
+    emit("genIndexRatioMax", lambda: ix_ratio(max), "{:.1f}", ix)
+    emit("genIndexAllSurvive",
+         lambda: "yes" if all(v["all_three_survive"] for v in jload(ix)["results"].values()) else "no", "{}", ix)
+
+    # --- incidence families ------------------------------------------------
+    imc = "robustness/incidence_monte_carlo.json"
+    s5 = "incidence/summary_five.csv"
+    fam_labels = [("exposure", "Exposure-proportional"), ("junior", "Junior-concentrated"),
+                  ("compression", "Expertise-compression"), ("uniform", "Uniform"),
+                  ("klein_top_loaded", "Klein-anchored stress test")]
+    for fam, Fam in FAMILY_MACRO.items():
+        emit(f"genInc{Fam}PovBhcSdPp", lambda fam=fam: jload(imc)[fam]["poverty_change_bhc_pp"]["sd"], "{:.2f}", imc)
+        emit(f"genInc{Fam}PovAhcMeanPp", lambda fam=fam: jload(imc)[fam]["poverty_change_ahc_pp"]["mean"], "{:.2f}", imc)
+        emit(f"genInc{Fam}GiniSdPp", lambda fam=fam: jload(imc)[fam]["gini_change_pp"]["sd"], "{:.2f}", imc)
+
+    def incidence_rows():
+        d = jload(imc)
+        five = csv(s5).set_index("family")
+        out = []
+        for fam, lab in fam_labels:
+            f = d[fam]
+            out.append(row_tex([
+                lab, f"{five.loc[fam, 'displaced_weighted_m']:.2f}",
+                f"{f['exchequer_cost_bn']['mean']:.1f} $\\pm$ {f['exchequer_cost_bn']['sd']:.1f}",
+                f"${f['poverty_change_bhc_pp']['mean']:+.2f}$ $\\pm$ {f['poverty_change_bhc_pp']['sd']:.2f}",
+                f"${f['poverty_change_ahc_pp']['mean']:+.2f}$ $\\pm$ {f['poverty_change_ahc_pp']['sd']:.2f}",
+                f"${f['gini_change_pp']['mean']:+.2f}$ $\\pm$ {f['gini_change_pp']['sd']:.2f}",
+            ]))
+        return "\n".join(out)
+    emit("genIncidenceRows", incidence_rows, "{}", imc)
+
+    def stylised_span():
+        d = jload(imc)
+        means = [d[f]["exchequer_cost_bn"]["mean"] for f in ("exposure", "junior", "compression", "uniform")]
+        return max(means) - min(means)
+    emit("genIncStylisedCostSpanBn", stylised_span, "{:.1f}", imc)
+    emit("genIncKleinTransDOnePct",
+         lambda: jload("incidence/klein_top_loaded.json")["decile_transition_share_pct"]["1"], "{:.2f}",
+         "incidence/klein_top_loaded.json")
+    emit("genIncKleinTransDTenPct",
+         lambda: jload("incidence/klein_top_loaded.json")["decile_transition_share_pct"]["10"], "{:.2f}",
+         "incidence/klein_top_loaded.json")
+
+    # paired draw-level differences (shared seeds), normal 95% interval
+    dr = "robustness/incidence_draws_five.csv"
+
+    def paired(a, b, col):
+        d = csv(dr)
+        x = d[d.family == a].set_index("seed")[col]
+        y = d[d.family == b].set_index("seed")[col]
+        diff = (x - y).dropna()
+        mean = float(diff.mean())
+        half = 1.96 * float(diff.std(ddof=1)) / len(diff) ** 0.5
+        return mean, mean - half, mean + half
+
+    for name, a, b, col in [
+        ("CompExpPov", "compression", "exposure", "poverty_change_bhc_pp"),
+        ("UniExpPov", "uniform", "exposure", "poverty_change_bhc_pp"),
+        ("UniExpCost", "uniform", "exposure", "exchequer_cost_bn"),
+        ("JunExpCost", "junior", "exposure", "exchequer_cost_bn"),
+        ("JunExpPov", "junior", "exposure", "poverty_change_bhc_pp"),
+        ("CompExpCost", "compression", "exposure", "exchequer_cost_bn"),
+        ("UniExpGini", "uniform", "exposure", "gini_change_pp"),
+        ("KleinCompGini", "klein_top_loaded", "compression", "gini_change_pp"),
+        ("KleinExpCost", "klein_top_loaded", "exposure", "exchequer_cost_bn"),
+    ]:
+        for i, S in enumerate(("Mean", "Lo", "Hi")):
+            emit(f"genPair{name}{S}", lambda a=a, b=b, col=col, i=i: paired(a, b, col)[i], SIGNED2, dr)
+        emit(f"genPair{name}Sig",
+             lambda a=a, b=b, col=col: "distinguishable" if (paired(a, b, col)[1] > 0 or paired(a, b, col)[2] < 0)
+             else "indistinguishable", "{}", dr)
+
+    # --- wage margin and adjustment-margin tables -------------------------
+    for rel, P in [("wage_margin_central.json", "WageMarginCentral"), ("wage_margin_pss.json", "WageMarginPss")]:
+        emit(f"gen{P}PovBhcSignedPp", lambda rel=rel: jload(rel)["poverty_rate_change_bhc"] * 100, SIGNED2, rel)
+        emit(f"gen{P}PovAhcSignedPp", lambda rel=rel: jload(rel)["poverty_rate_change_ahc"] * 100, SIGNED2, rel)
+        emit(f"gen{P}GiniSignedPp",
+             lambda rel=rel: (jload(rel)["gini_shocked"] - jload(rel)["gini_baseline"]) * 100, SIGNED2, rel)
+    emit("genGrossCutSharePct", lambda: jload("wage_margin_central.json")["gross_cut_share_target"] * 100,
+         "{:.2f}", "wage_margin_central.json")
+    emit("genGrossCutShareRaw", lambda: jload("wage_margin_central.json")["gross_cut_share_target"],
+         "{:.5f}", "wage_margin_central.json")
+
+    def wagemargin_rows():
+        out = []
+        for rel, lab in [("central.json", "Central displacement"),
+                         ("wage_margin_central.json", "Wage margin (C-AIOE gradient)"),
+                         ("wage_margin_pss.json", "Wage margin (PSS gradient)")]:
+            d = jload(rel)
+            out.append(row_tex([
+                lab, m(d["exchequer_cost"] / 1e9, "{:.1f}"), m(d["poverty_rate_change_bhc"] * 100, SIGNED2),
+                m(d["poverty_rate_change_ahc"] * 100, SIGNED2),
+                m((d["gini_shocked"] - d["gini_baseline"]) * 100, SIGNED2)]))
+        return "\n".join(out)
+    emit("genWageMarginRows", wagemargin_rows, "{}", "wage margin")
+
+    ma = "robustness/mixed_adjustment.csv"
+    sw = "robustness/survivor_wage_grid.csv"
+    lam_names = [("mixed_lambda_0", "Zero", r"$\lambda=0$"), ("mixed_lambda_0.25", "Quarter", r"$\lambda=.25$"),
+                 ("mixed_lambda_0.5", "Half", r"$\lambda=.50$"), ("mixed_lambda_0.75", "ThreeQ", r"$\lambda=.75$"),
+                 ("mixed_lambda_1", "One", r"$\lambda=1$")]
+    sw_names = [("survivor_wage_-0.050", "MinusFive", r"$-5.0\%$"), ("survivor_wage_-0.026", "MinusTwo", r"$-2.6\%$"),
+                ("survivor_wage_+0.000", "Zero", r"$0.0\%$"), ("survivor_wage_+0.026", "PlusTwo", r"$+2.6\%$"),
+                ("survivor_wage_+0.050", "PlusFive", r"$+5.0\%$")]
+
+    def adj_rows(rel, names):
+        d = csv(rel).set_index("scenario")
+        return "\n".join(row_tex([
+            lab, f"{d.loc[k, 'displaced_weighted_m']:.2f}", m(d.loc[k, "exchequer_cost_bn"], "{:.1f}"),
+            m(d.loc[k, "poverty_change_bhc_pp"], SIGNED2), m(d.loc[k, "gini_change_pp"], SIGNED2)])
+            for k, _, lab in names)
+    emit("genMixedRows", lambda: adj_rows(ma, lam_names), "{}", ma)
+    emit("genSurvivorRows", lambda: adj_rows(sw, sw_names), "{}", sw)
+    for rel, names, pre in [(ma, lam_names, "Mixed"), (sw, sw_names, "Survivor")]:
+        for k, N, _ in names:
+            emit(f"gen{pre}{N}CostBn", lambda rel=rel, k=k: csv(rel).set_index("scenario").loc[k, "exchequer_cost_bn"],
+                 "{:.1f}", rel)
+            emit(f"gen{pre}{N}PovBhcPp",
+                 lambda rel=rel, k=k: csv(rel).set_index("scenario").loc[k, "poverty_change_bhc_pp"], SIGNED2, rel)
+            emit(f"gen{pre}{N}GiniPp",
+                 lambda rel=rel, k=k: csv(rel).set_index("scenario").loc[k, "gini_change_pp"], SIGNED2, rel)
+    emit("genMixedNetEmpZeroPct",
+         lambda: -csv(ma).set_index("scenario").loc["mixed_lambda_0", "net_employment_income_change_pct"], "{:.2f}", ma)
+    emit("genMixedNetEmpOnePct",
+         lambda: -csv(ma).set_index("scenario").loc["mixed_lambda_1", "net_employment_income_change_pct"], "{:.2f}", ma)
+
+    # --- shock-size grid ---------------------------------------------------
+    gr = "jr16/grid.csv"
+
+    def cell(u, w, col):
+        g = csv(gr)
+        return float(g[(g.unemployment_pct == u) & (g.wage_pct == w)][col].iloc[0])
+    emit("genGridDispMaxPct", lambda: cell(0, 5, "avg_disposable_income_change_pct"), SIGNED1, gr)
+    emit("genGridDispMinPct", lambda: cell(10, 0, "avg_disposable_income_change_pct"), SIGNED1, gr)
+    emit("genGridReceiptsBn", lambda: cell(0, 5, "net_revenue_change_bn") * 100
+         / cell(0, 5, "net_revenue_change_pct_of_receipts"), "{:.0f}", gr)
+    emit("genGridRevGainBn", lambda: cell(0, 5, "net_revenue_change_bn"), "{:.1f}", gr)
+    emit("genGridRevGainPct", lambda: cell(0, 5, "net_revenue_change_pct_of_receipts"), "{:.1f}", gr)
+    emit("genGridRevLossBn", lambda: -cell(10, 0, "net_revenue_change_bn"), "{:.1f}", gr)
+    emit("genGridRevLossPct", lambda: -cell(10, 0, "net_revenue_change_pct_of_receipts"), "{:.1f}", gr)
+    emit("genGridSevenZeroLossBn", lambda: -cell(7, 0, "net_revenue_change_bn"), "{:.1f}", gr)
+    emit("genGridSevenZeroLossPct", lambda: -cell(7, 0, "net_revenue_change_pct_of_receipts"), "{:.1f}", gr)
+    emit("genGridSevenThreeLossBn", lambda: -cell(7, 3, "net_revenue_change_bn"), "{:.1f}", gr)
+    # central 7 per cent / 2.6 per cent cell, linearly interpolated between
+    # the 2 and 3 per cent wage columns
+    emit("genGridCentralCashCostBn",
+         lambda: -(cell(7, 2, "net_revenue_change_bn")
+                   + 0.6 * (cell(7, 3, "net_revenue_change_bn") - cell(7, 2, "net_revenue_change_bn"))),
+         "{:.0f}", gr)
+    emit("genGridGiniPositiveCells", lambda: int((csv(gr)["gini_change_pp"] > 0).sum()), "{:d}", gr)
+
+    def argmin_cell(col):
+        g = csv(gr)
+        r = g.loc[g[col].idxmin()]
+        return f"{int(r.unemployment_pct)} per cent displacement, {int(r.wage_pct)} per cent wage growth"
+    emit("genGridGiniMinCell", lambda: argmin_cell("gini_change_pp"), "{}", gr)
+    emit("genGridDispZeroLine",
+         lambda: cell(7, 3, "avg_disposable_income_change_pct"), SIGNED1, gr)
+
+    gd = "appendix/grid_deciles_capital.csv"
+
+    def gdf(capital):
+        g = csv(gd)
+        return g[g.capital_shock == capital]
+    emit("genAppGridDecileMaxPct",
+         lambda: gdf(True)[[f"decile{d}_change_pct" for d in range(1, 11)]].max().max(), SIGNED1, gd)
+    emit("genAppGridDecileMinPct",
+         lambda: gdf(True)[[f"decile{d}_change_pct" for d in range(1, 11)]].min().min(), SIGNED1, gd)
+    emit("genAppGridHarshDOnePct",
+         lambda: -float(gdf(True).query("unemployment_pct == 10 and wage_pct == 0")["decile1_change_pct"].iloc[0]),
+         "{:.1f}", gd)
+    emit("genAppGridHarshDTenPct",
+         lambda: -float(gdf(True).query("unemployment_pct == 10 and wage_pct == 0")["decile10_change_pct"].iloc[0]),
+         "{:.1f}", gd)
+    emit("genAppGridNoCapGiniPositive", lambda: int((gdf(False)["gini_change_pp"] > 1e-9).sum()), "{:d}", gd)
+    emit("genAppGridNoCapGiniMaxPp", lambda: gdf(False)["gini_change_pp"].max(), "{:.2f}", gd)
+    emit("genAppGridNoCapGiniMinPp", lambda: gdf(False)["gini_change_pp"].min(), SIGNED2, gd)
+
+    # --- appendix descriptives --------------------------------------------
+    bd = "appendix/baseline_distributions.csv"
+    for col, N in [("b1_market_income_less_capital", "Market"), ("b2_capital_income", "Capital"),
+                   ("b3_benefits", "Benefits"), ("b4_tax_and_ni", "TaxNi"), ("b5_disposable_income", "Disposable")]:
+        emit(f"genBase{N}Bn", lambda col=col: csv(bd)[col].sum(), "{:,.0f}", bd)
+    jl = "appendix/job_loss_by_major_group.csv"
+
+    def jobloss_rows():
+        d = csv(jl)
+        titles = {1: "Managers, directors and senior officials", 2: "Professional occupations",
+                  3: "Associate professional occupations", 4: "Administrative and secretarial occupations",
+                  5: "Skilled trades occupations", 6: "Caring, leisure and other service occupations",
+                  7: "Sales and customer service occupations", 8: "Process, plant and machine operatives",
+                  9: "Elementary occupations"}
+        return "\n".join(row_tex([f"{int(r.soc_major_group)} {titles[int(r.soc_major_group)]}",
+                                  m(r.c_aioe, "{:.2f}"), f"{r.employment_m:.2f}", f"{r.job_loss_pct:.1f}"])
+                         for r in d.itertuples())
+    emit("genJobLossRows", jobloss_rows, "{}", jl)
+    emit("genJobLossEmployeesM", lambda: csv(jl)["employment_m"].sum(), "{:.1f}", jl)
+    b7 = "appendix/b7_uniform_vs_ai_decile.csv"
+    emit("genBSevenAiDTenPct", lambda: -csv(b7).set_index("decile").loc[10, "ai_shock_pct"], "{:.1f}", b7)
+    emit("genBSevenUniDTenPct", lambda: -csv(b7).set_index("decile").loc[10, "uniform_shock_pct"], "{:.1f}", b7)
+
+    # --- gender ------------------------------------------------------------
+    ge = "appendix/gender_incidence.json"
+    for key, N, fmt, scale in [("female_mean_exposure", "FemaleExposure", "{:.2f}", 1),
+                               ("male_mean_exposure", "MaleExposure", "{:.2f}", 1),
+                               ("female_displacement_rate_mean", "FemaleRatePct", "{:.1f}", 100),
+                               ("male_displacement_rate_mean", "MaleRatePct", "{:.1f}", 100),
+                               ("female_share_of_employment", "FemaleEmpSharePct", "{:.1f}", 100),
+                               ("female_share_of_displaced_mean", "FemaleDispSharePct", "{:.1f}", 100),
+                               ("female_income_change_pct", "FemaleIncomePct", "{:.1f}", 1),
+                               ("male_income_change_pct", "MaleIncomePct", "{:.1f}", 1)]:
+        emit(f"genGender{N}", lambda key=key, scale=scale: jload(ge)[key] * scale, fmt, ge)
+
+    # --- caseloads ---------------------------------------------------------
+    cs = "caseloads/summary.csv"
+
+    def cl(scn, col):
+        return float(csv(cs).set_index("scenario").loc[scn, col])
+    emit("genCaseloadNewUcBenunitsK", lambda: cl("central", "new_uc_benunits_thousands"), "{:,.0f}", cs)
+    emit("genCaseloadExitUcBenunitsK", lambda: cl("central", "exiting_uc_benunits_thousands"), "{:,.0f}", cs)
+    emit("genCaseloadNewUcHouseholdsK", lambda: cl("central", "new_uc_households_thousands"), "{:,.0f}", cs)
+    emit("genCaseloadUcBaselineBn", lambda: cl("central", "uc_spend_baseline_bn"), "{:.1f}", cs)
+    emit("genCaseloadHousingBn", lambda: jload("caseloads/central.json")["uc_housing_element_gross_entitlement_change_bn"],
+         "{:.1f}", "caseloads/central.json")
+    emit("genCaseloadSharePct", lambda: 100 * cl("central", "uc_spend_change_bn") / 334.0, "{:.1f}", cs)
+    for scn, N in [("high", "High"), ("low", "Low"), ("incidence_junior", "Junior"), ("incidence_uniform", "Uniform")]:
+        emit(f"genCaseload{N}NetK", lambda scn=scn: cl(scn, "net_new_uc_benunits_thousands"), "{:,.0f}", cs)
+        emit(f"genCaseload{N}SpendBn", lambda scn=scn: cl(scn, "uc_spend_change_bn"), "{:.1f}", cs)
+
+    # --- policy ------------------------------------------------------------
+    ps = "policy/summary.csv"
+    pol_labels = [("R1_wage_insurance", "R1 Wage insurance"), ("R2_uc_circuit_breaker", r"R2 UC allowance $+20\%$"),
+                  ("R3_cap_suspension_taper_cut", r"R3 Cap suspension $+$ taper cut")]
+
+    def policy_rows():
+        d = csv(ps)
+        d = d[d.family == "exposure"].set_index("reform")
+        return "\n".join(row_tex([
+            lab, f"{d.loc[k, 'gross_cost_bn']:.1f}", m(d.loc[k, "poverty_change_bhc_pp"], SIGNED2),
+            m(d.loc[k, "poverty_change_ahc_pp"], SIGNED2), m(d.loc[k, "gini_change_pp"], SIGNED2),
+            f"{d.loc[k, 'cost_per_pp_bhc_bn']:.1f}", f"{d.loc[k, 'cost_per_pp_ahc_bn']:.1f}"])
+            for k, lab in pol_labels)
+    emit("genPolicyRows", policy_rows, "{}", ps)
+
+    def pol(reform, family, col):
+        d = csv(ps)
+        return float(d[(d.reform == reform) & (d.family == family)][col].iloc[0])
+    emit("genRoneMeanTransferGbp", lambda: pol("R1_wage_insurance", "exposure", "mean_transfer_per_displaced_gbp"),
+         "{:,.0f}", ps)
+    emit("genRoneDisplacedM", lambda: pol("R1_wage_insurance", "exposure", "displaced_weighted_m"), "{:.2f}", ps)
+    emit("genRoneJuniorCostPerPpAhcBn", lambda: pol("R1_wage_insurance", "junior", "cost_per_pp_ahc_bn"), "{:.1f}", ps)
+    emit("genRoneUniformCostPerPpAhcBn", lambda: pol("R1_wage_insurance", "uniform", "cost_per_pp_ahc_bn"), "{:.1f}", ps)
+    emit("genRoneCostMinFamBn", lambda: min(pol("R1_wage_insurance", f, "gross_cost_bn")
+                                            for f in ("exposure", "junior", "uniform")), "{:.1f}", ps)
+    emit("genRoneCostMaxFamBn", lambda: max(pol("R1_wage_insurance", f, "gross_cost_bn")
+                                            for f in ("exposure", "junior", "uniform")), "{:.1f}", ps)
+    emit("genRoneToRtwoPovRatio", lambda: pol("R1_wage_insurance", "exposure", "poverty_change_bhc_pp")
+         / pol("R2_uc_circuit_breaker", "exposure", "poverty_change_bhc_pp"), "{:.1f}", ps)
+    emit("genRoneToRtwoCostRatio", lambda: pol("R1_wage_insurance", "exposure", "gross_cost_bn")
+         / pol("R2_uc_circuit_breaker", "exposure", "gross_cost_bn"), "{:.1f}", ps)
+    emit("genRoneToRthreeCostRatio", lambda: pol("R1_wage_insurance", "exposure", "gross_cost_bn")
+         / pol("R3_cap_suspension_taper_cut", "exposure", "gross_cost_bn"), "{:.1f}", ps)
+    pmc = "robustness/policy_monte_carlo.json"
+    emit("genRoneMcPovBhcAvertedPp", lambda: -jload(pmc)["R1_wage_insurance_exposure"]["poverty_change_bhc_pp"]["mean"],
+         "{:.2f}", pmc)
+    emit("genRoneMcPovBhcAvertedSdPp", lambda: jload(pmc)["R1_wage_insurance_exposure"]["poverty_change_bhc_pp"]["sd"],
+         "{:.2f}", pmc)
+    dr_ = "robustness/duration_reform_ranking.json"
+    emit("genDurRoneCostPerPpBn", lambda: jload(dr_)["r1_cost_per_pp_bn"]["mean"], "{:.0f}", dr_)
+    emit("genDurRoneCostPerPpSdBn", lambda: jload(dr_)["r1_cost_per_pp_bn"]["sd"], "{:.0f}", dr_)
+    emit("genDurRtwoCostPerPpBn", lambda: jload(dr_)["r2_cost_per_pp_bn"]["mean"], "{:.1f}", dr_)
+    emit("genDurRtwoCostPerPpSdBn", lambda: jload(dr_)["r2_cost_per_pp_bn"]["sd"], "{:.1f}", dr_)
+    emit("genDurReformDraws", lambda: jload(dr_)["n_draws"], "{:d}", dr_)
+    dt = "robustness/duration_takeup_sensitivity.json"
+    emit("genDurTakeupDraws", lambda: jload(dt)["n_draws"], "{:d}", dt)
+    emit("genDurSixMoCostCutPct", lambda: 100 * (1 - jload(dt)["half_earnings_retention"]["results"]["exchequer_cost_bn"]["mean"]
+                                                 / jload("robustness/central_monte_carlo.json")["exchequer_cost_bn"]["mean"]),
+         "{:.0f}", dt)
+
+    # --- tax composition ---------------------------------------------------
+    tc = "tax_composition/composition_grid.csv"
+
+    def comp(phi, col):
+        g = csv(tc)
+        return float(g[(g.unemployment_pct == 7) & (g.phi == phi)][col].iloc[0])
+    emit("genCompWageBillBn", lambda: comp(0.5, "w_lost_bn"), "{:.1f}", tc)
+    emit("genCompEffRatePct", lambda: 100 * comp(0.5, "effective_labour_tax_rate"), "{:.1f}", tc)
+    emit("genCompLabourTaxBn", lambda: comp(0.5, "labour_tax_lost_bn"), "{:.1f}", tc)
+    emit("genCompPhiZeroBn", lambda: -comp(0.5, "microsim_net_revenue_change_bn"), "{:.1f}", tc)
+    emit("genCompPhiHalfBn", lambda: -comp(0.5, "net_revenue_change_with_ct_bn"), "{:.1f}", tc)
+    emit("genCompPhiOneBn", lambda: -comp(1.0, "net_revenue_change_with_ct_bn"), "{:.1f}", tc)
+    emit("genCompPhiOneGapBn", lambda: -comp(1.0, "delta_vs_full_labour_taxation_bn"), "{:.1f}", tc)
+    rc = "tax_composition/recycling_case.json"
+    emit("genRecyclingPovBhcPp", lambda: jload(rc)["recycling_minus_central"]["poverty_bhc_pp"], SIGNED2, rc)
+    emit("genRecyclingPovAhcPp", lambda: jload(rc)["recycling_minus_central"]["poverty_ahc_pp"], SIGNED2, rc)
+
+    # --- ripple ------------------------------------------------------------
+    def ripple_rows():
+        out = []
+        for rel, lab in [("central.json", "0 (central)"), ("central_ripple_low.json", "0.15"),
+                         ("central_ripple.json", "0.30"), ("central_ripple_high.json", "0.50")]:
+            d = jload(rel)
+            out.append(row_tex([lab, m(d["exchequer_cost"] / 1e9, "{:.1f}"),
+                                m(d["poverty_rate_change_bhc"] * 100, SIGNED2),
+                                m(d["poverty_rate_change_ahc"] * 100, SIGNED2),
+                                m((d["gini_shocked"] - d["gini_baseline"]) * 100, SIGNED2)]))
+        return "\n".join(out)
+    emit("genRippleRows", ripple_rows, "{}", "ripple")
+    emit("genRipplePovExtraPp", lambda: (jload("central_ripple.json")["poverty_rate_change_bhc"]
+                                         - jload("central.json")["poverty_rate_change_bhc"]) * 100, "{:.2f}", "ripple")
+    emit("genRippleCostRisePct", lambda: 100 * (jload("central_ripple.json")["exchequer_cost"]
+                                                / jload("central.json")["exchequer_cost"] - 1), "{:.0f}", "ripple")
+
+    # --- recession backcast ------------------------------------------------
+    rb = "robustness/recession_backcast.json"
+
+    def rbmean(key):
+        return float(np.mean([d[key] for d in jload(rb)["draws"]]))
+    emit("genBackcastPovBhcPp", lambda: rbmean("poverty_change_bhc_pp"), SIGNED2, rb)
+    emit("genBackcastPovAhcPp", lambda: rbmean("poverty_change_ahc_pp"), SIGNED2, rb)
+    emit("genBackcastRelPovPp", lambda: rbmean("relative_poverty_change_bhc_pp"), SIGNED2, rb)
+    emit("genBackcastGiniPp", lambda: rbmean("gini_change_pp"), SIGNED2, rb)
+    emit("genBackcastPerPointPp", lambda: rbmean("poverty_change_bhc_pp") / 2.6, SIGNED2, rb)
+    emit("genUniformPerPointPp",
+         lambda: jload("robustness/incidence_monte_carlo.json")["uniform"]["poverty_change_bhc_pp"]["mean"] / 7,
+         SIGNED2, "robustness/incidence_monte_carlo.json")
+
+    # --- dividend coverage and channel split -------------------------------
+    dv = "robustness/dividend_coverage.json"
+    emit("genDivMicrocosmBn", lambda: jload(dv)["microcosm_dividends_2026_bn"], "{:.1f}", dv)
+    emit("genDivSpiBn", lambda: jload(dv)["spi_dividends_2026_bn"], "{:.1f}", dv)
+    emit("genDivRatioPct", lambda: 100 * (jload(dv)["microcosm_to_spi_ratio"] - 1), "{:.0f}", dv)
+    emit("genDivHoldersM", lambda: jload(dv)["microcosm_dividend_holders_m"], "{:.1f}", dv)
+    emit("genDivScaleFactor", lambda: jload(dv)["scale_factor"], "{:.3f}", dv)
+    emit("genDivDraws", lambda: jload(dv)["draws"], "{:d}", dv)
+    for run, N in [("central", "Central"), ("spi_scaled", "Spi")]:
+        emit(f"genDiv{N}CostMeanBn", lambda run=run: jload(dv)[run]["exchequer_cost_bn"]["mean"], "{:.1f}", dv)
+        emit(f"genDiv{N}CostSdBn", lambda run=run: jload(dv)[run]["exchequer_cost_bn"]["sd"], "{:.1f}", dv)
+        emit(f"genDiv{N}PovBhcMeanPp", lambda run=run: jload(dv)[run]["poverty_change_bhc_pp"]["mean"], "{:.2f}", dv)
+        emit(f"genDiv{N}GiniMeanPp", lambda run=run: jload(dv)[run]["gini_change_pp"]["mean"], "{:.2f}", dv)
+    emit("genDivDiffCostBn", lambda: jload(dv)["paired_difference_spi_minus_central"]["exchequer_cost_bn"]["mean"],
+         SIGNED1, dv)
+    emit("genDivDiffGiniPp", lambda: jload(dv)["paired_difference_spi_minus_central"]["gini_change_pp"]["mean"],
+         SIGNED2, dv)
+    for ch, N in [("displacement", "Disp"), ("wage", "Wage"), ("capital", "Capital")]:
+        emit(f"genChannel{N}CostBn", lambda ch=ch: jload(dv)["channels_seed0"][ch]["exchequer_cost_bn"], SIGNED1, dv)
+        emit(f"genChannel{N}GiniPp", lambda ch=ch: jload(dv)["channels_seed0"][ch]["gini_change_pp"], SIGNED2, dv)
+        emit(f"genChannel{N}PovBhcPp", lambda ch=ch: jload(dv)["channels_seed0"][ch]["poverty_change_bhc_pp"], SIGNED2, dv)
+    emit("genChannelCapitalDivTaxBn", lambda: jload(dv)["channels_seed0"]["capital"]["dividend_tax_change_bn"],
+         "{:.1f}", dv)
+    emit("genChannelCapitalSpiCostBn", lambda: jload(dv)["capital_channel_seed0_spi_scaled"]["exchequer_cost_bn"],
+         SIGNED1, dv)
+    emit("genChannelSumCostBn", lambda: jload(dv)["channels_seed0_sum_cost_bn"], "{:.1f}", dv)
+
+    # --- data coverage (Microcosm occupation) -------------------------------
+    oc = "robustness/occupation_vs_ashe.csv"
+    emit("genOccMaxAbsDiffPp", lambda: csv(oc)["diff_pp"].abs().max(), "{:.1f}", oc)
+    ov = "robustness/occupation_coverage.json"
+    emit("genDataHouseholds", lambda: jload(ov)["households_rows"], "{:,d}", ov)
+    emit("genDataPersons", lambda: jload(ov)["persons_rows"], "{:,d}", ov)
+    emit("genDataPopulationM", lambda: jload(ov)["population_m"], "{:.1f}", ov)
+    emit("genDataEmployeesM", lambda: jload(ov)["employees_m"], "{:.1f}", ov)
+    emit("genDataEmployeeRows", lambda: jload(ov)["employees_rows"], "{:,d}", ov)
+    emit("genDataEmployeesSocPct", lambda: 100 * jload(ov)["employees_with_major_group_share"], "{:.1f}", ov)
+    emit("genDataEmployeeKishN", lambda: jload(ov)["employee_kish_effective_n"], "{:,.0f}", ov)
 
 
 def main() -> None:
@@ -348,6 +861,8 @@ def main() -> None:
          lambda: jload(rc)["recycled_dividends_bn"], "{:.1f}", rc)
     emit("genRecyclingGiniChangePp",
          lambda: jload(rc)["recycling_minus_central"]["gini_pp"], "{:.2f}", rc)
+
+    emit_extended()
 
     # --- write -------------------------------------------------------------
     header = [

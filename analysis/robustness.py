@@ -204,6 +204,23 @@ def validation_vs_ashe():
     out.to_csv(OUT / "occupation_vs_ashe.csv")
     print(out.round(3))
 
+    # occupation coverage of the Microcosm person table
+    age = calc("age")
+    employed = empinc > 0
+    has = np.isfinite(soc)
+    coverage = {
+        "persons_rows": int(len(w)),
+        "households_rows": int(len(sim.calculate("household_weight", period=2026, map_to="household").values)),
+        "population_m": float(w.sum() / 1e6),
+        "employees_rows": int(employed.sum()),
+        "employees_m": float(w[employed].sum() / 1e6),
+        "employees_with_major_group_share": float(w[employed & has].sum() / w[employed].sum()),
+        "adults_16plus_with_major_group_share": float(w[(age >= 16) & has].sum() / w[age >= 16].sum()),
+        "employee_kish_effective_n": float(w[employed].sum() ** 2 / (w[employed] ** 2).sum()),
+    }
+    (OUT / "occupation_coverage.json").write_text(json.dumps(coverage, indent=2))
+    print(coverage)
+
 
 if __name__ == "__main__":
     import sys

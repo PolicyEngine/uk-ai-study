@@ -206,6 +206,7 @@ MANIFEST = [
             "robustness/uniform_comparator.json",
             "robustness/age_exposure_moments.csv",
             "robustness/occupation_vs_ashe.csv",
+            "robustness/occupation_coverage.json",
         ],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
