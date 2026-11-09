@@ -50,6 +50,16 @@ CSV = OUT / "dividend_coverage_draws.csv"
 PERIOD = 2026
 N_DRAWS = 20
 SPI_DIVIDENDS_2026 = 79_969_122_354.0
+#: SPI 2026 projection by total-income band (same file and commit), £
+SPI_BANDS_2026 = {
+    (12_570, 15_000): 194_992_287, (15_000, 20_000): 952_676_600,
+    (20_000, 30_000): 3_710_424_654, (30_000, 40_000): 5_236_935_698,
+    (40_000, 50_000): 9_359_629_759, (50_000, 70_000): 13_928_020_474,
+    (70_000, 100_000): 10_518_441_062, (100_000, 150_000): 7_654_840_053,
+    (150_000, 200_000): 3_844_133_651, (200_000, 300_000): 4_122_694_060,
+    (300_000, 500_000): 3_821_848_818, (500_000, 1_000_000): 4_256_403_057,
+    (1_000_000, float("inf")): 12_368_082_181,
+}
 SPI_SOURCE = (
     "policyengine-uk-data policyengine_uk_data/storage/incomes_projection.csv "
     "@ fa4ebe9: HMRC SPI 2023-24 outturn projected to 2026, "
@@ -139,6 +149,13 @@ def main() -> None:
     microcosm_total = float((dividends * w).sum())
     holders_m = float(w[dividends > 0].sum() / 1e6)
     factor = SPI_DIVIDENDS_2026 / microcosm_total
+    total_income = person(baseline, "total_income")
+    bands = []
+    for (lo, hi), spi in SPI_BANDS_2026.items():
+        mask = (total_income >= lo) & (total_income < hi)
+        bands.append({"lower": lo, "upper": hi, "spi_bn": spi / 1e9,
+                      "microcosm_bn": float((dividends * w)[mask].sum() / 1e9)})
+    below = float((dividends * w)[total_income < 12_570].sum() / 1e9)
     b = metrics(baseline)
     arrays = base_arrays_for(baseline)
     del baseline
@@ -232,6 +249,8 @@ def main() -> None:
         "microcosm_dividend_holders_m": holders_m,
         "microcosm_to_spi_ratio": microcosm_total / SPI_DIVIDENDS_2026,
         "scale_factor": factor,
+        "by_total_income_band": bands,
+        "microcosm_below_12570_bn": below,
         "baseline_dividend_tax_bn": b["dividend_tax"] / 1e9,
         "baseline_dividend_tax_spi_scaled_bn": bs["dividend_tax"] / 1e9,
         "channels_seed0": channels,
