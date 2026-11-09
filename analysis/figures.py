@@ -213,7 +213,7 @@ FAMILY_STYLE = {
 
 
 def incidence_families():
-    """Two-panel comparison of the four incidence families (same aggregate
+    """Two-panel comparison of the five incidence families (same aggregate
     shock): decile transition shares (left) and the exchequer-cost /
     poverty-change trade-off (right)."""
     fams = {}
@@ -245,7 +245,11 @@ def incidence_families():
         axr.scatter(x, y, s=90, color=color, edgecolor="white", lw=1, zorder=3)
     axr.set_xlabel("Exchequer cost (£ billion per year)")
     axr.set_ylabel("Change in BHC poverty rate (pp)")
-    axr.set_xlim(12, 35)
+    # data-driven limits (a fixed 12-35 window clipped families whose cost
+    # falls outside it)
+    costs = [fams[n]["exchequer_cost_bn"] for n in FAMILY_STYLE]
+    pad = 0.12 * (max(costs) - min(costs) or 1.0)
+    axr.set_xlim(min(costs) - pad, max(costs) + pad)
     axr.grid(axis="x", visible=True)
     axr.set_title("What it costs vs poverty impact")
 
