@@ -1,7 +1,7 @@
 """UK analogues of the three anchor papers' employment findings.
 
 Each paper's headline employment effect is implemented as a displacement
-rule on the FRS person table, run through PolicyEngine UK, and summarised
+rule on the Microcosm person table, run through PolicyEngine UK, and summarised
 by age band (fiscal cost, poverty, Gini, displaced shares).
 
 1. Klein Teeselink (2025, SSRN 5516798) — GenAI-exposed UK firms cut

@@ -227,7 +227,7 @@ def main():
                 "junior_proxy": "junior positions proxied by age < 25 (KT's concept "
                                 "is seniority, not age; under-25s are ~2% of the "
                                 "displaced given the wage-tier tilt)",
-                "wage_tier_split": "weighted median of employee earnings (FRS person "
+                "wage_tier_split": "weighted median of employee earnings (Microcosm person "
                                    "earnings proxy for KT's firm pay tiers)",
                 "composite": "multiplicative combination of exposure x junior x "
                              "wage-tier channels (independence imposed)",

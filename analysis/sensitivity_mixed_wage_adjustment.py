@@ -157,7 +157,7 @@ def main() -> None:
     mixed_df.to_csv(OUT / "mixed_adjustment.csv", index=False)
     wage_df.to_csv(OUT / "survivor_wage_grid.csv", index=False)
     payload = {
-        "description": "Reduced-form adjustment-margin robustness, FRS 2024-25, 2026, seed 0",
+        "description": "Reduced-form adjustment-margin robustness, Microcosm UK 2024-25, 2026, seed 0",
         "mixed_adjustment": mixed_rows,
         "survivor_wage_grid": wage_rows,
         "assumptions": {
