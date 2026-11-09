@@ -39,16 +39,8 @@ manual and elementary work is insulated.
 \toprule
 Major group & C-AIOE & Employment (m) & Job loss (\%) \\
 \midrule
-1 Managers, directors and senior officials & 0.62 & 2.45 & 9.7 \\
-2 Professional occupations & 0.60 & 6.46 & 9.2 \\
-3 Associate professional occupations & 0.47 & 3.13 & 7.7 \\
-4 Administrative and secretarial occupations & 0.74 & 2.35 & 10.5 \\
-5 Skilled trades occupations & $-0.33$ & 1.56 & 2.7 \\
-6 Caring, leisure and other service occupations & $-0.14$ & 2.32 & 3.6 \\
-7 Sales and customer service occupations & 0.27 & 1.22 & 7.4 \\
+\genJobLossRows
 % source: results/appendix/job_loss_by_major_group.csv
-8 Process, plant and machine operatives & $-0.54$ & 1.41 & 1.3 \\
-9 Elementary occupations & $-0.73$ & 2.05 & 0.0 \\
 \bottomrule
 \end{tabular}
 
@@ -64,11 +56,11 @@ Figures~\ref{fig:b-market}--\ref{fig:b-disposable} show the baseline
 household-level decile distributions of the income components through which
 the three channels operate (aggregate \pounds billion per year by decile of
 equivalised household disposable income). Market income excluding capital
-(\pounds 1{,}313 billion in total) and income tax and National Insurance
-(\pounds 312 billion) are heavily concentrated in the top deciles---which
+(\pounds \genBaseMarketBn~billion in total) and income tax and National Insurance
+(\pounds \genBaseTaxNiBn~billion) are heavily concentrated in the top deciles---which
 is why displacement of high earners is fiscally expensive. Benefits
-(\pounds 320 billion) are spread across the lower and middle deciles,
-peaking in deciles~3 to~5. Capital income (\pounds 23 billion of interest
+(\pounds \genBaseBenefitsBn~billion) are spread across the lower and middle deciles,
+peaking in deciles~3 to~5. Capital income (\pounds \genBaseCapitalBn~billion of interest
 and dividends) is the most concentrated series of all: the top decile
 holds more than a third of the total.
 
@@ -158,7 +150,7 @@ aggregate shocks allocated uniformly across occupations, decile by decile;
 Figure~\ref{fig:b8} repeats the central scenario with the
 \citet{eloundou2023} GPT-exposure index in place of the C-AIOE. The
 exposure-based allocation shifts losses up the distribution relative to a
-uniform shock (top-decile losses of 5.3 against 2.5 per cent in this
+uniform shock (top-decile losses of \genBSevenAiDTenPct{} against \genBSevenUniDTenPct{} per cent in this
 single seed-0 draw); lower-decile comparisons are noisy at the single-draw
 level, and the choice of exposure index leaves the decile profile broadly
 similar. % results/appendix/b7_uniform_vs_ai_decile.csv
@@ -195,11 +187,10 @@ shock lands across occupation groups.
 
 Table~\ref{tab:indexsens} and Figure~\ref{fig:indexsens} report the
 outcomes. The Exchequer cost spans \pounds \genIndexCostMinBn--\genIndexCostMaxBn~billion (the largest
-deviation from the C-AIOE figure is $+11.9$ per cent, under the
-Eloundou GPT-exposure beta), the Gini change spans $+\genIndexGiniMinPp$ to $+\genIndexGiniMaxPp$ points, and the
+upward deviation from the C-AIOE figure is $\genIndexMaxDevPct$ per cent), the Gini change spans $+\genIndexGiniMinPp$ to $+\genIndexGiniMaxPp$ points, and the
 before-housing-costs poverty change spans $+\genIndexPovBhcMinPp$ to $+\genIndexPovBhcMaxPp$ points. The
-decile-10 transition share exceeds the decile-1 share by a factor of 8.4
-to 15.0. Within this seed-0 sensitivity, all five indices produce a
+decile-10 transition share exceeds the decile-1 share by a factor of \genIndexRatioMin{}
+to \genIndexRatioMax. Within this seed-0 sensitivity, all five indices produce a
 positive Gini change, a transition gradient that rises with income, and
 a fiscal cost within 20 per cent of the C-AIOE result. This is consistent
 with their similar major-group rankings and the fixed aggregate quota.
@@ -213,11 +204,7 @@ with their similar major-group rankings and the fixed aggregate quota.
 \toprule
 Index & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Gini (pp) & D1 share (\%) & D10 share (\%) \\
 \midrule
-C-AIOE (central) & 18.2 & 1.81 & 1.04 & 0.64 & 5.34 \\
-Felten AIOE & 18.1 & 1.84 & 1.05 & 0.50 & 5.44 \\
-Eloundou beta & 20.4 & 2.03 & 1.10 & 0.32 & 4.79 \\
-DSIT AIOE & 18.2 & 2.04 & 1.18 & 0.36 & 4.89 \\
-DSIT LLM & 16.7 & 1.83 & 0.94 & 0.43 & 5.80 \\
+\genIndexRows
 % source: results/robustness/index_sensitivity_full.json
 \bottomrule
 \end{tabular}
@@ -279,10 +266,7 @@ Table~\ref{tab:ripple} reports the results for $\eta \in \{0, 0.15,
 \toprule
 $\eta$ & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Pov.\ AHC (pp) & $\Delta$Gini (pp) \\
 \midrule
-0 (central) & 18.2 & 1.81 & 1.85 & 1.04 \\
-0.15 & 23.1 & 1.90 & 1.99 & 0.99 \\
-0.30 & 28.0 & 1.95 & 2.08 & 0.95 \\
-0.50 & 34.4 & 2.11 & 2.25 & 0.89 \\
+\genRippleRows
 % source: results/central.json, results/central_ripple_low.json, results/central_ripple.json, results/central_ripple_high.json
 \bottomrule
 \end{tabular}
@@ -299,7 +283,7 @@ Under this specification, the ripple channel loads mainly on the Exchequer. At $
 \pounds \genCentralRippleCostBn~billion, because thin, widespread wage cuts across the
 non-displaced workforce forgo income tax and National Insurance at the
 margin. The distributional estimates move less: BHC poverty rises by
-only 0.15 points more than in the central run, and the Gini increase
+\genRipplePovExtraPp~points more than in the central run, and the Gini increase
 falls slightly; the cuts are imposed on employed workers concentrated in
 the middle and upper deciles. Adding this particular ripple raises the
 simulated fiscal cost; other routing and wage-response assumptions could
@@ -312,9 +296,9 @@ As a historical benchmark, I push a 2008--09-sized employment shock
 through the same framework: a uniform-incidence 2.6 per cent displacement
 of employees, matching the observed 2008--2010 rise in the LFS
 unemployment rate, with no wage or capital channel (means over five
-assignment seeds). The simulation yields a $+0.81$-point rise in absolute
-BHC poverty, $+0.86$ after housing costs, $+0.29$ on the relative
-(contemporaneous-median) line and $+0.38$ points on the Gini. Recorded
+assignment seeds). The simulation yields a $\genBackcastPovBhcPp$-point change in absolute
+BHC poverty, $\genBackcastPovAhcPp$ after housing costs, $\genBackcastRelPovPp$ on the relative
+(contemporaneous-median) line and $\genBackcastGiniPp$ points on the Gini. Recorded
 HBAI outturns over 2007/08--2010/11 were very different: absolute BHC
 poverty and the Gini were roughly flat to slightly falling, and relative
 poverty fell outright, because benefits were uprated with high inflation
@@ -327,35 +311,90 @@ practice. The simulated estimates throughout the paper should accordingly
 be read as first-year mechanical impact effects against a frozen policy
 baseline: an upper envelope for measured poverty responses, not a
 forecast of HBAI outturns. Scaled per percentage point of uniform
-displacement, the backcast ($+0.31$ points BHC per point) sits on the
-same ray as the paper's uniform 7 per cent family ($+0.27$ per point),
+displacement, the backcast ($\genBackcastPerPointPp$ points BHC per point) sits on the
+same ray as the paper's uniform 7 per cent family ($\genUniformPerPointPp$ per point),
 so the benchmark and the headline results are internally consistent.
 % results/robustness/recession_backcast.json
 
-\subsection{Enhanced-dataset sensitivity}
-\label{app:enhanced-dataset}
+\subsection{Change of dataset and dividend coverage}
+\label{app:dataset-change}
 
-On PolicyEngine's enhanced FRS 2023--24 dataset the national BHC poverty
-response to the central scenario is $+3.0$ percentage points, roughly 1.6
-times the $+1.81$ points of the plain-FRS central run. A decomposition of
-the gap attributes essentially all of it to the dataset itself ($+1.16$
-of the $+1.14$-point total, evaluated at the main analysis's period), with
-a small negative period component on the enhanced data ($-0.02$ points). The enhanced dataset's calibrated weights and incomes
-gross to a substantially different employee base (2.97 million rather than
-1.56 million workers displaced at the same 7 per cent rate), so its fiscal
-aggregates are not comparable with the plain-FRS numbers elsewhere in the
-paper.
-% results/robustness/enhanced_dataset_central.json decomposition_bhc_poverty_pp
+Table~\ref{tab:dataset-change} sets the headline results of this version
+against those of the earlier version, which ran PolicyEngine UK 2.89.2 on
+the processed FRS 2024--25 file described in Section~\ref{sec:microsim}.
+Three differences between the datasets account for most of the change.
+First, Microcosm grosses to \genDataEmployeesM~million employees rather than
+22.9 million, so the same 7 per cent rate displaces more workers and removes
+more earnings. Second, Microcosm carries \pounds \genDivMicrocosmBn~billion of
+dividends held by \genDivHoldersM~million people in 2026, against
+\pounds 0.04 billion on eight records in the earlier file, so the capital
+shock now raises substantial dividend-tax revenue (Section~\ref{sec:results-channels}).
+Third, Microcosm's calibrated weights are more dispersed than survey grossing
+weights, which widens the spread across assignment draws
+(Section~\ref{sec:microsim}).
+
+\begin{table}[htbp]
+\centering
+\caption{Headline results in the earlier and current versions}
+\label{tab:dataset-change}
+\small
+\begin{tabular}{lrr}
+\toprule
+ & Earlier version & This version \\
+ & (processed FRS file) & (Microcosm) \\
+\midrule
+Employees (million) & 22.9 & \genDataEmployeesM \\
+Dividend income (\pounds bn) & 0.04 & \genDivMicrocosmBn \\
+Baseline Gini & 0.309 & \genBaselineGini \\
+Central displaced, seed 0 (million) & 1.56 & \genCentralDisplacedTwoM \\
+Central cost, 50-draw mean (\pounds bn) & 17.7 $\pm$ 1.2 & \genCentralMcCostMeanBn{} $\pm$ \genCentralMcCostSdBn \\
+Central BHC poverty, 50-draw mean (pp) & $+1.87$ & $+\genCentralMcPovBhcMeanPp$ \\
+Central Gini, 50-draw mean (pp) & $+1.11$ & $+\genCentralMcGiniMeanPp$ \\
+Low preset cost, seed 0 (\pounds bn) & 4.3 & $\genLowCostSignedBn$ \\
+High preset cost, seed 0 (\pounds bn) & 46.9 & \genHighCostBn \\
+Uniform family cost, 50-draw mean (\pounds bn) & 13.9 & \genIncUniformCostMeanBn \\
+Klein-anchored cost, 50-draw mean (\pounds bn) & 32.8 & \genIncKleinCostMeanBn \\
+% earlier version: repository commit 5d75106, results/*.json and results/robustness/*.json
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\parbox{\textwidth}{\footnotesize Earlier-version values are from the
+repository at commit 5d75106. Both versions simulate 2026; the model
+version also differs (2.89.2 against 2.174.1).}
+\end{table}
+
+Because the capital channel scales dividends proportionally, its fiscal
+size depends on how much dividend income the data carry. Microcosm's 2026
+dividend total is \genDivRatioPct~per cent above the HMRC SPI projection for
+the same year (\pounds \genDivSpiBn~billion: the SPI 2023--24 outturn
+projected to 2026 by PolicyEngine's data pipeline, summed over all income
+bands from \pounds 12{,}570).\footnote{The projection is
+\texttt{incomes\_projection.csv} in the policyengine-uk-data repository
+(commit fa4ebe9), the source of Microcosm's own SPI calibration targets.
+Microcosm matches the SPI targets band by band up to \pounds 1 million of
+total income; most of the excess sits in the untargeted band above it.}
+Scaling every person's dividends by \genDivScaleFactor{} in both the
+baseline and the shocked runs, so that the total matches the SPI
+projection, changes the central Exchequer cost from
+\pounds \genDivCentralCostMeanBn~$\pm$~\genDivCentralCostSdBn~billion to
+\pounds \genDivSpiCostMeanBn~$\pm$~\genDivSpiCostSdBn~billion (paired
+difference \pounds$\genDivDiffCostBn$~billion over \genDivDraws{} shared
+draws), and the Gini change from $+\genDivCentralGiniMeanPp$ to
+$+\genDivSpiGiniMeanPp$ points. I report this as a sensitivity, not as an
+alternative headline: the excess may reflect genuine top-income dividends
+that the SPI projection understates as much as calibration error.
+% results/robustness/dividend_coverage.json
 
 \subsection{The scenario grid by decile, and without the capital shock}
 
 Figure~\ref{fig:b9} facets the full 66-cell scenario grid by baseline
 income decile; cells report the change in mean household disposable income
-(HBAI concept), which across the grid as a whole ranges from $+3.0$ to
-$-5.1$ per cent. Every decile's panel shifts towards losses as displacement
+(HBAI concept), which across the grid as a whole ranges from $\genGridDispMaxPct$ to
+$\genGridDispMinPct$ per cent. Every decile's panel shifts towards losses as displacement
 rises, but the top deciles darken much faster: in the harshest cell (10 per
-cent displacement, no wage gain) the bottom decile loses 0.9 per cent of
-disposable income while the top decile loses 7.0 per cent. % results/appendix/grid_deciles_capital.csv
+cent displacement, no wage gain) the bottom decile loses \genAppGridHarshDOnePct~per cent of
+disposable income while the top decile loses \genAppGridHarshDTenPct~per cent. % results/appendix/grid_deciles_capital.csv
 Figure~\ref{fig:b11} removes the capital-return shock. Average disposable
 incomes fall relative to the capital-on grid, confirming that the capital
 channel raises average incomes while concentrating its gains at the top.

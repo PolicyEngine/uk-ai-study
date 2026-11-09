@@ -227,6 +227,14 @@ def emit_extended() -> None:
     emit("genCentralMcRelPovBhcSdPp", lambda: jload(mc)["relative_poverty_change_bhc_pp"]["sd"], "{:.2f}", mc)
     emit("genCentralMcPovAhcMeanPp", lambda: jload(mc)["poverty_change_ahc_pp"]["mean"], "{:.2f}", mc)
     emit("genCentralMcPovAhcSdPp", lambda: jload(mc)["poverty_change_ahc_pp"]["sd"], "{:.2f}", mc)
+    def central_displaced(agg):
+        d = csv("robustness/incidence_draws_five.csv")
+        return agg(d[d.family == "exposure"]["displaced_weighted_m"])
+    emit("genCentralMcDisplacedMinM", lambda: central_displaced(min), "{:.2f}", "robustness/incidence_draws_five.csv")
+    emit("genCentralMcDisplacedMaxM", lambda: central_displaced(max), "{:.2f}", "robustness/incidence_draws_five.csv")
+    emit("genCentralMcDisplacedMeanM", lambda: float(np.mean(list(
+        csv("robustness/incidence_draws_five.csv").query("family == 'exposure'")["displaced_weighted_m"]))),
+        "{:.2f}", "robustness/incidence_draws_five.csv")
     emit("genCentralMcCostCv", lambda: 100 * jload(mc)["exchequer_cost_bn"]["sd"]
          / jload(mc)["exchequer_cost_bn"]["mean"], "{:.0f}", mc)
     emit("genCentralMcCostHalfBn", lambda: jload(mc)["exchequer_cost_bn"]["mean"] / 2, "{:.1f}", mc)
