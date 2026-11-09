@@ -31,10 +31,7 @@ from uk_ai_study.shocks import (
     build_shocked_simulation,
 )
 
-DATA = Path("data")
 OUT = Path("results/robustness")
-H5 = DATA / "frs_2024_25.h5"
-ADULT = DATA / "frs_2024_25/UKDA-9563-tab/tab/adult.tab"
 PERIOD = 2026
 SEED = 0
 LAMBDAS = (0.0, 0.25, 0.5, 0.75, 1.0)
@@ -42,17 +39,15 @@ SURVIVOR_WAGE_EFFECTS = (-0.05, -0.026, 0.0, 0.026, 0.05)
 
 
 def main() -> None:
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    dataset = UKSingleYearDataset(file_path=str(H5))
-    baseline = Microsimulation(dataset=dataset)
+    baseline = microsimulation()
 
     def pcalc(variable: str) -> np.ndarray:
         return baseline.calculate(variable, period=PERIOD, map_to="person").values
 
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    persons = build_person_table(baseline, PERIOD)
 
     def metrics(sim) -> dict[str, float]:
         pw = sim.calculate("person_weight", period=PERIOD, map_to="person").values
@@ -91,7 +86,7 @@ def main() -> None:
     base_wage_bill = float((base_earnings * weights).sum())
 
     def evaluate(label: str, table: pd.DataFrame) -> dict[str, float | str]:
-        sim = build_shocked_simulation(dataset, baseline, table, PERIOD)
+        sim = build_shocked_simulation(baseline, table, PERIOD)
         shocked_metrics = metrics(sim)
         shocked_earnings = table["employment_income"].to_numpy(dtype=float)
         displaced = table["displaced"].to_numpy(dtype=bool)

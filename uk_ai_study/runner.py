@@ -9,7 +9,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.data import microsimulation, soc_major_group
+from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.shocks import (
     PRESETS,
     RIPPLE_PRESETS,
@@ -94,14 +95,14 @@ def gini(values: np.ndarray, weights: np.ndarray) -> float:
 def build_person_table(
     sim,
     period: int,
-    adult_tab_path: str | Path,
     *,
     extra_variables: tuple[str, ...] = (),
 ) -> pd.DataFrame:
     """Build the canonical shock person table used by every analysis.
 
-    Missing SOC matches receive survey-employment-weighted exposure and
-    complementarity means.  Keeping this construction here prevents the
+    Occupation is Microcosm's ``soc2020_major_group`` (1-9, NaN when none is
+    recorded). Employees without a major group receive the
+    survey-employment-weighted exposure and complementarity means.  Keeping this construction here prevents the
     central runner and extension scripts from silently defining different
     versions of the same exposure scenario.
     """
@@ -112,9 +113,7 @@ def build_person_table(
         {v: sim.calculate(v, period=period, map_to="person").values for v in variables}
     )
     table["weight"] = sim.calculate("person_weight", period=period, map_to="person").values
-    table["soc_major_group"] = attach_soc_major_group(
-        table["person_id"], adult_tab_path
-    )
+    table["soc_major_group"] = soc_major_group(sim, period)
     employed = table["employment_income"].to_numpy(dtype=float) > 0
     weights = table["weight"].to_numpy(dtype=float)
 
@@ -163,15 +162,10 @@ def _metrics(sim, period: int) -> dict:
 
 
 def run_scenario(
-    dataset_path: str | Path,
-    adult_tab_path: str | Path,
     scenario: ShockScenario | str,
     period: int = 2026,
     seed: int = 0,
 ) -> ScenarioResult:
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
-
     if isinstance(scenario, str):
         scenario = (
             PRESETS.get(scenario)
@@ -179,10 +173,9 @@ def run_scenario(
             or WAGE_MARGIN_PRESETS[scenario]
         )
 
-    dataset = UKSingleYearDataset(file_path=str(dataset_path))
-    baseline = Microsimulation(dataset=dataset)
+    baseline = microsimulation()
 
-    persons = build_person_table(baseline, period, adult_tab_path)
+    persons = build_person_table(baseline, period)
 
     if isinstance(scenario, WageMarginScenario):
         # the seed drives the paired central displacement draw the gross cut
@@ -193,7 +186,7 @@ def run_scenario(
     else:
         shocked_table = apply_shocks(persons, scenario, seed=seed)
 
-    shocked = build_shocked_simulation(dataset, baseline, shocked_table, period)
+    shocked = build_shocked_simulation(baseline, shocked_table, period)
     displaced = shocked_table["displaced"].to_numpy()
 
     base, shock = _metrics(baseline, period), _metrics(shocked, period)

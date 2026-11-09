@@ -37,23 +37,19 @@ from policy_counterfactuals import (  # noqa: E402
     build_sim, hh_state, metrics_from_state, person_calc, hh_calc,
 )
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 5
 RETENTION = 0.5
 CSV = OUT / "duration_reform_draws.csv"
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
     from policyengine_uk.system import system
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    baseline = microsimulation()
+    persons = build_person_table(baseline, PERIOD)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
@@ -89,7 +85,7 @@ def main():
         table = table.copy()
         table["employment_income"] = np.where(displaced, RETENTION * base_emp, emp)
 
-        sim0 = build_sim(ds, base_arrays, table)
+        sim0 = build_sim(base_arrays, table)
         s0 = hh_state(sim0)
         del sim0
         m0 = metrics_from_state(s0, pw_by_hh)
@@ -105,7 +101,7 @@ def main():
         transfer_hh = np.bincount(p2h, weights=transfer_p, minlength=len(s0["hw"]))
         m1 = metrics_from_state(s0, pw_by_hh, extra_hh_income=transfer_hh)
 
-        simr = build_sim(ds, base_arrays, table, reform=r2_reform)
+        simr = build_sim(base_arrays, table, reform=r2_reform)
         sr = hh_state(simr)
         del simr
         mr = metrics_from_state(sr, pw_by_hh)

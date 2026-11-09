@@ -433,7 +433,7 @@ def _gradient_values(
             raise ValueError(f"unknown gradient: {scenario.gradient!r}")
         gradient_weights = load_pss_weights()
     # per-major-group weights: accept any dict/Series keyed by major group
-    # (1-9 or FRS 1000-9000); employees without a SOC code get the
+    # (1-9; legacy 1000-9000 codes also accepted); employees without a SOC code get the
     # employment-weighted mean weight (mirroring mean-imputed exposure)
     weights = pd.Series(gradient_weights, dtype=float)
     if (weights < 0).any():
@@ -610,7 +610,7 @@ def compute_inflow_shares(
     weight = persons["weight"].to_numpy(dtype=float)
     employed = persons["employment_income"].to_numpy(dtype=float) > 0
     codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
-    codes = codes.where(codes < 10, codes / 1000)  # accept 1-9 or FRS 1000-9000
+    codes = codes.where(codes < 10, codes / 1000)  # 1-9; legacy 1000-9000 codes also accepted
     group = codes.to_numpy(dtype=float)
 
     dest = routing.columns
@@ -694,7 +694,7 @@ SHOCKED_INCOME_VARIABLES = (
 
 
 def build_shocked_simulation(
-    dataset, baseline_sim, shocked_table, period, reform=None, base_arrays=None
+    baseline_sim, shocked_table, period, reform=None, base_arrays=None
 ):
     """One shared constructor for the shocked simulation (every pipeline).
 
@@ -707,9 +707,9 @@ def build_shocked_simulation(
     the baseline simulation for memory); otherwise they are calculated from
     ``baseline_sim``.
     """
-    from policyengine_uk import Microsimulation
+    from uk_ai_study.data import microsimulation
 
-    sim = Microsimulation(dataset=dataset, reform=reform)
+    sim = microsimulation(reform=reform)
     for column in SHOCKED_INCOME_VARIABLES:
         sim.set_input(column, period, shocked_table[column].to_numpy(dtype=float))
     displaced = shocked_table["displaced"].to_numpy()

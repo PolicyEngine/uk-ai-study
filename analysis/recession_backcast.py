@@ -29,7 +29,6 @@ import numpy as np
 from uk_ai_study.runner import build_person_table, gini
 from uk_ai_study.shocks import ShockScenario, apply_shocks, build_shocked_simulation
 
-DATA = Path("data")
 OUT = Path("results/robustness")
 PERIOD = 2026
 SEEDS = range(5)
@@ -105,17 +104,11 @@ def metrics(sim):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-    )
+    baseline = microsimulation()
+    persons = build_person_table(baseline, PERIOD)
     b = metrics(baseline)
 
     # uniform incidence: flatten the exposure gradient before the eq 3.4
@@ -127,7 +120,7 @@ def main():
     draws = []
     for seed in SEEDS:
         shocked = apply_shocks(flat, SCENARIO, seed=seed)
-        sim = build_shocked_simulation(ds, baseline, shocked, PERIOD)
+        sim = build_shocked_simulation(baseline, shocked, PERIOD)
         m = metrics(sim)
         displaced = shocked["displaced"].to_numpy()
         rec = {

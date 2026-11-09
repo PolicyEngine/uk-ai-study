@@ -52,9 +52,7 @@ from policy_counterfactuals import (  # noqa: E402
     hh_calc,
 )
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 PERIOD = 2026
 N_DRAWS = 50
 FAMILIES = ("exposure", "junior", "compression", "uniform", "klein_top_loaded")
@@ -128,16 +126,13 @@ def convergence_diagnostics(df: pd.DataFrame, cols, checkpoint: int = 20) -> dic
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
     from policyengine_uk.system import system
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
 
-    persons = build_person_table(
-        baseline, PERIOD, ADULT, extra_variables=("region",)
+    persons = build_person_table(baseline, PERIOD, extra_variables=("region",)
     )
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
@@ -236,7 +231,7 @@ def main():
 
             table = family_table(family, persons, seed)
             displaced = table["displaced"].to_numpy()
-            sim = build_sim(ds, base_arrays, table)
+            sim = build_sim(base_arrays, table)
             m = sim_metrics(sim)
             s0 = hh_state(sim) if pol_needed else None
             del sim
@@ -281,7 +276,7 @@ def main():
             for name in pol_needed:
                 if name == "R1_wage_insurance":
                     continue
-                simr = build_sim(ds, base_arrays, table, reform=reforms_exposure[name])
+                simr = build_sim(base_arrays, table, reform=reforms_exposure[name])
                 sr = hh_state(simr)
                 del simr
                 mr = metrics_from_state(sr, pw_by_hh)

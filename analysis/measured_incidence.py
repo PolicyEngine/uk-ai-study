@@ -47,7 +47,6 @@ from uk_ai_study.shocks import (
     prescribed_systematic_sample,
 )
 
-DATA = Path("data")
 OUT = Path("results/incidence")
 PERIOD = 2026
 SEED = 0
@@ -137,18 +136,12 @@ def measured_table(
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-        extra_variables=("region",),
+    persons = build_person_table(baseline, PERIOD, extra_variables=("region",),
     )
 
     equiv = calc("equiv_hbai_household_net_income")
@@ -187,7 +180,7 @@ def main():
     }
 
     table = measured_table(persons, scenario, LONDON_MULT_CENTRAL)
-    sim = build_shocked_simulation(ds, baseline, table, PERIOD)
+    sim = build_shocked_simulation(baseline, table, PERIOD)
     m = metrics(sim)
     displaced = table["displaced"].to_numpy()
     delta = m["hni"] - b["hni"]

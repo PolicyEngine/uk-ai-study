@@ -49,7 +49,6 @@ from uk_ai_study.shocks import (
     prescribed_systematic_sample,
 )
 
-DATA = Path("data")
 OUT = Path("results/incidence")
 PERIOD = 2026
 SEED = 0
@@ -230,18 +229,12 @@ def compression_table(
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-    )
+    persons = build_person_table(baseline, PERIOD)
 
     equiv = calc("equiv_hbai_household_net_income")
     w = persons["weight"].to_numpy()
@@ -272,7 +265,7 @@ def main():
     # reported on their own clearly named axis
     for family in DEFAULT_FAMILIES + ("compression_compound", "uniform_compound"):
         table = shocked_table_for(family, persons)
-        sim = build_shocked_simulation(ds, baseline, table, PERIOD)
+        sim = build_shocked_simulation(baseline, table, PERIOD)
         m = metrics(sim)
         displaced = table["displaced"].to_numpy()
         delta = m["hni"] - b["hni"]

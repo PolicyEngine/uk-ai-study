@@ -183,7 +183,7 @@ def hh_metrics(sim):
     }
 
 
-def recycling_case(dataset, baseline_sim, persons, labour_tax):
+def recycling_case(baseline_sim, persons, labour_tax):
     """phi=0.5 dividend-recycling simulation vs the no-recycling central
     scenario. ONE extra Microsimulation (run sequentially, freed after use)."""
     scenario = PRESETS["central"]
@@ -197,7 +197,7 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
     deciles = persons["decile"].to_numpy()
 
     # no-recycling central scenario
-    sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
+    sim = build_shocked_simulation(baseline_sim, shocked_table, PERIOD)
     central = hh_metrics(sim)
     del sim
 
@@ -213,7 +213,7 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
     agg_div = float((div * weight).sum())
     recycled_table = shocked_table.copy()
     recycled_table["dividend_income"] = div * (1 + recycled / agg_div)
-    sim = build_shocked_simulation(dataset, baseline_sim, recycled_table, PERIOD)
+    sim = build_shocked_simulation(baseline_sim, recycled_table, PERIOD)
     recyc = hh_metrics(sim)
     del sim
 
@@ -264,13 +264,13 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    dataset, baseline_sim, persons = build_person_table()
+    baseline_sim, persons = build_person_table()
     labour_tax = labour_tax_attribution(baseline_sim, persons)
 
     grid = composition_grid(persons, labour_tax, Path("results/jr16/grid.csv"))
     shortfall_figure(grid)
 
-    result = recycling_case(dataset, baseline_sim, persons, labour_tax)
+    result = recycling_case(baseline_sim, persons, labour_tax)
 
     c = grid[(grid["unemployment_pct"] == 7) & (grid["phi"] == 0.5)].iloc[0]
     print(json.dumps({

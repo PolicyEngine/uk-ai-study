@@ -3,7 +3,7 @@
 Writes results/appendix/gender_incidence.json (paper §5.6). Recovered from
 the original generating session — see uk-ai-study#1, finding 8.
 
-Usage: python analysis/gender.py [--data-dir DATA] [--period 2026]
+Usage: python analysis/gender.py [--period 2026] [--draws 20]
 """
 
 import argparse
@@ -12,24 +12,19 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from policyengine_uk import Microsimulation
-from policyengine_uk.data import UKSingleYearDataset
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.data import microsimulation, soc_major_group
+from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", default="data")
     parser.add_argument("--period", type=int, default=2026)
     parser.add_argument("--draws", type=int, default=20)
     args = parser.parse_args()
-    data = Path(args.data_dir)
     P = args.period
-
-    ds = UKSingleYearDataset(file_path=str(data / "frs_2024_25.h5"))
-    base = Microsimulation(dataset=ds)
+    base = microsimulation()
     calc = lambda v: base.calculate(v, period=P, map_to="person").values
     persons = pd.DataFrame(
         {
@@ -42,8 +37,7 @@ def main():
             "gender": calc("gender"),
         }
     )
-    adult_tab = data / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], adult_tab)
+    persons["soc_major_group"] = soc_major_group(base, P)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
     w = persons["weight"].to_numpy()
@@ -77,7 +71,7 @@ def main():
     res["female_share_of_employment"] = float(w[emp & female].sum() / w[emp].sum())
 
     st = apply_shocks(persons, PRESETS["central"], seed=0)
-    sim = build_shocked_simulation(ds, base, st, P)
+    sim = build_shocked_simulation(base, st, P)
     # household-level totals broadcast to persons; only the % ratio below is
     # reported, identical for all members — broadcast intentional (issue #6)
     hni_b = base.calculate("hbai_household_net_income", period=P, map_to="person").values

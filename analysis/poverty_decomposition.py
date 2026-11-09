@@ -31,11 +31,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from uk_ai_study.runner import build_person_table
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
-DATA = Path("data")
 OUT = Path("results/robustness")
 PERIOD = 2026
 SEED = 0
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 
 
 def weighted_median(values: np.ndarray, weights: np.ndarray) -> float:
@@ -45,16 +43,14 @@ def weighted_median(values: np.ndarray, weights: np.ndarray) -> float:
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    baseline = microsimulation()
+    persons = build_person_table(baseline, PERIOD)
 
     table = apply_shocks(persons, PRESETS["central"], seed=SEED)
-    shocked = build_shocked_simulation(ds, baseline, table, PERIOD)
+    shocked = build_shocked_simulation(baseline, table, PERIOD)
 
     pcalc = lambda s, v: s.calculate(v, period=PERIOD, map_to="person").values
     pw = pcalc(baseline, "person_weight")

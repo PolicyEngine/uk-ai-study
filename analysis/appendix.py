@@ -29,20 +29,15 @@ from figstyle import (
     apply_style, decile_ax, legend_below, save,
 )
 
-DATA = Path("data")
 OUT = Path("results/appendix")
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
-H5 = DATA / "frs_2024_25.h5"
 PERIOD = 2026
 
 
 def setup():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
-    from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+    from uk_ai_study.data import microsimulation, soc_major_group
+    from uk_ai_study.exposure import exposure_for_major_group
 
-    dataset = UKSingleYearDataset(file_path=str(H5))
-    baseline = Microsimulation(dataset=dataset)
+    baseline = microsimulation()
 
     def calc(v, entity="person"):
         return baseline.calculate(v, period=PERIOD, map_to=entity).values
@@ -63,7 +58,7 @@ def setup():
             "weight": calc("person_weight"),
         }
     )
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
+    persons["soc_major_group"] = soc_major_group(baseline, PERIOD)
     e = exposure_for_major_group(persons["soc_major_group"], "c_aioe")
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
     # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
@@ -87,7 +82,7 @@ def setup():
     ranks = np.empty(len(equiv))
     ranks[order] = cw / cw[-1]
     persons["decile"] = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
-    return dataset, baseline, persons
+    return baseline, persons
 
 
 def bar_by_decile(values_bn, title, ylabel, fname, color=BLUE, fmt="{:.1f}"):
@@ -155,7 +150,7 @@ def redraw():
     print("redrew B.1-B.5, B.7, B.8 from CSVs")
 
 
-def fast(dataset, baseline, persons):
+def fast(baseline, persons):
     from uk_ai_study.exposure import exposure_for_major_group
     from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
@@ -237,7 +232,7 @@ def fast(dataset, baseline, persons):
     emp = persons["employment_income"].to_numpy() > 0
     recs = []
     for grp in range(1, 10):
-        m = emp & (g == grp * 1000)
+        m = emp & (g == grp)
         recs.append(
             {"soc_major_group": grp,
              "title": table.loc[grp, "major_group_title"],
@@ -249,11 +244,9 @@ def fast(dataset, baseline, persons):
     print(pd.DataFrame(recs).to_string(index=False))
 
     # --- B.7: AI vs uniform shock, disposable income change by decile
-    from policyengine_uk import Microsimulation
-
     def decile_change(persons_variant, label):
         shocked_table = apply_shocks(persons_variant, PRESETS["central"], seed=0)
-        sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+        sim = build_shocked_simulation(baseline, shocked_table, PERIOD)
         # household-level %, identical for all members; broadcast intentional
         hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
@@ -291,9 +284,8 @@ def fast(dataset, baseline, persons):
     print("fast appendix outputs written")
 
 
-def decomp_ci(dataset, baseline, persons, n_draws=20):
+def decomp_ci(baseline, persons, n_draws=20):
     """20-draw decomposition of disposable-income change by decile."""
-    from policyengine_uk import Microsimulation
     from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
     w = persons["weight"].to_numpy()
@@ -303,7 +295,7 @@ def decomp_ci(dataset, baseline, persons, n_draws=20):
     draws = np.zeros((n_draws, 10))
     for s in range(n_draws):
         shocked_table = apply_shocks(persons, PRESETS["central"], seed=s)
-        sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+        sim = build_shocked_simulation(baseline, shocked_table, PERIOD)
         hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
         for d in range(1, 11):
             m = dec == d
@@ -317,9 +309,8 @@ def decomp_ci(dataset, baseline, persons, n_draws=20):
     print("decomposition CIs written")
 
 
-def grids(dataset, baseline, persons):
+def grids(baseline, persons):
     """B.9 decile-faceted grid + B.11 no-capital grid."""
-    from policyengine_uk import Microsimulation
     from uk_ai_study.runner import gini
     from uk_ai_study.shocks import ShockScenario, apply_shocks, build_shocked_simulation
 
@@ -342,7 +333,7 @@ def grids(dataset, baseline, persons):
                     f"u{u}w{wg}c{int(capital)}", u / 100, wg / 100,
                     capital_return_increase=0.004 if capital else 0.0)
                 shocked_table = apply_shocks(persons, scenario, seed=0)
-                sim = build_shocked_simulation(dataset, baseline, shocked_table, PERIOD)
+                sim = build_shocked_simulation(baseline, shocked_table, PERIOD)
                 hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
                 eq_s = sim.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
                 hh_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values
@@ -367,10 +358,10 @@ if __name__ == "__main__":
     if task == "redraw":  # CSV-only, no simulation
         redraw()
         sys.exit(0)
-    dataset, baseline, persons = setup()
+    baseline, persons = setup()
     if task == "fast":
-        fast(dataset, baseline, persons)
+        fast(baseline, persons)
     elif task == "decomp":
-        decomp_ci(dataset, baseline, persons)
+        decomp_ci(baseline, persons)
     elif task == "grids":
-        grids(dataset, baseline, persons)
+        grids(baseline, persons)

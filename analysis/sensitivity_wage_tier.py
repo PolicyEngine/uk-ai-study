@@ -26,9 +26,7 @@ from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES  # noqa: E40
 from measured_incidence import LONDON_MULT_CENTRAL, measured_table  # noqa: E402
 from policy_counterfactuals import PERIOD, build_sim, person_calc, hh_calc  # noqa: E402
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 20
 VARIANTS = {"3_0.8": (3.0, 0.8), "6_0.7": (6.0, 0.7), "9.6_0.6": (9.6, 0.6)}
 CSV = OUT / "measured_wage_tier_draws.csv"
@@ -48,15 +46,12 @@ def sim_metrics(s):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
 
-    persons = build_person_table(
-        baseline, PERIOD, ADULT, extra_variables=("region",)
+    persons = build_person_table(baseline, PERIOD, extra_variables=("region",)
     )
     w = persons["weight"].to_numpy()
 
@@ -81,7 +76,7 @@ def main():
                 persons, scenario, LONDON_MULT_CENTRAL, seed=seed,
                 high_wage_mult=hi, low_wage_mult=lo,
             )
-            sim = build_sim(ds, base_arrays, table)
+            sim = build_sim(base_arrays, table)
             m = sim_metrics(sim)
             del sim
             displaced = table["displaced"].to_numpy()

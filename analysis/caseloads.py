@@ -27,11 +27,9 @@ from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
 from incidence_scenarios import shocked_table_for
 
-DATA = Path("data")
 OUT = Path("results/caseloads")
 PERIOD = 2026
 SEED = 0
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 
 PASSPORTED = ("free_school_meals", "council_tax_benefit")
 
@@ -67,14 +65,12 @@ def uc_metrics(sim):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    persons = build_person_table(baseline, PERIOD)
 
     pw = persons["weight"].to_numpy()
     hw = baseline.calculate("household_weight", period=PERIOD, map_to="household").values
@@ -94,7 +90,7 @@ def main():
     summary = []
     for name, make in scenarios.items():
         table = make()
-        sim = build_shocked_simulation(ds, baseline, table, PERIOD)
+        sim = build_shocked_simulation(baseline, table, PERIOD)
         s = uc_metrics(sim)
 
         new_bu = (s["uc_benunit"] > 0) & (b["uc_benunit"] <= 0)

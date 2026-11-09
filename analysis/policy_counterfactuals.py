@@ -58,7 +58,6 @@ from uk_ai_study.shocks import (
 )
 from incidence_scenarios import shocked_table_for  # noqa: E402
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "policy"
 PERIOD = 2026
 SEED = 0
@@ -98,10 +97,10 @@ def hh_calc(sim, var):
     return sim.calculate(var, period=PERIOD, map_to="household").values
 
 
-def build_sim(dataset, base_arrays, table, reform=None):
+def build_sim(base_arrays, table, reform=None):
     """Shared fail-fast constructor, with an optional parameter reform (R2-7)."""
     return build_shocked_simulation(
-        dataset, None, table, PERIOD, reform=reform, base_arrays=base_arrays
+        None, table, PERIOD, reform=reform, base_arrays=base_arrays
     )
 
 
@@ -149,19 +148,13 @@ def metrics_from_state(state, pw_by_hh, extra_hh_income=None):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
     from policyengine_uk.system import system
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
 
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-    )
+    persons = build_person_table(baseline, PERIOD)
 
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
@@ -256,7 +249,7 @@ def main():
     for family in FAMILIES_R1:
         table = shocked_table_for(family, persons)
         displaced = table["displaced"].to_numpy()
-        sim0 = build_sim(ds, base_arrays, table)
+        sim0 = build_sim(base_arrays, table)
         s0 = hh_state(sim0)
         del sim0
         m0 = metrics_from_state(s0, pw_by_hh)
@@ -287,7 +280,7 @@ def main():
         if family == "exposure":
             for name, reform in (("R2_uc_circuit_breaker", r2_reform),
                                  ("R3_cap_suspension_taper_cut", r3_reform)):
-                simr = build_sim(ds, base_arrays, table, reform=reform)
+                simr = build_sim(base_arrays, table, reform=reform)
                 sr = hh_state(simr)
                 del simr
                 mr = metrics_from_state(sr, pw_by_hh)

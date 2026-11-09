@@ -43,9 +43,7 @@ from uk_ai_study.runner import build_person_table, gini  # noqa: E402
 from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES, apply_shocks  # noqa: E402
 from policy_counterfactuals import PERIOD, build_sim, person_calc, hh_calc  # noqa: E402
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 20
 EARNINGS_RETENTION = 0.5   # 50% earnings retention (full-year unemployed status)
 UC_TAKEUP = 0.70
@@ -67,14 +65,12 @@ def sim_metrics(s):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
 
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    persons = build_person_table(baseline, PERIOD)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
@@ -119,7 +115,7 @@ def main():
                 t["employment_income"] = np.where(
                     displaced, EARNINGS_RETENTION * base_emp, emp
                 )
-                sim = build_sim(ds, base_arrays, t)
+                sim = build_sim(base_arrays, t)
                 m = sim_metrics(sim)
                 del sim
                 row_b = b
@@ -127,11 +123,11 @@ def main():
                 rng = np.random.default_rng(10_000 + seed)
                 claim = rng.random(n_benunits) < UC_TAKEUP
                 # same take-up draw in baseline and shocked worlds
-                sim0 = Microsimulation(dataset=ds)
+                sim0 = microsimulation()
                 sim0.set_input("would_claim_uc", PERIOD, claim)
                 row_b = sim_metrics(sim0)
                 del sim0
-                sim = build_sim(ds, base_arrays, table)
+                sim = build_sim(base_arrays, table)
                 sim.set_input("would_claim_uc", PERIOD, claim)
                 m = sim_metrics(sim)
                 del sim

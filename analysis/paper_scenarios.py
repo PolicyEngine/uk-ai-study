@@ -37,7 +37,6 @@ from uk_ai_study.runner import build_person_table
 from uk_ai_study.runner import AGE_BANDS, gini, per_capita_household_income
 from uk_ai_study.shocks import ShockScenario, draw_displaced
 
-DATA = Path("data")
 OUT = Path("results/paper_scenarios")
 PERIOD = 2026
 SEED = 0
@@ -116,7 +115,7 @@ def displaced_brynjolfsson(persons: pd.DataFrame) -> np.ndarray:
     return _rate_within(persons, mask, 0.16)
 
 
-def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
+def run(name: str, displaced: np.ndarray, baseline_sim, persons):
     from uk_ai_study.shocks import build_shocked_simulation
 
     employment = persons["employment_income"].to_numpy(dtype=float)
@@ -126,7 +125,7 @@ def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
     for col in ("savings_interest_income", "dividend_income"):
         if col not in shocked_table.columns:
             shocked_table[col] = baseline_sim.calculate(col, period=PERIOD, map_to="person").values
-    sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
+    sim = build_shocked_simulation(baseline_sim, shocked_table, PERIOD)
 
     def metrics(s):
         pw = s.calculate("person_weight", period=PERIOD, map_to="person").values
@@ -179,21 +178,15 @@ def run(name: str, displaced: np.ndarray, dataset, baseline_sim, persons):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    dataset = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=dataset)
+    baseline = microsimulation()
 
     def calc(v):
         return baseline.calculate(v, period=PERIOD, map_to="person").values
 
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-    )
+    persons = build_person_table(baseline, PERIOD)
 
     for name, fn in [
         ("klein_teeselink_2025", displaced_klein_teeselink),
@@ -204,7 +197,7 @@ def main():
         ),
         ("brynjolfsson_canaries_2025", displaced_brynjolfsson),
     ]:
-        r = run(name, fn(persons), dataset, baseline, persons)
+        r = run(name, fn(persons), baseline, persons)
         print(
             f"{name}: displaced {r['displaced_weighted_total']/1e6:.2f}m "
             f"({100*r['share_of_employed_displaced']:.1f}% of employees), "

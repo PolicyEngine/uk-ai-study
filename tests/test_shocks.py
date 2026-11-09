@@ -23,9 +23,9 @@ from uk_ai_study.shocks import (
 
 def make_persons(n=2000, seed=1):
     rng = np.random.default_rng(seed)
-    group = rng.integers(1, 10, n) * 1000.0
-    exposure_by_group = {g * 1000.0: x for g, x in zip(range(1, 10), np.linspace(-0.7, 0.7, 9))}
-    theta_by_group = {g * 1000.0: x for g, x in zip(range(1, 10), np.linspace(0.3, 0.9, 9))}
+    group = rng.integers(1, 10, n).astype(float)
+    exposure_by_group = {float(g): x for g, x in zip(range(1, 10), np.linspace(-0.7, 0.7, 9))}
+    theta_by_group = {float(g): x for g, x in zip(range(1, 10), np.linspace(0.3, 0.9, 9))}
     return pd.DataFrame(
         {
             "age": rng.integers(18, 64, n),
@@ -81,7 +81,7 @@ def test_equal_inclusion_regardless_of_weight():
             "savings_interest_income": [0.0, 0.0],
             "dividend_income": [0.0, 0.0],
             "weight": [1.0, 9.0],
-            "soc_major_group": [1000.0, 1000.0],
+            "soc_major_group": [1.0, 1.0],
             "exposure": [0.5, 0.5],
             "complementarity": [0.6, 0.6],
         }
@@ -106,7 +106,7 @@ def test_prescribed_inclusion_three_heterogeneous_weights():
             "savings_interest_income": [0.0] * 3,
             "dividend_income": [0.0] * 3,
             "weight": [1.0, 1.0, 9.0],
-            "soc_major_group": [1000.0] * 3,
+            "soc_major_group": [1.0] * 3,
             "exposure": [0.5] * 3,
             "complementarity": [0.6] * 3,
         }
@@ -237,8 +237,8 @@ def test_survivor_composition_wage_drift():
     assumed rate. Quantify the drift and bound it."""
     n = 3000
     rng = np.random.default_rng(7)
-    group = rng.integers(1, 10, n) * 1000.0
-    g = group / 1000.0
+    group = rng.integers(1, 10, n).astype(float)
+    g = group
     # theta rises with group; exposure falls with group (substitution vs
     # complementarity); wages rise with group -> theta correlates with wages
     theta_by_group = {gg: t for gg, t in zip(range(1, 10), np.linspace(0.3, 0.9, 9))}
@@ -409,7 +409,7 @@ def test_ripple_inflow_shares_sane():
     assert (s.to_numpy() < 1.0).all()
     # conservation: total inflow weight equals total SOC-coded displaced weight
     w = persons["weight"].to_numpy()
-    group = persons["soc_major_group"].to_numpy() / 1000
+    group = persons["soc_major_group"].to_numpy()
     base_emp = {
         l: w[(persons["employment_income"] > 0) & (group == l)].sum()
         for l in range(1, 10)

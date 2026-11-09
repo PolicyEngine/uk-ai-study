@@ -89,6 +89,14 @@ NON_GENERATED = []
 
 PY = sys.executable or "python3"
 
+# latexmk where installed, otherwise tectonic (both build paper/main.pdf)
+LATEX_CMD = (
+    ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
+     "-cd", "paper/main.tex"]
+    if shutil.which("latexmk")
+    else ["tectonic", "--keep-logs", "paper/main.tex"]
+)
+
 # ---------------------------------------------------------------------------
 # Manifest: stage -> command, declared outputs (relative to results/),
 # declared data inputs (relative to repo root), and upstream stage deps
@@ -98,7 +106,9 @@ PY = sys.executable or "python3"
 # divergence (missing or extra tracked files), so a PRESETS change surfaces
 # loudly rather than silently.
 # ---------------------------------------------------------------------------
-FRS_INPUTS = ["data/frs_2024_25.h5", "data/frs_2024_25/UKDA-9563-tab/tab/adult.tab"]
+# Certified Microcosm UK 2024-25 build pinned by policyengine[uk] (see
+# uk_ai_study/data.py); its sha256 is checked by policyengine.py on load.
+MICROCOSM_INPUTS = ["data/microcosm_uk_2024_25.h5"]
 
 MANIFEST = [
     {
@@ -111,7 +121,7 @@ MANIFEST = [
             "central_ripple_high.json",
             "wage_margin_central.json", "wage_margin_pss.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -123,14 +133,14 @@ MANIFEST = [
             "jr16/fig4_3_capital_by_decile.csv",
             "jr16/fig4_4_decomposition.csv",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "jr16_grid",
         "cmd": [PY, "analysis/replicate_jr16.py", "grid"],
         "outputs": ["jr16/grid.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -143,14 +153,14 @@ MANIFEST = [
             "incidence/compression_compound.json",
             "incidence/summary.csv",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "measured_incidence",
         "cmd": [PY, "analysis/measured_incidence.py"],
         "outputs": ["incidence/klein_top_loaded.json", "incidence/summary_five.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": ["incidence"],  # extends the four-family summary to five
     },
     {
@@ -171,36 +181,33 @@ MANIFEST = [
             "appendix/b8_alternative_index_decile.csv",
             "appendix/b8_alternative_index_decile.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "appendix_decomp",
         "cmd": [PY, "analysis/appendix.py", "decomp"],
         "outputs": ["appendix/decomposition_ci.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "appendix_grids",
         "cmd": [PY, "analysis/appendix.py", "grids"],
         "outputs": ["appendix/grid_deciles_capital.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "robustness",
-        "cmd": [PY, "analysis/robustness.py", "all"],
+        "cmd": [PY, "analysis/robustness.py", "fast"],
         "outputs": [
-            "robustness/central_draws.csv",
             "robustness/exposure_sensitivity.json",
             "robustness/uniform_comparator.json",
             "robustness/age_exposure_moments.csv",
-            "robustness/frs_vs_ashe_occupation.csv",
-            # also writes robustness/central_monte_carlo.json, which the
-            # monte_carlo stage recomputes and owns (declared there).
+            "robustness/occupation_vs_ashe.csv",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
@@ -214,8 +221,8 @@ MANIFEST = [
             "robustness/policy_monte_carlo.json",
             "robustness/central_monte_carlo.json",
         ],
-        "inputs": FRS_INPUTS,
-        "after": ["robustness"],  # supersedes robustness' central_monte_carlo.json
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
         "log": True,
     },
     {
@@ -225,7 +232,7 @@ MANIFEST = [
             "robustness/index_sensitivity_full.json",
             "robustness/index_sensitivity.png",
         ],
-        "inputs": FRS_INPUTS + ["data/raw"],
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
@@ -236,7 +243,7 @@ MANIFEST = [
             "robustness/duration_takeup_draws.csv",
             "robustness/duration_takeup_sensitivity.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": ["monte_carlo"],  # reads robustness/incidence_draws_five.csv
         "log": True,
     },
@@ -247,7 +254,7 @@ MANIFEST = [
             "robustness/duration_reform_draws.csv",
             "robustness/duration_reform_ranking.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
@@ -258,7 +265,7 @@ MANIFEST = [
             "robustness/measured_wage_tier_draws.csv",
             "robustness/measured_wage_tier_sensitivity.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
@@ -270,19 +277,19 @@ MANIFEST = [
             "robustness/survivor_wage_grid.csv",
             "robustness/mixed_wage_adjustment.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
     {
-        "stage": "enhanced_dataset",
-        "cmd": [PY, "analysis/sensitivity_enhanced_dataset.py"],
+        "stage": "dividend_coverage",
+        "cmd": [PY, "analysis/sensitivity_dividend_coverage.py"],
         "outputs": [
-            "robustness/enhanced_dataset_cells.csv",
-            "robustness/enhanced_dataset_central.json",
+            "robustness/dividend_coverage_draws.csv",
+            "robustness/dividend_coverage.json",
         ],
-        "inputs": FRS_INPUTS + ["data/enhanced_frs_2023_24.h5"],
-        "after": ["presets"],  # reads results/central.json
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
         "log": True,
     },
     {
@@ -294,7 +301,7 @@ MANIFEST = [
             "paper_scenarios/hosseini_lichtinger_2026_adopter_scaled.json",
             "paper_scenarios/klein_teeselink_2025.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -309,7 +316,7 @@ MANIFEST = [
             "policy/summary.csv",
             "policy/policy_reforms.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -321,7 +328,7 @@ MANIFEST = [
             "caseloads/incidence_uniform.json", "caseloads/incidence_compression.json",
             "caseloads/summary.csv", "caseloads/caseloads.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -332,53 +339,29 @@ MANIFEST = [
             "tax_composition/recycling_case.json",
             "tax_composition/revenue_shortfall_phi.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": ["jr16_grid"],  # reads results/jr16/grid.csv
     },
     {
         "stage": "gender",
         "cmd": [PY, "analysis/gender.py"],
         "outputs": ["appendix/gender_incidence.json"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "poverty_decomposition",
         "cmd": [PY, "analysis/poverty_decomposition.py"],
         "outputs": ["robustness/poverty_decomposition.json"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "recession_backcast",
         "cmd": [PY, "analysis/recession_backcast.py"],
         "outputs": ["robustness/recession_backcast.json"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
-    },
-    {
-        "stage": "geo_impact",
-        "cmd": [PY, "analysis/geo_impact.py"],
-        "outputs": [
-            "geo/constituency_impacts.csv",
-            "geo/region_summary.csv",
-            "geo/hexmap_income_change.png",
-            "geo/hexmap_displacement.png",
-            "geo/imputation_notes.json",
-        ],
-        "inputs": FRS_INPUTS + [
-            "data/enhanced_frs_2023_24.h5",
-            "data/parliamentary_constituency_weights.h5",
-            "data/constituencies_2024.csv",
-        ],
-        "after": [],
-    },
-    {
-        "stage": "geo_choropleth",
-        "cmd": [PY, "analysis/geo_choropleth.py"],
-        "outputs": ["geo/map_income_change.png", "geo/map_displacement.png"],
-        "inputs": ["data/uk_constituencies_2024.geojson"],
-        "after": ["geo_impact"],  # reads results/geo/constituency_impacts.csv
     },
     {
         "stage": "figures",
@@ -407,17 +390,16 @@ MANIFEST = [
         "after": [
             "presets", "jr16_figs", "jr16_grid", "incidence",
             "measured_incidence", "monte_carlo", "policy", "caseloads",
-            "tax_composition", "enhanced_dataset", "figures",
+            "tax_composition", "dividend_coverage", "figures",
         ],
     },
     {
         "stage": "paper_pdf",
-        "cmd": ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
-                "-cd", "paper/main.tex"],
+        "cmd": LATEX_CMD,
         "outputs": [],
         "repo_outputs": ["paper/main.pdf"],
         "inputs": [],
-        "after": ["tex_values", "geo_choropleth"],
+        "after": ["tex_values"],
     },
 ]
 
@@ -623,13 +605,12 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
         "package_versions": package_versions(
             (
                 "uk-ai-study",
+                "policyengine",
                 "policyengine-uk",
                 "policyengine-core",
-                "policyengine-uk-data",
                 "numpy",
                 "pandas",
                 "matplotlib",
-                "geopandas",
             )
         ),
         "stages": [
@@ -716,7 +697,7 @@ def build(manifest, keep_build=False, only_stages=None):
         if build_results.exists():
             shutil.rmtree(build_results)
         for sub in ["jr16", "appendix", "robustness", "incidence", "policy",
-                    "caseloads", "paper_scenarios", "tax_composition", "geo"]:
+                    "caseloads", "paper_scenarios", "tax_composition"]:
             (build_results / sub).mkdir(parents=True, exist_ok=True)
 
         log_path = build_results / BUILD_LOG
@@ -798,12 +779,10 @@ def build(manifest, keep_build=False, only_stages=None):
                     "uk-ai-study",
                     "policyengine-uk",
                     "policyengine-core",
-                    "policyengine-uk-data",
-                    "numpy",
+                        "numpy",
                     "pandas",
                     "matplotlib",
-                    "geopandas",
-                )
+                    )
             ),
             "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],
             "script_sha256": {
