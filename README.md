@@ -13,25 +13,27 @@ The pipeline is `C-AIOE exposure → employment/wage/capital shocks (JR16 eqs
 
 | JR16 (Ireland) | This study (UK) |
 |---|---|
-| SILC microdata | FRS 2024-25 (`frs_2024_25.h5`, PolicyEngine build) |
-| SWITCH microsimulation | **PolicyEngine UK** (latest release) |
-| ISCO occupations | SOC2020 major groups from raw FRS `adult.tab` |
+| SILC microdata | **Microcosm UK 2024-25** (PolicyEngine's calibrated FRS-based dataset, pinned by `policyengine[uk]==6.16.1`) |
+| SWITCH microsimulation | **PolicyEngine UK** 2.174.1, via `policyengine.uk.managed_microsimulation()` |
+| ISCO occupations | SOC2020 major groups from Microcosm's `soc2020_major_group` |
 | C-AIOE (Pizzinelli et al. 2023) | Same measure, via the populace PR #325 UK crosswalk |
 
-### 1. Exposure (`uk_ai_study/exposure.py`)
+### 1. Exposure (`uk_ai_study/exposure.py`, `uk_ai_study/data.py`)
 
-Each FRS adult carries a 1-digit SOC2020 major group in the raw UKDA
-`adult.tab` (`SOC2020`, coded 1000–9000). We join it onto the PolicyEngine
-person table with **`person_id = SERNUM*1000 + PERSON`** — the current
-`policyengine-uk-data` convention, verified to match 100% of FRS 2024-25
-adults. Each major group then gets its **C-AIOE** score (Felten AIOE ×
-Pizzinelli complementarity adjustment) and complementarity **θ** from the
-packaged crosswalk (`uk_ai_study/data/uk_soc2020_major_group_ai_exposure.csv`,
-derived in [populace PR #325](https://github.com/PolicyEngine/populace/pull/325)
+Each Microcosm person carries `soc2020_major_group`, the SOC 2020 major
+group of their main or last job (policyengine-uk 2.173.0+, carried from the
+FRS `SOC2020` field and calibrated to APS employment by major group and
+region; imputed from income for SPI-drawn records). It is coded 1-9, the same
+key as the exposure table, so no join to raw survey files is needed
+(`uk_ai_study.data.soc_major_group`). Each major group then gets its
+**C-AIOE** score (Felten AIOE × Pizzinelli complementarity adjustment) and
+complementarity **θ** from the packaged crosswalk
+(`uk_ai_study/data/uk_soc2020_major_group_ai_exposure.csv`, derived in
+[populace PR #325](https://github.com/PolicyEngine/populace/pull/325)
 from open-licensed sources: Felten et al. 2021, O*NET-reconstructed θ per IMF
 WP/23/216, ASHE 2025 Table 14 employment weights; OGL v3 / CC BY 4.0 / MIT).
-Persons without a SOC code (children, non-workers) receive the mean score —
-they never enter the employment shock, which conditions on positive earnings.
+Persons without a major group receive the employment-weighted mean score;
+only employees (positive employment income) enter the employment shock.
 
 ### 2. Shocks (`uk_ai_study/shocks.py`)
 
@@ -75,8 +77,9 @@ Hosseini & Lichtinger (2026).
 
 ### 3. Microsimulation (`uk_ai_study/runner.py`)
 
-Baseline and shocked `policyengine_uk.Microsimulation` runs on the same
-dataset; the shocked run receives the modified `employment_income`,
+Baseline and shocked simulations are built with
+`policyengine.uk.managed_microsimulation()` (`uk_ai_study.data.microsimulation`),
+so every run uses the certified Microcosm build and records its provenance; the shocked run receives the modified `employment_income`,
 `savings_interest_income`, `dividend_income` and `employment_status` via
 `set_input`. Reported deltas (shocked − baseline):
 
@@ -88,35 +91,64 @@ dataset; the shocked run receives the modified `employment_income`,
 - **By baseline income decile** and **by age band** (16-24 … 65+) — mean
   HBAI-household-net-income change, plus each band's share of the displaced
 
+## Data
+
+All simulations run on **Microcosm UK 2024-25**, build
+`microcosm-uk-2024-25-national-20261107T020434Z-eeb6093e` (sha256
+`0a9b77db…1f25`), the default dataset of the `policyengine[uk]==6.16.1`
+release bundle. Microcosm starts from the FRS 2024-25, adds SPI-drawn
+top-income records, imputes variables the survey lacks and calibrates
+household weights to about 1,500 administrative targets (HMRC SPI, ONS, DWP,
+OBR and others). It lives in a private Hugging Face repository
+(`policyengine/populace-uk-private`), so you need a token with access.
+
+The earlier version of the study used PolicyEngine's processed, uncalibrated
+FRS 2024-25 file (`frs_2024_25.h5`) plus a join to the raw UKDA `adult.tab`
+for occupation. That file had two build defects (household-level variables
+attached in row order rather than by serial number, giving about 62m people
+and 22.9m employees; and dividends joined on the wrong person key, leaving
+eight records with any dividends), so the study moved to Microcosm. The paper's
+appendix compares the headline results across the two datasets.
+
 ## Reproduce
 
 ```bash
-conda create -n ukai python=3.13 -y && conda activate ukai
-pip install -e .
-export HUGGING_FACE_TOKEN=hf_...   # needs access to policyengine/policyengine-uk-data
-python analysis/download_data.py    # FRS h5 + raw UKDA zip (adult.tab) -> data/
-python analysis/run_all.py          # all presets -> results/*.json
-bash analysis/regenerate_all.sh     # or: the FULL result set from empty results/
-python -m pytest tests/             # shock-mechanics unit tests
+uv sync                                   # Python 3.13, policyengine[uk]==6.16.1 (uv.lock)
+huggingface-cli login                     # or export HUGGING_FACE_TOKEN=hf_... (read access to policyengine/populace-uk-private)
+uv run python analysis/download_data.py   # optional: fetch the Microcosm h5 into data/ (sha256-checked)
+uv run python analysis/run_all.py         # presets -> results/*.json
+uv run bash analysis/regenerate_all.sh    # or: the full attested result set, built from empty results/
+uv run python analysis/emit_tex_values.py # paper/values_generated.tex from results/
+uv run pytest tests/                      # unit tests
 ```
 
-Microdata is licensed (UKDS EUL) and never committed; `data/` is gitignored.
-Results in `results/` are aggregates only.
+`analysis/rebuild.py --dry-run` lists every stage and its outputs;
+`--check` verifies `results/` against `results/BUILD_MANIFEST.json`. A full
+rebuild runs roughly 900 Microcosm simulations; each needs several GB of
+memory, so run one stage at a time on a laptop. `data/` is gitignored;
+`results/` holds aggregates only.
 
-## Known limitations (v0.1)
+## Known limitations
 
-- **1-digit exposure only**: within-major-group exposure variation is lost;
-  JR16 uses finer occupations. A QRF imputation from 4-digit LFS SOC (as in
-  populace PR #325) is the planned upgrade.
-- **Plain FRS weights**, not the calibrated enhanced FRS (its household
-  cloning breaks the `adult.tab` ID join; needs the SOC merge moved upstream
-  of cloning).
+- **1-digit exposure only**: the exposure crosswalk and Microcosm's observed
+  occupation field are both at SOC2020 major-group level, so within-group
+  variation is lost. Microcosm's sub-major group is imputed and unused.
+- **Uneven calibrated weights**: the employee records have a Kish effective
+  sample size of a few thousand, so single displacement draws are noisy and
+  the realised weighted count displaced varies around the 7% quota. Report
+  Monte Carlo means (50 draws for the incidence families and policy runs).
+- **Dividend coverage**: Microcosm's 2026 dividend total runs above the HMRC
+  SPI projection for 2026, mostly above £1m of total income;
+  `analysis/sensitivity_dividend_coverage.py` reruns the central scenario
+  with dividends scaled to the SPI total.
+- **Occupation of SPI-drawn records** is imputed from income, not observed.
 - Displaced workers are current-period unemployed; JR16's "9+ months
   unemployed, contributory benefits exhausted" contract is not fully
   expressible in PolicyEngine UK inputs.
-- Self-employed are outside all shocks (as in JR16). Decile figures average
-  50 seeded draws; the central preset is Monte-Carlo'd over 20 draws
-  (`analysis/robustness.py`); grid cells are single-draw (seed=0).
+- Self-employed are outside all shocks (as in JR16).
+- No constituency or local-authority breakdown: the earlier maps used the
+  enhanced FRS 2023-24 and were dropped with it. Microcosm's dense
+  local-area build could restore them.
 
 ## References
 
