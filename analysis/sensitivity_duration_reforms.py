@@ -19,6 +19,7 @@ to duration_reform_draws.csv).
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -88,6 +89,7 @@ def main():
         sim0 = build_sim(base_arrays, table)
         s0 = hh_state(sim0)
         del sim0
+        gc.collect()
         m0 = metrics_from_state(s0, pw_by_hh)
 
         # R1 duration-consistent wage insurance
@@ -104,6 +106,7 @@ def main():
         simr = build_sim(base_arrays, table, reform=r2_reform)
         sr = hh_state(simr)
         del simr
+        gc.collect()
         mr = metrics_from_state(sr, pw_by_hh)
         cost_r2 = s0["gov"] - sr["gov"]
 

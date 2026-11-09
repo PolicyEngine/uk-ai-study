@@ -39,6 +39,7 @@ results/policy/policy_reforms.png.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -252,6 +253,7 @@ def main():
         sim0 = build_sim(base_arrays, table)
         s0 = hh_state(sim0)
         del sim0
+        gc.collect()
         m0 = metrics_from_state(s0, pw_by_hh)
 
         # validation: post-hoc poverty rule reproduces the model's flags
@@ -283,6 +285,7 @@ def main():
                 simr = build_sim(base_arrays, table, reform=reform)
                 sr = hh_state(simr)
                 del simr
+                gc.collect()
                 mr = metrics_from_state(sr, pw_by_hh)
                 gross = s0["gov"] - sr["gov"]  # net-of-clawback exchequer cost
                 gain_hh = np.clip(sr["hbai_bhc"] - s0["hbai_bhc"], 0, None)

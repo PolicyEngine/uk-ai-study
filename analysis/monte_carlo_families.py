@@ -20,6 +20,7 @@ completed draws and rebuilds the JSON summaries.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -235,6 +236,7 @@ def main():
             m = sim_metrics(sim)
             s0 = hh_state(sim) if pol_needed else None
             del sim
+            gc.collect()
 
             if need_inc:
                 append_row(
@@ -279,6 +281,7 @@ def main():
                 simr = build_sim(base_arrays, table, reform=reforms_exposure[name])
                 sr = hh_state(simr)
                 del simr
+                gc.collect()
                 mr = metrics_from_state(sr, pw_by_hh)
                 append_row(
                     POL_CSV,

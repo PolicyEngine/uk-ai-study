@@ -34,6 +34,8 @@ Outputs results/incidence/<family>.json plus a combined summary CSV.
 
 from __future__ import annotations
 
+import gc
+
 import json
 from pathlib import Path
 
@@ -289,6 +291,8 @@ def main():
         (OUT / f"{family}.json").write_text(json.dumps(rec, indent=2))
         summary.append({k: v for k, v in rec.items() if not isinstance(v, dict)})
         print(family, {k: round(v, 2) for k, v in summary[-1].items() if k != "family"}, flush=True)
+        del sim
+        gc.collect()
     pd.DataFrame(summary).to_csv(OUT / "summary.csv", index=False)
 
 

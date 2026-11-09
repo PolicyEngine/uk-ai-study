@@ -27,6 +27,8 @@ Usage:
 
 from __future__ import annotations
 
+import gc
+
 import sys
 from pathlib import Path
 
@@ -253,6 +255,8 @@ def run_grid(baseline_sim, persons, resume: bool = False):
                 }
             )
             pd.DataFrame(rows)[GRID_COLUMNS].to_csv(out_path, index=False)
+            del sim
+            gc.collect()
             print(f"u={u} w={w} done", flush=True)
 
 

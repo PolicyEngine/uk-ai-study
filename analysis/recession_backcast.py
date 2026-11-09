@@ -21,6 +21,8 @@ Outputs results/robustness/recession_backcast.json.
 
 from __future__ import annotations
 
+import gc
+
 import json
 from pathlib import Path
 
@@ -122,6 +124,8 @@ def main():
         shocked = apply_shocks(flat, SCENARIO, seed=seed)
         sim = build_shocked_simulation(baseline, shocked, PERIOD)
         m = metrics(sim)
+        del sim
+        gc.collect()
         displaced = shocked["displaced"].to_numpy()
         rec = {
             "seed": seed,

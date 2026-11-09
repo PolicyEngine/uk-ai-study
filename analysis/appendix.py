@@ -13,6 +13,7 @@ Outputs in results/appendix/.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -300,6 +301,8 @@ def decomp_ci(baseline, persons, n_draws=20):
         for d in range(1, 11):
             m = dec == d
             draws[s, d - 1] = 100 * float(((hni_s - hni_b)[m] * w[m]).sum()) / float((hni_b[m] * w[m]).sum())
+        del sim
+        gc.collect()
         print(f"decomp draw {s} done", flush=True)
     mean, se = draws.mean(0), draws.std(0, ddof=1) / np.sqrt(n_draws)
     pd.DataFrame(
@@ -325,10 +328,17 @@ def grids(baseline, persons):
     mean_b = float(np.average(
         baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values, weights=hw))
 
-    rows = []
+    out_path = OUT / "grid_deciles_capital.csv"
+    rows, done = [], set()
+    if out_path.exists():  # resume a partial run
+        prev = pd.read_csv(out_path)
+        rows = prev.to_dict("records")
+        done = set(zip(prev["unemployment_pct"], prev["wage_pct"], prev["capital_shock"].astype(bool)))
     for u in range(0, 11):
         for wg in range(0, 6):
             for capital in (True, False):
+                if (u, wg, capital) in done:
+                    continue
                 scenario = ShockScenario(
                     f"u{u}w{wg}c{int(capital)}", u / 100, wg / 100,
                     capital_return_increase=0.004 if capital else 0.0)
@@ -346,7 +356,9 @@ def grids(baseline, persons):
                     m = dec == d
                     rec[f"decile{d}_change_pct"] = 100 * float(((hni_s - hni_b)[m] * w[m]).sum()) / float((hni_b[m] * w[m]).sum())
                 rows.append(rec)
-            pd.DataFrame(rows).to_csv(OUT / "grid_deciles_capital.csv", index=False)
+                del sim
+                gc.collect()
+            pd.DataFrame(rows).to_csv(out_path, index=False)
             print(f"u={u} w={wg} done (both capital variants)", flush=True)
     print("grids complete")
 

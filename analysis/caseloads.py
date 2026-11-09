@@ -13,6 +13,7 @@ Context (cited, not computed): DWP total welfare spending is ~£334bn in
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -128,6 +129,7 @@ def main():
         summary.append({k: v for k, v in rec.items() if not isinstance(v, dict)})
         print(name, {k: round(v, 2) for k, v in summary[-1].items() if isinstance(v, float)}, flush=True)
         del sim, s, table
+        gc.collect()
 
     df = pd.DataFrame(summary)
     df.to_csv(OUT / "summary.csv", index=False)

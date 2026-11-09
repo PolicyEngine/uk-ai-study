@@ -210,6 +210,17 @@ def emit_extended() -> None:
                        ("benefits", "Ben"), ("tax_and_contributions", "Tax")]:
             emit(f"genDecomp{C}D{D}Pct",
                  lambda d=d, col=col: csv(dc).set_index("decile").loc[d, col] * 100, "{:.1f}", dc)
+    def worst_decile():
+        d = csv(dc).set_index("decile")
+        return int(d["disposable_income"].idxmin())
+    emit("genDecompWorstDecile", worst_decile, "{:d}", dc)
+    for col, C in [("market_income", "Market"), ("disposable_income", "Disp"),
+                   ("benefits", "Ben"), ("tax_and_contributions", "Tax")]:
+        emit(f"genDecomp{C}WorstPct",
+             lambda col=col: csv(dc).set_index("decile").loc[worst_decile(), col] * 100, "{:.1f}", dc)
+    emit("genDecompAbsorbedWorstPct",
+         lambda: 100 * (1 - csv(dc).set_index("decile").loc[worst_decile(), "disposable_income"]
+                        / csv(dc).set_index("decile").loc[worst_decile(), "market_income"]), "{:.0f}", dc)
     emit("genDecompResidualMaxPct", lambda: csv(dc)["residual"].abs().max() * 100, "{:.1f}", dc)
     emit("genDecompAbsorbedDTenPct",
          lambda: 100 * (1 - csv(dc).set_index("decile").loc[10, "disposable_income"]
@@ -218,6 +229,12 @@ def emit_extended() -> None:
     emit("genDecompCiDOnePct", lambda: -csv(ci).set_index("decile").loc[1, "disposable_change_pct"], "{:.2f}", ci)
     emit("genDecompCiDTenPct", lambda: -csv(ci).set_index("decile").loc[10, "disposable_change_pct"], "{:.2f}", ci)
     emit("genDecompCiMaxLossPct", lambda: -csv(ci)["disposable_change_pct"].min(), "{:.2f}", ci)
+    emit("genDecompCiDOneSignedPct", lambda: csv(ci).set_index("decile").loc[1, "disposable_change_pct"], SIGNED2, ci)
+    emit("genDecompCiDTenSignedPct", lambda: csv(ci).set_index("decile").loc[10, "disposable_change_pct"], SIGNED2, ci)
+    emit("genDecompCiDTenLoPct", lambda: csv(ci).set_index("decile").loc[10, "ci_low"], SIGNED2, ci)
+    emit("genDecompCiDTenHiPct", lambda: csv(ci).set_index("decile").loc[10, "ci_high"], SIGNED2, ci)
+    emit("genDecompCiDOneLoPct", lambda: csv(ci).set_index("decile").loc[1, "ci_low"], SIGNED2, ci)
+    emit("genDecompCiDOneHiPct", lambda: csv(ci).set_index("decile").loc[1, "ci_high"], SIGNED2, ci)
     emit("genDecompCiMaxLossDecile",
          lambda: int(csv(ci).set_index("decile")["disposable_change_pct"].idxmin()), "{:d}", ci)
 
@@ -431,6 +448,22 @@ def emit_extended() -> None:
          lambda: -(cell(7, 2, "net_revenue_change_bn")
                    + 0.6 * (cell(7, 3, "net_revenue_change_bn") - cell(7, 2, "net_revenue_change_bn"))),
          "{:.0f}", gr)
+    emit("genGridCentralCashChangeBn",
+         lambda: cell(7, 2, "net_revenue_change_bn")
+         + 0.6 * (cell(7, 3, "net_revenue_change_bn") - cell(7, 2, "net_revenue_change_bn")),
+         SIGNED1, gr)
+    for u, w in [(3, 0), (4, 0), (7, 0), (7, 3), (7, 4), (7, 5)]:
+        emit(f"genGridDisp{['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'][u]}"
+             f"{['Zero','One','Two','Three','Four','Five'][w]}Pct",
+             lambda u=u, w=w: cell(u, w, "avg_disposable_income_change_pct"), SIGNED2, gr)
+        emit(f"genGridRev{['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'][u]}"
+             f"{['Zero','One','Two','Three','Four','Five'][w]}Bn",
+             lambda u=u, w=w: cell(u, w, "net_revenue_change_bn"), SIGNED1, gr)
+        emit(f"genGridRev{['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'][u]}"
+             f"{['Zero','One','Two','Three','Four','Five'][w]}Pct",
+             lambda u=u, w=w: cell(u, w, "net_revenue_change_pct_of_receipts"), SIGNED1, gr)
+    emit("genGridCapOnlyRevBn", lambda: cell(0, 0, "net_revenue_change_bn"), "{:.1f}", gr)
+    emit("genGridCapOnlyDispPct", lambda: cell(0, 0, "avg_disposable_income_change_pct"), SIGNED1, gr)
     emit("genGridGiniPositiveCells", lambda: int((csv(gr)["gini_change_pp"] > 0).sum()), "{:d}", gr)
 
     def argmin_cell(col):

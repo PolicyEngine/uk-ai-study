@@ -16,6 +16,8 @@ all tax-benefit recomputation are unchanged from the main paper.
 
 from __future__ import annotations
 
+import gc
+
 import json
 from pathlib import Path
 
@@ -88,6 +90,8 @@ def main() -> None:
     def evaluate(label: str, table: pd.DataFrame) -> dict[str, float | str]:
         sim = build_shocked_simulation(baseline, table, PERIOD)
         shocked_metrics = metrics(sim)
+        del sim
+        gc.collect()
         shocked_earnings = table["employment_income"].to_numpy(dtype=float)
         displaced = table["displaced"].to_numpy(dtype=bool)
         return {

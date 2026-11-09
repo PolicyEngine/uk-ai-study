@@ -28,6 +28,7 @@ summary to results/robustness/duration_takeup_sensitivity.json.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -118,6 +119,7 @@ def main():
                 sim = build_sim(base_arrays, t)
                 m = sim_metrics(sim)
                 del sim
+                gc.collect()
                 row_b = b
             else:
                 rng = np.random.default_rng(10_000 + seed)
@@ -127,10 +129,12 @@ def main():
                 sim0.set_input("would_claim_uc", PERIOD, claim)
                 row_b = sim_metrics(sim0)
                 del sim0
+                gc.collect()
                 sim = build_sim(base_arrays, table)
                 sim.set_input("would_claim_uc", PERIOD, claim)
                 m = sim_metrics(sim)
                 del sim
+                gc.collect()
 
             row = {
                 "variant": variant,

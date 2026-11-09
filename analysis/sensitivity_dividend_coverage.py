@@ -26,6 +26,7 @@ and results/robustness/dividend_coverage.json.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -182,6 +183,7 @@ def main() -> None:
         sim = build_shocked_simulation(None, table, PERIOD, base_arrays=arrays)
         m = metrics(sim)
         del sim
+        gc.collect()
         record(run, 0, b, table, m)
 
     # ---- (b) unscaled central draws ----------------------------------------
@@ -192,6 +194,7 @@ def main() -> None:
         sim = build_shocked_simulation(None, table, PERIOD, base_arrays=arrays)
         m = metrics(sim)
         del sim
+        gc.collect()
         record("central", seed, b, table, m)
 
     # ---- (b) SPI-scaled baseline and draws ---------------------------------
@@ -214,6 +217,7 @@ def main() -> None:
         sim = scaled_shocked(table)
         m = metrics(sim)
         del sim
+        gc.collect()
         record("spi_scaled_channel_capital", 0, bs, table, m)
     for seed in range(N_DRAWS):
         if ("spi_scaled", seed) in done:
@@ -222,6 +226,7 @@ def main() -> None:
         sim = scaled_shocked(table)
         m = metrics(sim)
         del sim
+        gc.collect()
         record("spi_scaled", seed, bs, table, m)
 
     # ---- summary -----------------------------------------------------------

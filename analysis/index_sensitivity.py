@@ -13,6 +13,7 @@ Outputs results/robustness/index_sensitivity_full.json + index_sensitivity.png.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -107,6 +108,7 @@ def main():
         }
         print(measure, {k: round(v, 3) for k, v in results[measure].items()}, flush=True)
         del sim, table
+        gc.collect()
 
     central_cost = results[CENTRAL_MEASURE]["exchequer_cost_bn"]
     for measure, r in results.items():

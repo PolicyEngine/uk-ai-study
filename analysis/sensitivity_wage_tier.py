@@ -10,6 +10,7 @@ results/robustness/measured_wage_tier_sensitivity.json.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -79,6 +80,7 @@ def main():
             sim = build_sim(base_arrays, table)
             m = sim_metrics(sim)
             del sim
+            gc.collect()
             displaced = table["displaced"].to_numpy()
             row = {
                 "variant": variant,
