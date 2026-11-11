@@ -30,13 +30,11 @@ def exposure_for_major_group(
     groups: np.ndarray | pd.Series,
     measure: str = "c_aioe",
 ) -> np.ndarray:
-    """Per-person exposure score from major-group codes (1-9; legacy FRS
-    1000-9000 codes are also accepted).
+    """Per-person exposure score from major-group codes 1-9.
 
-    Unknown/missing groups return NaN.
+    Unknown/missing groups (including any other code) return NaN.
     """
     table = load_major_group_exposure()
     codes = pd.to_numeric(pd.Series(np.asarray(groups)), errors="coerce")
-    codes = codes.where(codes.isin(VALID_MAJOR_GROUPS) | codes.isin([g * 1000 for g in VALID_MAJOR_GROUPS]))
-    codes = codes.where(codes < 10, codes / 1000)
+    codes = codes.where(codes.isin(VALID_MAJOR_GROUPS))
     return codes.map(table[measure]).to_numpy(dtype=float)
