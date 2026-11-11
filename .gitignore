@@ -3,3 +3,18 @@ __pycache__/
 *.egg-info/
 .cache/
 .DS_Store
+
+# LaTeX build intermediates (paper/main.pdf is rebuilt from the regenerated
+# macros and committed only with a complete, attested results/ tree)
+paper/*.aux
+paper/*.log
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.out
+paper/*.synctex.gz
+paper/*.bbl
+paper/*.blg
+paper/*.toc
+
+# stage-by-stage driver markers
+.done_*
