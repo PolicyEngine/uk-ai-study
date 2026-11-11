@@ -154,7 +154,9 @@ EXPECTED_CSV = {
     "appendix/grid_deciles_capital.csv": (
         132, _keys("unemployment_pct", "wage_pct", "capital_shock"), "appendix.py"),
     "appendix/decomposition_ci.csv": (10, _keys("decile"), None),
-    "appendix/decile_ranking_sensitivity.csv": (30, _keys("ranking", "decile"), None),
+    # 30 rows, and only from the full 20-draw design
+    "appendix/decile_ranking_sensitivity.csv": (
+        30, lambda d: _keys("ranking", "decile")(d) if (d["draws"] == 20).all() else -1, None),
     "robustness/incidence_draws_five.csv": (250, _keys("seed", "family"), "monte_carlo_families.py"),
     "robustness/policy_draws.csv": (250, _keys("seed", "reform", "family"), "monte_carlo_families.py"),
     "robustness/central_cost_components_draws.csv": (50, _keys("seed"), "monte_carlo_families.py"),
