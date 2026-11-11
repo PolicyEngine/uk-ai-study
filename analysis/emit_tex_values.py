@@ -166,7 +166,8 @@ EXPECTED_CSV = {
     # 20 x (central, displacement, wage) + capital + 3 scaled runs x (20 + capital)
     "robustness/dividend_coverage_draws.csv": (124, _keys("run", "seed"), "sensitivity_dividend_coverage.py"),
     "tax_composition/composition_sims.csv": (10, _keys("unemployment_pct"), "tax_composition.py"),
-    "incidence/summary_five.csv": (5, _keys("family"), None),
+    # the five families plus the two compound wage-axis variants
+    "incidence/summary_five.csv": (7, _keys("family"), None),
 }
 #: summaries that are only valid with their (complete, current) checkpoint
 REQUIRES = {
@@ -883,6 +884,20 @@ def emit_extended() -> None:
     for stat, S in [("mean", "Mean"), ("min", "Min"), ("max", "Max"), ("sd", "Sd")]:
         emit(f"genCentralMcRealisedRate{S}Pct",
              lambda stat=stat: 100 * jload(mc)["realised_displacement_rate"][stat], "{:.2f}", mc)
+    def employees_m():
+        return jload("central.json")["employees_weighted"] / 1e6
+    for rel, names, pre in [(ma, lam_names, "Mixed"), (sw, sw_names, "Survivor")]:
+        for k, N, _ in names:
+            emit(f"gen{pre}{N}RealisedRatePct",
+                 lambda rel=rel, k=k: 100 * csv(rel).set_index("scenario").loc[k, "displaced_weighted_m"]
+                 / employees_m(), "{:.2f}", rel)
+    for fam, Fam in [("exposure", "Exposure"), ("junior", "Junior"), ("uniform", "Uniform")]:
+        emit(f"genRone{Fam}RealisedRatePct",
+             lambda fam=fam: 100 * pol("R1_wage_insurance", fam, "displaced_weighted_m") / employees_m(),
+             "{:.2f}", ps)
+    emit("genChannelSeedZeroRealisedRatePct",
+         lambda: 100 * jload(dv)["channels_seed0"]["displacement"]["displaced_weighted_m"] / employees_m(),
+         "{:.2f}", dv)
     emit("genGridSevenRealisedRatePct",
          lambda: 100 * float(csv(gr).query("unemployment_pct == 7 and wage_pct == 0")
                              ["realised_displacement_rate"].iloc[0]), "{:.2f}", gr)

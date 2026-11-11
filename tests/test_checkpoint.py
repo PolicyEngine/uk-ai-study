@@ -65,3 +65,20 @@ def test_resume_refuses_an_unstamped_legacy_file(tmp_path):
     pd.DataFrame({"seed": [0, 1], "cost": [18.2, 18.3]}).to_csv(path, index=False)
     with pytest.raises(StaleCheckpointError, match="no certified_data_build_id"):
         Checkpoint(path, ("seed",), resume=True, stamp=STAMP)
+
+
+def test_resume_matches_grid_and_variant_keys(tmp_path):
+    # the appendix grid key is (int, int, bool); the sensitivities use strings
+    path = tmp_path / "grid.csv"
+    ck = Checkpoint(path, ("unemployment_pct", "wage_pct", "capital_shock"), resume=False, stamp=STAMP)
+    ck.append({"unemployment_pct": 3, "wage_pct": 0, "capital_shock": True, "x": 1.0})
+    ck.append({"unemployment_pct": 3, "wage_pct": 0, "capital_shock": False, "x": 2.0})
+    again = Checkpoint(path, ("unemployment_pct", "wage_pct", "capital_shock"), resume=True, stamp=STAMP)
+    assert again.is_done(3, 0, True) and again.is_done(3, 0, False) and not again.is_done(3, 1, True)
+
+    path = tmp_path / "tier.csv"
+    ck = Checkpoint(path, ("variant", "seed"), resume=False, stamp=STAMP)
+    ck.append({"variant": "3_0.8", "seed": 0})
+    ck.append({"variant": "9.6_0.6", "seed": 0})
+    again = Checkpoint(path, ("variant", "seed"), resume=True, stamp=STAMP)
+    assert again.is_done("3_0.8", 0) and again.is_done("9.6_0.6", 0) and not again.is_done("6_0.7", 0)

@@ -103,8 +103,10 @@ def weighted_deciles(values: np.ndarray, weights: np.ndarray) -> np.ndarray:
     """Deciles 1-10 of ``values`` with person weights (JR16 convention)."""
     # values keep their dtype: argsort can order ties differently in float32
     # and float64, and every script ranks the raw float32 model output
+    # weights keep their dtype too: a float64 cumulative sum moves tied
+    # boundary records relative to the float32 one every script uses
     values = np.asarray(values)
-    weights = np.asarray(weights, dtype=float)
+    weights = np.asarray(weights)
     order = np.argsort(values)
     cum = np.cumsum(weights[order])
     ranks = np.empty(len(values), dtype=float)
