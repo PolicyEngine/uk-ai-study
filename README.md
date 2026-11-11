@@ -124,9 +124,18 @@ uv run pytest tests/                      # unit tests
 
 `analysis/rebuild.py --dry-run` lists every stage and its outputs;
 `--check` verifies `results/` against `results/BUILD_MANIFEST.json`. A full
-rebuild runs roughly 900 Microcosm simulations; each needs several GB of
+rebuild runs roughly 950 Microcosm simulations; each needs several GB of
 memory, so run one stage at a time on a laptop. `data/` is gitignored;
 `results/` holds aggregates only.
+
+Long stages checkpoint every draw or grid cell to CSV. Each row is stamped
+with the certified Microcosm build id and a fingerprint of the code that
+wrote it (`uk_ai_study/checkpoint.py`). A stage resumes from its checkpoint
+only when given `--resume`, and refuses a checkpoint whose stamp differs;
+without the flag it recomputes from scratch. `emit_tex_values.py` writes a
+visible boxed "pending" for any value whose source is missing, incomplete
+(fewer cells or draws than the design) or stale, so the paper builds with
+`tectonic paper/main.tex` at any point of a rerun; `--strict` fails instead.
 
 ## Known limitations
 

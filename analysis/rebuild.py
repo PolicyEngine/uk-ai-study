@@ -101,6 +101,9 @@ LATEX_CMD = (
 # Manifest: stage -> command, declared outputs (relative to results/),
 # declared data inputs (relative to repo root), and upstream stage deps
 # ("after" = stages whose outputs this stage reads or overwrites).
+# "resumable": the stage checkpoints its draws/cells (stamped with the
+# certified data build and code fingerprint) and accepts --resume; the
+# clean-room build never passes it, the stage-by-stage driver may.
 # NOTE: the preset list mirrors uk_ai_study.shocks.PRESETS at the time of
 # writing; run_all.py iterates PRESETS at runtime, and --check will flag any
 # divergence (missing or extra tracked files), so a PRESETS change surfaces
@@ -142,6 +145,7 @@ MANIFEST = [
         "outputs": ["jr16/grid.csv"],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
+        "resumable": True,
     },
     {
         "stage": "incidence",
@@ -187,7 +191,8 @@ MANIFEST = [
     {
         "stage": "appendix_decomp",
         "cmd": [PY, "analysis/appendix.py", "decomp"],
-        "outputs": ["appendix/decomposition_ci.csv"],
+        "outputs": ["appendix/decomposition_ci.csv",
+                    "appendix/decile_ranking_sensitivity.csv"],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
@@ -197,6 +202,7 @@ MANIFEST = [
         "outputs": ["appendix/grid_deciles_capital.csv"],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
+        "resumable": True,
     },
     {
         "stage": "robustness",
@@ -221,10 +227,13 @@ MANIFEST = [
             "robustness/incidence_monte_carlo.json",
             "robustness/policy_monte_carlo.json",
             "robustness/central_monte_carlo.json",
+            "robustness/central_cost_components_draws.csv",
+            "robustness/central_cost_decomposition.json",
         ],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "index_sensitivity",
@@ -247,6 +256,7 @@ MANIFEST = [
         "inputs": MICROCOSM_INPUTS,
         "after": ["monte_carlo"],  # reads robustness/incidence_draws_five.csv
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "duration_reforms",
@@ -258,6 +268,7 @@ MANIFEST = [
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "wage_tier",
@@ -269,6 +280,7 @@ MANIFEST = [
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "mixed_wage_adjustment",
@@ -292,6 +304,7 @@ MANIFEST = [
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "paper_scenarios",
@@ -337,11 +350,14 @@ MANIFEST = [
         "cmd": [PY, "analysis/tax_composition.py"],
         "outputs": [
             "tax_composition/composition_grid.csv",
+            "tax_composition/composition_sims.csv",
             "tax_composition/recycling_case.json",
             "tax_composition/revenue_shortfall_phi.png",
         ],
         "inputs": MICROCOSM_INPUTS,
-        "after": ["jr16_grid"],  # reads results/jr16/grid.csv
+        # own capital-off simulations; no longer reads results/jr16/grid.csv
+        "after": [],
+        "resumable": True,
     },
     {
         "stage": "gender",
@@ -388,10 +404,16 @@ MANIFEST = [
         "outputs": [],
         "repo_outputs": ["paper/values_generated.tex"],
         "inputs": [],
+        # every stage whose outputs the emitter reads
         "after": [
             "presets", "jr16_figs", "jr16_grid", "incidence",
-            "measured_incidence", "monte_carlo", "policy", "caseloads",
-            "tax_composition", "dividend_coverage", "figures",
+            "measured_incidence", "appendix_fast", "appendix_decomp",
+            "appendix_grids", "robustness", "monte_carlo",
+            "index_sensitivity", "duration_takeup", "duration_reforms",
+            "wage_tier", "mixed_wage_adjustment", "dividend_coverage",
+            "paper_scenarios", "policy", "caseloads", "tax_composition",
+            "gender", "poverty_decomposition", "recession_backcast",
+            "figures",
         ],
     },
     {
