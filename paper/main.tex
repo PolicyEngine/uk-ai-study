@@ -15,6 +15,10 @@
 \usepackage{natbib}
 \bibliographystyle{apalike}
 \input{values_generated} % machine-generated numeric macros from results/
+% A figure whose PNG has not been generated yet prints a visible placeholder
+% instead of stopping the build (the rerun fills results/ stage by stage).
+\let\GENincludegraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{\IfFileExists{#2}{\GENincludegraphics[#1]{#2}}{\fbox{\parbox{.6\textwidth}{\centering\textbf{\textcolor{red}{pending figure}}\\\footnotesize\detokenize{#2}}}}}
 
 \title{\bfseries Who bears the AI shock?\\[0.15cm] The distributional and fiscal incidence in the UK\thanks{\textbf{Acknowledgements:} I thank Max Ghenis and Seyed Mahdi Hosseini for valuable comments and helpful discussions.}\\[0.7cm]}
 \author{Vahid Ahmadi\thanks{Research Associate at PolicyEngine. Email: \href{mailto:vahid@policyengine.org}{vahid@policyengine.org}.}}

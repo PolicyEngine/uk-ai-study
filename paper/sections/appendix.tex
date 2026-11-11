@@ -187,8 +187,8 @@ shock lands across occupation groups.
 
 Table~\ref{tab:indexsens} and Figure~\ref{fig:indexsens} report the
 outcomes. The Exchequer cost spans \pounds \genIndexCostMinBn--\genIndexCostMaxBn~billion (the largest
-upward deviation from the C-AIOE figure is $\genIndexMaxDevPct$ per cent), the Gini change spans $+\genIndexGiniMinPp$ to $+\genIndexGiniMaxPp$ points, and the
-before-housing-costs poverty change spans $+\genIndexPovBhcMinPp$ to $+\genIndexPovBhcMaxPp$ points. The
+upward deviation from the C-AIOE figure is $\genIndexMaxDevPct$ per cent), the Gini change spans $\genIndexGiniMinSignedPp$ to $\genIndexGiniMaxSignedPp$ points, and the
+before-housing-costs poverty change spans $\genIndexPovBhcMinSignedPp$ to $\genIndexPovBhcMaxSignedPp$ points. The
 decile-10 transition share exceeds the decile-1 share by a factor of \genIndexRatioMin{}
 to \genIndexRatioMax. Within this seed-0 sensitivity, all five indices produce a
 positive Gini change, a transition gradient that rises with income, and
@@ -348,8 +348,8 @@ Dividend income (\pounds bn) & 0.04 & \genDivMicrocosmBn \\
 Baseline Gini & 0.309 & \genBaselineGini \\
 Central displaced, seed 0 (million) & 1.56 & \genCentralDisplacedTwoM \\
 Central cost, 50-draw mean (\pounds bn) & 17.7 $\pm$ 1.2 & \genCentralMcCostMeanBn{} $\pm$ \genCentralMcCostSdBn \\
-Central BHC poverty, 50-draw mean (pp) & $+1.87$ & $+\genCentralMcPovBhcMeanPp$ \\
-Central Gini, 50-draw mean (pp) & $+1.11$ & $+\genCentralMcGiniMeanPp$ \\
+Central BHC poverty, 50-draw mean (pp) & $+1.87$ & $\genCentralMcPovBhcMeanSignedPp$ \\
+Central Gini, 50-draw mean (pp) & $+1.11$ & $\genCentralMcGiniMeanSignedPp$ \\
 Low preset cost, seed 0 (\pounds bn) & 4.3 & $\genLowCostSignedBn$ \\
 High preset cost, seed 0 (\pounds bn) & 46.9 & \genHighCostBn \\
 Uniform family cost, 50-draw mean (\pounds bn) & 13.9 & \genIncUniformCostMeanBn \\
@@ -380,8 +380,8 @@ projection, changes the central Exchequer cost from
 \pounds \genDivCentralCostMeanBn~$\pm$~\genDivCentralCostSdBn~billion to
 \pounds \genDivSpiCostMeanBn~$\pm$~\genDivSpiCostSdBn~billion (paired
 difference \pounds$\genDivDiffCostBn$~billion over \genDivDraws{} shared
-draws), and the Gini change from $+\genDivCentralGiniMeanPp$ to
-$+\genDivSpiGiniMeanPp$ points. I report this as a sensitivity, not as an
+draws), and the Gini change from $\genDivCentralGiniMeanSignedPp$ to
+$\genDivSpiGiniMeanSignedPp$ points. I report this as a sensitivity, not as an
 alternative headline: the excess may reflect genuine top-income dividends
 that the SPI projection understates as much as calibration error.
 % results/robustness/dividend_coverage.json

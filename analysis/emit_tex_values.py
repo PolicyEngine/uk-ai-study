@@ -11,10 +11,23 @@ prose itself.
 
 Usage:  python analysis/emit_tex_values.py   ->  paper/values_generated.tex
 
-If a source file or key is missing (e.g. mid-refactor of the upstream
-scripts), the macro is emitted as \\GENMISSING with a comment naming the
-missing source, so a stale/incomplete tree fails visibly at LaTeX build time
-rather than silently keeping old numbers.
+If a source file or key is missing, a source is INCOMPLETE (a checkpoint or
+grid with fewer cells than the design, e.g. 40 of the 132 appendix grid
+cells), or a source is STALE (its rows carry another certified data build,
+or another code fingerprint than the script that writes it), the macro is
+emitted as a visible placeholder (\\GENPENDING, a boxed "pending" that works
+in text and math; whole table-row macros get \\GENPENDINGROW) with a
+comment naming the source and reason. The paper therefore always builds,
+and every pending value is visible on the page. ``--strict`` exits non-zero
+if anything is pending (use it for the final build).
+
+Signed twins. Prose that welds a sign or a direction onto a number ("+X",
+"loses X") is wrong when the number changes sign. Every macro in SIGNED_TWINS
+also gets a twin with "Signed" inserted before its unit suffix (for example
+\\genIndexGiniMinPp -> \\genIndexGiniMinSignedPp), formatted with an
+explicit sign for math mode. Twins of loss-framed macros (which negate a
+change so that a loss prints as a positive number) carry the signed change
+itself: negative is a loss.
 
 Macros emitted (grouped by source):
 
@@ -85,6 +98,8 @@ Macros emitted (grouped by source):
 from __future__ import annotations
 
 import json
+import re
+import sys
 import time
 from pathlib import Path
 
@@ -110,23 +125,204 @@ REFORM_MACRO = {
 
 lines: list[str] = []
 missing: list[str] = []
+emitted: set[str] = set()
+
+# ---------------------------------------------------------------------------
+# Completeness and staleness guards
+# ---------------------------------------------------------------------------
+sys.path.insert(0, str(ROOT))
+from uk_ai_study.checkpoint import (  # noqa: E402
+    certified_data_build_id,
+    code_fingerprint,
+    read_stamped_csv,
+)
 
 
-def emit(name: str, value, fmt: str = "{:.1f}", source: str = ""):
-    """Emit one macro; on any failure emit a loud placeholder."""
+class Pending(Exception):
+    """A source exists but is incomplete or stale."""
+
+
+def _keys(*cols):
+    return lambda d: len(set(map(tuple, d[list(cols)].itertuples(index=False))))
+
+
+#: rel -> (expected count, counter, producing script). The counter returns the
+#: number of distinct design cells/draws present; checkpoint CSVs are also
+#: checked against the producing script's code fingerprint.
+EXPECTED_CSV = {
+    "jr16/grid.csv": (66, _keys("unemployment_pct", "wage_pct"), "replicate_jr16.py"),
+    "appendix/grid_deciles_capital.csv": (
+        132, _keys("unemployment_pct", "wage_pct", "capital_shock"), "appendix.py"),
+    "appendix/decomposition_ci.csv": (10, _keys("decile"), None),
+    "appendix/decile_ranking_sensitivity.csv": (30, _keys("ranking", "decile"), None),
+    "robustness/incidence_draws_five.csv": (250, _keys("seed", "family"), "monte_carlo_families.py"),
+    "robustness/policy_draws.csv": (250, _keys("seed", "reform", "family"), "monte_carlo_families.py"),
+    "robustness/central_cost_components_draws.csv": (50, _keys("seed"), "monte_carlo_families.py"),
+    "robustness/duration_takeup_draws.csv": (40, _keys("variant", "seed"), "sensitivity_duration_takeup.py"),
+    "robustness/duration_reform_draws.csv": (5, _keys("seed"), "sensitivity_duration_reforms.py"),
+    "robustness/measured_wage_tier_draws.csv": (60, _keys("variant", "seed"), "sensitivity_wage_tier.py"),
+    # 20 x (central, displacement, wage) + capital + 3 scaled runs x (20 + capital)
+    "robustness/dividend_coverage_draws.csv": (124, _keys("run", "seed"), "sensitivity_dividend_coverage.py"),
+    "tax_composition/composition_sims.csv": (10, _keys("unemployment_pct"), "tax_composition.py"),
+    "incidence/summary_five.csv": (5, _keys("family"), None),
+}
+#: summaries that are only valid with their (complete, current) checkpoint
+REQUIRES = {
+    "robustness/incidence_monte_carlo.json": ["robustness/incidence_draws_five.csv"],
+    "robustness/central_monte_carlo.json": ["robustness/incidence_draws_five.csv"],
+    "robustness/policy_monte_carlo.json": ["robustness/policy_draws.csv"],
+    "robustness/central_cost_decomposition.json": ["robustness/central_cost_components_draws.csv"],
+    "robustness/duration_takeup_sensitivity.json": ["robustness/duration_takeup_draws.csv",
+                                                   "robustness/incidence_draws_five.csv"],
+    "robustness/duration_reform_ranking.json": ["robustness/duration_reform_draws.csv"],
+    "robustness/measured_wage_tier_sensitivity.json": ["robustness/measured_wage_tier_draws.csv"],
+    "robustness/dividend_coverage.json": ["robustness/dividend_coverage_draws.csv"],
+    "tax_composition/composition_grid.csv": ["tax_composition/composition_sims.csv"],
+    "tax_composition/recycling_case.json": ["tax_composition/composition_sims.csv"],
+}
+_checked: dict[str, str | None] = {}
+
+
+def _build_id() -> str:
+    return certified_data_build_id()
+
+
+def _check_build_id(rel: str, value) -> None:
+    if value is not None and str(value) != _build_id():
+        raise Pending(f"{rel} is from data build {value}, current is {_build_id()}")
+
+
+def validate(rel: str) -> None:
+    """Raise Pending/FileNotFoundError unless ``rel`` is complete and current."""
+    if rel in _checked:
+        if _checked[rel]:
+            raise Pending(_checked[rel])
+        return
     try:
-        if callable(value):
-            value = value()
-        text = fmt.format(value) if not isinstance(value, str) else value
-        lines.append(f"\\newcommand{{\\{name}}}{{{text}}}")
-    except Exception as exc:  # noqa: BLE001 — every miss must surface, not abort
-        missing.append(f"{name} ({source or 'unknown source'}: {exc})")
-        lines.append(f"\\newcommand{{\\{name}}}{{\\GENMISSING}}"
-                     f" % MISSING: {source} -> {exc}")
+        for dep in REQUIRES.get(rel, []):
+            validate(dep)
+        path = R / rel
+        if rel.endswith(".csv"):
+            d = read_stamped_csv(path)
+            if "certified_data_build_id" in d.columns:
+                for v in set(d["certified_data_build_id"]):
+                    _check_build_id(rel, v)
+            if rel in EXPECTED_CSV:
+                n, count, script = EXPECTED_CSV[rel]
+                have = count(d)
+                if have != n or len(d) != n:
+                    raise Pending(f"{rel} is incomplete: {have} of {n} cells ({len(d)} rows)")
+                if script is not None:
+                    want = code_fingerprint(ROOT / "analysis" / script)
+                    got = set(d.get("code_fingerprint", pd.Series(["(none)"])).astype(str))
+                    if got != {want}:
+                        raise Pending(f"{rel} was written by other code ({sorted(got)}, "
+                                      f"current {script} is {want})")
+        else:
+            d = json.loads(path.read_text())
+            if isinstance(d, dict):
+                _check_build_id(rel, d.get("certified_data_build_id"))
+                _check_build_id(rel, (d.get("_metadata") or {}).get("certified_data_build_id"))
+        _checked[rel] = None
+    except Pending as exc:
+        _checked[rel] = str(exc)
+        raise
 
 
 def jload(rel: str) -> dict:
+    validate(rel)
     return json.loads((R / rel).read_text())
+
+
+#: twin name -> sign multiplier (-1 for loss-framed macros that negate a
+#: change). See the module docstring.
+SIGNED_TWINS = {
+    # "+X" welds
+    "genIndexGiniMinPp": 1, "genIndexGiniMaxPp": 1, "genIndexPovBhcMinPp": 1,
+    "genIndexPovBhcMaxPp": 1, "genCentralMcPovBhcMeanPp": 1, "genCentralMcGiniMeanPp": 1,
+    "genCentralMcPovAhcMeanPp": 1, "genCentralMcRelPovBhcMeanPp": 1,
+    "genDivCentralGiniMeanPp": 1, "genDivSpiGiniMeanPp": 1, "genDivCentralPovBhcMeanPp": 1,
+    "genDivSpiPovBhcMeanPp": 1, "genDurSixMoPovBhcMeanPp": 1, "genTakeupPovBhcMeanPp": 1,
+    "genGridGiniMinPp": 1, "genGridGiniMaxPp": 1, "genIncFamilyGiniMeanMinPp": 1,
+    "genIncFamilyGiniMeanMaxPp": 1, "genIncFamilyPovBhcMeanMinPp": 1,
+    "genIncFamilyPovBhcMeanMaxPp": 1, "genRecyclingGiniChangePp": 1,
+    "genCentralGiniChangePp": 1, "genCentralPovAhcPp": 1,
+    "genDecompMarketWorstPct": 1, "genDecompBenWorstPct": 1, "genDecompTaxWorstPct": 1,
+    "genDecompDispWorstPct": 1, "genWageGainDOnePct": 1, "genWageGainDTenPct": 1,
+    "genWageGainMinPct": 1, "genWageGainMaxPct": 1,
+    # costs that can turn into gains
+    "genCentralMcCostMeanBn": 1, "genIncFamilyCostMeanMinBn": 1, "genIncFamilyCostMeanMaxBn": 1,
+    "genCompPhiHalfBn": -1, "genCompPhiOneBn": -1, "genCompPhiZeroBn": -1, "genCompPhiOneGapBn": -1,
+    # loss-framed (negated) macros: twin = the signed change
+    "genDecompCiMaxLossPct": -1, "genGridRevLossBn": -1, "genGridRevLossPct": -1,
+    "genGridSevenZeroLossBn": -1, "genGridSevenZeroLossPct": -1, "genGridSevenThreeLossBn": -1,
+    "genAppGridHarshDOnePct": -1, "genAppGridHarshDTenPct": -1,
+    "genBSevenAiDTenPct": -1, "genBSevenUniDTenPct": -1,
+    "genMixedNetEmpZeroPct": -1, "genMixedNetEmpOnePct": -1, "genRoneMcPovBhcAvertedPp": -1,
+    "genLowGainBn": -1,
+}
+for _fam in ("Exposure", "Junior", "Compression", "Uniform", "Klein"):
+    for _k in ("CostMeanBn", "PovBhcMeanPp", "PovAhcMeanPp", "GiniMeanPp"):
+        SIGNED_TWINS[f"genInc{_fam}{_k}"] = 1
+for _ref in ("Rone", "Rtwo", "Rthree"):
+    SIGNED_TWINS[f"gen{_ref}McPovBhcMeanPp"] = 1
+_UNIT = re.compile(r"(Pp|Pct|Bn|M|K|Gbp)$")
+
+
+def twin_name(name: str) -> str:
+    m_ = _UNIT.search(name)
+    return name[: m_.start()] + "Signed" + m_.group(1) if m_ else name + "Signed"
+
+
+def signed_fmt(fmt: str) -> str:
+    m_ = re.fullmatch(r"\{:(,?)\.(\d)f\}", fmt)
+    if not m_:
+        return SIGNED2
+    return "{:+" + m_.group(1) + "." + m_.group(2) + "f}"
+
+
+#: macros that stand for whole table rows (placeholder must end the row)
+TABLE_ROW_MACROS = {
+    "genPresetRows", "genIndexRows", "genIncidenceRows", "genWageMarginRows",
+    "genMixedRows", "genSurvivorRows", "genJobLossRows", "genPolicyRows", "genRippleRows",
+}
+
+
+def _placeholder(name: str) -> str:
+    return "\\GENPENDINGROW" if name in TABLE_ROW_MACROS else "\\GENPENDING"
+
+
+def _line(name: str, text: str) -> None:
+    emitted.add(name)
+    lines.append(f"\\newcommand{{\\{name}}}{{{text}}}")
+
+
+def emit(name: str, value, fmt: str = "{:.1f}", source: str = ""):
+    """Emit one macro; on any failure emit a visible placeholder."""
+    if name in emitted:  # first definition wins (twins can pre-empt a name)
+        return
+    try:
+        if callable(value):
+            value = value()
+        if not isinstance(value, str) and not np.isfinite(float(value)):
+            raise Pending(f"non-finite value {value}")
+        text = fmt.format(value) if not isinstance(value, str) else value
+        _line(name, text)
+        if name in SIGNED_TWINS and not isinstance(value, str):
+            tw = twin_name(name)
+            if tw not in emitted:
+                _line(tw, signed_fmt(fmt).format(SIGNED_TWINS[name] * float(value)))
+    except Exception as exc:  # noqa: BLE001 — every miss must surface, not abort
+        kind = "PENDING" if isinstance(exc, Pending) else "MISSING"
+        reason = str(exc).replace("\n", " ").replace(str(ROOT) + "/", "")
+        missing.append(f"{name} ({source or 'unknown source'}: {kind} {reason})")
+        names = [name] + ([twin_name(name)] if name in SIGNED_TWINS else [])
+        for n in names:
+            if n in emitted:
+                continue
+            emitted.add(n)
+            lines.append(f"\\newcommand{{\\{n}}}{{{_placeholder(n)}}}"
+                         f" % {kind}: {source} -> {reason}")
 
 # ---------------------------------------------------------------------------
 # Extended macros (Microcosm revision): every number the paper states, so the
@@ -139,7 +335,8 @@ SIGNED1 = "{:+.1f}"
 
 
 def csv(rel: str) -> pd.DataFrame:
-    return pd.read_csv(R / rel)
+    validate(rel)
+    return read_stamped_csv(R / rel)
 
 
 def row_tex(cells) -> str:
@@ -321,7 +518,7 @@ def emit_extended() -> None:
         for fam, lab in fam_labels:
             f = d[fam]
             out.append(row_tex([
-                lab, f"{five.loc[fam, 'displaced_weighted_m']:.2f}",
+                lab, f"{five().loc[fam, 'displaced_weighted_m']:.2f}",
                 f"{f['exchequer_cost_bn']['mean']:.1f} $\\pm$ {f['exchequer_cost_bn']['sd']:.1f}",
                 f"${f['poverty_change_bhc_pp']['mean']:+.2f}$ $\\pm$ {f['poverty_change_bhc_pp']['sd']:.2f}",
                 f"${f['poverty_change_ahc_pp']['mean']:+.2f}$ $\\pm$ {f['poverty_change_ahc_pp']['sd']:.2f}",
@@ -669,6 +866,120 @@ def emit_extended() -> None:
          SIGNED1, dv)
     emit("genChannelSumCostBn", lambda: jload(dv)["channels_seed0_sum_cost_bn"], "{:.1f}", dv)
 
+    # --- quota realisation (seed-0 figures carry their realised rate) ------
+    for rel, P in [("central.json", "Central"), ("low.json", "Low"), ("high.json", "High"),
+                   ("central_youth_tilted.json", "Youth")]:
+        emit(f"gen{P}RealisedRatePct", lambda rel=rel: 100 * jload(rel)["realised_displacement_rate"],
+             "{:.2f}", rel)
+        emit(f"gen{P}PrescribedRatePct", lambda rel=rel: 100 * jload(rel)["displacement_rate"],
+             "{:.0f}", rel)
+    for fam, Fam in FAMILY_MACRO.items():
+        emit(f"genSeedZero{Fam}RealisedRatePct",
+             lambda fam=fam: 100 * float(csv("incidence/summary_five.csv").set_index("family")
+                                         .loc[fam, "realised_displacement_rate"]), "{:.2f}",
+             "incidence/summary_five.csv")
+    for stat, S in [("mean", "Mean"), ("min", "Min"), ("max", "Max"), ("sd", "Sd")]:
+        emit(f"genCentralMcRealisedRate{S}Pct",
+             lambda stat=stat: 100 * jload(mc)["realised_displacement_rate"][stat], "{:.2f}", mc)
+    emit("genGridSevenRealisedRatePct",
+         lambda: 100 * float(csv(gr).query("unemployment_pct == 7 and wage_pct == 0")
+                             ["realised_displacement_rate"].iloc[0]), "{:.2f}", gr)
+
+    # --- decile-1 ranking sensitivity (20-draw means) ----------------------
+    rk = "appendix/decile_ranking_sensitivity.csv"
+    rankings = [("hbai", "Hbai"), ("pre_pension", "PrePension"), ("hbai_excl_large_ppc", "Excl")]
+
+    def rank(r, d, col):
+        x = csv(rk)
+        return float(x[(x.ranking == r) & (x.decile == d)][col].iloc[0])
+    for r, R_ in rankings:
+        for d, D in [(1, "One"), (2, "Two"), (10, "Ten")]:
+            emit(f"genDecileRank{R_}D{D}SignedPct", lambda r=r, d=d: rank(r, d, "disposable_change_pct"),
+                 SIGNED2, rk)
+            emit(f"genDecileRank{R_}D{D}SignedGbp", lambda r=r, d=d: rank(r, d, "per_capita_change_gbp"),
+                 "{:+,.0f}", rk)
+        emit(f"genDecileRank{R_}DOneLoPct", lambda r=r: rank(r, 1, "ci_low"), SIGNED2, rk)
+        emit(f"genDecileRank{R_}DOneHiPct", lambda r=r: rank(r, 1, "ci_high"), SIGNED2, rk)
+    emit("genDecileRankExclHouseholds", lambda: int(csv(rk)["excluded_households_rows"].iloc[0]), "{:,d}", rk)
+    emit("genDecileRankExclPersonsK", lambda: 1000 * float(csv(rk)["excluded_persons_m"].iloc[0]), "{:,.0f}", rk)
+
+    def d1_verdict():
+        vals = [rank(r, 1, "disposable_change_pct") for r, _ in rankings]
+        lows = [rank(r, 1, "ci_low") for r, _ in rankings]
+        highs = [rank(r, 1, "ci_high") for r, _ in rankings]
+        same_sign = all(v > 0 for v in vals) or all(v < 0 for v in vals)
+        separated = all(lo > 0 for lo in lows) or all(hi < 0 for hi in highs)
+        if same_sign and separated:
+            return "keeps its sign under every ranking"
+        return "is not robust to how households are ranked"
+    # text macro: what may be said about decile 1 (never "gains" on its own)
+    emit("genDecileOneRobustness", d1_verdict, "{}", rk)
+    emit("genDecileRankLargePpcFloorGbp", lambda: 10_000, "{:,d}", rk)
+
+    # --- headline cost by component and basis (50-draw means) -------------
+    cd = "robustness/central_cost_decomposition.json"
+    for key, N in [("total", "Total"), ("income_tax", "IncomeTax"), ("dividend_tax", "DividendTax"),
+                   ("savings_tax", "SavingsTax"), ("other_income_tax", "OtherIncomeTax"),
+                   ("employee_ni", "EmployeeNi"), ("employer_ni", "EmployerNi"),
+                   ("universal_credit", "Uc"), ("childcare", "Childcare"), ("other", "Other"),
+                   ("excluding_employer_ni", "ExclEmployerNi"), ("narrow_cash", "NarrowCash"),
+                   ("gov_balance_minus_narrow_cash", "BasisGap")]:
+        emit(f"genCost{N}SignedBn", lambda key=key: jload(cd)[key]["mean"], SIGNED1, cd)
+        emit(f"genCost{N}SdBn", lambda key=key: jload(cd)[key]["sd"], "{:.1f}", cd)
+    emit("genCostEmployerNiSharePct",
+         lambda: 100 * jload(cd)["employer_ni"]["mean"] / jload(cd)["total"]["mean"], "{:.0f}", cd)
+
+    # --- channel split, 20 paired draws ------------------------------------
+    for ch, N in [("displacement", "Disp"), ("wage", "Wage"), ("capital", "Capital")]:
+        emit(f"genChannelMc{N}CostSignedBn", lambda ch=ch: jload(dv)["channels"][ch]["exchequer_cost_bn"]["mean"],
+             SIGNED1, dv)
+        emit(f"genChannelMc{N}PovBhcSignedPp",
+             lambda ch=ch: jload(dv)["channels"][ch]["poverty_change_bhc_pp"]["mean"], SIGNED2, dv)
+        emit(f"genChannelMc{N}GiniSignedPp",
+             lambda ch=ch: jload(dv)["channels"][ch]["gini_change_pp"]["mean"], SIGNED2, dv)
+    emit("genChannelMcSumCostSignedBn", lambda: jload(dv)["channels_sum"]["exchequer_cost_bn"], SIGNED1, dv)
+    emit("genChannelMcInteractionCostSignedBn",
+         lambda: jload(dv)["channels_interaction"]["exchequer_cost_bn"], SIGNED1, dv)
+    emit("genChannelMcCentralCostSignedBn", lambda: jload(dv)["central"]["exchequer_cost_bn"]["mean"],
+         SIGNED1, dv)
+    emit("genChannelMcExclCapitalCostSignedBn",
+         lambda: jload(dv)["central"]["exchequer_cost_bn"]["mean"]
+         - jload(dv)["channels"]["capital"]["exchequer_cost_bn"]["mean"], SIGNED1, dv)
+
+    # --- capital-income coverage: banded dividends, savings ----------------
+    emit("genDivTaxpayerBn", lambda: jload(dv)["microcosm_dividends_taxpayers_2026_bn"], "{:.1f}", dv)
+    emit("genDivBelowThresholdBn",
+         lambda: jload(dv)["coverage"]["dividend_income"]["microcosm_below_threshold_bn"], "{:.2f}", dv)
+    emit("genDivTopBandMicrocosmBn",
+         lambda: jload(dv)["scaling"]["div_banded"]["bands"][-1]["microcosm_bn"], "{:.2f}", dv)
+    emit("genDivTopBandSpiBn", lambda: jload(dv)["scaling"]["div_banded"]["bands"][-1]["spi_bn"], "{:.2f}", dv)
+    emit("genDivTopBandFactor", lambda: jload(dv)["scaling"]["div_banded"]["bands"][-1]["factor"], "{:.2f}", dv)
+    emit("genSavMicrocosmBn", lambda: jload(dv)["coverage"]["savings_interest_income"]["microcosm_all_bn"],
+         "{:.1f}", dv)
+    emit("genSavTaxpayerBn", lambda: jload(dv)["coverage"]["savings_interest_income"]["microcosm_taxpayers_bn"],
+         "{:.1f}", dv)
+    emit("genSavSpiBn", lambda: jload(dv)["coverage"]["savings_interest_income"]["spi_bn"], "{:.1f}", dv)
+    emit("genSavScaleFactor", lambda: jload(dv)["savings_scale_factor"], "{:.3f}", dv)
+    for run, N in [("div_uniform", "DivUniform"), ("div_banded", "DivBanded"),
+                   ("savings_uniform", "SavUniform")]:
+        emit(f"genCov{N}CostMeanBn", lambda run=run: jload(dv)[run]["exchequer_cost_bn"]["mean"], "{:.1f}", dv)
+        emit(f"genCov{N}CostSdBn", lambda run=run: jload(dv)[run]["exchequer_cost_bn"]["sd"], "{:.1f}", dv)
+        emit(f"genCov{N}PovBhcSignedPp", lambda run=run: jload(dv)[run]["poverty_change_bhc_pp"]["mean"],
+             SIGNED2, dv)
+        emit(f"genCov{N}GiniSignedPp", lambda run=run: jload(dv)[run]["gini_change_pp"]["mean"], SIGNED2, dv)
+        pdk = f"paired_difference_{run}_minus_central"
+        emit(f"genCov{N}DiffCostSignedBn", lambda pdk=pdk: jload(dv)[pdk]["exchequer_cost_bn"]["mean"],
+             SIGNED1, dv)
+        emit(f"genCov{N}DiffGiniSignedPp", lambda pdk=pdk: jload(dv)[pdk]["gini_change_pp"]["mean"],
+             SIGNED2, dv)
+        emit(f"genCov{N}DiffPovBhcSignedPp", lambda pdk=pdk: jload(dv)[pdk]["poverty_change_bhc_pp"]["mean"],
+             SIGNED2, dv)
+        emit(f"genCov{N}CapitalCostSignedBn",
+             lambda run=run: jload(dv)[f"{run}_channel_capital"]["exchequer_cost_bn"], SIGNED1, dv)
+
+    # --- tax composition: capital-off basis --------------------------------
+    emit("genCompPhiZeroGovSignedBn", lambda: comp(0.5, "microsim_gov_balance_change_bn"), SIGNED1, tc)
+
     # --- data coverage (Microcosm occupation) -------------------------------
     oc = "robustness/occupation_vs_ashe.csv"
     emit("genOccMaxAbsDiffPp", lambda: csv(oc)["diff_pp"].abs().max(), "{:.1f}", oc)
@@ -757,19 +1068,17 @@ def main() -> None:
 
     # --- seed-0 incidence families ----------------------------------------
     s5 = "incidence/summary_five.csv"
-    try:
-        five = pd.read_csv(R / s5).set_index("family")
-    except Exception:
-        five = None
+    def five():
+        return csv(s5).set_index("family")
     for fam, Fam in FAMILY_MACRO.items():
         emit(f"genSeedZero{Fam}CostBn",
-             lambda fam=fam: float(five.loc[fam, "exchequer_cost_bn"]),
+             lambda fam=fam: float(five().loc[fam, "exchequer_cost_bn"]),
              "{:.1f}", s5)
         emit(f"genSeedZero{Fam}PovBhcPp",
-             lambda fam=fam: float(five.loc[fam, "poverty_change_bhc_pp"]),
+             lambda fam=fam: float(five().loc[fam, "poverty_change_bhc_pp"]),
              "{:.2f}", s5)
         emit(f"genSeedZero{Fam}GiniPp",
-             lambda fam=fam: float(five.loc[fam, "gini_change_pp"]),
+             lambda fam=fam: float(five().loc[fam, "gini_change_pp"]),
              "{:.2f}", s5)
 
     # --- duration / take-up sensitivities ---------------------------------
@@ -794,17 +1103,15 @@ def main() -> None:
 
     # --- policy reforms, seed 0 -------------------------------------------
     ps = "policy/summary.csv"
-    try:
-        pol = pd.read_csv(R / ps)
-        pol = pol[pol["family"] == "exposure"].set_index("reform")
-    except Exception:
-        pol = None
+    def pol():
+        d = csv(ps)
+        return d[d["family"] == "exposure"].set_index("reform")
     for reform, Ref in REFORM_MACRO.items():
         emit(f"gen{Ref}CostBn",
-             lambda reform=reform: float(pol.loc[reform, "gross_cost_bn"]),
+             lambda reform=reform: float(pol().loc[reform, "gross_cost_bn"]),
              "{:.1f}", ps)
         emit(f"gen{Ref}CostPerPpAhcBn",
-             lambda reform=reform: float(pol.loc[reform, "cost_per_pp_ahc_bn"]),
+             lambda reform=reform: float(pol().loc[reform, "cost_per_pp_ahc_bn"]),
              "{:.1f}", ps)
 
     def decile_share(reform, deciles):
@@ -866,14 +1173,10 @@ def main() -> None:
 
     # --- scenario grid -----------------------------------------------------
     gr = "jr16/grid.csv"
-    try:
-        grid = pd.read_csv(R / gr)
-    except Exception:
-        grid = None
-    emit("genGridCells", lambda: len(grid), "{:d}", gr)
-    emit("genGridGiniMinPp", lambda: float(grid["gini_change_pp"].min()),
+    emit("genGridCells", lambda: len(csv(gr)), "{:d}", gr)
+    emit("genGridGiniMinPp", lambda: float(csv(gr)["gini_change_pp"].min()),
          "{:.2f}", gr)
-    emit("genGridGiniMaxPp", lambda: float(grid["gini_change_pp"].max()),
+    emit("genGridGiniMaxPp", lambda: float(csv(gr)["gini_change_pp"].max()),
          "{:.2f}", gr)
 
     # --- index sensitivity -------------------------------------------------
@@ -910,18 +1213,24 @@ def main() -> None:
         "% values_generated.tex — machine-generated by analysis/emit_tex_values.py",
         f"% generated {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())} "
         "from canonical files under results/. DO NOT EDIT BY HAND.",
-        "% \\GENMISSING marks values whose canonical source was absent at emit "
-        "time; it errors at LaTeX build time by design.",
-        "\\newcommand{\\GENMISSING}{\\errmessage{emit_tex_values: missing "
-        "canonical result}}",
+        f"% certified data build: {_build_id()}",
+        f"% {len(missing)} macro(s) pending (source missing, incomplete or stale).",
+        "% \\GENPENDING marks a value whose canonical source was missing,",
+        "% incomplete or stale at emit time: a boxed 'pending' that builds in",
+        "% text and math. \\GENPENDINGROW stands in for a whole table row.",
+        "\\providecommand{\\GENPENDING}{\\fbox{\\textbf{\\textcolor{red}{pending}}}}",
+        "\\providecommand{\\GENPENDINGROW}{\\multicolumn{2}{l}{\\GENPENDING} \\\\}",
+        "\\providecommand{\\GENMISSING}{\\GENPENDING}",
         "",
     ]
     OUT.write_text("\n".join(header + lines) + "\n")
-    print(f"wrote {OUT} ({len(lines)} macros)")
+    print(f"wrote {OUT} ({len(emitted)} macros)")
     if missing:
-        print(f"WARNING: {len(missing)} macros missing canonical sources:")
+        print(f"WARNING: {len(missing)} macros pending:")
         for m in missing:
             print("  " + m)
+        if "--strict" in sys.argv:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
