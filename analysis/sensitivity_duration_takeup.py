@@ -92,10 +92,10 @@ def main():
     )
     del baseline
 
-    done = set()
-    if CSV.exists():
-        d = pd.read_csv(CSV)
-        done = set(zip(d["variant"], d["seed"]))
+    from uk_ai_study.checkpoint import Checkpoint
+
+    ckpt = Checkpoint(CSV, ("variant", "seed"), script=__file__)
+    done = ckpt.done
 
     scenario = PRESETS["central"]
     for seed in range(N_DRAWS):
@@ -146,10 +146,14 @@ def main():
                 "baseline_pov_bhc": row_b["pov_bhc"],
                 "displaced_weighted_m": float(w[displaced].sum() / 1e6),
             }
-            pd.DataFrame([row]).to_csv(CSV, mode="a", header=not CSV.exists(), index=False)
+            ckpt.append(row)
             print(f"{variant} seed {seed} done", flush=True)
 
-    d = pd.read_csv(CSV)
+    d = ckpt.read()
+    if set(zip(d["variant"], d["seed"])) != {
+        (v, s) for v in ("half_earnings_retention", "takeup_70") for s in range(N_DRAWS)
+    } or d.duplicated(["variant", "seed"]).any():
+        raise ValueError("duration/take-up checkpoint is incomplete or duplicated")
     summary = {
         "n_draws": N_DRAWS,
         "half_earnings_retention": {
@@ -177,7 +181,10 @@ def main():
     # convex-combination comparator: 0.5 x full-year central MC
     mc_path = OUT / "incidence_draws_five.csv"
     if mc_path.exists():
-        mc = pd.read_csv(mc_path)
+        from uk_ai_study.checkpoint import certified_data_build_id, read_stamped_csv, verify_stamp
+
+        mc = read_stamped_csv(mc_path)
+        verify_stamp(mc, {"certified_data_build_id": certified_data_build_id()}, mc_path)
         mc = mc[mc.family == "exposure"]
         summary["half_earnings_retention"]["convex_combination_comparator_0.5x_full_year"] = {
             c: {"mean": float(0.5 * mc[c].mean()), "sd": float(0.5 * mc[c].std(ddof=1))}

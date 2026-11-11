@@ -5,8 +5,12 @@ Tasks:
             incidence by decile (3.2/3.3), job-loss table by major group
             (Table 3.2), uniform-vs-AI decile figure (B.7), alternative-index
             decile figure (B.8)
-  decomp  - 20-draw CIs on the fig 4.4 decomposition
-  grids   - decile-faceted grid (B.9) and no-capital grid (B.11), 66 sims each
+  decomp  - 20-draw CIs on the fig 4.4 decomposition, plus the decile-ranking
+            sensitivity (income before pension contributions, and the HBAI
+            ranking without households whose large personal pension
+            contributions place them in decile 1)
+  grids   - decile-faceted grid (B.9) and no-capital grid (B.11), 66 sims each;
+            checkpointed per cell, resumable only with --resume
 
 Outputs in results/appendix/.
 """
@@ -84,6 +88,16 @@ def setup():
     ranks[order] = cw / cw[-1]
     persons["decile"] = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
     return baseline, persons
+
+
+def rankings_for(baseline, persons):
+    """Main and alternative decile rankings (see runner.decile_rankings)."""
+    from uk_ai_study.runner import decile_rankings
+
+    rankings = decile_rankings(baseline, PERIOD, persons["weight"].to_numpy())
+    if not (rankings["hbai"][0] == persons["decile"].to_numpy()).all():
+        raise AssertionError("main decile ranking differs from setup()")
+    return rankings
 
 
 def bar_by_decile(values_bn, title, ylabel, fname, color=BLUE, fmt="{:.1f}"):
@@ -224,9 +238,15 @@ def fast(baseline, persons):
         ax.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.18))
         save(fig, OUT / fname)
 
-    # --- Table 3.2 analogue: job loss per major group, central scenario
+    # --- Table 3.2 analogue: job loss per major group, central scenario.
+    # The table reports the PRESCRIBED eq 3.4 quota rate of each group (what
+    # the sampler targets in expectation); the seed-0 realised rate is kept
+    # alongside for reference only, since one draw realises the quota only up
+    # to sampling noise (seed 0: 6.76 per cent overall against 7).
     from uk_ai_study.exposure import load_major_group_exposure
+    from uk_ai_study.shocks import group_quotas, realised_displacement_rate
     table = load_major_group_exposure()
+    quotas = group_quotas(persons, PRESETS["central"].displacement_rate)
     shocked = apply_shocks(persons, PRESETS["central"], seed=0)
     disp = shocked["displaced"].to_numpy()
     g = persons["soc_major_group"].to_numpy()
@@ -239,10 +259,12 @@ def fast(baseline, persons):
              "title": table.loc[grp, "major_group_title"],
              "c_aioe": round(float(table.loc[grp, "c_aioe"]), 3),
              "employment_m": round(float(w[m].sum() / 1e6), 2),
-             "job_loss_pct": round(100 * float(w[m & disp].sum() / w[m].sum()), 1)}
+             "job_loss_pct": round(100 * quotas[float(grp)]["quota_rate"], 1),
+             "seed0_realised_pct": round(100 * float(w[m & disp].sum() / w[m].sum()), 1)}
         )
     pd.DataFrame(recs).to_csv(OUT / "job_loss_by_major_group.csv", index=False)
     print(pd.DataFrame(recs).to_string(index=False))
+    print("seed-0 realised overall rate:", realised_displacement_rate(persons, disp))
 
     # --- B.7: AI vs uniform shock, disposable income change by decile
     def decile_change(persons_variant, label):
@@ -286,36 +308,74 @@ def fast(baseline, persons):
 
 
 def decomp_ci(baseline, persons, n_draws=20):
-    """20-draw decomposition of disposable-income change by decile."""
+    """20-draw decomposition of disposable-income change by decile, and the
+    same profile under the alternative decile rankings."""
+    from uk_ai_study.runner import DECILE_RANKINGS, per_capita_household_income
     from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
     w = persons["weight"].to_numpy()
-    dec = persons["decile"].to_numpy()
+    rankings = rankings_for(baseline, persons)
     # household-level %, identical for all members; broadcast intentional
     hni_b = baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
-    draws = np.zeros((n_draws, 10))
+    size = baseline.calculate("household_count_people", period=PERIOD, map_to="person").values
+    pc_b = per_capita_household_income(hni_b, size)
+    pct = {r: np.zeros((n_draws, 10)) for r in DECILE_RANKINGS}
+    gbp = {r: np.zeros((n_draws, 10)) for r in DECILE_RANKINGS}
     for s in range(n_draws):
         shocked_table = apply_shocks(persons, PRESETS["central"], seed=s)
         sim = build_shocked_simulation(baseline, shocked_table, PERIOD)
         hni_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="person").values
-        for d in range(1, 11):
-            m = dec == d
-            draws[s, d - 1] = 100 * float(((hni_s - hni_b)[m] * w[m]).sum()) / float((hni_b[m] * w[m]).sum())
+        pc_delta = per_capita_household_income(hni_s, size) - pc_b
+        for r in DECILE_RANKINGS:
+            dec, include = rankings[r]
+            for d in range(1, 11):
+                m = (dec == d) & include
+                pct[r][s, d - 1] = 100 * float(((hni_s - hni_b)[m] * w[m]).sum()) / float((hni_b[m] * w[m]).sum())
+                gbp[r][s, d - 1] = float(np.average(pc_delta[m], weights=w[m]))
         del sim
         gc.collect()
         print(f"decomp draw {s} done", flush=True)
-    mean, se = draws.mean(0), draws.std(0, ddof=1) / np.sqrt(n_draws)
+
+    def summary(draws):
+        mean, se = draws.mean(0), draws.std(0, ddof=1) / np.sqrt(n_draws)
+        return mean, mean - 1.96 * se, mean + 1.96 * se
+
+    mean, lo, hi = summary(pct["hbai"])
     pd.DataFrame(
         {"decile": range(1, 11), "disposable_change_pct": mean,
-         "ci_low": mean - 1.96 * se, "ci_high": mean + 1.96 * se}
+         "ci_low": lo, "ci_high": hi}
     ).to_csv(OUT / "decomposition_ci.csv", index=False)
-    print("decomposition CIs written")
+
+    rows = []
+    large = rankings["_large_ppc_households"]
+    for r in DECILE_RANKINGS:
+        mean, lo, hi = summary(pct[r])
+        gmean, glo, ghi = summary(gbp[r])
+        dec, include = rankings[r]
+        for d in range(1, 11):
+            m = (dec == d) & include
+            rows.append({
+                "ranking": r, "decile": d,
+                "disposable_change_pct": mean[d - 1], "ci_low": lo[d - 1], "ci_high": hi[d - 1],
+                "per_capita_change_gbp": gmean[d - 1],
+                "per_capita_ci_low": glo[d - 1], "per_capita_ci_high": ghi[d - 1],
+                "persons_m": float(w[m].sum() / 1e6), "rows": int(m.sum()),
+            })
+    out = pd.DataFrame(rows)
+    out["draws"] = n_draws
+    out["excluded_households_rows"] = int(large.sum())
+    out["excluded_persons_m"] = float(w[~rankings["hbai_excl_large_ppc"][1]].sum() / 1e6)
+    out.to_csv(OUT / "decile_ranking_sensitivity.csv", index=False)
+    print(out[out.decile.isin([1, 2, 10])].to_string(index=False))
+    print("decomposition CIs and ranking sensitivity written")
 
 
 def grids(baseline, persons):
     """B.9 decile-faceted grid + B.11 no-capital grid."""
     from uk_ai_study.runner import gini
-    from uk_ai_study.shocks import ShockScenario, apply_shocks, build_shocked_simulation
+    from uk_ai_study.shocks import (
+        ShockScenario, apply_shocks, build_shocked_simulation, realised_displacement_rate,
+    )
 
     w = persons["weight"].to_numpy()
     dec = persons["decile"].to_numpy()
@@ -328,16 +388,18 @@ def grids(baseline, persons):
     mean_b = float(np.average(
         baseline.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values, weights=hw))
 
+    from uk_ai_study.checkpoint import Checkpoint
+
+    # per-cell checkpoint (stamped with the data build and code fingerprint);
+    # an existing file is reused only with --resume, and only if every row
+    # carries the current stamp
     out_path = OUT / "grid_deciles_capital.csv"
-    rows, done = [], set()
-    if out_path.exists():  # resume a partial run
-        prev = pd.read_csv(out_path)
-        rows = prev.to_dict("records")
-        done = set(zip(prev["unemployment_pct"], prev["wage_pct"], prev["capital_shock"].astype(bool)))
+    ckpt = Checkpoint(out_path, ("unemployment_pct", "wage_pct", "capital_shock"),
+                      script=__file__)
     for u in range(0, 11):
         for wg in range(0, 6):
             for capital in (True, False):
-                if (u, wg, capital) in done:
+                if ckpt.is_done(u, wg, capital):
                     continue
                 scenario = ShockScenario(
                     f"u{u}w{wg}c{int(capital)}", u / 100, wg / 100,
@@ -349,16 +411,17 @@ def grids(baseline, persons):
                 hh_s = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values
                 rec = {
                     "unemployment_pct": u, "wage_pct": wg, "capital_shock": capital,
+                    "realised_displacement_rate": realised_displacement_rate(
+                        persons, shocked_table["displaced"].to_numpy()),
                     "avg_disposable_income_change_pct": 100 * (float(np.average(hh_s, weights=hw)) / mean_b - 1),
                     "gini_change_pp": 100 * (gini(eq_s, hw * nppl) - gini_b),
                 }
                 for d in range(1, 11):
                     m = dec == d
                     rec[f"decile{d}_change_pct"] = 100 * float(((hni_s - hni_b)[m] * w[m]).sum()) / float((hni_b[m] * w[m]).sum())
-                rows.append(rec)
+                ckpt.append(rec)
                 del sim
                 gc.collect()
-            pd.DataFrame(rows).to_csv(out_path, index=False)
             print(f"u={u} w={wg} done (both capital variants)", flush=True)
     print("grids complete")
 

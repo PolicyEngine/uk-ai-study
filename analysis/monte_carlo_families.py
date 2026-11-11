@@ -13,9 +13,19 @@
       "exposure" family IS the central preset, same apply_shocks call as
       uk_ai_study.runner.run_scenario)
 
+  (d) for the exposure (central) family, the exchequer cost split by
+      component on every draw (dividend, savings and other income tax,
+      employee and employer NI, UC, childcare, other) with the narrow cash
+      basis of the JR16 grid alongside
+      -> results/robustness/central_cost_components_draws.csv and
+         results/robustness/central_cost_decomposition.json
+
 Each (seed, family) draw is checkpointed to CSV as it completes
-(incidence_draws_five.csv / policy_draws.csv); rerunning the script skips
-completed draws and rebuilds the JSON summaries.
+(incidence_draws_five.csv / policy_draws.csv /
+central_cost_components_draws.csv), stamped with the certified data build
+and code fingerprint. An existing checkpoint is continued only with
+``--resume`` (and refused if its stamp differs); otherwise the run starts
+from scratch.
 """
 
 from __future__ import annotations
@@ -32,8 +42,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "analysis"))
 
-from uk_ai_study.runner import build_person_table, gini
-from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES
+from uk_ai_study.checkpoint import Checkpoint, certified_data_build_id
+from uk_ai_study.runner import (
+    CHILDCARE_VARIABLES,
+    COST_COMPONENTS,
+    build_person_table,
+    cost_component_totals,
+    cost_decomposition,
+    gini,
+)
+from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES, realised_displacement_rate
 from incidence_scenarios import (  # noqa: E402
     COMPRESSION_TOP_TERTILE_MULTIPLIER,
     shocked_table_for,
@@ -60,6 +78,11 @@ FAMILIES = ("exposure", "junior", "compression", "uniform", "klein_top_loaded")
 FAMILIES_R1 = ("exposure", "junior", "uniform")
 INC_CSV = OUT / "incidence_draws_five.csv"
 POL_CSV = OUT / "policy_draws.csv"
+COST_CSV = OUT / "central_cost_components_draws.csv"
+COST_FIELDS = COST_COMPONENTS + (
+    "other", "income_tax", "excluding_employer_ni", "narrow_cash",
+    "gov_balance_minus_narrow_cash",
+)
 
 
 def family_table(
@@ -81,10 +104,6 @@ def family_table(
     return shocked_table_for(
         family, persons, seed=seed, compression_multiplier=compression_multiplier
     )
-
-
-def append_row(path: Path, row: dict) -> None:
-    pd.DataFrame([row]).to_csv(path, mode="a", header=not path.exists(), index=False)
 
 
 def summarise(df: pd.DataFrame, cols) -> dict:
@@ -154,6 +173,7 @@ def main():
         }
 
     b = sim_metrics(baseline)
+    b_cost = cost_component_totals(baseline, PERIOD)
 
     base_arrays = {
         var: person_calc(baseline, var).astype(float) for var in TRANSITION_ZEROED_VARIABLES
@@ -188,46 +208,21 @@ def main():
     }
     reforms_exposure = {"R2_uc_circuit_breaker": r2_reform, "R3_cap_suspension_taper_cut": r3_reform}
 
-    done_inc = set()
-    if INC_CSV.exists():
-        d = pd.read_csv(INC_CSV)
-        if "poverty_change_ahc_pp" not in d.columns:
-            # The enlarged design evaluates AHC on every draw; legacy
-            # checkpoints cannot be mixed because they contain no AHC result.
-            d = d.iloc[0:0].copy()
-            d["poverty_change_ahc_pp"] = pd.Series(dtype=float)
-            d.to_csv(INC_CSV, index=False)
-        # Migrations. (1) The pre-revision "measured" family name; keeping
-        # those rows would mix two calibrations in one checkpoint file.
-        # (2) R2-3: checkpoints written before the factorial redesign carry
-        # no wage_axis column, and their compression/uniform rows are the
-        # old COMPOUND bundles (family-specific wage channel) — stale under
-        # the new default (wage_axis="central"), so they are redrawn.
-        stale = d["family"].eq("measured")
-        migrated = "wage_axis" not in d.columns
-        if migrated:
-            stale |= d["family"].isin(["compression", "uniform"])
-            d["wage_axis"] = "central"
-        else:
-            stale |= d["wage_axis"].fillna("central").ne("central")
-        if stale.any() or migrated:
-            d = d[~stale].copy()
-            d.to_csv(INC_CSV, index=False)
-        done_inc = set(zip(d["seed"], d["family"]))
-    done_pol = set()
-    if POL_CSV.exists():
-        d = pd.read_csv(POL_CSV)
-        done_pol = set(zip(d["seed"], d["reform"], d["family"]))
+    inc_ckpt = Checkpoint(INC_CSV, ("seed", "family"), script=__file__)
+    pol_ckpt = Checkpoint(POL_CSV, ("seed", "reform", "family"), script=__file__)
+    cost_ckpt = Checkpoint(COST_CSV, ("seed",), script=__file__)
+    done_inc, done_pol = inc_ckpt.done, pol_ckpt.done
 
     for seed in range(N_DRAWS):
         for family in FAMILIES:
             need_inc = (seed, family) not in done_inc
+            need_cost = family == "exposure" and not cost_ckpt.is_done(seed)
             pol_needed = [
                 r for r in (["R1_wage_insurance"] if family in FAMILIES_R1 else [])
                 + (list(reforms_exposure) if family == "exposure" else [])
                 if (seed, r, family) not in done_pol
             ]
-            if not need_inc and not pol_needed:
+            if not need_inc and not pol_needed and not need_cost:
                 continue
 
             table = family_table(family, persons, seed)
@@ -235,12 +230,14 @@ def main():
             sim = build_sim(base_arrays, table)
             m = sim_metrics(sim)
             s0 = hh_state(sim) if pol_needed else None
+            costs = cost_component_totals(sim, PERIOD) if need_cost else None
             del sim
             gc.collect()
 
+            if need_cost:
+                cost_ckpt.append({"seed": seed, **cost_decomposition(b_cost, costs)})
             if need_inc:
-                append_row(
-                    INC_CSV,
+                inc_ckpt.append(
                     {
                         "seed": seed,
                         "family": family,
@@ -251,6 +248,7 @@ def main():
                         "relative_poverty_change_bhc_pp": 100 * (m["relpov_bhc"] - b["relpov_bhc"]),
                         "gini_change_pp": 100 * (m["gini"] - b["gini"]),
                         "displaced_weighted_m": float(w[displaced].sum() / 1e6),
+                        "realised_displacement_rate": realised_displacement_rate(persons, displaced),
                     },
                 )
             if pol_needed:
@@ -264,8 +262,7 @@ def main():
                 gross = float((transfer_p * w).sum())
                 transfer_hh = np.bincount(p2h, weights=transfer_p, minlength=len(s0["hw"]))
                 m1 = metrics_from_state(s0, pw_by_hh, extra_hh_income=transfer_hh)
-                append_row(
-                    POL_CSV,
+                pol_ckpt.append(
                     {
                         "seed": seed,
                         "reform": "R1_wage_insurance",
@@ -283,8 +280,7 @@ def main():
                 del simr
                 gc.collect()
                 mr = metrics_from_state(sr, pw_by_hh)
-                append_row(
-                    POL_CSV,
+                pol_ckpt.append(
                     {
                         "seed": seed,
                         "reform": name,
@@ -297,7 +293,7 @@ def main():
             print(f"seed {seed} family {family} done", flush=True)
 
     # ---- summaries ----
-    inc = pd.read_csv(INC_CSV)
+    inc = inc_ckpt.read()
     expected = {(seed, family) for seed in range(N_DRAWS) for family in FAMILIES}
     observed = set(zip(inc["seed"], inc["family"]))
     if observed != expected or inc.duplicated(["seed", "family"]).any():
@@ -313,6 +309,7 @@ def main():
         for fam in FAMILIES
     }
     inc_summary["_metadata"] = {
+        "certified_data_build_id": certified_data_build_id(),
         "draws": N_DRAWS,
         "seeds": [0, N_DRAWS - 1],
         "interval_interpretation": (
@@ -326,7 +323,16 @@ def main():
     }
     (OUT / "incidence_monte_carlo.json").write_text(json.dumps(inc_summary, indent=2))
 
-    pol = pd.read_csv(POL_CSV)
+    pol = pol_ckpt.read()
+    expected_pol = {
+        (seed, reform, family)
+        for seed in range(N_DRAWS)
+        for family in FAMILIES
+        for reform in (["R1_wage_insurance"] if family in FAMILIES_R1 else [])
+        + (list(reforms_exposure) if family == "exposure" else [])
+    }
+    if set(zip(pol["seed"], pol["reform"], pol["family"])) != expected_pol:
+        raise ValueError("policy checkpoint is incomplete or duplicated")
     policy_metrics = ["exchequer_cost_bn", "poverty_change_bhc_pp", "gini_change_pp"]
     pol_summary = {}
     for (reform, family), g in pol.groupby(["reform", "family"]):
@@ -338,11 +344,46 @@ def main():
     # poverty variant added
     central = inc[inc.family == "exposure"]
     central_summary = summarise(
-        central, incidence_metrics + ["relative_poverty_change_bhc_pp"]
+        central,
+        incidence_metrics
+        + ["relative_poverty_change_bhc_pp", "displaced_weighted_m", "realised_displacement_rate"],
     )
     central_summary["baseline_relative_poverty_bhc_rate"] = b["relpov_bhc"]
+    central_summary["prescribed_displacement_rate"] = PRESETS["central"].displacement_rate
+    central_summary["certified_data_build_id"] = certified_data_build_id()
     (OUT / "central_monte_carlo.json").write_text(json.dumps(central_summary, indent=2))
 
+    # exchequer cost by component, central family, all draws
+    cost = cost_ckpt.read()
+    if sorted(cost["seed"]) != list(range(N_DRAWS)):
+        raise ValueError("cost-component checkpoint is incomplete or duplicated")
+    cost_summary = summarise(cost, list(COST_FIELDS) + ["total"])
+    gap = (cost["total"] - inc[inc.family == "exposure"].set_index("seed")
+           .loc[cost["seed"], "exchequer_cost_bn"].to_numpy()).abs().max()
+    if gap > 1e-6:
+        raise AssertionError(f"cost decomposition total differs from incidence cost by {gap}")
+    cost_summary["_metadata"] = {
+        "certified_data_build_id": certified_data_build_id(),
+        "draws": N_DRAWS,
+        "family": "exposure (central preset)",
+        "sign": "positive = cost to the Exchequer (fall in gov_balance)",
+        "components": {
+            "dividend_tax": "dividend_income_tax (part of income tax)",
+            "savings_tax": "savings_income_tax (part of income tax)",
+            "other_income_tax": "income_tax less dividend and savings income tax",
+            "employee_ni": "national_insurance (class 1 employee, 2, 3, 4)",
+            "employer_ni": "ni_employer (class 1 employer and 1A)",
+            "universal_credit": "universal_credit",
+            "childcare": "+".join(CHILDCARE_VARIABLES),
+            "other": "gov_balance cost less the named components (residual)",
+        },
+        "narrow_cash": (
+            "income_tax + national_insurance - household_benefits, the basis of "
+            "the JR16 shock grid (results/jr16/grid.csv); it omits employer NI "
+            "and the other gov_balance lines"
+        ),
+    }
+    (OUT / "central_cost_decomposition.json").write_text(json.dumps(cost_summary, indent=2))
     print(json.dumps({"incidence": inc_summary, "policy": pol_summary,
                       "central": central_summary}, indent=1))
 

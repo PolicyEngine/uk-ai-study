@@ -45,6 +45,7 @@ from uk_ai_study.shocks import (
     PRESETS,
     build_shocked_simulation,
     prescribed_systematic_sample,
+    realised_displacement_rate,
 )
 
 OUT = Path("results/incidence")
@@ -187,6 +188,7 @@ def main():
     rec = {
         "family": "klein_top_loaded",
         "displaced_weighted_m": float(w[displaced].sum() / 1e6),
+        "realised_displacement_rate": realised_displacement_rate(persons, displaced),
         "exchequer_cost_bn": (b["gov"] - m["gov"]) / 1e9,
         "poverty_change_bhc_pp": 100 * (m["pov_bhc"] - b["pov_bhc"]),
         "poverty_change_ahc_pp": 100 * (m["pov_ahc"] - b["pov_ahc"]),

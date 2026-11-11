@@ -43,6 +43,7 @@ from uk_ai_study.shocks import (
     apply_shocks,
     build_shocked_simulation,
     draw_displaced,
+    realised_displacement_rate,
 )
 from uk_ai_study.runner import build_person_table as canonical_person_table, gini
 
@@ -218,19 +219,13 @@ def run_grid(baseline_sim, persons, resume: bool = False):
         }
 
     base = hh_metrics(baseline_sim)
-    out_path = OUT / "grid.csv"
-    # resume is opt-in and fingerprint-aware: a stale-schema CSV is never
-    # silently reused (#1, finding 8)
-    done = set()
-    rows = []
-    if resume and out_path.exists():
-        prev = pd.read_csv(out_path)
-        if list(prev.columns) == GRID_COLUMNS:
-            done = set(zip(prev["unemployment_pct"], prev["wage_pct"]))
-            rows = prev.to_dict("records")
-        else:
-            print("existing grid.csv has a different schema; recomputing all cells")
+    from uk_ai_study.checkpoint import Checkpoint
 
+    # resume is opt-in and stamp-checked: a checkpoint from another data
+    # build or code version is refused, never silently reused (#1, finding 8)
+    ckpt = Checkpoint(OUT / "grid.csv", ("unemployment_pct", "wage_pct"),
+                      resume=resume, script=__file__)
+    done = ckpt.done
     for u in range(0, 11):
         for w in range(0, 6):
             if (u, w) in done:
@@ -240,10 +235,13 @@ def run_grid(baseline_sim, persons, resume: bool = False):
             sim = build_shocked_simulation(baseline_sim, shocked_table, PERIOD)
             m = hh_metrics(sim)
             delta_rev = m["net_revenue"] - base["net_revenue"]
-            rows.append(
+            ckpt.append(
                 {
                     "unemployment_pct": u,
                     "wage_pct": w,
+                    # seed-0 cell: the realised share of employees displaced
+                    "realised_displacement_rate": realised_displacement_rate(
+                        persons, shocked_table["displaced"].to_numpy()),
                     "avg_disposable_income_change_pct": 100 * (m["mean_hni"] / base["mean_hni"] - 1),
                     # change in net revenue (IT + NI - household benefits) in
                     # £bn, and re-expressed against gross IT+NI receipts; the
@@ -254,7 +252,6 @@ def run_grid(baseline_sim, persons, resume: bool = False):
                     "gini_change_pp": 100 * (m["gini"] - base["gini"]),
                 }
             )
-            pd.DataFrame(rows)[GRID_COLUMNS].to_csv(out_path, index=False)
             del sim
             gc.collect()
             print(f"u={u} w={w} done", flush=True)

@@ -49,6 +49,7 @@ from uk_ai_study.shocks import (
     build_shocked_simulation,
     draw_displaced,
     prescribed_systematic_sample,
+    realised_displacement_rate,
 )
 
 OUT = Path("results/incidence")
@@ -274,6 +275,9 @@ def main():
         rec = {
             "family": family,
             "displaced_weighted_m": float(w[displaced].sum() / 1e6),
+            # one draw realises the 7 per cent quota only up to sampling
+            # noise; report the realised rate beside every seed-0 figure
+            "realised_displacement_rate": realised_displacement_rate(persons, displaced),
             "exchequer_cost_bn": (b["gov"] - m["gov"]) / 1e9,
             "poverty_change_bhc_pp": 100 * (m["pov_bhc"] - b["pov_bhc"]),
             "poverty_change_ahc_pp": 100 * (m["pov_ahc"] - b["pov_ahc"]),

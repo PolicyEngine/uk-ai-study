@@ -4,7 +4,8 @@ Reruns the measured family with (high, low) wage-tier displacement multipliers
 (3, 0.8) and (6, 0.7) alongside the baseline (9.6, 0.6), holding the junior
 (5.8/4.5) and London (1.5) tilts and the central aggregate shock fixed.
 20 draws (seeds 0-19) per variant; each draw checkpointed to
-results/robustness/measured_wage_tier_draws.csv (rerun resumes); summary to
+results/robustness/measured_wage_tier_draws.csv (stamped; continued only
+with --resume); summary to
 results/robustness/measured_wage_tier_sensitivity.json.
 """
 
@@ -63,10 +64,10 @@ def main():
     base_arrays["employment_status"] = person_calc(baseline, "employment_status").astype(object)
     del baseline
 
-    done = set()
-    if CSV.exists():
-        d = pd.read_csv(CSV)
-        done = set(zip(d["variant"], d["seed"]))
+    from uk_ai_study.checkpoint import Checkpoint
+
+    ckpt = Checkpoint(CSV, ("variant", "seed"), script=__file__)
+    done = ckpt.done
 
     scenario = PRESETS["central"]
     for seed in range(N_DRAWS):
@@ -90,10 +91,13 @@ def main():
                 "gini_change_pp": 100 * (m["gini"] - b["gini"]),
                 "displaced_weighted_m": float(w[displaced].sum() / 1e6),
             }
-            pd.DataFrame([row]).to_csv(CSV, mode="a", header=not CSV.exists(), index=False)
+            ckpt.append(row)
             print(f"wage-tier {variant} seed {seed} done", flush=True)
 
-    d = pd.read_csv(CSV)
+    d = ckpt.read()
+    if set(zip(d["variant"], d["seed"])) != {(v, s) for v in VARIANTS for s in range(N_DRAWS)} \
+            or d.duplicated(["variant", "seed"]).any():
+        raise ValueError("wage-tier checkpoint is incomplete or duplicated")
     summary = {
         "description": "Measured family (Klein Teeselink) with alternative "
                        "high/low wage-tier displacement multipliers; junior "
