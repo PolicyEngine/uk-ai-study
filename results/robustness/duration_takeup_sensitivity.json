@@ -1,0 +1,76 @@
+{
+  "n_draws": 20,
+  "half_earnings_retention": {
+    "description": "Central scenario; displaced workers keep 50% of baseline annual earnings, in-model, while carrying full-year unemployed status/hours (documented 50%-earnings-retention hybrid, NOT a six-month unemployment spell).",
+    "results": {
+      "exchequer_cost_bn": {
+        "mean": -9.2146581504,
+        "sd": 1.1558094822814566,
+        "min": -11.648073728,
+        "max": -7.51222784
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 0.10785814239141797,
+        "sd": 0.11999378010542351,
+        "min": -0.1584555433784898,
+        "max": 0.3954955077496117
+      },
+      "gini_change_pp": {
+        "mean": 0.7733787350933868,
+        "sd": 0.05433828940597048,
+        "min": 0.6722539805537497,
+        "max": 0.8752491768799553
+      },
+      "uc_change_bn": {
+        "mean": 0.23771367537353427,
+        "sd": 0.1370081488445953,
+        "min": -0.0280432250104354,
+        "max": 0.6776256245895809
+      }
+    },
+    "convex_combination_comparator_0.5x_full_year": {
+      "exchequer_cost_bn": {
+        "mean": 3.6913222451200003,
+        "sd": 0.9162916342229745
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 1.1681015724503871,
+        "sd": 0.10344941145512482
+      },
+      "gini_change_pp": {
+        "mean": 0.8820700864867886,
+        "sd": 0.06094767326143463
+      }
+    }
+  },
+  "takeup_70": {
+    "description": "Central scenario under Bernoulli(0.70) UC take-up (would_claim_uc set identically in baseline and shocked simulations, redrawn per seed).",
+    "dataset_baseline_would_claim_uc_person_weighted_mean": 0.46104608370585276,
+    "results": {
+      "exchequer_cost_bn": {
+        "mean": 8.336619929600001,
+        "sd": 2.0063745128824633,
+        "min": 3.822813184,
+        "max": 11.447435264
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 2.1583373937559505,
+        "sd": 0.16389036406256333,
+        "min": 1.818652273674901,
+        "max": 2.433992418030689
+      },
+      "gini_change_pp": {
+        "mean": 1.6650840024586835,
+        "sd": 0.11031404664329143,
+        "min": 1.4473856852214029,
+        "max": 1.893029413278402
+      },
+      "uc_change_bn": {
+        "mean": 3.3531292415404876,
+        "sd": 0.4337604303318191,
+        "min": 2.544818893578366,
+        "max": 4.0795945730698975
+      }
+    }
+  }
+}

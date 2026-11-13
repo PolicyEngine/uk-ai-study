@@ -1,0 +1,130 @@
+{
+  "description": "Reduced-form adjustment-margin robustness, Microcosm UK 2024-25, 2026, seed 0",
+  "mixed_adjustment": [
+    {
+      "scenario": "mixed_lambda_0",
+      "displaced_weighted_m": 0.0,
+      "net_employment_income_change_pct": -5.049248736271455,
+      "exchequer_cost_bn": 18.56438272,
+      "poverty_change_bhc_pp": 0.19331823241600238,
+      "poverty_change_ahc_pp": 0.3357047154035231,
+      "gini_change_pp": 0.2859178759743952,
+      "lambda_displacement_share": 0.0,
+      "gross_earnings_loss_pct": 7.71242688890708,
+      "gross_displacement_loss_pct": 0.0,
+      "gross_wage_cut_loss_pct": 7.71242688890708
+    },
+    {
+      "scenario": "mixed_lambda_0.25",
+      "displaced_weighted_m": 0.5242889030217314,
+      "net_employment_income_change_pct": -5.107607469636879,
+      "exchequer_cost_bn": 15.441199104,
+      "poverty_change_bhc_pp": 0.6029040599486015,
+      "poverty_change_ahc_pp": 0.7813450387310156,
+      "gini_change_pp": 0.5983367843115039,
+      "lambda_displacement_share": 0.25,
+      "gross_earnings_loss_pct": 7.712426888907079,
+      "gross_displacement_loss_pct": 2.165786370055671,
+      "gross_wage_cut_loss_pct": 5.546640518851407
+    },
+    {
+      "scenario": "mixed_lambda_0.5",
+      "displaced_weighted_m": 0.9298614758730988,
+      "net_employment_income_change_pct": -5.15410649877661,
+      "exchequer_cost_bn": 13.259603968,
+      "poverty_change_bhc_pp": 0.9910697242938693,
+      "poverty_change_ahc_pp": 1.116367615315597,
+      "gini_change_pp": 0.8236733023982312,
+      "lambda_displacement_share": 0.5,
+      "gross_earnings_loss_pct": 7.712426888907079,
+      "gross_displacement_loss_pct": 3.891000406045112,
+      "gross_wage_cut_loss_pct": 3.8214264828619666
+    },
+    {
+      "scenario": "mixed_lambda_0.75",
+      "displaced_weighted_m": 1.418003549374572,
+      "net_employment_income_change_pct": -5.20220408028986,
+      "exchequer_cost_bn": 10.492362752,
+      "poverty_change_bhc_pp": 1.3815956470740853,
+      "poverty_change_ahc_pp": 1.6240196044458117,
+      "gini_change_pp": 1.1040525755160013,
+      "lambda_displacement_share": 0.75,
+      "gross_earnings_loss_pct": 7.7124268889070775,
+      "gross_displacement_loss_pct": 5.680115941525963,
+      "gross_wage_cut_loss_pct": 2.0323109473811143
+    },
+    {
+      "scenario": "mixed_lambda_1",
+      "displaced_weighted_m": 1.9594854039974798,
+      "net_employment_income_change_pct": -5.256739151873865,
+      "exchequer_cost_bn": 7.378010112,
+      "poverty_change_bhc_pp": 1.9500770397753775,
+      "poverty_change_ahc_pp": 2.1460668862844976,
+      "gini_change_pp": 1.4992733421534954,
+      "lambda_displacement_share": 1.0,
+      "gross_earnings_loss_pct": 7.712426888907082,
+      "gross_displacement_loss_pct": 7.712426888907079,
+      "gross_wage_cut_loss_pct": 2.4232730253079554e-15
+    }
+  ],
+  "survivor_wage_grid": [
+    {
+      "scenario": "survivor_wage_-0.050",
+      "displaced_weighted_m": 1.9594854039974798,
+      "net_employment_income_change_pct": -12.434903306278649,
+      "exchequer_cost_bn": 56.50694144,
+      "poverty_change_bhc_pp": 2.7489392452621497,
+      "poverty_change_ahc_pp": 3.704708737186144,
+      "gini_change_pp": 1.1180493589692864,
+      "survivor_wage_effect_pct": -5.0
+    },
+    {
+      "scenario": "survivor_wage_-0.026",
+      "displaced_weighted_m": 1.9594854039974798,
+      "net_employment_income_change_pct": -10.168114625940296,
+      "exchequer_cost_bn": 41.022865408,
+      "poverty_change_bhc_pp": 2.4799100034321593,
+      "poverty_change_ahc_pp": 3.317086843216746,
+      "gini_change_pp": 1.230125972277063,
+      "survivor_wage_effect_pct": -2.6
+    },
+    {
+      "scenario": "survivor_wage_+0.000",
+      "displaced_weighted_m": 1.9594854039974798,
+      "net_employment_income_change_pct": -7.712426888907082,
+      "exchequer_cost_bn": 24.24717312,
+      "poverty_change_bhc_pp": 2.1381184322103897,
+      "poverty_change_ahc_pp": 2.6483933776434347,
+      "gini_change_pp": 1.362533712931746,
+      "survivor_wage_effect_pct": 0.0
+    },
+    {
+      "scenario": "survivor_wage_+0.026",
+      "displaced_weighted_m": 1.9594854039974798,
+      "net_employment_income_change_pct": -5.256739151873865,
+      "exchequer_cost_bn": 7.378010112,
+      "poverty_change_bhc_pp": 1.9500770397753775,
+      "poverty_change_ahc_pp": 2.1460668862844976,
+      "gini_change_pp": 1.4992733421534954,
+      "survivor_wage_effect_pct": 2.6
+    },
+    {
+      "scenario": "survivor_wage_+0.050",
+      "displaced_weighted_m": 1.9594854039974798,
+      "net_employment_income_change_pct": -2.989950471535513,
+      "exchequer_cost_bn": -8.332836864,
+      "poverty_change_bhc_pp": 1.644262109913619,
+      "poverty_change_ahc_pp": 1.7637536975530028,
+      "gini_change_pp": 1.6301719556758076,
+      "survivor_wage_effect_pct": 5.0
+    }
+  ],
+  "assumptions": {
+    "aggregate_adjustment_share": 0.07,
+    "lambda_definition": "lambda scales the 7% employee-displacement-rate parameter; C-AIOE-graded survivor cuts fill the gap to the seed-specific central draw's gross earnings loss",
+    "common_loss_basis": "gross employment earnings before the common wage uplift",
+    "mixed_wage_gradient": "C-AIOE",
+    "standard_wage_uplift": 0.026,
+    "capital_return_increase_pp": 0.4
+  }
+}

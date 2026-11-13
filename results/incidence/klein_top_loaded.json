@@ -1,0 +1,64 @@
+{
+  "family": "klein_top_loaded",
+  "displaced_weighted_m": 2.0373430252075195,
+  "realised_displacement_rate": 0.07026713565403182,
+  "exchequer_cost_bn": 29.280141312,
+  "poverty_change_bhc_pp": 2.6837950387199356,
+  "poverty_change_ahc_pp": 3.404875050357395,
+  "gini_change_pp": 1.582257312666946,
+  "decile_transition_share_pct": {
+    "1": 0.18858003616333008,
+    "2": 0.46695205569267273,
+    "3": 0.7217478156089783,
+    "4": 0.8209644556045532,
+    "5": 1.820025086402893,
+    "6": 2.5725505352020264,
+    "7": 4.141024589538574,
+    "8": 4.746789455413818,
+    "9": 5.5966596603393555,
+    "10": 8.291754722595215
+  },
+  "decile_income_change_pct": {
+    "1": 2.0058679580688477,
+    "2": -0.044335223734378815,
+    "3": -0.43493202328681946,
+    "4": -0.47056031227111816,
+    "5": -1.6967995166778564,
+    "6": -2.7235913276672363,
+    "7": -4.880654811859131,
+    "8": -3.8757808208465576,
+    "9": -4.344500541687012,
+    "10": -3.8181586265563965
+  },
+  "london_composition_no_tilt": {
+    "london_share_of_displaced_pct": 20.174198150634766,
+    "london_displacement_rate_pct": 9.873003005981445
+  },
+  "provenance": {
+    "source": "Klein Teeselink (2025), 'Generative AI and Labor Market Outcomes: Evidence from the United Kingdom', SSRN 5516798; KCL press release 2025-09.",
+    "paper_per_standard_deviation_estimates_pct": {
+      "total_employment": -0.3,
+      "junior_employment": -0.4,
+      "high_compensation_firm_employment": -0.7,
+      "low_compensation_firm_employment": "close to zero",
+      "london": "minimal and statistically insignificant effects"
+    },
+    "press_release_maximum_exposure_scalings_pct": {
+      "total_employment": -4.5,
+      "junior_employment": -5.8,
+      "high_paying_firm_employment": -9.6,
+      "exposed_occupations_postings_pct": -23.4,
+      "high_salary_occupations_postings_pct": -34.2
+    },
+    "author_imposed": {
+      "junior_multiplier": 1.2888888888888888,
+      "geographic_multiplier": "none (London multiplier fixed at 1.0)",
+      "low_wage_multiplier_floor": 0.6,
+      "high_wage_multiplier": 9.6,
+      "junior_proxy": "junior positions proxied by age < 25 (KT's concept is seniority, not age; under-25s are ~2% of the displaced given the wage-tier tilt)",
+      "wage_tier_split": "weighted median of employee earnings (Microcosm person earnings proxy for KT's firm pay tiers)",
+      "composite": "multiplicative combination of exposure x junior x wage-tier channels (independence imposed)",
+      "aggregate_shock": "central preset (7% displacement, +2.6% wages, +0.4pp capital) \u2014 KT shapes incidence, not size"
+    }
+  }
+}

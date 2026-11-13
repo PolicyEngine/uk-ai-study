@@ -1,0 +1,40 @@
+{
+  "scenario": "hosseini_lichtinger_2026",
+  "displaced_weighted_total": 201027.28125,
+  "share_of_employed_displaced": 0.006933349650353193,
+  "exchequer_cost_bn": 1.667694592,
+  "poverty_change_bhc_pp": 0.24930801904513855,
+  "gini_change_pp": 0.08021480827412608,
+  "age_bands": {
+    "16-24": {
+      "displaced_weighted": 103611.8203125,
+      "displacement_rate_of_employed": 0.03269675001502037,
+      "mean_per_capita_income_change": -155.16813086882317
+    },
+    "25-34": {
+      "displaced_weighted": 97415.453125,
+      "displacement_rate_of_employed": 0.014234490692615509,
+      "mean_per_capita_income_change": -209.54878855186033
+    },
+    "35-44": {
+      "displaced_weighted": 0.0,
+      "displacement_rate_of_employed": 0.0,
+      "mean_per_capita_income_change": -13.606923032789593
+    },
+    "45-54": {
+      "displaced_weighted": 0.0,
+      "displacement_rate_of_employed": 0.0,
+      "mean_per_capita_income_change": -44.17242209454357
+    },
+    "55-64": {
+      "displaced_weighted": 0.0,
+      "displacement_rate_of_employed": 0.0,
+      "mean_per_capita_income_change": -27.156296761627534
+    },
+    "65-+": {
+      "displaced_weighted": 0.0,
+      "displacement_rate_of_employed": 0.0,
+      "mean_per_capita_income_change": -8.558949022025033
+    }
+  }
+}
