@@ -501,6 +501,12 @@ def emit_extended() -> None:
          lambda: 100 * (1 - csv(dc).set_index("decile").loc[worst_decile(), "disposable_income"]
                         / csv(dc).set_index("decile").loc[worst_decile(), "market_income"]), "{:.0f}", dc)
     emit("genDecompResidualMaxPct", lambda: csv(dc)["residual"].abs().max() * 100, "{:.1f}", dc)
+    # share of the market loss offset by benefits and taxes alone (the
+    # AbsorbedWorst figure above also counts the HBAI residual items)
+    emit("genDecompAbsorbedTbWorstPct",
+         lambda: 100 * (csv(dc).set_index("decile").loc[worst_decile(), "benefits"]
+                        + csv(dc).set_index("decile").loc[worst_decile(), "tax_and_contributions"])
+         / -csv(dc).set_index("decile").loc[worst_decile(), "market_income"], "{:.0f}", dc)
     emit("genDecompAbsorbedDTenPct",
          lambda: 100 * (1 - csv(dc).set_index("decile").loc[10, "disposable_income"]
                         / csv(dc).set_index("decile").loc[10, "market_income"]), "{:.0f}", dc)
@@ -561,6 +567,10 @@ def emit_extended() -> None:
 
     # --- index sensitivity -------------------------------------------------
     ix = "robustness/index_sensitivity_full.json"
+    emit("genIndexDisplacedMinM",
+         lambda: min(v["displaced_weighted_m"] for v in jload(ix)["results"].values()), "{:.2f}", ix)
+    emit("genIndexDisplacedMaxM",
+         lambda: max(v["displaced_weighted_m"] for v in jload(ix)["results"].values()), "{:.2f}", ix)
     labels = [("c_aioe", "C-AIOE (central)"), ("felten_aioe", "Felten AIOE"),
               ("eloundou_beta", "Eloundou beta"), ("dsit_aioe", "DSIT AIOE"), ("dsit_llm", "DSIT LLM")]
 
@@ -828,8 +838,8 @@ def emit_extended() -> None:
                                ("male_displacement_rate_mean", "MaleRatePct", "{:.1f}", 100),
                                ("female_share_of_employment", "FemaleEmpSharePct", "{:.1f}", 100),
                                ("female_share_of_displaced_mean", "FemaleDispSharePct", "{:.1f}", 100),
-                               ("female_income_change_pct", "FemaleIncomePct", "{:.1f}", 1),
-                               ("male_income_change_pct", "MaleIncomePct", "{:.1f}", 1)]:
+                               ("female_income_change_pct", "FemaleIncomePct", "{:.2f}", 1),
+                               ("male_income_change_pct", "MaleIncomePct", "{:.2f}", 1)]:
         emit(f"genGender{N}", lambda key=key, scale=scale: jload(ge)[key] * scale, fmt, ge)
 
     # --- caseloads ---------------------------------------------------------
@@ -882,6 +892,21 @@ def emit_extended() -> None:
     emit("genRoneToRthreeCostRatio", lambda: pol("R1_wage_insurance", "exposure", "gross_cost_bn")
          / pol("R3_cap_suspension_taper_cut", "exposure", "gross_cost_bn"), "{:.1f}", ps)
     pmc = "robustness/policy_monte_carlo.json"
+    emit("genRoneJuniorMcCostMeanBn",
+         lambda: jload(pmc)["R1_wage_insurance_junior"]["exchequer_cost_bn"]["mean"], "{:.1f}", pmc)
+    emit("genRoneUniformMcCostMeanBn",
+         lambda: jload(pmc)["R1_wage_insurance_uniform"]["exchequer_cost_bn"]["mean"], "{:.1f}", pmc)
+    # seed 0's rank among the 50 exposure-family draws (1 = smallest)
+    _idf = "robustness/incidence_draws_five.csv"
+
+    def seed0_rank(col):
+        d = csv(_idf)
+        d = d[d["family"] == "exposure"]
+        return int((d[col] < d.loc[d["seed"] == 0, col].iloc[0]).sum() + 1)
+
+    for col, N in [("poverty_change_bhc_pp", "PovBhc"), ("poverty_change_ahc_pp", "PovAhc"),
+                   ("gini_change_pp", "Gini"), ("exchequer_cost_bn", "Cost")]:
+        emit(f"genSeedZeroRank{N}", lambda col=col: seed0_rank(col), "{:d}", _idf)
     emit("genRoneMcPovBhcAvertedPp", lambda: -jload(pmc)["R1_wage_insurance_exposure"]["poverty_change_bhc_pp"]["mean"],
          "{:.2f}", pmc)
     emit("genRoneMcPovBhcAvertedSdPp", lambda: jload(pmc)["R1_wage_insurance_exposure"]["poverty_change_bhc_pp"]["sd"],
@@ -894,6 +919,8 @@ def emit_extended() -> None:
     emit("genDurReformDraws", lambda: jload(dr_)["n_draws"], "{:d}", dr_)
     dt = "robustness/duration_takeup_sensitivity.json"
     emit("genDurTakeupDraws", lambda: jload(dt)["n_draws"], "{:d}", dt)
+    emit("genTakeupBaselinePropensityPct",
+         lambda: 100 * jload(dt)["takeup_70"]["dataset_baseline_would_claim_uc_person_weighted_mean"], "{:.0f}", dt)
     emit("genDurSixMoCostCutPct", lambda: 100 * (1 - jload(dt)["half_earnings_retention"]["results"]["exchequer_cost_bn"]["mean"]
                                                  / jload("robustness/central_monte_carlo.json")["exchequer_cost_bn"]["mean"]),
          "{:.0f}", dt)

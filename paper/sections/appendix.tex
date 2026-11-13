@@ -15,9 +15,9 @@ ripple sensitivities, the policy table and the tax-composition cells.
 Means over 50 paired draws (seeds 0--49): the five incidence families, the
 central Monte Carlo and its cost by component, the policy Monte Carlo, and
 the decile transition and wage-gain profiles (Figures~\ref{fig:transition}
-and~\ref{fig:wages}). Means over 20 draws: the decile decomposition in
-Figure~\ref{fig:decomp-ci} and its ranking sensitivity, the duration,
-take-up sensitivities and the gender incidence. Means over 20
+and~\ref{fig:wages}). Means over 20 draws: the decile profile in
+Figure~\ref{fig:decomp-ci} and its ranking sensitivity, the duration and
+take-up sensitivities and the gender displacement rates. Means over five draws (seeds 0--4): the 2008--09 backcast. Seed 0 also underlies the gender income change, the caseloads, the poverty decomposition and the age shares. Means over 20
 paired draws with identical displacement in every run: the capital-income
 coverage runs and the channel split. The duration-consistent policy
 ranking uses \genDurReformDraws~draws. The $\pm$ values are standard
@@ -155,7 +155,7 @@ report it as a finding.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/decomposition_ci.png}
-\caption{Disposable income change by decile, central scenario: mean and 95 per cent interval for the mean across 20 assignment draws.}
+\caption{Disposable income change by decile, central scenario: mean and 95 per cent interval for the mean across 20 assignment draws. Each household's change is weighted by its number of members.}
 \label{fig:decomp-ci}
 \end{figure}
 
@@ -166,7 +166,7 @@ aggregate shocks allocated uniformly across occupations, decile by decile;
 Figure~\ref{fig:b8} repeats the central scenario with the
 \citet{eloundou2023} GPT-exposure index in place of the C-AIOE. The
 exposure-based allocation shifts losses towards deciles 8 and 9 relative
-to a uniform shock: in this single seed-0 draw they change by
+to a uniform shock: in this single seed-0 draw, with each household weighted by its number of members (Figure~\ref{fig:decomp} weights households once and gives smaller decile losses), they change by
 $\genBSevenAiDEightSignedPct$ and $\genBSevenAiDNineSignedPct$ per cent
 under exposure-based allocation against $\genBSevenUniDEightSignedPct$ and
 $\genBSevenUniDNineSignedPct$ per cent under the uniform shock, while the
@@ -177,14 +177,14 @@ at the single-draw level. % results/appendix/b7_uniform_vs_ai_decile.csv
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/b7_uniform_vs_ai_decile.png}
-\caption{Disposable income change by decile: exposure-allocated versus uniform shock, central parameters.}
+\caption{Disposable income change by decile: exposure-allocated versus uniform shock, central parameters (seed 0; each household weighted by its number of members).}
 \label{fig:b7}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/b8_alternative_index_decile.png}
-\caption{Disposable income change by decile under the C-AIOE and the Eloundou et al.\ exposure index.}
+\caption{Disposable income change by decile under the C-AIOE and the Eloundou et al.\ exposure index (seed 0; each household weighted by its number of members).}
 \label{fig:b8}
 \end{figure}
 
@@ -200,9 +200,8 @@ comparison matters because the published literature disagrees on
 \emph{levels}: estimates of the share of employment ``highly exposed'' to
 AI range from a few per cent to well over half depending on the index and
 threshold chosen, so any result that survived under only one index would
-be fragile. My quota mechanism holds the aggregate displacement rate at
-7~per cent, so the indices differ only in \emph{where} the same aggregate
-shock lands across occupation groups.
+be fragile. My quota mechanism sets the expected displacement rate at
+7~per cent under every index, so the indices differ in \emph{where} the shock lands across occupation groups; a single draw also realises a slightly different number of displaced workers under each index.
 
 Table~\ref{tab:indexsens} and Figure~\ref{fig:indexsens} report the
 outcomes. The Exchequer cost spans \pounds \genIndexCostMinBn--\genIndexCostMaxBn~billion, the Gini change spans $\genIndexGiniMinSignedPp$ to $\genIndexGiniMaxSignedPp$ points, and the
@@ -228,8 +227,7 @@ Index & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Gini (pp) & D1 shar
 \parbox{\textwidth}{\footnotesize Single draw, seed 0, 2026. D1 and D10
 shares are the percentages of persons in the bottom and top baseline
 income deciles who transition to unemployment (displaced shares) under
-the draw. Aggregate displacement is held at 7 per cent by the quota
-mechanism under every index.}
+the draw. The quota is 7 per cent under every index; the realised seed-0 count ranges from \genIndexDisplacedMinM{} to \genIndexDisplacedMaxM~million, so differences across rows mix index and draw effects.}
 \end{table}
 
 \begin{figure}[htbp]
@@ -426,7 +424,7 @@ Figure~\ref{fig:b9} facets the full 66-cell scenario grid by baseline
 income decile; cells report the change in mean household disposable income
 (HBAI concept), which across the grid as a whole ranges from $\genGridDispMaxPct$ to
 $\genGridDispMinPct$ per cent. Losses deepen with displacement in every decile, though not
-monotonically in a single draw. In the harshest cell (10 per cent displacement, no wage gain)
+monotonically in a single draw. In the cell with the largest loss (10 per cent displacement, no wage gain)
 the top decile's disposable income changes by $\genAppGridHarshDTenSignedPct$ per cent; the
 bottom decile is subject to the ranking caveat of Section~\ref{sec:results-mediation}. % results/appendix/grid_deciles_capital.csv
 Figure~\ref{fig:b11} removes the capital-return shock. Average disposable
@@ -442,7 +440,7 @@ not generated solely by the capital channel.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{../results/appendix/b9_grid_by_decile.png}
-\caption{Change in household disposable income across the scenario grid, faceted by baseline income decile. Single draw, seed 0.}
+\caption{Change in household disposable income across the scenario grid, faceted by baseline income decile. Single draw, seed 0; each household weighted by its number of members.}
 \label{fig:b9}
 \end{figure}
 
