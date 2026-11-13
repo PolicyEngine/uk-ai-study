@@ -41,7 +41,10 @@ Outputs (results/takeup/):
     takeup_draws.csv    one row per (scenario, variant, seed), stamped with
                         this script's own code fingerprint; continued only
                         with --resume
-    takeup_deciles.csv  household flows by baseline decile per draw
+    takeup_deciles.csv  household flows by baseline decile per draw (gov
+                        balance, income tax, employee and employer NI,
+                        benefits, cash benefits, UC, JSA, childcare,
+                        statutory pay, market and HBAI net income)
     takeup_runs.json    summaries, JSA facts and the take-up diagnostics
 
 Usage:
@@ -240,6 +243,32 @@ def existing_unemployed_reference(*, bu_weight, n_unemployed, flag, entitled, uc
     }
 
 
+#: diagnostic columns every checkpoint row carries (NaN on jsa rows), so the
+#: CSV keeps one header and the stamp columns stay aligned
+DIAG_KEYS = ("displaced_benunits_m", "flag_true_share", "entitled_after_share", "flag_true_share_entitled_after",
+             "flag_true_share_newly_entitled", "over_capital_limit_share", "other_earner_share", "owner_share",
+             "mean_lost_earnings_gbp")
+
+
+def checkpoint_row(scenario: str, variant: str, seed: int, changes: dict, *, displaced_m: float,
+                   wage_bill_bn: float, jsa_eligible_m: float = 0.0, jsa_award_bn: float = 0.0,
+                   diag: dict | None = None) -> dict:
+    """One draw's checkpoint row with a fixed set of columns."""
+    diag = diag or {}
+    extra = set(diag) - set(DIAG_KEYS)
+    if extra:
+        raise KeyError(f"unexpected diagnostics {sorted(extra)}")
+    return {"scenario": scenario, "variant": variant, "seed": seed, **changes,
+            "displaced_weighted_m": displaced_m, "wage_bill_lost_bn": wage_bill_bn,
+            "jsa_eligible_m": jsa_eligible_m, "jsa_award_input_bn": jsa_award_bn,
+            **{f"diag_{k}": float(diag.get(k, np.nan)) for k in DIAG_KEYS}}
+
+
+#: household arrays whose shocked-minus-paired-baseline change is written by
+#: baseline decile
+DECILE_FLOWS = ("hh_gov", "hh_market", "hh_benefits", "hh_cash_benefits", "hh_uc", "hh_jsa", "hh_childcare",
+                "hh_statutory_pay", "hh_income_tax", "hh_ni_employee", "hh_ni_employer", "hh_net")
+
 DRAW_COLS = tuple(BN_CHANGES) + tuple(PP_CHANGES) + (
     "exchequer_cost_bn", "household_basis_cost_bn", "household_basis_cash_cost_bn", "narrow_cash_change_bn",
     "displaced_weighted_m", "wage_bill_lost_bn", "jsa_eligible_m", "jsa_award_input_bn")
@@ -275,7 +304,8 @@ def _sim_metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
         "hh_uc": h("universal_credit"), "hh_jsa": h("jsa_contrib"),
         "hh_childcare": sum(h(v) for v in CHILDCARE_VARS),
         "hh_statutory_pay": sum(h(v) for v in STATUTORY_PAY_VARS),
-        "hh_tax": h("income_tax") + h("ni_employee"), "hh_net": h("hbai_household_net_income"),
+        "hh_income_tax": h("income_tax"), "hh_ni_employee": h("ni_employee"), "hh_ni_employer": h("ni_employer"),
+        "hh_gov": h("gov_balance"), "hh_net": h("hbai_household_net_income"),
     }
     hh["hh_cash_benefits"] = hh["hh_benefits"] - hh["hh_childcare"] - hh["hh_statutory_pay"]
     tot = {k: float((x * hw).sum()) for k, x in hh.items()}
@@ -465,16 +495,13 @@ def main(only: str | None = None) -> None:  # pragma: no cover - needs Microcosm
                         person_weight=w, displaced=disp, baseline_earnings=earnings)
                 del sim
                 gc.collect()
-                flows = {k: sm[k] - bm[k] for k in ("hh_market", "hh_benefits", "hh_cash_benefits", "hh_uc",
-                                                    "hh_jsa", "hh_childcare", "hh_statutory_pay", "hh_tax",
-                                                    "hh_net")}
+                flows = {k: sm[k] - bm[k] for k in DECILE_FLOWS}
                 _append_deciles(decile_flows(hh_decile, b0["hw"], flows),
                                 {"scenario": scen_name, "variant": variant, "seed": seed})
-                ck.append({"scenario": scen_name, "variant": variant, "seed": seed,
-                           **draw_changes(bm, sm), "displaced_weighted_m": disp_m, "wage_bill_lost_bn": wage_bill_bn,
-                           "jsa_eligible_m": float(w[elig].sum() / 1e6) if variant == "jsa" else 0.0,
-                           "jsa_award_input_bn": float((award * w).sum() / 1e9) if variant == "jsa" else 0.0,
-                           **{f"diag_{k}": v for k, v in diag.items()}})
+                ck.append(checkpoint_row(
+                    scen_name, variant, seed, draw_changes(bm, sm), displaced_m=disp_m, wage_bill_bn=wage_bill_bn,
+                    jsa_eligible_m=float(w[elig].sum() / 1e6) if variant == "jsa" else 0.0,
+                    jsa_award_bn=float((award * w).sum() / 1e9) if variant == "jsa" else 0.0, diag=diag))
                 print(f"{scen_name} {variant} seed {seed} done", flush=True)
 
     draws = ck.read()
@@ -484,8 +511,7 @@ def main(only: str | None = None) -> None:  # pragma: no cover - needs Microcosm
     for (s, v), d in draws.groupby(["scenario", "variant"]):
         summary["results"].setdefault(s, {})[v] = summarise(d)
         if v == "takeup1":
-            dcols = [c for c in d.columns if c.startswith("diag_")]
-            summary["diagnostics"][s] = {c[5:]: float(d[c].astype(float).mean()) for c in dcols}
+            summary["diagnostics"][s] = {k: float(d[f"diag_{k}"].astype(float).mean()) for k in DIAG_KEYS}
     SUMMARY.write_text(json.dumps(summary, indent=2))
     print(f"wrote {SUMMARY} ({len(draws)} of {EXPECTED_ROWS} draws)", flush=True)
 

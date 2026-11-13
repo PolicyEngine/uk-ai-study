@@ -143,3 +143,30 @@ def test_summarise_single_draw_has_nan_spread():
     assert s["exchequer_cost_bn"]["mean"] == 7.0 and np.isnan(s["exchequer_cost_bn"]["se"])
     s = tr.summarise(pd.DataFrame({"exchequer_cost_bn": [7.0, 9.0]}))
     assert s["exchequer_cost_bn"]["se"] == pytest.approx(1.0)
+
+
+def test_checkpoint_rows_share_one_header_and_read_back(tmp_path):
+    from uk_ai_study.checkpoint import Checkpoint
+    stamp = {"certified_data_build_id": "B", "code_fingerprint": "cF"}
+    ck = Checkpoint(tmp_path / "d.csv", ("scenario", "variant", "seed"), resume=False, stamp=stamp)
+    changes = tr.draw_changes(metrics(gov=1e9), metrics())
+    diag = {k: 0.5 for k in tr.DIAG_KEYS}
+    ck.append(tr.checkpoint_row("obr", "takeup1", 0, changes, displaced_m=0.5, wage_bill_bn=24.0, diag=diag))
+    ck.append(tr.checkpoint_row("obr", "jsa", 0, changes, displaced_m=0.5, wage_bill_bn=24.0,
+                                jsa_eligible_m=0.48, jsa_award_bn=1.1))
+    d = ck.read()  # raises if the stamp columns are misaligned
+    assert len(d) == 2 and set(d["code_fingerprint"]) == {"cF"}
+    assert d.loc[0, "diag_flag_true_share"] == 0.5 and np.isnan(d.loc[1, "diag_flag_true_share"])
+    resumed = Checkpoint(tmp_path / "d.csv", ("scenario", "variant", "seed"), resume=True, stamp=stamp)
+    assert resumed.is_done("obr", "jsa", 0)
+    with pytest.raises(KeyError):
+        tr.checkpoint_row("obr", "jsa", 0, changes, displaced_m=0.5, wage_bill_bn=24.0, diag={"bogus": 1})
+
+
+def test_diagnostics_return_exactly_the_checkpoint_keys():
+    d = tr.displaced_diagnostics(
+        bu_weight=[1.0], displaced_bu=[True], flag_base=[True], entitled_before=[False], entitled_after=[True],
+        capital=[0.0], capital_limit=16e3, other_earner=[False], owner=[True], person_weight=[1.0],
+        displaced=[True], baseline_earnings=[30e3])
+    assert tuple(d) == tr.DIAG_KEYS
+    assert "hh_gov" in tr.DECILE_FLOWS and "hh_ni_employer" in tr.DECILE_FLOWS
