@@ -70,16 +70,16 @@ def test_closed_variant_adds_post_ct_profit_to_dividend_holders():
     p = persons()
     full = central_draw(p)
     v = {x.name: x for x in nr.CAPITAL_VARIANTS}
-    t = nr.capital_variant_table(p, full, v["closed_phi050"])
+    t = nr.capital_variant_table(p, full, v["closed_k0375"])
     w = p["weight"].to_numpy()
     added = ((t["dividend_income"] - p["dividend_income"]) * w).sum()
     net = 50_000.0 - 3_000.0
-    assert added == pytest.approx(0.75 * 0.5 * net)
+    assert added == pytest.approx(0.375 * net)
     assert np.allclose(t["savings_interest_income"], p["savings_interest_income"])
     # pro rata: the holder with three times the dividends gets three times the rise
     rise = t["dividend_income"] - p["dividend_income"]
     assert rise[2] == pytest.approx(3 * rise[1])
-    assert t.attrs["closed_profit_bn"] == pytest.approx(0.5 * net / 1e9)
+    assert t.attrs["closed_wedge_bn"] == pytest.approx(net / 1e9)
 
 
 def test_decile_flows_stabilisation():
@@ -146,4 +146,20 @@ def test_public_paybill_counts_displaced_public_employees_only():
 
 def test_run16_order_puts_cap60_third():
     assert [v.name for v in nr.CAPITAL_VARIANTS] == [
-        "cap10", "cap20", "cap60", "div_only", "closed_phi100", "closed_phi050"]
+        "cap10", "cap20", "cap60", "div_only", "closed_k0375", "closed_k01875", "closed_k009375", "closed_k075"]
+
+
+def test_decile_flows_net_income_and_family_split():
+    dec = np.array([1, 1, 2]); w = np.array([1.0, 2.0, 1.0])
+    g = nr.decile_flows(dec, w, [-10.0, -10.0, -5.0], [3.0, 3.0, 1.0], [-1.0, -1.0, 0.0], [-6.0, -6.0, -4.0])
+    assert g.net_income_change.tolist() == [-18.0, -4.0]
+    f = nr.decile_family_flows(dec, ["A", "B", "A"], w, [-10.0, -10.0, -5.0], [3.0, 3.0, 1.0],
+                               [-1.0, -1.0, 0.0], [-6.0, -6.0, -4.0])
+    assert len(f) == 3 and f.weight.sum() == 4.0
+    assert f.loc[(f.decile == 1) & (f.family_type == "B"), "stabilisation"].item() == pytest.approx(0.4)
+
+
+def test_lf_components_rate():
+    c = nr.lf_components(["FT_EMPLOYED", "UNEMPLOYED", "FT_SELF_EMPLOYED", "RETIRED"], [30, 30, 30, 70],
+                         [8e6, 1e6, 1e6, 5e6])
+    assert c["labour_force_m"] == 10.0 and c["unemployment_rate_pct"] == 10.0

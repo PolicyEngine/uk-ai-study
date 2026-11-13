@@ -19,18 +19,19 @@ Run 16 (``capital``): capital-channel variants on the central 7 per cent
     exposure-proportional draw with the +2.6 per cent survivor uplift, seeds
     0-19 (the seeds of the existing channel split, so every variant pairs
     with ``dividend_coverage_draws.csv`` draw by draw):
-      cap10, cap20      interest and dividends x1.10 and x1.20;
+      cap10, cap20,     interest and dividends x1.10, x1.20 and x1.60;
+      cap60
       div_only          dividends x(1.405/1.005), interest unchanged;
-      closed_phi050,    no exogenous capital uplift; instead household
-      closed_phi100     dividends rise by (1 - CT) x phi x (W - S), where W
-                        is the draw's displaced wage bill and S the
-                        survivors' gain from the uplift, distributed pro
-                        rata to baseline dividend holders (full payout to UK
-                        households; corporation tax at 25 per cent on
-                        phi x (W - S) is added in post-processing, and a
-                        payout or UK-ownership share below one scales the
-                        dividend rise, so closed_phi050 doubles as phi = 1 at
-                        half payout).
+      closed_k*         no exogenous capital uplift; instead household
+                        dividends rise by kappa x (W - S), where W is the
+                        draw's displaced wage bill and S the survivors' gain
+                        from the uplift, pro rata to baseline dividend
+                        holders. kappa = (1 - CT) x phi x payout x UK share:
+                        0.375, 0.1875, 0.09375 are phi = 1, 0.5, 0.25 at the
+                        50 per cent payout of Table 6; 0.75 is the
+                        full-payout upper bound. Corporation tax on phi x
+                        (W - S) is added in post-processing.
+Variants run in the order of ``CAPITAL_VARIANTS``, 20 seeds each.
 
 Every draw row also records the displaced wage bill, the survivor gain, the
 capital income added and the household-basis cost (income tax + employee NI
@@ -106,7 +107,12 @@ class CapitalVariant:
     name: str
     interest_factor: float = 1.0
     dividend_factor: float = 1.0
-    closed_phi: float | None = None
+    #: closed-economy pass-through to household dividends:
+    #: kappa = (1 - CT) x phi x payout x UK share, applied to (W - S).
+    #: Table 6 (50 per cent payout, UK share 1): phi = 1 -> 0.375,
+    #: phi = 0.5 -> 0.1875, phi = 0.25 -> 0.09375; 0.75 is the full-payout
+    #: upper bound. Corporation tax stays in post-processing.
+    closed_kappa: float | None = None
 
 
 JR16_FACTOR = (BASELINE_CAPITAL_RETURN + CAPITAL_RETURN_INCREASE) / BASELINE_CAPITAL_RETURN
@@ -117,8 +123,10 @@ CAPITAL_VARIANTS = (
     # +57 per cent capital break-even
     CapitalVariant("cap60", 1.60, 1.60),
     CapitalVariant("div_only", 1.0, JR16_FACTOR),
-    CapitalVariant("closed_phi100", closed_phi=1.0),
-    CapitalVariant("closed_phi050", closed_phi=0.5),
+    CapitalVariant("closed_k0375", closed_kappa=0.375),
+    CapitalVariant("closed_k01875", closed_kappa=0.1875),
+    CapitalVariant("closed_k009375", closed_kappa=0.09375),
+    CapitalVariant("closed_k075", closed_kappa=0.75),
 )
 #: The tuple order is the execution order of run 16 (variant by variant, 20
 #: seeds each), so a stopped run leaves whole variants complete.
@@ -146,18 +154,18 @@ def capital_variant_table(persons: pd.DataFrame, shocked: pd.DataFrame, v: Capit
     w = persons["weight"].to_numpy(float)
     interest = persons["savings_interest_income"].to_numpy(float)
     dividends = persons["dividend_income"].to_numpy(float)
-    if v.closed_phi is None:
+    if v.closed_kappa is None:
         t["savings_interest_income"] = interest * v.interest_factor
         t["dividend_income"] = dividends * v.dividend_factor
         return t
     f = wage_flows(persons, shocked)
-    target = (1 - CT_RATE) * v.closed_phi * (f["wage_bill_lost"] - f["survivor_gain"])
+    target = v.closed_kappa * (f["wage_bill_lost"] - f["survivor_gain"])
     total = float((dividends * w).sum())
     if total <= 0:
         raise ValueError("no baseline dividends to scale")
     t["savings_interest_income"] = interest
     t["dividend_income"] = dividends * (1 + max(target, 0.0) / total)
-    t.attrs["closed_profit_bn"] = v.closed_phi * (f["wage_bill_lost"] - f["survivor_gain"]) / 1e9
+    t.attrs["closed_wedge_bn"] = (f["wage_bill_lost"] - f["survivor_gain"]) / 1e9
     return t
 
 
@@ -170,7 +178,7 @@ def obr_table(persons: pd.DataFrame, shocked: pd.DataFrame) -> pd.DataFrame:
     return t
 
 
-def decile_flows(deciles, weights, d_market, d_benefits, d_tax) -> pd.DataFrame:
+def decile_flows(deciles, weights, d_market, d_benefits, d_tax, d_net=None) -> pd.DataFrame:
     """Weighted sums of household changes by baseline decile, and the
     stabilisation coefficient (share of the market-income change offset by
     benefits and lower taxes). Arrays are household-level."""
@@ -179,7 +187,39 @@ def decile_flows(deciles, weights, d_market, d_benefits, d_tax) -> pd.DataFrame:
     g.columns = ["market_change", "benefit_change", "tax_change"]
     g["stabilisation"] = np.where(g.market_change < 0,
                                   (g.benefit_change - g.tax_change) / -g.market_change, np.nan)
+    if d_net is not None:
+        g["net_income_change"] = (pd.Series(np.asarray(d_net, float) * np.asarray(weights, float))
+                                  .groupby(np.asarray(deciles)).sum())
     return g.reset_index()
+
+
+def decile_family_flows(deciles, family, weights, d_market, d_benefits, d_tax, d_net) -> pd.DataFrame:
+    """As ``decile_flows`` by baseline decile x family type (households)."""
+    df = pd.DataFrame({"decile": deciles, "family_type": family, "w": weights})
+    for k, x in (("market_change", d_market), ("benefit_change", d_benefits),
+                 ("tax_change", d_tax), ("net_income_change", d_net)):
+        df[k] = np.asarray(x, float) * df.w
+    g = df.groupby(["decile", "family_type"])[["market_change", "benefit_change", "tax_change",
+                                                "net_income_change", "w"]].sum()
+    g = g.rename(columns={"w": "weight"})
+    g["stabilisation"] = np.where(g.market_change < 0,
+                                  (g.benefit_change - g.tax_change) / -g.market_change, np.nan)
+    return g.reset_index()
+
+
+def lf_components(status, age, weights) -> dict:
+    """Weighted labour-force components (millions) and the implied
+    unemployment rate (per cent) of the baseline."""
+    status = np.asarray(status).astype(str)
+    w = np.asarray(weights, float)
+    adult = np.asarray(age) >= 16
+    c = {k: float(w[adult & np.isin(status, sts)].sum() / 1e6) for k, sts in (
+        ("employed_m", ("FT_EMPLOYED", "PT_EMPLOYED")),
+        ("self_employed_m", ("FT_SELF_EMPLOYED", "PT_SELF_EMPLOYED")),
+        ("unemployed_m", ("UNEMPLOYED",)))}
+    c["labour_force_m"] = c["employed_m"] + c["self_employed_m"] + c["unemployed_m"]
+    c["unemployment_rate_pct"] = 100 * c["unemployed_m"] / c["labour_force_m"]
+    return c
 
 
 def summarise(draws: pd.DataFrame, cols) -> dict:
@@ -195,7 +235,13 @@ DRAW_COLS = ("exchequer_cost_bn", "household_basis_cost_bn", "employer_ni_change
              "uc_change_bn", "benefits_change_bn", "poverty_change_bhc_pp", "poverty_change_ahc_pp",
              "relative_poverty_change_bhc_pp", "gini_change_pp", "displaced_weighted_m",
              "wage_bill_lost_bn", "survivor_gain_bn", "capital_income_added_bn",
-             "public_paybill_displaced_bn")
+             "public_paybill_displaced_bn", "income_tax_change_bn", "ni_employee_change_bn",
+             "childcare_change_bn", "statutory_pay_change_bn", "displaced_employer_pension_bn")
+CHILDCARE_VARS = ("tax_free_childcare", "extended_childcare_entitlement", "universal_childcare_entitlement",
+                  "targeted_childcare_entitlement", "wales_childcare_offer")  # = runner.CHILDCARE_VARIABLES
+STATUTORY_PAY_VARS = ("statutory_sick_pay", "statutory_maternity_pay", "statutory_paternity_pay")
+#: household arrays per draw (compressed npz) live outside results/
+ARRAYS_DIR = ROOT.parent / "ai-study-household-arrays"
 
 
 def public_paybill(persons: pd.DataFrame, table: pd.DataFrame, public, employer_costs) -> float:
@@ -225,6 +271,14 @@ def _sim_metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
     return {
         "gov": float((h("gov_balance") * hw).sum()),
         "hh_tax": float(((p("income_tax") + p("ni_employee")) * pw).sum()),
+        "income_tax": float((p("income_tax") * pw).sum()),
+        "ni_employee": float((p("ni_employee") * pw).sum()),
+        "childcare": float((sum(h(v) for v in CHILDCARE_VARS) * hw).sum()),
+        "statutory_pay": float((sum(p(v) for v in STATUTORY_PAY_VARS) * pw).sum()),
+        "hh_net": h("hbai_household_net_income"),
+        "hh_uc": h("universal_credit"),
+        "hh_it": sim.calculate("income_tax", period=PERIOD, map_to="household").values,
+        "hh_ni": sim.calculate("ni_employee", period=PERIOD, map_to="household").values,
         "employer_ni": float((p("ni_employer") * pw).sum()),
         "benefits": float((h("household_benefits") * hw).sum()),
         "uc": float((h("universal_credit") * hw).sum()),
@@ -241,7 +295,8 @@ def _sim_metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
     }
 
 
-def _row(base, shocked, persons, table, public=None, employer_costs=None) -> dict:  # pragma: no cover
+def _row(base, shocked, persons, table, public=None, employer_costs=None,
+         employer_pension=None) -> dict:  # pragma: no cover
     f = wage_flows(persons, table)
     w = persons["weight"].to_numpy(float)
     cap = sum(((table[c].to_numpy(float) - persons[c].to_numpy(float)) * w).sum()
@@ -263,7 +318,27 @@ def _row(base, shocked, persons, table, public=None, employer_costs=None) -> dic
         "capital_income_added_bn": float(cap) / 1e9,
         "public_paybill_displaced_bn": (np.nan if public is None
                                         else public_paybill(persons, table, public, employer_costs) / 1e9),
+        "income_tax_change_bn": (shocked["income_tax"] - base["income_tax"]) / 1e9,
+        "ni_employee_change_bn": (shocked["ni_employee"] - base["ni_employee"]) / 1e9,
+        "childcare_change_bn": (shocked["childcare"] - base["childcare"]) / 1e9,
+        "statutory_pay_change_bn": (shocked["statutory_pay"] - base["statutory_pay"]) / 1e9,
+        "displaced_employer_pension_bn": (np.nan if employer_pension is None else float(
+            (np.asarray(employer_pension, float) * w)[table["displaced"].to_numpy(bool)].sum()) / 1e9),
     }
+
+
+def _draw_outputs(b, s, hh_decile, family, dec_path, fam_path, key, tag) -> None:  # pragma: no cover
+    """Decile, decile x family and household-array outputs of one draw,
+    written before the draw's checkpoint row."""
+    d = {k: s[k] - b[k] for k in ("hh_market", "hh_benefits", "hh_tax_arr", "hh_net")}
+    _append_deciles(dec_path, decile_flows(hh_decile, b["hw"], d["hh_market"], d["hh_benefits"],
+                                           d["hh_tax_arr"], d["hh_net"]), dict(key))
+    if family is not None:
+        _append_deciles(fam_path, decile_family_flows(hh_decile, family, b["hw"], d["hh_market"],
+                                                      d["hh_benefits"], d["hh_tax_arr"], d["hh_net"]), dict(key))
+    ARRAYS_DIR.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(ARRAYS_DIR / f"{tag}.npz", **{k: s[k] for k in (
+        "hh_market", "hh_net", "hh_it", "hh_ni", "hh_benefits", "hh_uc")})
 
 
 def _append_deciles(path: Path, dec: pd.DataFrame, key: dict) -> None:  # pragma: no cover
@@ -310,7 +385,23 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
     except Exception as exc:  # recorded as NaN rather than stopping the run
         print(f"public pay bill unavailable: {exc}", flush=True)
         public = employer_costs = None
-    print(f"baseline ready; public employees {0 if public is None else int(public.sum())}", flush=True)
+    try:  # household family type: the family type of the household's first person
+        hid_p = baseline.calculate("household_id", period=PERIOD, map_to="person").values
+        hid_h = baseline.calculate("household_id", period=PERIOD, map_to="household").values
+        fam_p = baseline.calculate("family_type", period=PERIOD, map_to="person").values.astype(str)
+        family = pd.Series(fam_p).groupby(hid_p, sort=False).first().reindex(hid_h).to_numpy().astype(str)
+    except Exception as exc:
+        print(f"family type unavailable: {exc}", flush=True)
+        family = None
+    ARRAYS_DIR.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(ARRAYS_DIR / "baseline.npz", weight=b["hw"], decile=hh_decile,
+                        family=family if family is not None else np.array([]),
+                        **{k: b[k] for k in ("hh_market", "hh_net", "hh_it", "hh_ni", "hh_benefits", "hh_uc")})
+    lfc = lf_components(arrays["employment_status"], persons["age"], persons["weight"])
+    print(f"baseline ready; public employees {0 if public is None else int(public.sum())}; "
+          f"family types {None if family is None else sorted(set(family))}; lf {lfc}", flush=True)
+    assert 2.0 <= lfc["unemployment_rate_pct"] <= 9.0, f"implausible baseline unemployment rate {lfc}"
+    employer_pension = arrays["employer_pension_contributions"]
     del baseline
     gc.collect()
 
@@ -323,8 +414,9 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
         rate = obr_displacement_rate(lf, employees_m)
         scen = ShockScenario("obr_benchmark", rate, 0.0, capital_return_increase=0.0)
         ck = Checkpoint(OUT / "obr_benchmark_draws.csv", ("seed",), script=__file__)
-        if not ck.done and (OUT / "obr_benchmark_deciles.csv").exists():
-            (OUT / "obr_benchmark_deciles.csv").unlink()  # restart with the draws
+        if not ck.done:  # restart the per-draw side files with the draws
+            for f in ("obr_benchmark_deciles.csv", "obr_benchmark_decile_family.csv"):
+                (OUT / f).unlink(missing_ok=True)
         for seed in SEEDS:
             if ck.is_done(seed):
                 continue
@@ -333,22 +425,25 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
             s = _sim_metrics(sim)
             del sim
             gc.collect()
-            dec = decile_flows(hh_decile, b["hw"], s["hh_market"] - b["hh_market"],
-                               s["hh_benefits"] - b["hh_benefits"], s["hh_tax_arr"] - b["hh_tax_arr"])
-            _append_deciles(OUT / "obr_benchmark_deciles.csv", dec, {"seed": seed})
+            _draw_outputs(b, s, hh_decile, family, OUT / "obr_benchmark_deciles.csv",
+                          OUT / "obr_benchmark_decile_family.csv", {"seed": seed}, f"obr_seed{seed:02d}")
             ck.append({"seed": seed, "displacement_rate": rate,
-                       **_row(b, s, persons, table, public, employer_costs)})
+                       **_row(b, s, persons, table, public, employer_costs, employer_pension)})
             print(f"obr seed {seed} done", flush=True)
         draws = ck.read()
         out = {"displacement_rate": rate, "labour_force_m": lf, "employees_m": employees_m,
+               "labour_force_components": lfc, "labour_force_override": lf_override,
                "obr": {"borrowing_bn": OBR_BORROWING_BN, "receipts_bn": OBR_RECEIPTS_BN,
                        "welfare_bn": OBR_WELFARE_BN}, "summary": summarise(draws, DRAW_COLS)}
         (OUT / "obr_benchmark.json").write_text(json.dumps(out, indent=2))
     elif stage == "capital":
         scen = PRESETS["central"]
         ck = Checkpoint(OUT / "capital_variants_draws.csv", ("variant", "seed"), script=__file__)
-        if not ck.done and (OUT / "capital_variants_deciles.csv").exists():
-            (OUT / "capital_variants_deciles.csv").unlink()
+        if not ck.done:
+            for f in ("capital_variants_deciles.csv", "capital_variants_decile_family.csv"):
+                (OUT / f).unlink(missing_ok=True)
+        ref = pd.read_csv(ROOT / "results" / "robustness" / "dividend_coverage_draws.csv")
+        ref = ref[ref["run"] == "central"].set_index("seed")["displaced_weighted_m"]
         fulls: dict = {}
         for v in CAPITAL_VARIANTS:  # variant-major: whole variants finish first
             for seed in SEEDS:
@@ -356,17 +451,20 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
                     continue
                 if seed not in fulls:
                     fulls[seed] = apply_shocks(persons, scen, seed=seed)
+                    got = float(persons["weight"].to_numpy(float)[fulls[seed]["displaced"].to_numpy(bool)].sum() / 1e6)
+                    assert np.isclose(got, ref.loc[seed], rtol=1e-9), \
+                        f"seed {seed}: displaced {got} != central {ref.loc[seed]}"
                 table = capital_variant_table(persons, fulls[seed], v)
                 sim = build_shocked_simulation(None, table, PERIOD, base_arrays=arrays)
                 s = _sim_metrics(sim)
                 del sim
                 gc.collect()
-                dec = decile_flows(hh_decile, b["hw"], s["hh_market"] - b["hh_market"],
-                                   s["hh_benefits"] - b["hh_benefits"], s["hh_tax_arr"] - b["hh_tax_arr"])
-                _append_deciles(OUT / "capital_variants_deciles.csv", dec, {"variant": v.name, "seed": seed})
-                ck.append({"variant": v.name, "seed": seed,
-                           "closed_profit_bn": table.attrs.get("closed_profit_bn", np.nan),
-                           **_row(b, s, persons, table, public, employer_costs)})
+                _draw_outputs(b, s, hh_decile, family, OUT / "capital_variants_deciles.csv",
+                              OUT / "capital_variants_decile_family.csv", {"variant": v.name, "seed": seed},
+                              f"capital_{v.name}_seed{seed:02d}")
+                ck.append({"variant": v.name, "seed": seed, "closed_kappa": v.closed_kappa,
+                           "closed_wedge_bn": table.attrs.get("closed_wedge_bn", np.nan),
+                           **_row(b, s, persons, table, public, employer_costs, employer_pension)})
                 print(f"capital {v.name} seed {seed} done", flush=True)
         draws = ck.read()
         out = {v.name: summarise(draws[draws.variant == v.name], DRAW_COLS) for v in CAPITAL_VARIANTS
