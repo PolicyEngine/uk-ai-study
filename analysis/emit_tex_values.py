@@ -1290,13 +1290,6 @@ def emit_revision() -> None:
     emit("genObrImpliedDisplacedM",
          lambda: nr.OBR_BORROWING_BN * 1e9 / ra.cost_per_displaced(csv(dcd))["mean_gbp"] / 1e6, "{:.2f}", dcd)
 
-    # --- ratios stated in the conclusions ------------------------------------
-    emit("genMarginPovRatio", lambda: jload("central.json")["poverty_rate_change_bhc"]
-         / jload("wage_margin_central.json")["poverty_rate_change_bhc"], "{:.0f}", "central.json")
-    emit("genIncStylisedCostRatio",
-         lambda: jload("robustness/incidence_monte_carlo.json")["compression"]["exchequer_cost_bn"]["mean"]
-         / jload("robustness/incidence_monte_carlo.json")["uniform"]["exchequer_cost_bn"]["mean"], "{:.0f}",
-         "robustness/incidence_monte_carlo.json")
 
     # --- B12 exposure-index comparison adjusted to the mean displaced count --
     ix = "robustness/index_sensitivity_full.json"

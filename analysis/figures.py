@@ -16,6 +16,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from figstyle import MEDIUM_DARK_GRAY  # noqa: E402
 from figstyle import (
     AQUA,
     BLUE,
@@ -98,7 +99,8 @@ def fig4_4():
         ("tax_and_contributions", "Tax & contributions", YELLOW),
     ]
     if "residual" in d.columns:
-        comps.append(("residual", "Other (residual)", MUTED))
+        # a lighter grey than market income (GRAY), so the two series differ
+        comps.append(("residual", "Other (residual)", MEDIUM_DARK_GRAY))
     wd = 0.8 / len(comps)
     fig, ax = plt.subplots(figsize=(9, 4.5))
     for k, (col, label, color) in enumerate(comps):
@@ -208,7 +210,7 @@ FAMILY_STYLE = {
     "junior": ("Junior-concentrated", AQUA),
     "compression": ("Expertise compression", YELLOW),
     "uniform": ("Uniform", GREEN),
-    "klein_top_loaded": ("Klein-anchored top-loaded stress test", VIOLET),
+    "klein_top_loaded": ("Top-loaded stress test", VIOLET),
 }
 
 

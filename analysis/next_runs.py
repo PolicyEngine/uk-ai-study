@@ -88,6 +88,19 @@ def obr_displacement_rate(labour_force_m: float, employees_m: float,
     return rise_pp / 100 * labour_force_m / employees_m
 
 
+LABOUR_FORCE_STATUSES = ("FT_EMPLOYED", "PT_EMPLOYED", "FT_SELF_EMPLOYED", "PT_SELF_EMPLOYED", "UNEMPLOYED")
+
+
+def labour_force_m(status, age, weights) -> float:
+    """Weighted labour force (millions): people aged 16+ who are employed,
+    self-employed or unemployed in the baseline. Run 15 uses Microcosm's own
+    labour force by default, so the head-count target and the employee base
+    come from the same data; ``--labour-force-m`` overrides it."""
+    status = np.asarray(status).astype(str)
+    active = np.isin(status, LABOUR_FORCE_STATUSES) & (np.asarray(age) >= 16)
+    return float(np.asarray(weights, float)[active].sum() / 1e6)
+
+
 @dataclass(frozen=True)
 class CapitalVariant:
     name: str
@@ -233,7 +246,7 @@ def _row(base, shocked, persons, table) -> dict:  # pragma: no cover
     }
 
 
-def main(stage: str, labour_force_m: float | None = None) -> None:  # pragma: no cover
+def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no cover
     import gc
 
     from uk_ai_study.checkpoint import Checkpoint
@@ -257,10 +270,12 @@ def main(stage: str, labour_force_m: float | None = None) -> None:  # pragma: no
     gc.collect()
 
     if stage == "obr":
-        if labour_force_m is None:
-            raise SystemExit("pass --labour-force-m (OBR 2026 labour force, millions)")
+        if lf_override is None:
+            lf = labour_force_m(arrays["employment_status"], persons["age"], persons["weight"])
+        else:
+            lf = lf_override
         employees_m = float(persons["weight"][persons["employment_income"] > 0].sum() / 1e6)
-        rate = obr_displacement_rate(labour_force_m, employees_m)
+        rate = obr_displacement_rate(lf, employees_m)
         scen = ShockScenario("obr_benchmark", rate, 0.0, capital_return_increase=0.0)
         ck = Checkpoint(OUT / "obr_benchmark_draws.csv", ("seed",), script=__file__)
         if not ck.done and (OUT / "obr_benchmark_deciles.csv").exists():
@@ -280,7 +295,7 @@ def main(stage: str, labour_force_m: float | None = None) -> None:  # pragma: no
             dpath = OUT / "obr_benchmark_deciles.csv"
             dec.to_csv(dpath, mode="a", header=not dpath.exists(), index=False)
         draws = ck.read()
-        out = {"displacement_rate": rate, "labour_force_m": labour_force_m, "employees_m": employees_m,
+        out = {"displacement_rate": rate, "labour_force_m": lf, "employees_m": employees_m,
                "obr": {"borrowing_bn": OBR_BORROWING_BN, "receipts_bn": OBR_RECEIPTS_BN,
                        "welfare_bn": OBR_WELFARE_BN}, "summary": summarise(draws, DRAW_COLS)}
         (OUT / "obr_benchmark.json").write_text(json.dumps(out, indent=2))

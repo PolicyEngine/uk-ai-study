@@ -128,3 +128,10 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
     assert "\\newcommand{\\genCapClosedOneCostMeanSignedBn}{-1.0}" in text or \
         "\\newcommand{\\genCapClosedOneCostMeanBn}{-1.0}" in text
     assert "Closed, $\\phi=1$ & -1.0" in text.replace("$-1.0$", "-1.0")
+
+
+def test_labour_force_counts_active_adults_only():
+    status = ["FT_EMPLOYED", "PT_SELF_EMPLOYED", "UNEMPLOYED", "RETIRED", "STUDENT", "UNEMPLOYED"]
+    age = [30, 40, 20, 70, 19, 15]
+    w = [1e6, 2e6, 1e6, 5e6, 1e6, 1e6]
+    assert nr.labour_force_m(status, age, w) == pytest.approx(4.0)

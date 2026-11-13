@@ -437,8 +437,8 @@ MANIFEST = [
 NEXT_RUNS = [
     {
         "stage": "obr_benchmark",
-        # labour force: OBR March 2026 EFO, 2026 LFS 16+ labour force (see spec)
-        "cmd": [PY, "analysis/next_runs.py", "obr", "--labour-force-m", "OBR_LABOUR_FORCE_M"],
+        # labour force: Microcosm's own 16+ active population (see next_runs.py)
+        "cmd": [PY, "analysis/next_runs.py", "obr"],
         "outputs": ["next_runs/obr_benchmark_draws.csv", "next_runs/obr_benchmark_deciles.csv",
                     "next_runs/obr_benchmark.json"],
         "inputs": MICROCOSM_INPUTS,
@@ -919,9 +919,6 @@ def main():
     else:
         manifest = MANIFEST
         if args.stages and NEXT_RUN_NAMES & set(args.stages):
-            if any("OBR_LABOUR_FORCE_M" in c for s in NEXT_RUNS for c in s["cmd"]) and \
-                    "obr_benchmark" in args.stages:
-                raise SystemExit("set the OBR labour force in NEXT_RUNS before running obr_benchmark")
             manifest = MANIFEST + NEXT_RUNS
         build(manifest, keep_build=args.keep_build, only_stages=args.stages)
 
