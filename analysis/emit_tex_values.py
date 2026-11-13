@@ -171,6 +171,9 @@ EXPECTED_CSV = {
     # runs 15 and 16 (13 Nov 2026): 20 draws; 8 capital variants x 20 draws
     "next_runs/obr_benchmark_draws.csv": (20, _keys("seed"), "next_runs.py"),
     "next_runs/capital_variants_draws.csv": (160, _keys("variant", "seed"), "next_runs.py"),
+    # UC take-up = 1 and new-style JSA: (disp_only seed 0 + obr and central
+    # seeds 0-19) x (takeup1, jsa)
+    "takeup/takeup_draws.csv": (82, _keys("scenario", "variant", "seed"), "displaced_takeup_runs.py"),
 }
 #: summaries that are only valid with their (complete, current) checkpoint
 REQUIRES = {
@@ -189,6 +192,7 @@ REQUIRES = {
     "next_runs/obr_benchmark.json": ["next_runs/obr_benchmark_draws.csv"],
     "next_runs/obr_household_deciles.csv": ["next_runs/obr_benchmark_draws.csv"],
     "next_runs/capital_variants.json": ["next_runs/capital_variants_draws.csv"],
+    "takeup/takeup_runs.json": ["takeup/takeup_draws.csv"],
 }
 _checked: dict[str, str | None] = {}
 
@@ -371,7 +375,21 @@ DIRECTIONS = {
 }
 
 
+#: (larger, smaller): orderings the prose states. The discussion and the
+#: introduction say the Exchequer absorbs more of each pound lost through wage
+#: cuts than through job loss, including with full UC take-up and new-style
+#: JSA for the displaced; a take-up run that overturns that fails the emit.
+ORDERINGS = (
+    ("genAbsWageGovPct", "genAbsJobGovPct"),
+    ("genAbsWageGovPct", "genAbsJobGovTakeupPct"),
+    ("genAbsWageGovPct", "genAbsJobGovJsaPct"),
+)
+
+
 def check_directions() -> None:
+    for big, small in ORDERINGS:
+        if big in values and small in values and not values[big] > values[small]:
+            missing.append(f"{big} > {small} (ORDERING: {values[big]} vs {values[small]} contradicts the text)")
     for name, sign in DIRECTIONS.items():
         if name not in values:
             if name in emitted:
@@ -1594,6 +1612,101 @@ def emit_post() -> None:
     emit("genObrFrsComplementPct", lambda: 30, "{:d}", "OBR FRS July 2026 Box 4.1")
 
 
+TAKEUP_DRAWS = "takeup/takeup_draws.csv"
+TAKEUP_JSON = "takeup/takeup_runs.json"
+TAKEUP_SCENARIOS = {"central": "Central", "obr": "Obr"}
+TAKEUP_VARIANTS = {"takeup1": "Takeup", "jsa": "Jsa"}
+
+
+def _existing_draws(scenario: str) -> pd.DataFrame:
+    """The central-assumption draws each take-up scenario pairs with."""
+    if scenario == "obr":
+        return csv("next_runs/obr_benchmark_draws.csv")
+    d = csv("robustness/dividend_coverage_draws.csv")
+    return d[d["run"] == "central"]
+
+
+def emit_takeup() -> None:
+    """UC take-up = 1 and new-style JSA beside the central assumption
+    (analysis/post_takeup_runs.py; draws from displaced_takeup_runs.py)."""
+    import next_runs as nr
+    import post_takeup_runs as pt
+    ob = "next_runs/obr_benchmark.json"
+    obd = "next_runs/obr_benchmark_draws.csv"
+
+    # --- per-head comparison with the OBR, run 15 (available now) ----------
+    def ph():
+        return pt.obr_per_head(csv(obd), jload(ob)["labour_force_m"], nr.OBR_UNEMPLOYMENT_RISE_PP,
+                               nr.OBR_WELFARE_BN)
+    emit("genObrWelfarePerUnempGbp", lambda: round(ph()["obr_welfare_per_extra_unemployed_gbp"], -2),
+         "{:,.0f}", obd)
+    emit("genObrUcPerDisplacedGbp", lambda: round(ph()["uc_per_displaced_gbp"], -1), "{:,.0f}", obd)
+    emit("genObrMeanLostEarningsGbp", lambda: round(ph()["mean_lost_earnings_gbp"], -2), "{:,.0f}", obd)
+    emit("genObrBenefitsPence", lambda: ph()["benefits_pence"], "{:.1f}", obd)
+    emit("genObrCashBenefitsPence", lambda: ph()["cash_benefits_pence"], "{:.1f}", obd)
+
+    # --- Dolls, Fuest and Peichl (2010 NBER WP), Table 3, UK row -----------
+    dsrc = "post_takeup_runs.py (Dolls et al. 2010, NBER WP 16275, Table 3)"
+    dw = pt.DOLLS_WP_UK_UNEMPLOYMENT
+    emit("genDollsUkBenefitsPct", lambda: 100 * dw["benefits"], "{:.1f}", dsrc)
+    emit("genDollsUkTotalPct", lambda: 100 * dw["total"], "{:.1f}", dsrc)
+
+    # --- take-up runs (pending until results/takeup/ is complete) ---------
+    def tk():
+        return csv(TAKEUP_DRAWS)
+
+    def mean(s, v, col):
+        try:
+            return float(pt.variant_means(tk(), s, v)[col])
+        except pt.Incomplete as exc:
+            raise Pending(str(exc)) from None
+
+    for s, S in TAKEUP_SCENARIOS.items():
+        for v, V in TAKEUP_VARIANTS.items():
+            pre = f"genTk{S}{V}"
+            emit(f"{pre}CostMeanBn", lambda s=s, v=v: mean(s, v, "exchequer_cost_bn"), "{:.1f}", TAKEUP_DRAWS)
+            emit(f"{pre}UcBn", lambda s=s, v=v: mean(s, v, "uc_change_bn"), "{:.2f}", TAKEUP_DRAWS)
+            emit(f"{pre}PovBhcMeanPp", lambda s=s, v=v: mean(s, v, "poverty_change_bhc_pp"), "{:.2f}",
+                 TAKEUP_DRAWS)
+            emit(f"{pre}GiniMeanPp", lambda s=s, v=v: mean(s, v, "gini_change_pp"), "{:.2f}", TAKEUP_DRAWS)
+            emit(f"{pre}CashPence", lambda s=s, v=v: mean(s, v, "cash_benefits_pence"), "{:.1f}", TAKEUP_DRAWS)
+            emit(f"{pre}CostDiffBn", lambda s=s, v=v: pt.paired_change(
+                tk(), s, v, _existing_draws(s), "exchequer_cost_bn"), SIGNED1, TAKEUP_DRAWS)
+            emit(f"{pre}PovBhcDiffPp", lambda s=s, v=v: pt.paired_change(
+                tk(), s, v, _existing_draws(s), "poverty_change_bhc_pp"), SIGNED2, TAKEUP_DRAWS)
+        emit(f"genTk{S}JsaJsaBn", lambda s=s: mean(s, "jsa", "jsa_change_bn"), "{:.2f}", TAKEUP_DRAWS)
+    emit("genTkObrTakeupUcPerDisplacedGbp", lambda: round(mean("obr", "takeup1", "uc_per_displaced_gbp"), -1),
+         "{:,.0f}", TAKEUP_DRAWS)
+    emit("genTkObrJsaEligiblePct", lambda: 100 * mean("obr", "jsa", "jsa_eligible_m")
+         / mean("obr", "jsa", "displaced_weighted_m"), "{:.0f}", TAKEUP_DRAWS)
+
+    # absorption, seed-0 displacement-only, beside genAbsJob*Pct
+    def absv(v, basis):
+        wm = jload("wage_margin_central.json")
+        try:
+            return 100 * pt.absorption_variants(tk(), wm["gross_cut_realised"] / 1e9)[v][basis]
+        except pt.Incomplete as exc:
+            raise Pending(str(exc)) from None
+    for v, V in TAKEUP_VARIANTS.items():
+        emit(f"genAbsJobGov{V}Pct", lambda v=v: absv(v, "gov_balance"), "{:.0f}", TAKEUP_DRAWS)
+        emit(f"genAbsJobHh{V}Pct", lambda v=v: absv(v, "household"), "{:.0f}", TAKEUP_DRAWS)
+
+    # who the displaced are (run-15 sizing) and the existing unemployed
+    def diag(k):
+        return 100 * jload(TAKEUP_JSON)["diagnostics"]["obr"][k]
+    for k, N in [("flag_true_share", "FlagTrue"), ("flag_true_share_entitled_after", "FlagTrueEntitled"),
+                 ("flag_true_share_newly_entitled", "FlagTrueNewly"),
+                 ("over_capital_limit_share", "OverCapital"), ("other_earner_share", "OtherEarner"),
+                 ("owner_share", "Owner")]:
+        emit(f"genTk{N}Pct", lambda k=k: diag(k), "{:.0f}", TAKEUP_JSON)
+    emit("genTkUnempFlagEntitledPct",
+         lambda: 100 * jload(TAKEUP_JSON)["existing_unemployed"]["flag_true_share_entitled"], "{:.0f}", TAKEUP_JSON)
+    emit("genTkUnempUcPerPersonGbp",
+         lambda: round(jload(TAKEUP_JSON)["existing_unemployed"]["uc_per_person_gbp"], -2), "{:,.0f}", TAKEUP_JSON)
+    emit("genTkJsaTaxWords", lambda: "counts it as taxable income" if jload(TAKEUP_JSON)["jsa"]["taxed_by_model"]
+         else "does not tax it", "{}", TAKEUP_JSON)
+
+
 def main() -> None:
     # --- presets -----------------------------------------------------------
     for rel, prefix in [("central.json", "Central"), ("low.json", "Low"),
@@ -1811,6 +1924,7 @@ def main() -> None:
     emit_revision()
     emit_next_runs()
     emit_post()
+    emit_takeup()
     check_directions()
 
     # --- write -------------------------------------------------------------
