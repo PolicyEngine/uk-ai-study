@@ -168,6 +168,9 @@ EXPECTED_CSV = {
     "tax_composition/composition_sims.csv": (10, _keys("unemployment_pct"), "tax_composition.py"),
     # the five families plus the two compound wage-axis variants
     "incidence/summary_five.csv": (7, _keys("family"), None),
+    # runs 15 and 16 (13 Nov 2026): 20 draws; 8 capital variants x 20 draws
+    "next_runs/obr_benchmark_draws.csv": (20, _keys("seed"), "next_runs.py"),
+    "next_runs/capital_variants_draws.csv": (160, _keys("variant", "seed"), "next_runs.py"),
 }
 #: summaries that are only valid with their (complete, current) checkpoint
 REQUIRES = {
@@ -1379,11 +1382,13 @@ def emit_revision() -> None:
 # ---------------------------------------------------------------------------
 CAPITAL_VARIANT_LABELS = [
     ("cap10", r"Interest and dividends $+10\%$"), ("cap20", r"Interest and dividends $+20\%$"),
-    ("div_only", r"Dividends only, $+39.8\%$"), ("closed_phi050", r"Closed, $\phi=0.5$"),
-    ("closed_phi100", r"Closed, $\phi=1$"),
+    ("cap60", r"Interest and dividends $+60\%$"), ("div_only", r"Dividends only, $+39.8\%$"),
+    ("closed_k0375", r"Closed, $\phi=1$, payout 50\%"), ("closed_k01875", r"Closed, $\phi=0.5$, payout 50\%"),
+    ("closed_k009375", r"Closed, $\phi=0.25$, payout 50\%"), ("closed_k075", r"Closed, $\phi=1$, full payout"),
 ]
-CAPITAL_VARIANT_MACRO = {"cap10": "CapTen", "cap20": "CapTwenty", "div_only": "DivOnly",
-                         "closed_phi050": "ClosedHalf", "closed_phi100": "ClosedOne"}
+CAPITAL_VARIANT_MACRO = {"cap10": "CapTen", "cap20": "CapTwenty", "cap60": "CapSixty", "div_only": "DivOnly",
+                         "closed_k0375": "ClosedOne", "closed_k01875": "ClosedHalf",
+                         "closed_k009375": "ClosedQuarter", "closed_k075": "ClosedFullPayout"}
 
 
 def emit_next_runs() -> None:

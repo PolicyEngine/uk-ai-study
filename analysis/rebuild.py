@@ -440,7 +440,7 @@ NEXT_RUNS = [
         # labour force: Microcosm's own 16+ active population (see next_runs.py)
         "cmd": [PY, "analysis/next_runs.py", "obr"],
         "outputs": ["next_runs/obr_benchmark_draws.csv", "next_runs/obr_benchmark_deciles.csv",
-                    "next_runs/obr_benchmark.json"],
+                    "next_runs/obr_benchmark_decile_family.csv", "next_runs/obr_benchmark.json"],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "resumable": True,
@@ -449,7 +449,7 @@ NEXT_RUNS = [
         "stage": "capital_variants",
         "cmd": [PY, "analysis/next_runs.py", "capital"],
         "outputs": ["next_runs/capital_variants_draws.csv", "next_runs/capital_variants_deciles.csv",
-                    "next_runs/capital_variants.json"],
+                    "next_runs/capital_variants_decile_family.csv", "next_runs/capital_variants.json"],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "resumable": True,

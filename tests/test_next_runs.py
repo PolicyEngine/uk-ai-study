@@ -110,8 +110,9 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
         {"displacement_rate": 0.0171, "summary": summary}))
     cap = {k: {"exchequer_cost_bn": stat(c), "poverty_change_bhc_pp": stat(2.0), "gini_change_pp": stat(1.0),
                "capital_income_added_bn": stat(12.0)}
-           for k, c in [("cap10", 15.0), ("cap20", 11.0), ("div_only", 9.0), ("closed_phi050", 14.0),
-                        ("closed_phi100", -1.0)]}
+           for k, c in [("cap10", 15.0), ("cap20", 11.0), ("cap60", 2.0), ("div_only", 9.0),
+                        ("closed_k0375", -1.0), ("closed_k01875", 14.0), ("closed_k009375", 15.0),
+                        ("closed_k075", -9.0)]}
     (tmp_path / "next_runs/capital_variants.json").write_text(json.dumps(cap))
     for name, val in [("R", tmp_path), ("_checked", {}), ("lines", []), ("missing", []), ("emitted", set()),
                       ("values", {})]:
@@ -127,7 +128,7 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
     assert "\\newcommand{\\genObrWelfareBn}{1.5}" in text
     assert "\\newcommand{\\genCapClosedOneCostMeanSignedBn}{-1.0}" in text or \
         "\\newcommand{\\genCapClosedOneCostMeanBn}{-1.0}" in text
-    assert "Closed, $\\phi=1$ & -1.0" in text.replace("$-1.0$", "-1.0")
+    assert "Closed, $\\phi=1$, payout 50\\% & -1.0" in text.replace("$-1.0$", "-1.0")
 
 
 def test_labour_force_counts_active_adults_only():
