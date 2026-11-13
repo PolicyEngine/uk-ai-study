@@ -295,9 +295,79 @@ def _placeholder(name: str) -> str:
     return "\\GENPENDINGROW" if name in TABLE_ROW_MACROS else "\\GENPENDING"
 
 
+_NUMBER = re.compile(r"[+-]?\d[\d,]*(\.\d+)?")
+#: name -> numeric value of every macro whose text is a plain number
+values: dict[str, float] = {}
+
+
+def abs_name(name: str) -> str:
+    """Magnitude twin: "Signed" -> "Abs", else "Abs" before the unit suffix."""
+    if "Signed" in name:
+        return name.replace("Signed", "Abs")
+    m_ = _UNIT.search(name)
+    return name[: m_.start()] + "Abs" + m_.group(1) if m_ else name + "Abs"
+
+
 def _line(name: str, text: str) -> None:
+    # a value that rounds to zero prints without a sign ("-0.0" -> "0.0")
+    if re.fullmatch(r"[+-]0(\.0+)?", text):
+        text = text[1:]
     emitted.add(name)
     lines.append(f"\\newcommand{{\\{name}}}{{{text}}}")
+    if _NUMBER.fullmatch(text):
+        values[name] = float(text.replace(",", ""))
+        # Magnitude twin for every signed or negative number, so prose can
+        # state the direction in words ("raises the cost by \genXAbsBn")
+        # instead of welding a sign onto a pound figure. DIRECTIONS below
+        # guards the words against a sign change.
+        if text[0] in "+-":
+            an = abs_name(name)
+            if an not in emitted:
+                emitted.add(an)
+                lines.append(f"\\newcommand{{\\{an}}}{{{text.lstrip('+-')}}}")
+
+
+#: Macros whose sign the prose states in words (with the Abs twin): +1 means
+#: the text says the value is positive (a cost, a rise), -1 negative (a gain,
+#: a fall). A sign change fails the emit, so the words are re-checked.
+DIRECTIONS = {
+    # channel split, 20 paired draws (Section 4.1, abstract, intro)
+    "genChannelMcDispCostSignedBn": 1, "genChannelMcWageCostSignedBn": -1,
+    "genChannelMcCapitalCostSignedBn": -1, "genChannelMcInteractionCostSignedBn": 1,
+    "genChannelMcExclCapitalCostSignedBn": 1, "genChannelMcSumCostSignedBn": 1,
+    "genChannelMcCentralCostSignedBn": 1,
+    # central cost by component, 50 draws
+    "genCostTotalSignedBn": 1, "genCostIncomeTaxSignedBn": -1, "genCostDividendTaxSignedBn": -1,
+    "genCostSavingsTaxSignedBn": -1, "genCostOtherIncomeTaxSignedBn": 1,
+    "genCostEmployeeNiSignedBn": 1, "genCostEmployerNiSignedBn": 1, "genCostUcSignedBn": 1,
+    "genCostChildcareSignedBn": -1, "genCostExclEmployerNiSignedBn": -1,
+    "genCostNarrowCashSignedBn": -1, "genCostBasisGapSignedBn": 1,
+    # paired incidence differences
+    "genPairKleinExpCostMean": 1, "genPairCompExpCostMean": 1, "genPairUniExpCostMean": -1,
+    "genPairJunExpCostMean": -1,
+    # duration hybrid: a net gain
+    "genDurSixMoCostMeanBn": -1,
+    # index sensitivity, grid, tax composition, dividend coverage
+    "genIndexDsitDiffBn": -1, "genIndexEloundouDiffBn": -1,
+    "genGridRevSevenZeroBn": -1, "genGridRevSevenZeroPct": -1, "genGridRevSevenThreeBn": 1,
+    "genCompPhiZeroSignedBn": -1, "genCompPhiHalfSignedBn": -1, "genCompPhiOneSignedBn": -1,
+    "genCompPhiOneGapSignedBn": -1, "genCompPhiZeroGovSignedBn": -1,
+    "genDivDiffCostBn": 1, "genCovDivUniformDiffCostSignedBn": 1,
+    "genCovDivBandedDiffCostSignedBn": 1, "genCovSavUniformDiffCostSignedBn": 1,
+    # gender: household income falls for both sexes
+    "genGenderFemaleIncomePct": -1, "genGenderMaleIncomePct": -1,
+}
+
+
+def check_directions() -> None:
+    for name, sign in DIRECTIONS.items():
+        if name not in values:
+            if name in emitted:
+                continue  # pending: already reported
+            missing.append(f"{name} (DIRECTION: macro not emitted)")
+        elif values[name] * sign <= 0:
+            missing.append(f"{name} (DIRECTION: value {values[name]} contradicts the "
+                           f"{'positive' if sign > 0 else 'negative'} direction the text states)")
 
 
 def emit(name: str, value, fmt: str = "{:.1f}", source: str = ""):
@@ -993,11 +1063,11 @@ def emit_extended() -> None:
              lambda ch=ch: jload(dv)["channels"][ch]["poverty_change_bhc_pp"]["mean"], SIGNED2, dv)
         emit(f"genChannelMc{N}GiniSignedPp",
              lambda ch=ch: jload(dv)["channels"][ch]["gini_change_pp"]["mean"], SIGNED2, dv)
-    emit("genChannelMcSumCostSignedBn", lambda: jload(dv)["channels_sum"]["exchequer_cost_bn"], SIGNED1, dv)
+    emit("genChannelMcSumCostSignedBn", lambda: jload(dv)["channels_sum"]["exchequer_cost_bn"], SIGNED2, dv)
     emit("genChannelMcInteractionCostSignedBn",
-         lambda: jload(dv)["channels_interaction"]["exchequer_cost_bn"], SIGNED1, dv)
+         lambda: jload(dv)["channels_interaction"]["exchequer_cost_bn"], SIGNED2, dv)
     emit("genChannelMcCentralCostSignedBn", lambda: jload(dv)["central"]["exchequer_cost_bn"]["mean"],
-         SIGNED1, dv)
+         SIGNED2, dv)
     emit("genChannelMcExclCapitalCostSignedBn",
          lambda: jload(dv)["central"]["exchequer_cost_bn"]["mean"]
          - jload(dv)["channels"]["capital"]["exchequer_cost_bn"]["mean"], SIGNED1, dv)
@@ -1263,6 +1333,7 @@ def main() -> None:
          lambda: jload(rc)["recycling_minus_central"]["gini_pp"], "{:.2f}", rc)
 
     emit_extended()
+    check_directions()
 
     # --- write -------------------------------------------------------------
     header = [

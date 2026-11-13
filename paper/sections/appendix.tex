@@ -342,7 +342,7 @@ First, Microcosm grosses to \genDataEmployeesM~million employees rather than
 more earnings. Second, Microcosm carries \pounds \genDivMicrocosmBn~billion of
 dividends held by \genDivHoldersM~million people in 2026, against
 \pounds 0.04 billion on eight records in the earlier file, so the capital
-shock now changes dividend-tax revenue (\pounds$\genCostDividendTaxSignedBn$~billion of the 50-draw central cost; Section~\ref{sec:results-channels}).
+shock now raises dividend-tax revenue (by \pounds\genCostDividendTaxAbsBn~billion in the 50-draw central draws; Section~\ref{sec:results-channels}).
 Third, Microcosm's calibrated weights are more dispersed than survey grossing
 weights, which affects the spread across assignment draws
 (Section~\ref{sec:microsim}). Fourth, the model version differs
@@ -378,7 +378,7 @@ Klein-anchored cost, 50-draw mean (\pounds bn) & 32.8 & \genIncKleinCostMeanBn \
 \vspace{2pt}
 \parbox{\textwidth}{\footnotesize Earlier-version values are from the
 repository at commit 5d75106 (the earlier capital income sums the
-decile file \texttt{results/jr16/fig4\_3\_capital\_by\_decile.csv}). Both
+decile file \nolinkurl{results/jr16/fig4_3_capital_by_decile.csv}). Both
 versions simulate 2026. Exchequer cost is the fall in the government
 balance; a negative value is a net gain. The earlier version reported the
 seed-0 central cost of \pounds 18.2 billion as its headline.}
@@ -404,15 +404,15 @@ only for people above the threshold:
 \begin{itemize}
 \item dividends scaled by one factor (\genDivScaleFactor) to the SPI total:
 the central cost changes from \pounds \genDivCentralCostMeanBn~billion to
-\pounds \genCovDivUniformCostMeanBn~billion (paired difference
-\pounds$\genCovDivUniformDiffCostSignedBn$~billion), and the Gini change by
+\pounds \genCovDivUniformCostMeanBn~billion (a paired increase of
+\pounds\genCovDivUniformDiffCostAbsBn~billion), and the Gini change by
 $\genCovDivUniformDiffGiniSignedPp$ points;
 \item dividends scaled band by band to the SPI band totals (top-band factor
 \genDivTopBandFactor): the cost is \pounds \genCovDivBandedCostMeanBn~billion
-(paired difference \pounds$\genCovDivBandedDiffCostSignedBn$~billion);
+(a paired increase of \pounds\genCovDivBandedDiffCostAbsBn~billion);
 \item savings interest scaled by \genSavScaleFactor{} to the SPI total of
 \pounds \genSavSpiBn~billion: the cost is \pounds \genCovSavUniformCostMeanBn~billion
-(paired difference \pounds$\genCovSavUniformDiffCostSignedBn$~billion).
+(a paired increase of \pounds\genCovSavUniformDiffCostAbsBn~billion).
 \end{itemize}
 I report these as sensitivities, not as alternative headlines: these data
 do not show whether the gap reflects top-income dividends the projection
