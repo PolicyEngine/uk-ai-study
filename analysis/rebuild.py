@@ -448,7 +448,8 @@ NEXT_RUNS = [
     {
         "stage": "capital_variants",
         "cmd": [PY, "analysis/next_runs.py", "capital"],
-        "outputs": ["next_runs/capital_variants_draws.csv", "next_runs/capital_variants.json"],
+        "outputs": ["next_runs/capital_variants_draws.csv", "next_runs/capital_variants_deciles.csv",
+                    "next_runs/capital_variants.json"],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
         "resumable": True,

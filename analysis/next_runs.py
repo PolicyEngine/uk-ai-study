@@ -113,10 +113,15 @@ JR16_FACTOR = (BASELINE_CAPITAL_RETURN + CAPITAL_RETURN_INCREASE) / BASELINE_CAP
 CAPITAL_VARIANTS = (
     CapitalVariant("cap10", 1.10, 1.10),
     CapitalVariant("cap20", 1.20, 1.20),
+    # decision (c), 13 Nov 2026: +60 per cent brackets the extrapolated
+    # +57 per cent capital break-even
+    CapitalVariant("cap60", 1.60, 1.60),
     CapitalVariant("div_only", 1.0, JR16_FACTOR),
-    CapitalVariant("closed_phi050", closed_phi=0.5),
     CapitalVariant("closed_phi100", closed_phi=1.0),
+    CapitalVariant("closed_phi050", closed_phi=0.5),
 )
+#: The tuple order is the execution order of run 16 (variant by variant, 20
+#: seeds each), so a stopped run leaves whole variants complete.
 
 
 def wage_flows(persons: pd.DataFrame, shocked: pd.DataFrame) -> dict:
@@ -189,7 +194,20 @@ def summarise(draws: pd.DataFrame, cols) -> dict:
 DRAW_COLS = ("exchequer_cost_bn", "household_basis_cost_bn", "employer_ni_change_bn",
              "uc_change_bn", "benefits_change_bn", "poverty_change_bhc_pp", "poverty_change_ahc_pp",
              "relative_poverty_change_bhc_pp", "gini_change_pp", "displaced_weighted_m",
-             "wage_bill_lost_bn", "survivor_gain_bn", "capital_income_added_bn")
+             "wage_bill_lost_bn", "survivor_gain_bn", "capital_income_added_bn",
+             "public_paybill_displaced_bn")
+
+
+def public_paybill(persons: pd.DataFrame, table: pd.DataFrame, public, employer_costs) -> float:
+    """Pay bill saved by the public sector (pounds, weighted): baseline
+    earnings plus employer NI and employer pension contributions of displaced
+    public-sector employees. Output only (decision (b), 13 Nov 2026):
+    gov_balance has no pay-bill item, so this is reported beside it and not
+    netted from the Exchequer cost."""
+    w = persons["weight"].to_numpy(float)
+    disp = table["displaced"].to_numpy(bool) & np.asarray(public, bool)
+    cost = persons["employment_income"].to_numpy(float) + np.asarray(employer_costs, float)
+    return float((cost * w)[disp].sum())
 
 
 # ---------------------------------------------------------------------------
@@ -223,7 +241,7 @@ def _sim_metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
     }
 
 
-def _row(base, shocked, persons, table) -> dict:  # pragma: no cover
+def _row(base, shocked, persons, table, public=None, employer_costs=None) -> dict:  # pragma: no cover
     f = wage_flows(persons, table)
     w = persons["weight"].to_numpy(float)
     cap = sum(((table[c].to_numpy(float) - persons[c].to_numpy(float)) * w).sum()
@@ -243,7 +261,24 @@ def _row(base, shocked, persons, table) -> dict:  # pragma: no cover
         "wage_bill_lost_bn": f["wage_bill_lost"] / 1e9,
         "survivor_gain_bn": f["survivor_gain"] / 1e9,
         "capital_income_added_bn": float(cap) / 1e9,
+        "public_paybill_displaced_bn": (np.nan if public is None
+                                        else public_paybill(persons, table, public, employer_costs) / 1e9),
     }
+
+
+def _append_deciles(path: Path, dec: pd.DataFrame, key: dict) -> None:  # pragma: no cover
+    """Write one draw's decile rows, replacing any rows of the same draw left
+    by an interrupted run (deciles are written before the draw checkpoint)."""
+    for k, val in reversed(list(key.items())):
+        dec.insert(0, k, val)
+    if path.exists():
+        old = pd.read_csv(path)
+        mask = np.ones(len(old), bool)
+        for k, val in key.items():
+            mask &= old[k].astype(str).to_numpy() == str(val)
+        if mask.any():
+            old[~mask].to_csv(path, index=False)
+    dec.to_csv(path, mode="a", header=not path.exists(), index=False)
 
 
 def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no cover
@@ -266,6 +301,16 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
     # baseline-fixed deciles of equivalised HBAI income, households weighted
     # by their number of members (the 20-draw decile profile's basis)
     hh_decile = weighted_deciles(b["equiv"], b["hw"] * b["count"])
+    # public-sector pay bill inputs (decision (b)): FRS employment sector and
+    # the employer's NI and pension cost of each baseline job
+    try:
+        public = baseline.calculate("employment_sector", period=PERIOD, map_to="person").values.astype(str) == "PUBLIC"
+        employer_costs = (baseline.calculate("ni_employer", period=PERIOD, map_to="person").values.astype(float)
+                          + arrays["employer_pension_contributions"])
+    except Exception as exc:  # recorded as NaN rather than stopping the run
+        print(f"public pay bill unavailable: {exc}", flush=True)
+        public = employer_costs = None
+    print(f"baseline ready; public employees {0 if public is None else int(public.sum())}", flush=True)
     del baseline
     gc.collect()
 
@@ -288,12 +333,12 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
             s = _sim_metrics(sim)
             del sim
             gc.collect()
-            ck.append({"seed": seed, "displacement_rate": rate, **_row(b, s, persons, table)})
             dec = decile_flows(hh_decile, b["hw"], s["hh_market"] - b["hh_market"],
                                s["hh_benefits"] - b["hh_benefits"], s["hh_tax_arr"] - b["hh_tax_arr"])
-            dec.insert(0, "seed", seed)
-            dpath = OUT / "obr_benchmark_deciles.csv"
-            dec.to_csv(dpath, mode="a", header=not dpath.exists(), index=False)
+            _append_deciles(OUT / "obr_benchmark_deciles.csv", dec, {"seed": seed})
+            ck.append({"seed": seed, "displacement_rate": rate,
+                       **_row(b, s, persons, table, public, employer_costs)})
+            print(f"obr seed {seed} done", flush=True)
         draws = ck.read()
         out = {"displacement_rate": rate, "labour_force_m": lf, "employees_m": employees_m,
                "obr": {"borrowing_bn": OBR_BORROWING_BN, "receipts_bn": OBR_RECEIPTS_BN,
@@ -302,21 +347,30 @@ def main(stage: str, lf_override: float | None = None) -> None:  # pragma: no co
     elif stage == "capital":
         scen = PRESETS["central"]
         ck = Checkpoint(OUT / "capital_variants_draws.csv", ("variant", "seed"), script=__file__)
-        for seed in SEEDS:
-            full = apply_shocks(persons, scen, seed=seed)
-            for v in CAPITAL_VARIANTS:
+        if not ck.done and (OUT / "capital_variants_deciles.csv").exists():
+            (OUT / "capital_variants_deciles.csv").unlink()
+        fulls: dict = {}
+        for v in CAPITAL_VARIANTS:  # variant-major: whole variants finish first
+            for seed in SEEDS:
                 if ck.is_done(v.name, seed):
                     continue
-                table = capital_variant_table(persons, full, v)
+                if seed not in fulls:
+                    fulls[seed] = apply_shocks(persons, scen, seed=seed)
+                table = capital_variant_table(persons, fulls[seed], v)
                 sim = build_shocked_simulation(None, table, PERIOD, base_arrays=arrays)
                 s = _sim_metrics(sim)
                 del sim
                 gc.collect()
+                dec = decile_flows(hh_decile, b["hw"], s["hh_market"] - b["hh_market"],
+                                   s["hh_benefits"] - b["hh_benefits"], s["hh_tax_arr"] - b["hh_tax_arr"])
+                _append_deciles(OUT / "capital_variants_deciles.csv", dec, {"variant": v.name, "seed": seed})
                 ck.append({"variant": v.name, "seed": seed,
                            "closed_profit_bn": table.attrs.get("closed_profit_bn", np.nan),
-                           **_row(b, s, persons, table)})
+                           **_row(b, s, persons, table, public, employer_costs)})
+                print(f"capital {v.name} seed {seed} done", flush=True)
         draws = ck.read()
-        out = {v.name: summarise(draws[draws.variant == v.name], DRAW_COLS) for v in CAPITAL_VARIANTS}
+        out = {v.name: summarise(draws[draws.variant == v.name], DRAW_COLS) for v in CAPITAL_VARIANTS
+               if (draws.variant == v.name).any()}
         (OUT / "capital_variants.json").write_text(json.dumps(out, indent=2))
     else:
         raise SystemExit(f"unknown stage {stage}")

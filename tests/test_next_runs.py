@@ -135,3 +135,15 @@ def test_labour_force_counts_active_adults_only():
     age = [30, 40, 20, 70, 19, 15]
     w = [1e6, 2e6, 1e6, 5e6, 1e6, 1e6]
     assert nr.labour_force_m(status, age, w) == pytest.approx(4.0)
+
+
+def test_public_paybill_counts_displaced_public_employees_only():
+    p = pd.DataFrame({"weight": [2.0, 1.0, 1.0], "employment_income": [30_000.0, 20_000.0, 10_000.0]})
+    t = pd.DataFrame({"displaced": [True, True, False]})
+    got = nr.public_paybill(p, t, public=[True, False, True], employer_costs=[5_000.0, 1.0, 1.0])
+    assert got == 2.0 * 35_000.0
+
+
+def test_run16_order_puts_cap60_third():
+    assert [v.name for v in nr.CAPITAL_VARIANTS] == [
+        "cap10", "cap20", "cap60", "div_only", "closed_phi100", "closed_phi050"]
