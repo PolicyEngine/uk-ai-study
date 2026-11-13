@@ -417,6 +417,8 @@ def emit_extended() -> None:
                        ("benefits", "Ben"), ("tax_and_contributions", "Tax")]:
             emit(f"genDecomp{C}D{D}Pct",
                  lambda d=d, col=col: csv(dc).set_index("decile").loc[d, col] * 100, "{:.1f}", dc)
+            emit(f"genDecomp{C}D{D}SignedPct",
+                 lambda d=d, col=col: csv(dc).set_index("decile").loc[d, col] * 100, SIGNED1, dc)
     def worst_decile():
         d = csv(dc).set_index("decile")
         return int(d["disposable_income"].idxmin())
@@ -462,6 +464,14 @@ def emit_extended() -> None:
     emit("genCentralMcCostCv", lambda: 100 * jload(mc)["exchequer_cost_bn"]["sd"]
          / jload(mc)["exchequer_cost_bn"]["mean"], "{:.0f}", mc)
     emit("genCentralMcCostHalfBn", lambda: jload(mc)["exchequer_cost_bn"]["mean"] / 2, "{:.1f}", mc)
+    # central exposure-family mean on the seeds the duration/take-up stage uses
+    def dur_central():
+        d = csv("robustness/incidence_draws_five.csv")
+        n = int(jload("robustness/duration_takeup_sensitivity.json")["n_draws"])
+        return float(d[(d.family == "exposure") & (d.seed < n)]["exchequer_cost_bn"].mean())
+    emit("genDurCentralCostMeanBn", dur_central, "{:.1f}", "robustness/duration_takeup_sensitivity.json")
+    emit("genDurCentralCostHalfBn", lambda: dur_central() / 2, "{:.1f}",
+         "robustness/duration_takeup_sensitivity.json")
 
     # --- poverty decomposition --------------------------------------------
     pd_ = "robustness/poverty_decomposition.json"
@@ -849,6 +859,8 @@ def emit_extended() -> None:
     emit("genRippleRows", ripple_rows, "{}", "ripple")
     emit("genRipplePovExtraPp", lambda: (jload("central_ripple.json")["poverty_rate_change_bhc"]
                                          - jload("central.json")["poverty_rate_change_bhc"]) * 100, "{:.2f}", "ripple")
+    emit("genRippleCostRiseBn", lambda: (jload("central_ripple.json")["exchequer_cost"]
+                                         - jload("central.json")["exchequer_cost"]) / 1e9, "{:.1f}", "ripple")
     emit("genRippleCostRisePct", lambda: 100 * (jload("central_ripple.json")["exchequer_cost"]
                                                 / jload("central.json")["exchequer_cost"] - 1), "{:.0f}", "ripple")
 
@@ -871,6 +883,9 @@ def emit_extended() -> None:
     emit("genDivMicrocosmBn", lambda: jload(dv)["microcosm_dividends_2026_bn"], "{:.1f}", dv)
     emit("genDivSpiBn", lambda: jload(dv)["spi_dividends_2026_bn"], "{:.1f}", dv)
     emit("genDivRatioPct", lambda: 100 * (jload(dv)["microcosm_to_spi_ratio"] - 1), "{:.0f}", dv)
+    emit("genDivRatioAbsPct", lambda: abs(100 * (jload(dv)["microcosm_to_spi_ratio"] - 1)), "{:.0f}", dv)
+    emit("genDivRatioDirection",
+         lambda: "above" if jload(dv)["microcosm_to_spi_ratio"] >= 1 else "below", "{}", dv)
     emit("genDivHoldersM", lambda: jload(dv)["microcosm_dividend_holders_m"], "{:.1f}", dv)
     emit("genDivScaleFactor", lambda: jload(dv)["scale_factor"], "{:.3f}", dv)
     emit("genDivDraws", lambda: jload(dv)["draws"], "{:d}", dv)
