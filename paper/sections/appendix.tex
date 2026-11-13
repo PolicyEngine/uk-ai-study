@@ -7,26 +7,30 @@
 
 Displacement is a random draw of which exposed workers lose employment,
 subject to occupation-group quotas proportional to employment times mean
-exposure. Throughout the paper, three conventions apply. The scenario grid
+exposure. Single draws at seed~0: the scenario grid
 (Figures~\ref{fig:griddisp}--\ref{fig:gridgini}, and their appendix
-variants below), the decomposition in Figure~\ref{fig:decomp} and the preset
-scenarios are single draws at seed~0, while the five incidence families
-report means over 50 draws (seeds 0--49). The
-decile transition and wage-gain profiles (Figures~\ref{fig:transition}
-and~\ref{fig:wages}) are means over the same 50 paired draws. The robustness
-summary and the assignment-draw intervals in Figure~\ref{fig:decomp-ci} are
-20-draw Monte Carlo runs, with $\pm$ values reported as standard deviations
-across draws. Within each draw, ordering keys are uniform within occupation
-group, so a record's inclusion probability does not depend on its grossing
-weight.
+variants below), the decomposition in Figure~\ref{fig:decomp}, the preset
+scenarios, the wage-margin and adjustment-margin tables, the index and
+ripple sensitivities, the policy table and the tax-composition cells.
+Means over 50 paired draws (seeds 0--49): the five incidence families, the
+central Monte Carlo and its cost by component, the policy Monte Carlo, and
+the decile transition and wage-gain profiles (Figures~\ref{fig:transition}
+and~\ref{fig:wages}). Means over 20 draws: the decile decomposition in
+Figure~\ref{fig:decomp-ci} and its ranking sensitivity, the duration,
+take-up and wage-tier sensitivities and the gender incidence. Means over 20
+paired draws with identical displacement in every run: the capital-income
+coverage runs and the channel split. The duration-consistent policy
+ranking uses \genDurReformDraws~draws. The $\pm$ values are standard
+deviations across draws. Within each draw, ordering keys are uniform within
+occupation group, so a record's inclusion probability does not depend on
+its calibrated weight.
 
 \subsection{Job loss by occupation group}
 
-Table~\ref{tab:jobloss} reports the central-scenario displacement rate for
+Table~\ref{tab:jobloss} reports the prescribed central-scenario quota rate for
 each SOC2020 major group. The allocation rule concentrates losses in
-administrative and secretarial work (10.5 per cent of the group's
-employment), managerial and professional occupations (9.2--9.7 per cent)
-and associate professional roles, while elementary occupations---the
+administrative and secretarial, managerial, professional and associate
+professional occupations, while elementary occupations---the
 least-exposed group, whose normalised exposure score is zero---experience
 no displacement at all. Clerical and professional work bears the shock;
 manual and elementary work is insulated.
@@ -37,7 +41,7 @@ manual and elementary work is insulated.
 \label{tab:jobloss}
 \begin{tabular}{lrrr}
 \toprule
-Major group & C-AIOE & Employment (m) & Job loss (\%) \\
+Major group & C-AIOE & Employment (m) & Quota rate (\%) \\
 \midrule
 \genJobLossRows
 % source: results/appendix/job_loss_by_major_group.csv
@@ -47,7 +51,9 @@ Major group & C-AIOE & Employment (m) & Job loss (\%) \\
 \vspace{2pt}
 {\footnotesize C-AIOE is the standardised complementarity-adjusted exposure
 score before the min-zero normalisation used in the allocation rule.
-Employment and job-loss rates are survey-weighted; single draw, seed 0.}
+Employment uses calibrated weights. Quota rates are the prescribed
+group displacement rates; any single draw realises them in expectation
+only (the seed-0 realised rates are in the source file).}
 \end{table}
 
 \subsection{Where the shock lands: baseline distributions}
@@ -61,8 +67,8 @@ equivalised household disposable income). Market income excluding capital
 is why displacement of high earners is fiscally expensive. Benefits
 (\pounds \genBaseBenefitsBn~billion) are spread across the lower and middle deciles,
 peaking in deciles~3 to~5. Capital income (\pounds \genBaseCapitalBn~billion of interest
-and dividends) is the most concentrated series of all: the top decile
-holds more than a third of the total.
+and dividends) is the most concentrated series: the top decile
+holds \genCapTopSharePct~per cent of the total.
 
 \begin{figure}[htbp]
 \centering
@@ -104,8 +110,9 @@ holds more than a third of the total.
 Figures~\ref{fig:exp-incidence} and \ref{fig:comp-incidence} show, without
 any shock, how workers in each income decile distribute across
 employment-weighted tertiles of AI exposure and of complementarity. The
-share of workers in the top exposure tertile rises steadily with household
-income, while complementarity shows no comparable gradient---the
+share of workers in the lowest exposure tertile falls with household
+income, and the lowest complementarity tertile shows a similar
+gradient---the
 descriptive facts that generate the simulated incidence in
 Section~\ref{sec:results}.
 
@@ -127,13 +134,22 @@ Section~\ref{sec:results}.
 
 Figure~\ref{fig:decomp-ci} reports the central-scenario disposable-income
 change by decile as the mean over twenty independent displacement draws
-with central 95 per cent intervals across assignment draws. The gradient runs from $-0.75$ per
-cent in the bottom decile to $-3.87$ per cent in the top. On the current
-20-draw means it is not everywhere strictly monotone: decile~3 loses
-slightly less than decile~2 ($-0.85$ against $-0.93$ per cent) and
-deciles~9 and~10 are essentially tied ($-3.87$ per cent each), with both
-differences well inside the draw noise. The overall upward slope of the loss
-profile appears across the reported draw interval.
+with central 95 per cent intervals across assignment draws. The profile
+is hump-shaped: the largest mean loss, \genDecompCiMaxLossPct~per cent,
+falls in decile~\genDecompCiMaxLossDecile, and the top decile changes by
+$\genDecompCiDTenSignedPct$ per cent. The bottom decile depends on the
+income ranking. Under the HBAI ranking it changes by
+$\genDecileRankHbaiDOneSignedPct$ per cent
+($[\genDecileRankHbaiDOneLoPct, \genDecileRankHbaiDOneHiPct]$); ranked on
+income before pension contributions, by
+$\genDecileRankPrePensionDOneSignedPct$ per cent
+($[\genDecileRankPrePensionDOneLoPct, \genDecileRankPrePensionDOneHiPct]$);
+and excluding the \genDecileRankExclHouseholds~households whose personal
+pension contributions exceed both \pounds\genDecileRankLargePpcFloorGbp{}
+and their earnings, by $\genDecileRankExclDOneSignedPct$ per cent
+($[\genDecileRankExclDOneLoPct, \genDecileRankExclDOneHiPct]$). The
+bottom-decile change therefore \genDecileOneRobustness, and I do not
+report it as a finding.
 % decile means from results/appendix/decomposition_ci.csv (rebuild vintage)
 
 \begin{figure}[htbp]
@@ -149,11 +165,14 @@ Figure~\ref{fig:b7} compares the central scenario against the same
 aggregate shocks allocated uniformly across occupations, decile by decile;
 Figure~\ref{fig:b8} repeats the central scenario with the
 \citet{eloundou2023} GPT-exposure index in place of the C-AIOE. The
-exposure-based allocation shifts losses up the distribution relative to a
-uniform shock (top-decile losses of \genBSevenAiDTenPct{} against \genBSevenUniDTenPct{} per cent in this
-single seed-0 draw); lower-decile comparisons are noisy at the single-draw
-level, and the choice of exposure index leaves the decile profile broadly
-similar. % results/appendix/b7_uniform_vs_ai_decile.csv
+exposure-based allocation shifts losses towards deciles 8 and 9 relative
+to a uniform shock: in this single seed-0 draw they change by
+$\genBSevenAiDEightSignedPct$ and $\genBSevenAiDNineSignedPct$ per cent
+under exposure-based allocation against $\genBSevenUniDEightSignedPct$ and
+$\genBSevenUniDNineSignedPct$ per cent under the uniform shock, while the
+top decile changes by $\genBSevenAiDTenSignedPct$ and
+$\genBSevenUniDTenSignedPct$ per cent. Lower-decile comparisons are noisy
+at the single-draw level. % results/appendix/b7_uniform_vs_ai_decile.csv
 
 \begin{figure}[htbp]
 \centering
@@ -189,11 +208,8 @@ Table~\ref{tab:indexsens} and Figure~\ref{fig:indexsens} report the
 outcomes. The Exchequer cost spans \pounds \genIndexCostMinBn--\genIndexCostMaxBn~billion (the largest
 upward deviation from the C-AIOE figure is $\genIndexMaxDevPct$ per cent), the Gini change spans $\genIndexGiniMinSignedPp$ to $\genIndexGiniMaxSignedPp$ points, and the
 before-housing-costs poverty change spans $\genIndexPovBhcMinSignedPp$ to $\genIndexPovBhcMaxSignedPp$ points. The
-decile-10 transition share exceeds the decile-1 share by a factor of \genIndexRatioMin{}
-to \genIndexRatioMax. Within this seed-0 sensitivity, all five indices produce a
-positive Gini change, a transition gradient that rises with income, and
-a fiscal cost within 20 per cent of the C-AIOE result. This is consistent
-with their similar major-group rankings and the fixed aggregate quota.
+ratio of the decile-10 to the decile-1 transition share runs from \genIndexRatioMin{}
+to \genIndexRatioMax.
 
 \begin{table}[htbp]
 \centering
@@ -279,12 +295,11 @@ central scenario exactly.}
 \end{table}
 
 Under this specification, the ripple channel loads mainly on the Exchequer. At $\eta =
-0.3$ the fiscal cost rises by more than half, from \pounds \genCentralCostBn{} to
+0.3$ the fiscal cost rises by \genRippleCostRisePct~per cent, from \pounds \genCentralCostBn{} to
 \pounds \genCentralRippleCostBn~billion, because thin, widespread wage cuts across the
 non-displaced workforce forgo income tax and National Insurance at the
 margin. The distributional estimates move less: BHC poverty rises by
-\genRipplePovExtraPp~points more than in the central run, and the Gini increase
-falls slightly; the cuts are imposed on employed workers concentrated in
+\genRipplePovExtraPp~points more than in the central run (Table~\ref{tab:ripple} gives the Gini change); the cuts are imposed on employed workers concentrated in
 the middle and upper deciles. Adding this particular ripple raises the
 simulated fiscal cost; other routing and wage-response assumptions could
 produce different results.
@@ -303,17 +318,17 @@ HBAI outturns over 2007/08--2010/11 were very different: absolute BHC
 poverty and the Gini were roughly flat to slightly falling, and relative
 poverty fell outright, because benefits were uprated with high inflation
 while median incomes fell, and because unemployment spells were of mixed
-duration rather than full-year. The gap---roughly one and a half to two
-points of poverty per recession-sized shock---quantifies what the channels
+duration rather than full-year. The gap between the simulated and recorded
+changes indicates what the channels
 this framework deliberately excludes (benefit and threshold uprating,
 duration composition, behavioural and macro-policy responses) absorbed in
 practice. The simulated estimates throughout the paper should accordingly
 be read as first-year mechanical impact effects against a frozen policy
 baseline: an upper envelope for measured poverty responses, not a
 forecast of HBAI outturns. Scaled per percentage point of uniform
-displacement, the backcast ($\genBackcastPerPointPp$ points BHC per point) sits on the
-same ray as the paper's uniform 7 per cent family ($\genUniformPerPointPp$ per point),
-so the benchmark and the headline results are internally consistent.
+displacement, the backcast gives $\genBackcastPerPointPp$ points BHC per point,
+against $\genUniformPerPointPp$ per point for the paper's uniform 7 per cent
+family, which also carries the wage and capital channels.
 % results/robustness/recession_backcast.json
 
 \subsection{Change of dataset and dividend coverage}
@@ -321,17 +336,18 @@ so the benchmark and the headline results are internally consistent.
 
 Table~\ref{tab:dataset-change} sets the headline results of this version
 against those of the earlier version, which ran PolicyEngine UK 2.89.2 on
-the processed FRS 2024--25 file described in Section~\ref{sec:microsim}.
-Three differences between the datasets account for most of the change.
+the processed FRS 2024--25 file (version 1.56.6) described in
+Section~\ref{sec:microsim}. Four differences contribute to the change.
 First, Microcosm grosses to \genDataEmployeesM~million employees rather than
 22.9 million, so the same 7 per cent rate displaces more workers and removes
 more earnings. Second, Microcosm carries \pounds \genDivMicrocosmBn~billion of
 dividends held by \genDivHoldersM~million people in 2026, against
 \pounds 0.04 billion on eight records in the earlier file, so the capital
-shock now raises substantial dividend-tax revenue (Section~\ref{sec:results-channels}).
+shock now changes dividend-tax revenue (\pounds$\genCostDividendTaxSignedBn$~billion of the 50-draw central cost) (Section~\ref{sec:results-channels}).
 Third, Microcosm's calibrated weights are more dispersed than survey grossing
 weights, which widens the spread across assignment draws
-(Section~\ref{sec:microsim}).
+(Section~\ref{sec:microsim}). Fourth, the model version differs
+(PolicyEngine UK 2.89.2 against 2.174.1).
 
 \begin{table}[htbp]
 \centering
@@ -346,8 +362,10 @@ weights, which widens the spread across assignment draws
 Employees (million) & 22.9 & \genDataEmployeesM \\
 Dividend income (\pounds bn) & 0.04 & \genDivMicrocosmBn \\
 Baseline Gini & 0.309 & \genBaselineGini \\
+Baseline capital income (\pounds bn) & 23.0 & \genBaseCapitalBn \\
 Central displaced, seed 0 (million) & 1.56 & \genCentralDisplacedTwoM \\
 Central cost, 50-draw mean (\pounds bn) & 17.7 $\pm$ 1.2 & \genCentralMcCostMeanBn{} $\pm$ \genCentralMcCostSdBn \\
+Central cost excl.\ employer NI, 50-draw mean (\pounds bn) & -- & $\genCostExclEmployerNiSignedBn$ \\
 Central BHC poverty, 50-draw mean (pp) & $+1.87$ & $\genCentralMcPovBhcMeanSignedPp$ \\
 Central Gini, 50-draw mean (pp) & $+1.11$ & $\genCentralMcGiniMeanSignedPp$ \\
 Low preset cost, seed 0 (\pounds bn) & 4.3 & $\genLowCostSignedBn$ \\
@@ -360,30 +378,47 @@ Klein-anchored cost, 50-draw mean (\pounds bn) & 32.8 & \genIncKleinCostMeanBn \
 
 \vspace{2pt}
 \parbox{\textwidth}{\footnotesize Earlier-version values are from the
-repository at commit 5d75106. Both versions simulate 2026; the model
-version also differs (2.89.2 against 2.174.1).}
+repository at commit 5d75106 (the earlier capital income sums the
+decile file \texttt{results/jr16/fig4\_3\_capital\_by\_decile.csv}). Both
+versions simulate 2026. Exchequer cost is the fall in the government
+balance; a negative value is a net gain. The earlier version reported the
+seed-0 central cost of \pounds 18.2 billion as its headline.}
 \end{table}
 
 Because the capital channel scales dividends proportionally, its fiscal
-size depends on how much dividend income the data carry. Microcosm's 2026
-dividend total is \genDivRatioPct~per cent above the HMRC SPI projection for
+size depends on how much dividend income the data carry. Restricted to
+people with total income of at least \pounds 12{,}570, the population the
+SPI covers, Microcosm's 2026 dividend income is \pounds \genDivTaxpayerBn~billion,
+which differs by \genDivRatioPct~per cent from the HMRC SPI projection for
 the same year (\pounds \genDivSpiBn~billion: the SPI 2023--24 outturn
 projected to 2026 by PolicyEngine's data pipeline, summed over all income
 bands from \pounds 12{,}570).\footnote{The projection is
 \texttt{incomes\_projection.csv} in the policyengine-uk-data repository
 (commit fa4ebe9), the source of Microcosm's own SPI calibration targets.
 Microcosm matches the SPI targets band by band up to \pounds 1 million of
-total income; most of the excess sits in the untargeted band above it.}
-Scaling every person's dividends by \genDivScaleFactor{} in both the
-baseline and the shocked runs, so that the total matches the SPI
-projection, changes the central Exchequer cost from
-\pounds \genDivCentralCostMeanBn~$\pm$~\genDivCentralCostSdBn~billion to
-\pounds \genDivSpiCostMeanBn~$\pm$~\genDivSpiCostSdBn~billion (paired
-difference \pounds$\genDivDiffCostBn$~billion over \genDivDraws{} shared
-draws), and the Gini change from $\genDivCentralGiniMeanSignedPp$ to
-$\genDivSpiGiniMeanSignedPp$ points. I report this as a sensitivity, not as an
-alternative headline: the excess may reflect genuine top-income dividends
-that the SPI projection understates as much as calibration error.
+total income; in the untargeted band above it Microcosm holds
+\pounds \genDivTopBandMicrocosmBn~billion of dividends against
+\pounds \genDivTopBandSpiBn~billion in the projection.} I run three scaled
+variants, each over \genDivDraws{} draws paired with the unscaled central
+run, scaling the variable in both the baseline and the shocked runs and
+only for people above the threshold:
+\begin{itemize}
+\item dividends scaled by one factor (\genDivScaleFactor) to the SPI total:
+the central cost changes from \pounds \genDivCentralCostMeanBn~billion to
+\pounds \genCovDivUniformCostMeanBn~billion (paired difference
+\pounds$\genCovDivUniformDiffCostSignedBn$~billion), and the Gini change by
+$\genCovDivUniformDiffGiniSignedPp$ points;
+\item dividends scaled band by band to the SPI band totals (top-band factor
+\genDivTopBandFactor): the cost is \pounds \genCovDivBandedCostMeanBn~billion
+(paired difference \pounds$\genCovDivBandedDiffCostSignedBn$~billion);
+\item savings interest scaled by \genSavScaleFactor{} to the SPI total of
+\pounds \genSavSpiBn~billion: the cost is \pounds \genCovSavUniformCostMeanBn~billion
+(paired difference \pounds$\genCovSavUniformDiffCostSignedBn$~billion).
+\end{itemize}
+I report these as sensitivities, not as alternative headlines: these data
+do not show whether the gap reflects top-income dividends the projection
+misses or calibration error. The Monte Carlo spread does not capture this
+uncertainty, because the capital uplift is the same in every draw.
 % results/robustness/dividend_coverage.json
 
 \subsection{The scenario grid by decile, and without the capital shock}
@@ -392,16 +427,16 @@ Figure~\ref{fig:b9} facets the full 66-cell scenario grid by baseline
 income decile; cells report the change in mean household disposable income
 (HBAI concept), which across the grid as a whole ranges from $\genGridDispMaxPct$ to
 $\genGridDispMinPct$ per cent. Every decile's panel shifts towards losses as displacement
-rises, but the top deciles darken much faster: in the harshest cell (10 per
-cent displacement, no wage gain) the bottom decile loses \genAppGridHarshDOnePct~per cent of
-disposable income while the top decile loses \genAppGridHarshDTenPct~per cent. % results/appendix/grid_deciles_capital.csv
+rises. In the harshest cell (10 per cent displacement, no wage gain) the
+bottom decile's disposable income changes by $\genAppGridHarshDOneSignedPct$
+per cent and the top decile's by $\genAppGridHarshDTenSignedPct$ per cent. % results/appendix/grid_deciles_capital.csv
 Figure~\ref{fig:b11} removes the capital-return shock. Average disposable
 incomes fall relative to the capital-on grid, confirming that the capital
 channel raises average incomes while concentrating its gains at the top.
 Within this grid, without the capital shock
-the Gini of equivalised disposable income rises in 65 of the 66 cells,
-by up to 1.57 percentage points; the remaining cell is the null $(0,0)$
-cell, which with the capital shock also off contains no shock at all and
+the Gini of equivalised disposable income rises in \genAppGridNoCapGiniPositive{} of the 66 cells,
+by up to \genAppGridNoCapGiniMaxPp{} percentage points; the null $(0,0)$
+cell, which with the capital shock also off contains no shock at all,
 is exactly zero. Thus the positive Gini change in the shocked cells is
 not generated solely by the capital channel.
 

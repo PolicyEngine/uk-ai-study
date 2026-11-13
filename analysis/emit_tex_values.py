@@ -382,6 +382,13 @@ def emit_extended() -> None:
             emit(f"genAge{P}{B}SharePct",
                  lambda rel=rel, band=band: jload(rel)["age_band_displacement_share"][band] * 100,
                  "{:.1f}", rel)
+        # the largest displaced age band, named in the text rather than assumed
+        emit(f"genAge{P}LargestBand",
+             lambda rel=rel: max(jload(rel)["age_band_displacement_share"].items(),
+                                 key=lambda kv: kv[1])[0].replace("-+", " and over").replace("-", "--"),
+             "{}", rel)
+        emit(f"genAge{P}LargestSharePct",
+             lambda rel=rel: max(jload(rel)["age_band_displacement_share"].values()) * 100, "{:.1f}", rel)
 
     # --- channel profiles (50-draw means) ---------------------------------
     t = "jr16/fig4_1_transition_by_decile.csv"
@@ -516,12 +523,12 @@ def emit_extended() -> None:
 
     def incidence_rows():
         d = jload(imc)
-        five = csv(s5).set_index("family")
+        draws = csv("robustness/incidence_draws_five.csv")
         out = []
         for fam, lab in fam_labels:
             f = d[fam]
             out.append(row_tex([
-                lab, f"{five().loc[fam, 'displaced_weighted_m']:.2f}",
+                lab, f"{draws.query('family == @fam')['displaced_weighted_m'].mean():.2f}",
                 f"{f['exchequer_cost_bn']['mean']:.1f} $\\pm$ {f['exchequer_cost_bn']['sd']:.1f}",
                 f"${f['poverty_change_bhc_pp']['mean']:+.2f}$ $\\pm$ {f['poverty_change_bhc_pp']['sd']:.2f}",
                 f"${f['poverty_change_ahc_pp']['mean']:+.2f}$ $\\pm$ {f['poverty_change_ahc_pp']['sd']:.2f}",
@@ -529,6 +536,18 @@ def emit_extended() -> None:
             ]))
         return "\n".join(out)
     emit("genIncidenceRows", incidence_rows, "{}", imc)
+
+    # four stylised families (the Klein stress test excluded), 50-draw means
+    def stylised(key, agg):
+        d = jload(imc)
+        return agg(d[f][key]["mean"] for f in ("exposure", "junior", "compression", "uniform"))
+    emit("genIncStylisedPovBhcMeanMinSignedPp", lambda: stylised("poverty_change_bhc_pp", min), SIGNED2, imc)
+    emit("genIncStylisedPovBhcMeanMaxSignedPp", lambda: stylised("poverty_change_bhc_pp", max), SIGNED2, imc)
+    # mean weighted number displaced per family over the 50 paired draws
+    for fam, Fam in FAMILY_MACRO.items():
+        emit(f"genInc{Fam}DisplacedMeanM",
+             lambda fam=fam: csv("robustness/incidence_draws_five.csv").query("family == @fam")[
+                 "displaced_weighted_m"].mean(), "{:.2f}", "robustness/incidence_draws_five.csv")
 
     def stylised_span():
         d = jload(imc)
@@ -715,6 +734,11 @@ def emit_extended() -> None:
     b7 = "appendix/b7_uniform_vs_ai_decile.csv"
     emit("genBSevenAiDTenPct", lambda: -csv(b7).set_index("decile").loc[10, "ai_shock_pct"], "{:.1f}", b7)
     emit("genBSevenUniDTenPct", lambda: -csv(b7).set_index("decile").loc[10, "uniform_shock_pct"], "{:.1f}", b7)
+    for dec, D in [(8, "Eight"), (9, "Nine")]:
+        emit(f"genBSevenAiD{D}SignedPct",
+             lambda dec=dec: csv(b7).set_index("decile").loc[dec, "ai_shock_pct"], SIGNED1, b7)
+        emit(f"genBSevenUniD{D}SignedPct",
+             lambda dec=dec: csv(b7).set_index("decile").loc[dec, "uniform_shock_pct"], SIGNED1, b7)
 
     # --- gender ------------------------------------------------------------
     ge = "appendix/gender_incidence.json"
