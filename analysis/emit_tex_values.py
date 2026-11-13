@@ -1295,6 +1295,7 @@ def emit_revision() -> None:
     emit("genObrBorrowingBn", lambda: nr.OBR_BORROWING_BN, "{:.0f}", src)
     emit("genObrReceiptsLostBn", lambda: nr.OBR_RECEIPTS_BN, "{:.0f}", src)
     emit("genObrWelfareAddedBn", lambda: nr.OBR_WELFARE_BN, "{:.0f}", src)
+    emit("genObrUnempRisePp", lambda: nr.OBR_UNEMPLOYMENT_RISE_PP, "{:.1f}", src)
     emit("genObrImpliedDisplacedM",
          lambda: nr.OBR_BORROWING_BN * 1e9 / ra.cost_per_displaced(csv(dcd))["mean_gbp"] / 1e6, "{:.2f}", dcd)
 
