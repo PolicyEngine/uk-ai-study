@@ -1417,17 +1417,24 @@ def emit_next_runs() -> None:
     emit("genObrReceiptsBn", lambda: _obr_lines()["receipts"], "{:.1f}", ob)
     emit("genObrWelfareBn", lambda: _obr_lines()["welfare"], "{:.1f}", ob)
     cv = "next_runs/capital_variants.json"
+
+    def capsum():
+        import post_next_runs as pn
+        validate(cv)  # complete run 16 only (requires the 160-row draws file)
+        return pn.capital_variant_summary(csv("next_runs/capital_variants_draws.csv"))
+    # closed variants: cost after corporation tax on phi x (W - S), as in Table 9
     for k, N in CAPITAL_VARIANT_MACRO.items():
-        emit(f"genCap{N}CostMeanBn", lambda k=k: jload(cv)[k]["exchequer_cost_bn"]["mean"], SIGNED1, cv)
-        emit(f"genCap{N}PovBhcMeanPp", lambda k=k: jload(cv)[k]["poverty_change_bhc_pp"]["mean"], SIGNED2, cv)
-        emit(f"genCap{N}GiniMeanPp", lambda k=k: jload(cv)[k]["gini_change_pp"]["mean"], SIGNED2, cv)
+        emit(f"genCap{N}CostMeanBn", lambda k=k: capsum()[k]["cost"], SIGNED1, cv)
+        emit(f"genCap{N}PovBhcMeanPp", lambda k=k: capsum()[k]["pov"], SIGNED2, cv)
+        emit(f"genCap{N}GiniMeanPp", lambda k=k: capsum()[k]["gini"], SIGNED2, cv)
 
     def cap_rows():
-        d = jload(cv)
+        d = capsum()
         return "\n".join(row_tex([
-            lab, f"{d[k]['exchequer_cost_bn']['mean']:.1f} $\\pm$ {d[k]['exchequer_cost_bn']['se']:.1f}",
-            m(d[k]["poverty_change_bhc_pp"]["mean"], SIGNED2), m(d[k]["gini_change_pp"]["mean"], SIGNED2),
-            f"{d[k]['capital_income_added_bn']['mean']:.1f}"]) for k, lab in CAPITAL_VARIANT_LABELS)
+            lab, f"{d[k]['cost']:.1f} $\\pm$ {d[k]['cost_se']:.1f}",
+            "--" if np.isnan(d[k]["corporation_tax"]) else f"{d[k]['corporation_tax']:.1f}",
+            m(d[k]["pov"], SIGNED2), m(d[k]["gini"], SIGNED2),
+            f"{d[k]['capital_added']:.1f}"]) for k, lab in CAPITAL_VARIANT_LABELS)
     emit("genCapVariantRows", cap_rows, "{}", cv)
 
 

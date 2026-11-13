@@ -119,14 +119,16 @@ def household_flows(group, weights, d: dict) -> pd.DataFrame:
     """Weighted sums of household changes by ``group`` (a decile array, or a
     list of arrays for decile x family), with both coefficients.
 
-    ``d`` maps market, net, income_tax, ni_employee, uc, benefits to
-    household-level change arrays (pounds)."""
+    ``d`` maps market, net, income_tax, ni_employee, ni_employer, uc,
+    benefits to household-level change arrays (pounds). Employer NI is
+    recorded beside the household basis, not in it."""
     keys = list(group) if isinstance(group, (list, tuple)) else [group]
     names = ["decile", "family_type"][: len(keys)]
     df = pd.DataFrame({n: np.asarray(k) for n, k in zip(names, keys)})
     w = np.asarray(weights, float)
     cols = {"market_change": "market", "net_income_change": "net", "income_tax_change": "income_tax",
-            "ni_employee_change": "ni_employee", "uc_change": "uc", "benefit_change": "benefits"}
+            "ni_employee_change": "ni_employee", "ni_employer_change": "ni_employer", "uc_change": "uc",
+            "benefit_change": "benefits"}
     for c, k in cols.items():
         df[c] = np.asarray(d[k], float) * w
     df["weight"] = w
@@ -139,11 +141,23 @@ def household_flows(group, weights, d: dict) -> pd.DataFrame:
     return g.reset_index()
 
 
+HH_ARRAYS = ("hh_market", "hh_net", "hh_it", "hh_ni", "hh_ni_er", "hh_benefits", "hh_uc")
+
+
 def changes(b: dict, s: dict) -> dict:
-    """Household change arrays from two ``next_runs._sim_metrics`` dicts."""
+    """Household change arrays from two ``next_runs._sim_metrics`` dicts
+    extended with ``hh_ni_er`` (household employer NI, see ``metrics``)."""
     return {"market": s["hh_market"] - b["hh_market"], "net": s["hh_net"] - b["hh_net"],
             "income_tax": s["hh_it"] - b["hh_it"], "ni_employee": s["hh_ni"] - b["hh_ni"],
+            "ni_employer": s["hh_ni_er"] - b["hh_ni_er"],
             "uc": s["hh_uc"] - b["hh_uc"], "benefits": s["hh_benefits"] - b["hh_benefits"]}
+
+
+def metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
+    """``next_runs._sim_metrics`` plus household employer NI."""
+    out = nr._sim_metrics(sim)
+    out["hh_ni_er"] = sim.calculate("ni_employer", period=PERIOD, map_to="household").values
+    return out
 
 
 def draw_row(b: dict, s: dict, persons: pd.DataFrame, table: pd.DataFrame) -> dict:
@@ -154,7 +168,9 @@ def draw_row(b: dict, s: dict, persons: pd.DataFrame, table: pd.DataFrame) -> di
     hw = np.asarray(b["hw"], float)
     agg = {k: float((v * hw).sum()) for k, v in d.items()}
     row.update({
-        "other_benefits_change_bn": (agg["benefits"] - agg["uc"]) / 1e9,
+        # from the same aggregates as next_runs' benefits and UC columns
+        "other_benefits_change_bn": row["benefits_change_bn"] - row["uc_change_bn"],
+        "employer_ni_household_sum_bn": agg["ni_employer"] / 1e9,
         "market_income_change_bn": agg["market"] / 1e9,
         "net_income_change_bn": agg["net"] / 1e9,
         "gross_cut_bn": float(table.attrs.get("gross_cut_realised", np.nan)) / 1e9,
@@ -185,6 +201,22 @@ def summarise(draws: pd.DataFrame) -> dict:
     return out
 
 
+def record_draw(b: dict, s: dict, persons: pd.DataFrame, table: pd.DataFrame, hh_decile, family,
+                ck, key: dict, out_dir: Path, arrays_dir: Path) -> dict:
+    """Write one draw: decile and decile x family flows, the household
+    arrays, then the checkpoint row (last, so a stopped run redoes the draw
+    and ``_append`` replaces its partial side rows)."""
+    d = changes(b, s)
+    _append(out_dir / "wage_cut_deciles.csv", household_flows(hh_decile, b["hw"], d), dict(key))
+    _append(out_dir / "wage_cut_decile_family.csv", household_flows([hh_decile, family], b["hw"], d), dict(key))
+    arrays_dir.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(arrays_dir / f"{key['variant']}_seed{key['seed']:02d}.npz",
+                        **{k: s[k] for k in HH_ARRAYS})
+    row = {**key, **draw_row(b, s, persons, table)}
+    ck.append(row)
+    return row
+
+
 def parse_variants(argv) -> list[str]:
     if "--variants" not in argv:
         return list(VARIANTS)
@@ -198,7 +230,7 @@ def parse_variants(argv) -> list[str]:
 # ---------------------------------------------------------------------------
 # Simulation driver (needs Microcosm; not executed when written)
 # ---------------------------------------------------------------------------
-def _append(path: Path, df: pd.DataFrame, key: dict) -> None:  # pragma: no cover
+def _append(path: Path, df: pd.DataFrame, key: dict) -> None:
     nr._append_deciles(path, df, key)
 
 
@@ -216,7 +248,7 @@ def main(argv=None) -> None:  # pragma: no cover - needs Microcosm
     ARRAYS_DIR.mkdir(parents=True, exist_ok=True)
     baseline = microsimulation()
     persons = build_person_table(baseline, PERIOD)
-    b = nr._sim_metrics(baseline)
+    b = metrics(baseline)
     arrays = {v: baseline.calculate(v, period=PERIOD, map_to="person").values.astype(float)
               for v in TRANSITION_ZEROED_VARIABLES}
     arrays["employment_status"] = baseline.calculate(
@@ -229,7 +261,7 @@ def main(argv=None) -> None:  # pragma: no cover - needs Microcosm
     fam_p = baseline.calculate("family_type", period=PERIOD, map_to="person").values.astype(str)
     family = pd.Series(fam_p).groupby(hid_p, sort=False).first().reindex(hid_h).to_numpy().astype(str)
     np.savez_compressed(ARRAYS_DIR / "baseline.npz", weight=b["hw"], decile=hh_decile, family=family,
-                        **{k: b[k] for k in ("hh_market", "hh_net", "hh_it", "hh_ni", "hh_benefits", "hh_uc")})
+                        **{k: b[k] for k in HH_ARRAYS})
     del baseline
     gc.collect()
 
@@ -245,16 +277,11 @@ def main(argv=None) -> None:  # pragma: no cover - needs Microcosm
                 continue
             table = apply_wage_margin_shock(persons, scen, seed=seed)
             sim = build_shocked_simulation(None, table, PERIOD, base_arrays=arrays)
-            s = nr._sim_metrics(sim)
+            s = metrics(sim)
             del sim
             gc.collect()
-            d = changes(b, s)
-            key = {"variant": name, "seed": seed}
-            _append(dec_path, household_flows(hh_decile, b["hw"], d), dict(key))
-            _append(fam_path, household_flows([hh_decile, family], b["hw"], d), dict(key))
-            np.savez_compressed(ARRAYS_DIR / f"{name}_seed{seed:02d}.npz", **{k: s[k] for k in (
-                "hh_market", "hh_net", "hh_it", "hh_ni", "hh_benefits", "hh_uc")})
-            ck.append({**key, **draw_row(b, s, persons, table)})
+            record_draw(b, s, persons, table, hh_decile, family, ck, {"variant": name, "seed": seed},
+                        OUT, ARRAYS_DIR)
             print(f"wage_cut {name} seed {seed} done", flush=True)
     draws = ck.read()
     (OUT / "wage_cut.json").write_text(json.dumps(

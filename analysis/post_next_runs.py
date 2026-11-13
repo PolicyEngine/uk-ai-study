@@ -101,6 +101,31 @@ def capital_breakeven(central: pd.DataFrame, cap60: pd.DataFrame,
             "cost_at_x1_bn": y1, "draws": int(len(a))}
 
 
+#: phi of each closed run-16 variant (kappa = (1 - CT) x phi x payout x UK
+#: share; see CAPITAL_VARIANTS in next_runs.py)
+CLOSED_PHI = {"closed_k0375": 1.0, "closed_k01875": 0.5, "closed_k009375": 0.25, "closed_k075": 1.0}
+CT_RATE = 0.25
+
+
+def capital_variant_summary(draws: pd.DataFrame) -> dict:
+    """Per run-16 variant: mean and SE over draws of the Exchequer cost, with
+    corporation tax on the closed variants' profits phi x (W - S) deducted
+    (the simulated balance has no corporation tax; Table 9 adds it the same
+    way), plus the corporation tax itself and the poverty, Gini and capital
+    income means."""
+    out = {}
+    for v, d in draws.groupby(draws["variant"].astype(str), sort=False):
+        ct = CT_RATE * CLOSED_PHI[v] * d["closed_wedge_bn"].astype(float) if v in CLOSED_PHI \
+            else pd.Series(0.0, index=d.index)
+        cost = d["exchequer_cost_bn"].astype(float) - ct
+        n = len(d)
+        out[v] = {"cost": float(cost.mean()), "cost_se": float(cost.std(ddof=1) / np.sqrt(n)) if n > 1 else np.nan,
+                  "corporation_tax": float(ct.mean()) if v in CLOSED_PHI else np.nan,
+                  "pov": float(d["poverty_change_bhc_pp"].mean()), "gini": float(d["gini_change_pp"].mean()),
+                  "capital_added": float(d["capital_income_added_bn"].mean()), "draws": int(n)}
+    return out
+
+
 def obr_lines(draws: pd.DataFrame) -> dict:
     """20-draw means of run 15's balance split (pounds bn, positive = adds
     to borrowing). ``household_benefits`` includes childcare support and

@@ -125,7 +125,16 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
         "displaced_weighted_m": [0.5, 0.5], "public_paybill_displaced_bn": [6.0, 6.0],
         "wage_bill_lost_bn": [24.0, 24.0], "certified_data_build_id": "fake"})
     draws.to_csv(tmp_path / "next_runs/obr_benchmark_draws.csv", index=False)
-    draws.assign(variant="cap10").head(1).to_csv(tmp_path / "next_runs/capital_variants_draws.csv", index=False)
+    # run-16 draws: closed variants deduct corporation tax on phi x (W - S);
+    # closed_k0375 (phi = 1): 3.0 - 0.25 x 16 = -1.0
+    capd = pd.DataFrame([{"variant": k, "seed": s, "exchequer_cost_bn": (3.0 if k == "closed_k0375" else c),
+                          "closed_wedge_bn": 16.0 if k.startswith("closed") else float("nan"),
+                          "poverty_change_bhc_pp": 2.0, "gini_change_pp": 1.0, "capital_income_added_bn": 12.0,
+                          "public_paybill_displaced_bn": 25.0, "certified_data_build_id": "fake"}
+                         for k, c in [("cap10", 15.0), ("cap20", 11.0), ("cap60", 2.0), ("div_only", 9.0),
+                                      ("closed_k0375", 3.0), ("closed_k01875", 14.0), ("closed_k009375", 15.0),
+                                      ("closed_k075", -9.0)] for s in (0, 1)])
+    capd.to_csv(tmp_path / "next_runs/capital_variants_draws.csv", index=False)
     monkeypatch.setattr(etv, "EXPECTED_CSV", {})
     for name, val in [("R", tmp_path), ("_checked", {}), ("lines", []), ("missing", []), ("emitted", set()),
                       ("values", {})]:
@@ -142,7 +151,8 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
     assert "\\newcommand{\\genObrWelfareBn}{2.0}" in text
     assert "\\newcommand{\\genCapClosedOneCostMeanSignedBn}{-1.0}" in text or \
         "\\newcommand{\\genCapClosedOneCostMeanBn}{-1.0}" in text
-    assert "Closed, $\\phi=1$, payout 50\\% & -1.0" in text.replace("$-1.0$", "-1.0")
+    assert "Closed, $\\phi=1$, payout 50\\% & -1.0 $\\pm$ 0.0 & 4.0" in text
+    assert "Interest and dividends $+10\\%$ & 15.0 $\\pm$ 0.0 & --" in text
 
 
 def test_labour_force_counts_active_adults_only():
