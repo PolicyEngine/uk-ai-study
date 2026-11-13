@@ -288,7 +288,7 @@ def signed_fmt(fmt: str) -> str:
 TABLE_ROW_MACROS = {
     "genPresetRows", "genIndexRows", "genIncidenceRows", "genWageMarginRows",
     "genMixedRows", "genSurvivorRows", "genJobLossRows", "genPolicyRows", "genRippleRows",
-    "genFactorRows", "genIndexAdjRows", "genPresetMcRows", "genPolicyMcRows",
+    "genFactorRows", "genIndexAdjRows", "genPresetMcRows", "genPolicyMcRows", "genCapVariantRows",
 }
 
 
@@ -1353,6 +1353,52 @@ def emit_revision() -> None:
          "{:.1f}", pdr)
     emit("genRoneToRtwoMcCostRatio",
          lambda: pol_mc("R1_wage_insurance")["cost"] / pol_mc("R2_uc_circuit_breaker")["cost"], "{:.1f}", pdr)
+
+
+
+# ---------------------------------------------------------------------------
+# Runs 15 and 16 (specified 13 Nov 2026, not yet run). NOT called from
+# main(): call it there, and use its macros in the .tex, once
+# results/next_runs/ holds attested outputs (see analysis/next_runs.py).
+# ---------------------------------------------------------------------------
+CAPITAL_VARIANT_LABELS = [
+    ("cap10", r"Interest and dividends $+10\%$"), ("cap20", r"Interest and dividends $+20\%$"),
+    ("div_only", r"Dividends only, $+39.8\%$"), ("closed_phi050", r"Closed, $\phi=0.5$"),
+    ("closed_phi100", r"Closed, $\phi=1$"),
+]
+CAPITAL_VARIANT_MACRO = {"cap10": "CapTen", "cap20": "CapTwenty", "div_only": "DivOnly",
+                         "closed_phi050": "ClosedHalf", "closed_phi100": "ClosedOne"}
+
+
+def emit_next_runs() -> None:
+    ob = "next_runs/obr_benchmark.json"
+    emit("genObrRatePct", lambda: 100 * jload(ob)["displacement_rate"], "{:.2f}", ob)
+    for key, N in [("exchequer_cost_bn", "Cost"), ("household_basis_cost_bn", "HhCost"),
+                   ("uc_change_bn", "Uc"), ("displaced_weighted_m", "Displaced"),
+                   ("poverty_change_bhc_pp", "PovBhc"), ("gini_change_pp", "Gini")]:
+        unit = "M" if N == "Displaced" else ("Pp" if N in ("PovBhc", "Gini") else "Bn")
+        emit(f"genObr{N}Mean{unit}", lambda key=key: jload(ob)["summary"][key]["mean"],
+             "{:.2f}" if unit != "Bn" else "{:.1f}", ob)
+        emit(f"genObr{N}Se{unit}", lambda key=key: jload(ob)["summary"][key]["se"], "{:.2f}", ob)
+    # the OBR's split: receipts lost (household taxes + employer NI) and
+    # welfare (cash benefits) added
+    emit("genObrReceiptsBn", lambda: jload(ob)["summary"]["household_basis_cost_bn"]["mean"]
+         - jload(ob)["summary"]["benefits_change_bn"]["mean"]
+         - jload(ob)["summary"]["employer_ni_change_bn"]["mean"], "{:.1f}", ob)
+    emit("genObrWelfareBn", lambda: jload(ob)["summary"]["benefits_change_bn"]["mean"], "{:.1f}", ob)
+    cv = "next_runs/capital_variants.json"
+    for k, N in CAPITAL_VARIANT_MACRO.items():
+        emit(f"genCap{N}CostMeanBn", lambda k=k: jload(cv)[k]["exchequer_cost_bn"]["mean"], SIGNED1, cv)
+        emit(f"genCap{N}PovBhcMeanPp", lambda k=k: jload(cv)[k]["poverty_change_bhc_pp"]["mean"], SIGNED2, cv)
+        emit(f"genCap{N}GiniMeanPp", lambda k=k: jload(cv)[k]["gini_change_pp"]["mean"], SIGNED2, cv)
+
+    def cap_rows():
+        d = jload(cv)
+        return "\n".join(row_tex([
+            lab, f"{d[k]['exchequer_cost_bn']['mean']:.1f} $\\pm$ {d[k]['exchequer_cost_bn']['se']:.1f}",
+            m(d[k]["poverty_change_bhc_pp"]["mean"], SIGNED2), m(d[k]["gini_change_pp"]["mean"], SIGNED2),
+            f"{d[k]['capital_income_added_bn']['mean']:.1f}"]) for k, lab in CAPITAL_VARIANT_LABELS)
+    emit("genCapVariantRows", cap_rows, "{}", cv)
 
 
 def main() -> None:

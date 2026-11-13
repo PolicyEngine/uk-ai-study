@@ -428,6 +428,36 @@ MANIFEST = [
 
 
 # ---------------------------------------------------------------------------
+# Specified but not yet run (Fiscal Studies revision, 13 Nov 2026): runs 15
+# and 16. These stages are runnable with --stages but are kept out of
+# MANIFEST, so --check and the full clean-room build ignore their outputs
+# until they exist. Promote each into MANIFEST (and into the tex_values
+# stage's "after") once its outputs are attested.
+# ---------------------------------------------------------------------------
+NEXT_RUNS = [
+    {
+        "stage": "obr_benchmark",
+        # labour force: OBR March 2026 EFO, 2026 LFS 16+ labour force (see spec)
+        "cmd": [PY, "analysis/next_runs.py", "obr", "--labour-force-m", "OBR_LABOUR_FORCE_M"],
+        "outputs": ["next_runs/obr_benchmark_draws.csv", "next_runs/obr_benchmark_deciles.csv",
+                    "next_runs/obr_benchmark.json"],
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
+        "resumable": True,
+    },
+    {
+        "stage": "capital_variants",
+        "cmd": [PY, "analysis/next_runs.py", "capital"],
+        "outputs": ["next_runs/capital_variants_draws.csv", "next_runs/capital_variants.json"],
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
+        "resumable": True,
+    },
+]
+NEXT_RUN_NAMES = {s["stage"] for s in NEXT_RUNS}
+
+
+# ---------------------------------------------------------------------------
 # DAG utilities
 # ---------------------------------------------------------------------------
 def topo_order(manifest):
@@ -882,10 +912,18 @@ def main():
         attest_existing(args.attest_existing.resolve(), ROOT)
     elif args.dry_run:
         dry_run(MANIFEST)
+        print("\nSpecified, not yet run (excluded from --check): "
+              + ", ".join(f"{s['stage']} -> {s['outputs']}" for s in NEXT_RUNS))
     elif args.check:
         sys.exit(check(MANIFEST, verify_hashes=not args.no_hashes))
     else:
-        build(MANIFEST, keep_build=args.keep_build, only_stages=args.stages)
+        manifest = MANIFEST
+        if args.stages and NEXT_RUN_NAMES & set(args.stages):
+            if any("OBR_LABOUR_FORCE_M" in c for s in NEXT_RUNS for c in s["cmd"]) and \
+                    "obr_benchmark" in args.stages:
+                raise SystemExit("set the OBR labour force in NEXT_RUNS before running obr_benchmark")
+            manifest = MANIFEST + NEXT_RUNS
+        build(manifest, keep_build=args.keep_build, only_stages=args.stages)
 
 
 if __name__ == "__main__":
