@@ -1,180 +1,83 @@
 \section{Results}
 \label{sec:results}
 
-I first report the central scenario and its household mediation, then vary shock size, incidence and adjustment margin. Seed and draw conventions follow Section~\ref{sec:microsim}; $\pm$ values are standard deviations across assignment draws, not sampling standard errors.
+I first report the central scenario and how the tax-benefit system absorbs it, then the two comparisons that organise the paper: who loses the job, and how the earnings loss arrives. The section closes with the assumptions that move the central cost, an account of where the displaced wage bill goes, and a benchmark against the OBR.
 
-\subsection{The three market-income channels}
+\subsection{The central scenario and its three channels}
 \label{sec:results-channels}
 
-The central scenario sets a 7 per cent displacement quota, allocated across occupations in proportion to exposure (at seed 0 it displaces \genCentralDisplacedTwoM~million workers, a realised rate of \genCentralRealisedRatePct~per cent), and grants every surviving employee a wage uplift proportional to occupational complementarity, averaging 2.6 per cent, alongside the capital income channel. Figure~\ref{fig:transition} plots the share of each equivalised disposable income decile that transitions from employment to unemployment. The gradient is \genTransMonotone: \genTransDOnePct~per cent of the bottom decile transitions, against \genTransDTenPct~per cent at the top. % results/jr16/fig4_1_transition_by_decile.csv
-The gradient is not an empirical finding about who AI will in fact displace; it is the exposure-proportional allocation assumption made visible. Because the professional, associate-professional and administrative occupations that score highest on the C-AIOE index sit in the upper half of the income distribution, allocating displacement in proportion to occupational exposure necessarily concentrates job loss among higher-income households. \citet{doorley2026} obtain a similarly top-concentrated simulated profile for Ireland using different microdata and a finer occupational classification. Both results are conditional on exposure-proportional allocation and should not be read as evidence of realised incidence. Section~\ref{sec:results-incidence} therefore varies that assumption.
+Table~\ref{tab:presets} summarises the central scenario and the two presets. Over 50 assignment draws, the central shock displaces \genCentralMcDisplacedMeanM~million employees, costs the Exchequer \pounds\genCentralMcCostMeanBn~billion a year (draw standard deviation \pounds\genCentralMcCostSdBn~billion; standard error of the mean \pounds\genCentralMcCostSeBn~billion), and raises the Gini coefficient by \genCentralMcGiniMeanPp~points from a baseline of \genBaselineGini. The exposure-proportional rule concentrates job loss in higher-income households: \genTransDOnePct~per cent of people in the bottom decile live through a transition to unemployment, against \genTransDTenPct~per cent in the top (Figure~\ref{fig:transition}). That gradient restates the allocation assumption; it is not evidence about who AI will displace.
+
+\begin{table}[htbp]
+\centering
+\caption{Preset scenarios}
+\label{tab:presets}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+Scenario & Displaced & Exchequer cost & \multicolumn{3}{c}{$\Delta$ Poverty (pp)} & $\Delta$ Gini \\
+ & (million) & (\pounds bn/yr) & Abs.\ BHC & Abs.\ AHC & Rel.\ BHC & (pp) \\
+\midrule
+\genPresetMcRows
+% source: results/robustness/central_monte_carlo.json (central); results/low.json, results/high.json (seed 0)
+\bottomrule
+\end{tabular}
+
+\vspace{0.4em}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Exchequer cost is the fall in the government balance; a negative cost is a net gain. Low: 1 per cent displacement, no wage gain. Central: 7 per cent displacement, 2.6 per cent wage gain. High: 13 per cent displacement, 2.6 per cent wage gain. The capital shock applies in every row. Abs.: absolute line fixed at baseline; Rel.: 60 per cent of the shocked median. The relative line is reported for the central case only.}
+\end{table}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=.7\textwidth]{../results/jr16/fig4_1_transition.png}
-\caption{Share of the population transitioning from employment to unemployment by equivalised disposable income decile, central scenario. Bars are means over 50 seeded displacement draws; error bars show 95 per cent intervals for the mean across assignment draws. The gradient reflects the exposure-proportional allocation assumption, not observed incidence (see text).}
+\includegraphics[width=.65\textwidth]{../results/jr16/fig4_1_transition.png}
+\caption{Share of each equivalised disposable income decile that moves from employment to unemployment, central scenario. Means over 50 draws with 95 per cent intervals for the mean.}
 \label{fig:transition}
 \end{figure}
 
-The wage channel, by contrast, is almost distributionally flat. Figure~\ref{fig:wages} shows the percentage change in employment income among workers who remain employed: gains run from \genWageGainDOnePct~per cent in the bottom decile to \genWageGainDTenPct~per cent in the top, % results/jr16/fig4_2_wage_gain_by_decile.csv
-a spread of about 0.2 percentage points around the 2.6 per cent average uplift. Complementarity varies little across the deciles in which people work, so the uplift is close to uniform. Between the two labour-market channels, cross-decile variation comes from the displacement margin. That allocation is a property of the scenario design rather than a finding: in the US evidence of \citet{acemoglu2022tasks}, task displacement operates chiefly through relative wage declines, which account for 50--70 per cent of changes in the wage structure. Section~\ref{sec:results-wagemargin} examines this alternative: a wage-margin implementation of the same headline calibration shifts losses from benefit caseloads to earnings, with a higher fiscal cost and a smaller poverty and inequality response.
+The central cost nets three large flows. Running each channel alone on 20 paired draws, displacement costs \pounds\genChannelMcDispCostAbsBn~billion, while the survivor-wage and capital channels each raise net receipts by \pounds\genChannelMcWageCostAbsBn~billion; the channels sum to within \pounds\genChannelMcInteractionCostAbsBn~billion of the full shock. Per displaced worker, the displacement channel costs \pounds\genCostPerDisplacedGbp{} (mean of the per-draw ratio over \genCostPerDisplacedDraws~draws, standard deviation \pounds\genCostPerDisplacedSdGbp). By tax and benefit, the 50-draw cost combines lost income tax on earnings (\pounds\genCostOtherIncomeTaxAbsBn~billion), employer NI (\pounds\genCostEmployerNiAbsBn~billion), employee NI (\pounds\genCostEmployeeNiAbsBn~billion) and higher Universal Credit (UC) spending (\pounds\genCostUcAbsBn~billion), against higher dividend tax (\pounds\genCostDividendTaxAbsBn~billion), higher savings tax (\pounds\genCostSavingsTaxAbsBn~billion) and lower childcare support (\pounds\genCostChildcareAbsBn~billion). The Exchequer loses the employer contributions on displaced workers' earnings whatever their incidence; whether the saved labour cost returns as taxable profit is the closure question of Section~\ref{sec:results-closure}.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.7\textwidth]{../results/jr16/fig4_2_wages.png}
-\caption{Percentage change in employment income among workers remaining in employment, by income decile, central scenario. Means over 50 seeded draws.}
-\label{fig:wages}
-\end{figure}
+The Gini rises because displaced workers lose all earnings, survivors gain, and the capital uplift accrues mainly in the top decile, which holds \genCapTopSharePct~per cent of baseline capital income. The rise does not depend on the capital channel: on its own the displacement channel raises the Gini by \genChannelMcDispGiniAbsPp~points (20 draws), and with the capital shock switched off the Gini rises in all \genAppGridNoCapGiniPositive{} shocked cells of the grid (Online Appendix~\ref{app:grid}).
 
-The third channel is capital income. The scenario assumes part of the productivity gain is capitalised into returns on existing capital, applying a uniform proportional uplift to interest and dividend income (Section~\ref{sec:shocks}). Although the percentage change is identical across deciles by construction, Figure~\ref{fig:capital} shows the incidence in pounds is heavily concentrated: the top decile holds \genCapTopSharePct~per cent of all capital income (\pounds \genCapTopBn~billion of the \pounds \genCapTotalBn~billion baseline aggregate), the top two deciles together \genCapTopTwoSharePct~per cent, and the bottom decile \genCapBottomSharePct~per cent. Under this proportional allocation, most simulated capital-income gains accrue to households already near the top of the distribution.
+\paragraph{Poverty.} Absolute BHC poverty rises by \genCentralMcPovBhcMeanPp~points (standard error \genCentralMcPovBhcSePp). I read this as an upper bound. Every displaced worker loses a full year of earnings against a poverty line frozen at its baseline value, and the framework over-predicts the poverty response to a past downturn: a uniform 2.6 per cent displacement sized to the 2008--09 rise in unemployment raises simulated absolute BHC poverty by \genBackcastPovBhcAbsPp~points (five draws), while recorded HBAI absolute poverty was roughly flat over 2007/08--2010/11, when benefits were uprated with high inflation and spells were of mixed length (Appendix~\ref{app:backcast}). On the relative line, which moves with the shocked median, the central rise is \genCentralMcRelPovBhcMeanPp~points. At seed~0, \genPovInDisplacedHhPct~per cent of people entering absolute poverty live with a displaced worker, and \genPovSoleEarnerPct~per cent of those households had no other earner.
 
-The capital channel also changes the fiscal result, because the uplift is proportional and the extra interest and dividends are taxed at the household level. Running each channel of the central shock on its own, with the other two held at baseline, over 20 paired draws, the displacement channel costs the Exchequer \pounds\genChannelMcDispCostAbsBn~billion, while the survivor-wage channel raises net receipts by \pounds\genChannelMcWageCostAbsBn~billion and the capital channel by \pounds\genChannelMcCapitalCostAbsBn~billion. The three single-channel results sum to a cost of \pounds\genChannelMcSumCostAbsBn~billion, against \pounds\genChannelMcCentralCostAbsBn~billion for the full shock on the same draws, an interaction of \pounds\genChannelMcInteractionCostAbsBn~billion. Adding back the capital channel's receipts to the full-shock cost gives \pounds\genChannelMcExclCapitalCostAbsBn~billion, the cost the other two channels imply on these draws. The headline cost is therefore a net figure of large offsetting flows, and it depends on the assumed capital-income uplift (Section~\ref{sec:shocks}) and on how much dividend income the microdata carry at the top. % results/robustness/dividend_coverage.json
-
-By tax and benefit, the 50-draw central cost of \pounds\genCostTotalAbsBn~billion combines four losses to the Exchequer with three offsets. Employer National Insurance falls by \pounds\genCostEmployerNiAbsBn~billion, employee National Insurance by \pounds\genCostEmployeeNiAbsBn~billion and income tax other than on savings and dividends by \pounds\genCostOtherIncomeTaxAbsBn~billion, and Universal Credit spending rises by \pounds\genCostUcAbsBn~billion. Against these, dividend tax rises by \pounds\genCostDividendTaxAbsBn~billion and savings tax by \pounds\genCostSavingsTaxAbsBn~billion, so income tax as a whole rises by \pounds\genCostIncomeTaxAbsBn~billion; childcare support spending falls by \pounds\genCostChildcareAbsBn~billion; and the remaining items net to less than \pounds 0.1~billion. Employer contributions fall with each displaced employee's earnings. Excluding them, the central scenario is a net gain to the Exchequer of \pounds\genCostExclEmployerNiAbsBn~billion; this is the relevant figure for readers who treat employer contributions as part of labour cost rather than as a tax on households. % results/robustness/central_cost_decomposition.json
-
-Microcosm is calibrated to HMRC Survey of Personal Incomes income by band up to \pounds 1 million of total income. Its 2026 dividend income of people with total income of at least \pounds 12{,}570 is \genDivRatioAbsPct~per cent \genDivRatioDirection{} the SPI projection for that year; scaling those dividends to the projection changes the central cost from \pounds \genDivCentralCostMeanBn~billion to \pounds \genDivSpiCostMeanBn~billion (means over \genDivDraws~shared draws; Appendix~\ref{app:dataset-change} reports banded and savings-interest variants). The processed survey file used in an earlier version of this paper carried almost no dividends, so its capital channel ran almost entirely through savings interest: it held \pounds 23 billion of baseline capital income, against \pounds \genBaseCapitalBn~billion here. % earlier file: results/jr16/fig4_3_capital_by_decile.csv at commit 5d75106
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.7\textwidth]{../results/jr16/fig4_3_capital.png}
-\caption{Capital income channel by decile: a uniform proportional uplift, but pound gains concentrated where capital income is held.}
-\label{fig:capital}
-\end{figure}
-
-\subsection{Household mediation of the shock}
-\label{sec:results-mediation}
-
-The tax-benefit system converts each market-income loss into a smaller disposable-income loss; Figure~\ref{fig:decomp} decomposes that mediation by decile into market income, benefits, and taxes and contributions, all expressed relative to baseline disposable income. The decomposition is household-level and additive: market income change plus benefit change minus tax change equals the disposable income change up to an explicit residual, which collects perimeter items inside the HBAI concept (council tax and pension deductions) and never exceeds \genDecompResidualMaxPct~per cent of baseline income in any decile.
-
-The capital channel reshapes this mediation. In the seed-0 draw the largest disposable-income loss falls in decile~\genDecompWorstDecile: market income changes by $\genDecompMarketWorstSignedPct$ per cent of baseline disposable income, benefits by $\genDecompBenWorstSignedPct$ per cent and lower taxes and contributions return $\genDecompTaxWorstSignedPct$ per cent, leaving, with the HBAI perimeter items, a disposable-income change of $\genDecompDispWorstSignedPct$ per cent. Benefits and lower taxes and contributions offset about \genDecompAbsorbedTbWorstPct~per cent of the market loss, and \genDecompAbsorbedWorstPct~per cent including the perimeter items. In the top decile the capital uplift offsets the earnings lost by displaced workers: market income changes by $\genDecompMarketDTenSignedPct$ per cent and disposable income by $\genDecompDispDTenSignedPct$ per cent. Figure~\ref{fig:decomp} weights households once; the 20-draw profile instead weights each household by its number of members (the basis of Figures~\ref{fig:decomp-ci}, \ref{fig:b7}, \ref{fig:b8} and~\ref{fig:b9}). Averaged over 20 displacement draws on that basis, the largest mean loss, \genDecompCiMaxLossPct~per cent, falls in decile~\genDecompCiMaxLossDecile, and the top decile changes by $\genDecompCiDTenSignedPct$ per cent (95 per cent interval for the mean $[\genDecompCiDTenLoPct, \genDecompCiDTenHiPct]$). The loss profile is therefore hump-shaped rather than rising with income: displacement losses concentrate in the upper-middle deciles, while capital-income gains offset them at the top. The bottom-decile result depends on how households are ranked. Under the HBAI ranking, decile~1 changes by $\genDecileRankHbaiDOneSignedPct$ per cent; ranked on income before pension contributions it changes by $\genDecileRankPrePensionDOneSignedPct$ per cent, and excluding the \genDecileRankExclHouseholds~households whose personal pension contributions exceed both \pounds\genDecileRankLargePpcFloorGbp{} and their earnings it changes by $\genDecileRankExclDOneSignedPct$ per cent. The bottom-decile change \genDecileOneRobustness: under HBAI, a small number of heavily weighted households with large personal pension contributions sit in decile~1 and receive capital income, so I do not report a bottom-decile result as a finding. % seed-0 components from results/jr16/fig4_4_decomposition.csv; 20-draw means from results/appendix/decomposition_ci.csv
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.85\textwidth]{../results/jr16/fig4_4_decomposition.png}
-\caption{Additive household-level decomposition of the change in income by decile into market income, benefits, and taxes and contributions, central scenario (single draw, seed 0), as a share of baseline HBAI disposable income. The residual collects perimeter items (council tax, pension deductions) inside the HBAI concept.}
-\label{fig:decomp}
-\end{figure}
-
-\subsection{Fiscal and distributional aggregates}
-\label{sec:results-aggregates}
-
-Table~\ref{tab:presets} summarises the preset scenarios. In the central scenario (seed 0, realised displacement rate \genCentralRealisedRatePct~per cent) the annual Exchequer cost is \pounds \genCentralCostBn~billion: lost income tax and National Insurance on displaced workers and higher benefit spending, net of higher receipts from the survivor-wage and capital channels. Poverty rises by \genCentralPovBhcPp~percentage points before housing costs (\genCentralPovAhcPp~points after housing costs) and the Gini coefficient of equivalised disposable income rises by \genCentralGiniChangePp~percentage points from a baseline of \genBaselineGini. The low scenario---a 1 per cent displacement rate with no wage gain, which I treat as a sensitivity case rather than an estimate drawn from the literature---improves the Exchequer balance by \pounds \genLowGainBn~billion, because the revenue from the capital-income uplift exceeds the cost of 1 per cent displacement; poverty changes by $\genLowPovBhcSignedPp$ (BHC) and $\genLowPovAhcSignedPp$ (AHC) points and the Gini by $\genLowGiniSignedPp$ points. The high scenario, at 13 per cent displacement, costs \pounds \genHighCostBn~billion a year with poverty up \genHighPovBhcPp~points. PolicyEngine's before-housing-costs poverty line is an \emph{absolute} threshold, so these poverty changes are measured against a fixed threshold, not relative to a shock-shifted median. On the relative (60 per cent of contemporaneous median) BHC line the central scenario changes poverty by $\genCentralMcRelPovBhcMeanSignedPp \pm \genCentralMcRelPovBhcSdPp$ percentage points over 50 draws, against $\genCentralMcPovBhcMeanSignedPp$ points on the absolute line; the relative line moves with the shocked median. % results/robustness/central_monte_carlo.json relative_poverty_change_bhc_pp
-
-The scenario anchors are calibration conventions rather than forecasts (Section~\ref{sec:scenarios}); in particular, the low scenario is not an employment estimate from \citet{acemoglu2025}, whose 0.9--1.1 per cent figure refers to ten-year GDP growth.
-
-Absolute poverty barely moved in recent UK downturns, so I decompose the central poverty response. The \genPovNetPp-point net change (seed 0) is a gross inflow of \genPovInflowM~million people (\genPovInflowPp~points), \genPovInDisplacedHhPct~per cent of them in households containing a displaced worker, net of a \genPovOutflowM-million outflow (\genPovOutflowPp~points) lifted over the line by the capital and survivor-wage channels. The entrants come from across baseline deciles 2--10 (\genPovTopDecilePct~per cent from the top decile, where a displaced sole earner falls the full distance), their households start at a median \genPovEntrantRatio~times the poverty line, and they land at a median \genPovEntrantShortfallPct~per cent below it. \genPovSoleEarnerPct~per cent depended entirely on the displaced worker's earnings. The magnitude follows from the framework's polar assumptions---full-year earnings loss and Universal Credit replacement rates against a baseline-fixed line; the duration and wage-margin sensitivities below show how it changes when those assumptions are relaxed, and a 2008--09-sized backcast in Appendix~\ref{app:backcast} quantifies how much of a recession's measured poverty response the excluded uprating and duration channels absorb in practice. % results/robustness/poverty_decomposition.json
-
-\begin{table}[htbp]
-\centering
-\caption{Summary of preset scenarios (single draw, seed 0)}
-\label{tab:presets}
-\small
-\begin{tabular}{lrrrrr}
-\toprule
-Scenario & Displaced & Exchequer cost & \multicolumn{2}{c}{$\Delta$ Poverty (pp)} & $\Delta$ Gini \\
- & (million) & (\pounds bn/yr) & BHC & AHC & (pp) \\
-\midrule
-\genPresetRows
-% source: results/low.json, results/central.json, results/high.json (seed 0)
-\bottomrule
-\end{tabular}
-
-\vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Exchequer cost is the fall in the government balance; a negative cost is a net gain. Low: 1 per cent displacement, no wage gain (sensitivity case). Central: 7 per cent displacement, 2.6 per cent wage gain. High: 13 per cent displacement, 2.6 per cent wage gain. The capital-return shock (+0.4pp) applies in every preset.}
-\end{table}
-
-Seed 0 lies at the low end of the 50 exposure-proportional draws for poverty and inequality: its BHC poverty change ranks \genSeedZeroRankPovBhc{} of 50 from the bottom, its AHC change \genSeedZeroRankPovAhc{} and its Gini change \genSeedZeroRankGini{}, while its cost ranks \genSeedZeroRankCost. Single-draw (seed-0) tables therefore understate the mean poverty and Gini responses; their cost figures sit close to the mean. Across the 50 assignment draws, the mean Exchequer cost is \pounds \genCentralMcCostMeanBn~billion (assignment-draw standard deviation \pounds \genCentralMcCostSdBn~billion; range \pounds \genCentralMcCostMinBn--\genCentralMcCostMaxBn~billion), with mean poverty and Gini increases of $\genCentralMcPovBhcMeanPp \pm \genCentralMcPovBhcSdPp$ and $\genCentralMcGiniMeanPp \pm \genCentralMcGiniSdPp$ percentage points. Replacing C-AIOE with the DSIT AIOE mapping lowers the seed-0 Exchequer cost by \pounds\genIndexDsitDiffAbsBn~billion, and the GPT-exposure measure of \citet{eloundou2023} lowers it by \pounds\genIndexEloundouDiffAbsBn~billion. Appendix~\ref{app:index-sensitivity} reports the transition gradients under each index. % results/robustness/index_sensitivity_full.json
-
-Two tested assumptions change the headline numbers. The first is displacement duration. The central scenario removes a full year of earnings from every displaced worker. Under a 50 per cent earnings-retention hybrid---annual earnings are halved while employment status and hours remain those of full-year unemployment, so this approximates rather than models a six-month spell---the central cost of \pounds \genDurCentralCostMeanBn~billion (the central scenario on the same \genDurTakeupDraws~draws) turns into a net gain to the Exchequer of \pounds \genDurSixMoCostMeanAbsBn~$\pm$~\genDurSixMoCostSdBn~billion, and the BHC poverty change falls to $\genDurSixMoPovBhcMeanSignedPp \pm \genDurSixMoPovBhcSdPp$ points, over \genDurTakeupDraws~draws. Halving the full-year cost on the same draws would give \pounds \genDurCentralCostHalfBn~billion. The sign changes because the hybrid shrinks only the displacement channel: workers who keep half a year's earnings remain taxpayers and draw less means-tested support, while the survivor-wage and capital channels, which raise net receipts by \pounds\genChannelMcWageCostAbsBn~billion (survivor wages) and \pounds\genChannelMcCapitalCostAbsBn~billion (capital income) in the channel split, do not depend on duration. The displacement channel's fiscal and poverty effects scale with the expected out-of-work duration, and the headline figures describe a full-year no-reemployment case. The second is benefit take-up. Imposing a 70 per cent Universal Credit take-up probability (drawn identically in baseline and shocked worlds) raises the cost from \pounds \genDurCentralCostMeanBn~billion to \pounds \genTakeupCostMeanBn~$\pm$~\genTakeupCostSdBn~billion and lowers the poverty change to $\genTakeupPovBhcMeanSignedPp \pm \genTakeupPovBhcSdPp$ points. Microcosm's own take-up flags give a person-weighted baseline claim propensity of \genTakeupBaselinePropensityPct~per cent, so a flat 70 per cent raises claiming among newly entitled households: Universal Credit spending then rises by more, and fewer of them fall below the line. Microcosm's own take-up flags already apply in the central draws, where higher Universal Credit spending accounts for \pounds\genCostUcAbsBn~billion of the cost. % results/robustness/duration_takeup_sensitivity.json (variant half_earnings_retention)
-
-\subsection{The shock-size grid}
-\label{sec:results-grid}
-
-To move beyond the presets I simulate a grid of 66 scenarios, crossing eleven displacement rates (0 to 10 per cent of employees, allocated in proportion to exposure, as in the presets) with six wage uplifts (0 to 5 per cent), each combined with the capital income channel, all under exposure-proportional incidence. Figure~\ref{fig:griddisp} maps the change in average household disposable income. The corners bracket the range: with a 5 per cent wage gain and no job loss, average disposable income changes by $\genGridDispMaxPct$ per cent; with 10 per cent displacement and no wage gain it changes by $\genGridDispMinPct$ per cent. % results/jr16/grid.csv
-The capital channel shifts the whole surface upwards: on its own (no displacement, no wage gain) it raises average disposable income by $\genGridCapOnlyDispPct$ per cent. With no wage growth, average disposable income still rises at 3 per cent displacement ($\genGridDispThreeZeroPct$ per cent) and first falls at 4 per cent ($\genGridDispFourZeroPct$ per cent); at the central 7 per cent displacement rate it falls with up to 4 per cent wage growth ($\genGridDispSevenFourPct$ per cent) and rises slightly with 5 per cent ($\genGridDispSevenFivePct$ per cent). Whether AI raises or lowers average living standards in this grid therefore depends on the balance between displacement and wage growth, and on the assumed capital-return shock, all of which are uncertain.
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.85\textwidth]{../results/jr16/fig4_5_disposable_grid.png}
-\caption{Change in average household disposable income (per cent) across the 66-cell grid of displacement rates and wage uplifts (single draw, seed 0).}
-\label{fig:griddisp}
-\end{figure}
-
-Figure~\ref{fig:gridrev} shows the corresponding fiscal picture. One measurement issue deserves note: in PolicyEngine's UK aggregates, income tax plus National Insurance minus total benefit expenditure (which includes the state pension) is a negative number, so expressing revenue changes relative to that net position produces uninformative percentages. I therefore express the net revenue change relative to gross income tax and National Insurance receipts as simulated on the household microdata (about \pounds \genGridReceiptsBn~billion); this base is smaller than headline OBR receipts, which include employer contributions and income outside the household universe. Two consequences follow. First, the grid's revenue measure is income tax plus National Insurance minus cash benefit expenditure, a narrower concept than the full government-balance measure behind the \pounds \genCentralMcCostMeanBn~billion headline cost of Section~\ref{sec:results-aggregates}, which also includes employer National Insurance, indirect taxes and other levies. Over the 50 central draws the narrow cash basis shows a net gain of \pounds\genCostNarrowCashAbsBn~billion, against a cost of \pounds\genCostTotalAbsBn~billion on the government balance; the gap of \pounds\genCostBasisGapAbsBn~billion matches the employer National Insurance component of \pounds\genCostEmployerNiAbsBn~billion, and the two measures should not be read off the same surface. Second, on that narrower basis the grid spans a gain of \pounds \genGridRevGainBn~billion, or \genGridRevGainPct~per cent of receipts (5 per cent wage growth, no displacement), to a loss of \pounds \genGridRevLossBn~billion, or \genGridRevLossPct~per cent of receipts, in the worst cell (10 per cent displacement, no wage growth). On this narrow basis the capital shock alone adds \pounds \genGridCapOnlyRevBn~billion of net revenue. At the central displacement rate, net revenue falls by \pounds\genGridRevSevenZeroAbsBn~billion with no wage offset (\genGridRevSevenZeroAbsPct~per cent of receipts) and rises by \pounds\genGridRevSevenThreeAbsBn~billion with a 3 per cent wage uplift. % results/jr16/grid.csv
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.85\textwidth]{../results/jr16/fig4_6_exchequer_grid.png}
-\caption{Net Exchequer revenue change as a percentage of gross income tax and National Insurance receipts, across the 66-cell scenario grid.}
-\label{fig:gridrev}
-\end{figure}
-
-Figure~\ref{fig:gridgini} maps the change in the Gini coefficient across the same grid. The Gini rises in all \genGridCells{} cells, from $\genGridGiniMinSignedPp$ percentage points in the capital-only cell (no displacement, no wage gain) to $\genGridGiniMaxSignedPp$ points at the far corner. The capital channel alone accounts for a substantial part of the rise, because the uplift accrues mainly to the top decile; displacement adds to it by pushing affected households down the distribution, and the wage uplift by lifting surviving workers further from workless and low-income households. Because each cell is a single draw on uneven weights, the Gini change is not strictly monotone in the displacement rate; the cross-draw spread reported for the central scenario (Section~\ref{sec:results-aggregates}) indicates the scale of that noise. Within the model, inequality rises even though the displacement shock lands mainly on higher earners.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.85\textwidth]{../results/jr16/fig4_7_gini_grid.png}
-\caption{Change in the Gini coefficient of equivalised HBAI disposable income (percentage points) across the 66-cell scenario grid. The Gini rises in every cell.}
-\label{fig:gridgini}
-\end{figure}
-
-\subsection{The incidence axis: who bears the shock}
+\subsection{Who loses the job}
 \label{sec:results-incidence}
 
-Everything so far conditions on exposure-proportional incidence. But allocation is at least as uncertain as shock size, so I reallocate the same central calibration across five families. Four are stylised: exposure-proportional, junior-concentrated, expertise-compression (implemented as a high-earner displacement tilt, not the \citet{hosseinilichtinger2026barriers} wage mechanism; Section~\ref{sec:incidence}) and uniform. The fifth is a Klein-anchored top-loaded stress test: exposure-proportional draws multiplied by an author-imposed junior tilt (1.29) and wage-tier tilt (9.6 above, 0.6 below median person earnings). Table~\ref{tab:incidence} gives means and assignment-draw standard deviations over 50 paired seeds.
+Table~\ref{tab:incidence} reallocates the same expected number of displaced workers across the five rules of Section~\ref{sec:incidence}; survivor wages and capital income are identical at the person level. Across the four stylised rules the Exchequer cost runs from \pounds\genIncUniformCostMeanBn~billion (uniform) to \pounds\genIncCompressionCostMeanBn~billion (expertise compression); the top-loaded stress test costs \pounds\genIncKleinCostMeanBn~billion. The cost tracks the earnings of those displaced. Adding the survivor-wage and capital channels back, the displacement channel costs about \pounds\genFamPerWorkerUniformGbp{} per displaced worker under uniform incidence, \pounds\genFamPerWorkerExposureGbp{} under exposure-proportional, \pounds\genFamPerWorkerCompressionGbp{} under expertise compression and \pounds\genFamPerWorkerKleinGbp{} under the stress test (50-draw means, assuming the channels add up, as they do to within \pounds\genChannelMcInteractionCostAbsBn~billion in the central case).
 
 \begin{table}[htbp]
 \centering
-\caption{Central shock under five incidence calibrations}
+\caption{The central shock under five displacement rules (50 paired draws)}
 \label{tab:incidence}
 \small
 \setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.12}
 \begin{tabular}{lrrrrr}
 \toprule
-Incidence family & Displaced & Exchequer cost & \multicolumn{2}{c}{$\Delta$ Poverty (pp)} & $\Delta$ Gini \\
+Displacement rule & Displaced & Exchequer cost & \multicolumn{2}{c}{$\Delta$ Poverty (pp)} & $\Delta$ Gini \\
  & (million) & (\pounds bn/yr) & BHC & AHC & (pp) \\
 \midrule
 \genIncidenceRows
-% source: results/robustness/incidence_monte_carlo.json (means/sd); displaced: 50-draw mean from results/robustness/incidence_draws_five.csv
+% source: results/robustness/incidence_monte_carlo.json; displaced: results/robustness/incidence_draws_five.csv
 \bottomrule
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means $\pm$ assignment-draw standard deviations over 50 paired seeds. Displaced is the 50-draw mean weighted count; every family has the same expected count, and single draws differ. Exchequer cost is the fall in the government balance. Assignment quantiles and Monte Carlo standard errors are reported separately in the machine-readable summary; they describe allocation noise, not population uncertainty. The Klein-anchored family combines exposure with author-imposed junior (1.29) and wage-tier (9.6 above / 0.6 below median person earnings) multipliers. The wage-tier values use press-release maximum-exposure scalings rather than the paper's per-standard-deviation estimates; this is a stress test, not an estimated displacement schedule. }
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means $\pm$ standard deviations across 50 shared assignment draws; divide a standard deviation by $\sqrt{50}$ for the standard error of the mean. Every rule has the same expected displaced count. The top-loaded stress test multiplies exposure-proportional probabilities by a junior factor (1.29) and wage-tier factors (9.6 above and 0.6 below median person earnings).}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.95\textwidth]{../results/incidence/incidence_families.png}
-\caption{Decile incidence of the same aggregate central shock under five incidence families: share of each decile transitioning to unemployment, and change in equivalised HBAI disposable income by decile. The figure shows a single illustrative draw (seed 0), whereas the aggregates in Table~\ref{tab:incidence} are means over 50 Monte Carlo draws.}
-\label{fig:incidence}
-\end{figure}
+Because the rules share assignment seeds, I compare them draw by draw. Uniform incidence costs \pounds\genPairUniExpCostMeanAbs~billion less than exposure-proportional incidence (paired 95 per cent interval $[\genPairUniExpCostLo, \genPairUniExpCostHi]$) and expertise compression \pounds\genPairCompExpCostMeanAbs~billion more ($[\genPairCompExpCostLo, \genPairCompExpCostHi]$); the junior tilt changes the cost by $\genPairJunExpCostMean$ billion ($[\genPairJunExpCostLo, \genPairJunExpCostHi]$), because the tilt operates within fixed occupation quotas and young workers sit mostly in low-exposure groups. These intervals describe assignment noise across 50 draws and narrow as draws are added; they carry no information about survey sampling or about which rule is right.
 
-Within these calibrations, who bears the shock changes its simulated cost. The mean Exchequer cost is \pounds \genIncUniformCostMeanBn~billion under uniform incidence and \pounds \genIncKleinCostMeanBn~billion under the Klein-anchored stress test, generated by reallocating which workers lose their jobs; paired over the shared draws, the Klein-anchored stress test costs \pounds\genPairKleinExpCostMeanAbs~billion more than exposure-proportional incidence (paired 95 per cent interval $[\genPairKleinExpCostLo, \genPairKleinExpCostHi]$). Displacing workers with higher earnings removes larger income tax and National Insurance liabilities. These are paired-seed scenario comparisons, not population confidence statements.
+Poverty does not follow cost. Relative to exposure-proportional incidence, uniform incidence raises BHC poverty by a further $\genPairUniExpPovMean$ points ($[\genPairUniExpPovLo, \genPairUniExpPovHi]$) and the Gini by $\genPairUniExpGiniMean$ points while costing less, and expertise compression raises poverty by $\genPairCompExpPovMean$ points more ($[\genPairCompExpPovLo, \genPairCompExpPovHi]$) while costing more. Two routes could produce this ordering. Uniform incidence displaces more workers in lower-income households, which start closer to the line; the high-earner tilts displace more sole earners, whose households fall the full distance. The saved draws do not separate the two routes; the runs specified for the next revision record the decile flows that would (Section~\ref{sec:limitations}).
 
-% Paired 95% intervals recomputed from results/robustness/incidence_draws_five.csv (clean-room rebuild vintage; paired normal interval on draw-level differences, 50 shared seeds).
-Across the four stylised families, the mean BHC poverty change lies between $\genIncStylisedPovBhcMeanMinSignedPp$ and $\genIncStylisedPovBhcMeanMaxSignedPp$ percentage points, while mean Exchequer costs span \pounds \genIncStylisedCostSpanBn~billion. Because the families share assignment seeds, draw-level \emph{differences} support paired inference (paired 95 per cent intervals in brackets). All families share the central wage and capital axis, so each comparison isolates displacement allocation.
-{\sloppy
-\begin{itemize}
-\item Expertise compression minus exposure-proportional: BHC poverty $\genPairCompExpPovMean$ points ($[\genPairCompExpPovLo, \genPairCompExpPovHi]$, \genPairCompExpPovSig\ from zero); cost \pounds\genPairCompExpCostMeanAbs~billion higher ($[\genPairCompExpCostLo, \genPairCompExpCostHi]$, \genPairCompExpCostSig).
-\item Uniform minus exposure-proportional: BHC poverty $\genPairUniExpPovMean$ points ($[\genPairUniExpPovLo, \genPairUniExpPovHi]$, \genPairUniExpPovSig); cost \pounds\genPairUniExpCostMeanAbs~billion lower ($[\genPairUniExpCostLo, \genPairUniExpCostHi]$, \genPairUniExpCostSig); Gini $\genPairUniExpGiniMean$ points ($[\genPairUniExpGiniLo, \genPairUniExpGiniHi]$, \genPairUniExpGiniSig).
-\item Junior-concentrated minus exposure-proportional: cost \pounds\genPairJunExpCostMeanAbs~billion lower ($[\genPairJunExpCostLo, \genPairJunExpCostHi]$, \genPairJunExpCostSig); BHC poverty $\genPairJunExpPovMean$ points ($[\genPairJunExpPovLo, \genPairJunExpPovHi]$, \genPairJunExpPovSig).
-\end{itemize}
-\par}
-These paired intervals describe assignment-draw noise only, not population sampling uncertainty. Poverty does not follow the cost ranking. The two top-loaded families raise BHC poverty by more than exposure-proportional incidence ($\genIncCompressionPovBhcMeanSignedPp$ and $\genIncKleinPovBhcMeanSignedPp$ against $\genIncExposurePovBhcMeanSignedPp$ points), and uniform incidence raises both poverty and the Gini by more while costing less. Whether a displaced household falls below the fixed line depends on how far its income falls relative to the line and on its entitlement to means-tested support, and both differ across the families; I do not decompose these differences further. % paired intervals from results/robustness/incidence_draws_five.csv (50 shared seeds)
-
-Two families are author-imposed top-loaded calibrations. The mean cost under expertise compression is \pounds \genIncCompressionCostMeanBn~billion and changes BHC poverty by $\genIncCompressionPovBhcMeanSignedPp$ points. The Klein-anchored stress test has means of \pounds \genIncKleinCostMeanBn~billion and $\genIncKleinPovBhcMeanSignedPp$ points; its AHC effect is evaluated over the same 50 assignment draws. Its wage-tier multiplier produces the most top-tilted seed-0 gradient, from \genIncKleinTransDOnePct~per cent transitioning in the bottom decile to \genIncKleinTransDTenPct~per cent in the top. These magnitudes are conditional on the stress-test mapping and are not estimates transported from Klein Teeselink.
-
-The 50-draw mean Gini change across the five simulated families runs from $\genIncFamilyGiniMeanMinSignedPp$ to $\genIncFamilyGiniMeanMaxSignedPp$ percentage points, and the Gini rises in all 66 grid cells (in the appendix's capital-off variant of the grid the null cell with no shock at all is exactly zero, as it must be). The Klein-anchored minus expertise-compression Gini difference is $\genPairKleinCompGiniMean$ points ($[\genPairKleinCompGiniLo, \genPairKleinCompGiniHi]$, \genPairKleinCompGiniSig). The directional result is conditional on these displacement calibrations.
-
-\subsection{The adjustment margin: wage cuts versus displacement}
+\subsection{How the earnings loss arrives}
 \label{sec:results-wagemargin}
 
-The incidence families reallocate displacement across workers; the wage-margin family instead moves the same shock to the wage margin. Every employee keeps their job, and earnings are removed through author-imposed occupation-level cuts proportional to C-AIOE or PSS, calibrated so that the aggregate employee-earnings loss equals the realised gross earnings loss of the paired central displacement draw---\genGrossCutSharePct~per cent of the baseline wage bill at seed 0 (recorded target share \genGrossCutShareRaw), larger than the 7 per cent head-count rate because group job-loss rates correlate with group pay; the equality is asserted in code. The PSS rows are a PSS-ranked wage-cut stress test, not the \citet{hosseinilichtinger2026barriers} labour-supply mechanism. Table~\ref{tab:wagemargin} compares these clearly labelled calibrations on the seed-0 basis. % results/wage_margin_central.json gross_cut_share_target
+Table~\ref{tab:wagemargin} moves the same gross earnings loss from job loss to wage cuts. The comparison is paired at seed~0, where the displacement draw removes \genGrossCutSharePct~per cent of the baseline wage bill and costs \pounds\genCentralCostBn~billion (close to the 50-draw mean). Delivered as occupation-level wage cuts, the same loss costs \pounds\genWageMarginCentralCostBn~billion and raises BHC poverty by only $\genWageMarginCentralPovBhcSignedPp$ points, against $\genCentralPovBhcSignedPp$ under job loss.
 
 \begin{table}[htbp]
 \centering
-\caption{The headline calibration on two adjustment margins (central calibration; displacement row single draw, seed 0; wage-margin rows deterministic given the seed-0 loss target)}
+\caption{The same gross earnings loss on two margins (paired at seed 0)}
 \label{tab:wagemargin}
 \small
 \begin{tabular}{lrrrr}
@@ -188,21 +91,16 @@ Scenario & Exchequer cost & \multicolumn{2}{c}{$\Delta$ Poverty (pp)} & $\Delta$
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} The wage-margin rows remove the same aggregate gross earnings as the paired seed-0 central displacement draw (\genGrossCutSharePct~per cent of the baseline employee wage bill); the displacement row removes the earnings of a weighted \genCentralRealisedRatePct~per cent of employees (7 per cent quota). All rows apply the 2.6 per cent wage uplift and the capital shock. The wage-margin scenarios displace no one: cuts are occupation-level percentages proportional to the stated gradient, calibrated to the stated baseline-wage-bill share.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Every row removes \genGrossCutSharePct~per cent of the baseline employee wage bill before the 2.6 per cent uplift and the capital shock, which apply in all rows. The wage-margin rows displace no one; cuts are proportional to the stated occupation gradient.}
 \end{table}
 
-Three contrasts stand out. First, under the simulated wage schedules the fiscal cost rises from \pounds \genCentralCostBn~billion to \pounds \genWageMarginCentralCostBn~billion (\pounds \genWageMarginPssCostBn~billion under the PSS gradient). Wage cuts remove earnings taxed at marginal income tax and National Insurance rates, whereas displacement removes whole earnings, including the part covered by allowances and thresholds, so it forgoes less tax per pound of lost earnings; that difference exceeds the extra means-tested benefit spending that displacement triggers. This comparison is conditional on these calibrations and does not establish a general lower bound.
+The margin changes how much of each lost pound the Exchequer absorbs. Displacement alone (seed~0, no wage or capital channel) removes \pounds\genFaWageBillBn~billion of earnings and costs the government balance \genAbsJobGovPct~pence per pound; on the household basis that excludes employer NI (income tax, employee NI and benefits, the stabilisation coefficient of \citet{dolls2012}) it costs \genAbsJobHhPct~pence. Cutting survivors' wages from the survivor-wage grid's 0 to $-2.6$ per cent row costs \genAbsWageGovPct~pence per pound on the government balance. A wage cut removes pounds taxed at the worker's marginal rates of income tax and NI, and withdraws UC at the taper; job loss removes whole earnings, including the slice covered by the personal allowance and NI thresholds, and the UC it adds is small relative to the tax it forgoes. Poverty moves the other way: concentrated losses push displaced households across the line, while the same loss spread across \genDataEmployeesM~million employees moves few households below it.
 
-Second, the poverty effect falls in the simulated wage-cut cases: the $\genCentralPovBhcSignedPp$-point BHC poverty change becomes $\genWageMarginCentralPovBhcSignedPp$ points under the C-AIOE gradient and $\genWageMarginPssPovBhcSignedPp$ under PSS. Spreading the calibrated loss across employees pushes fewer households across the frozen absolute line than concentrating losses on displaced workers; this does not establish a bound for other wage schedules.
-
-Third, the inequality effect is smaller under both author-chosen wage gradients: the Gini changes by $\genWageMarginCentralGiniSignedPp$ and $\genWageMarginPssGiniSignedPp$ points, against $\genCentralGiniSignedPp$ points for displacement and $\genGridGiniMinSignedPp$ points for the capital-only grid cell. Percentage cuts scale with gradients concentrated in well-paid occupations and compress earnings from above, while the capital uplift widens the distribution. The comparison shows that poverty and inequality conclusions depend on both the adjustment margin and its imposed schedule; it does not establish a universal fiscal or distributional result.
-
-Table~\ref{tab:mixedwage} makes the like-for-like comparison. In every row gross earnings loss before the common uplift is \genGrossCutSharePct~per cent of the baseline wage bill, exactly the loss realised in the seed-0 central/exposure draw to which the exercise is paired. Moving that fixed loss from wage cuts to displacement changes the Exchequer cost from \pounds \genMixedZeroCostBn~billion to \pounds \genMixedOneCostBn~billion, BHC poverty from $\genMixedZeroPovBhcPp$ to $\genMixedOnePovBhcPp$ points and the Gini effect from $\genMixedZeroGiniPp$ to $\genMixedOneGiniPp$ points. The half-index case has a cost of \pounds \genMixedHalfCostBn~billion, with poverty and Gini changes of $\genMixedHalfPovBhcPp$ and $\genMixedHalfGiniPp$ points. Net employee-income changes after the uplift move from $\genMixedNetEmpZeroSignedPct$ to $\genMixedNetEmpOneSignedPct$ per cent, because fewer survivors receive the uplift as displacement rises; the pre-uplift loss being compared is invariant. % results/robustness/mixed_adjustment.csv
-These patterns are conditional on this author-designed allocation rule; they are not structural causal estimates.
+Table~\ref{tab:mixedwage} holds the gross loss fixed and moves it between margins. As the displaced share $\lambda$ rises from 0 to 1, the cost falls from \pounds\genMixedZeroCostBn~billion to \pounds\genMixedOneCostBn~billion and BHC poverty rises from $\genMixedZeroPovBhcPp$ to $\genMixedOnePovBhcPp$ points. The second panel shows the survivor-wage assumption: with no pass-through to survivors the central cost is \pounds\genSurvivorZeroCostBn~billion, and a 2.6 per cent survivor-wage decline gives \pounds\genSurvivorMinusTwoCostBn~billion.
 
 \begin{table}[htbp]
 \centering
-\caption{Adjustment-margin and survivor-wage sensitivities (seed 0, 2026)}
+\caption{Adjustment-margin and survivor-wage sensitivities (seed 0)}
 \label{tab:mixedwage}
 \small
 \begin{tabular}{lrrrr}
@@ -210,32 +108,74 @@ These patterns are conditional on this author-designed allocation rule; they are
 Scenario & Displaced & Exchequer cost & $\Delta$ Poverty & $\Delta$ Gini \\
  & (million) & (\pounds bn/yr) & BHC (pp) & (pp) \\
 \midrule
-\multicolumn{5}{l}{\emph{Fixed gross earnings loss (\genGrossCutSharePct~per cent); $\lambda$ scales displacement}} \\
+\multicolumn{5}{l}{\emph{Fixed gross earnings loss (\genGrossCutSharePct~per cent); $\lambda$ is the displaced share}} \\
 \genMixedRows
 \midrule
-\multicolumn{5}{l}{\emph{Central 7 per cent displacement with alternative survivor-wage effects}} \\
+\multicolumn{5}{l}{\emph{Central displacement draw with alternative survivor-wage effects}} \\
 \genSurvivorRows
 % source: results/robustness/mixed_adjustment.csv, results/robustness/survivor_wage_grid.csv
 \bottomrule
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} In the mixed panel, $\lambda$ thins the central 7 per cent employee-displacement draw and C-AIOE-graded survivor cuts fill the gap to that same seed-0 draw's gross pre-uplift earnings loss (\genGrossCutSharePct~per cent of the wage bill). Gross loss is identical in every row; the 2.6 per cent complementarity-graded uplift and capital shock then apply. The pure wage-cut endpoint therefore matches the C-AIOE wage-margin row's gross-loss calibration. The second panel holds displaced workers and the capital shock fixed and changes only the employment-weighted survivor-wage parameter. These are author-designed reduced-form comparative statics, not estimates of equilibrium wage responses.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} In the first panel C-AIOE-graded survivor cuts fill the gap between the thinned displacement draw and the fixed gross loss; $\lambda=1$ is the central draw. The second panel holds the displaced and the capital shock fixed and changes the mean survivor-wage effect, keeping the complementarity gradient.}
 \end{table}
 
-The second panel holds the \genCentralDisplacedTwoM~million displaced workers fixed and varies survivor wages. Removing the productivity pass-through changes the Exchequer cost from \pounds \genSurvivorPlusTwoCostBn~billion to \pounds \genSurvivorZeroCostBn~billion; an average 2.6 per cent wage decline gives \pounds \genSurvivorMinusTwoCostBn~billion, and a 5 per cent decline \pounds \genSurvivorMinusFiveCostBn~billion. The BHC poverty change moves from $\genSurvivorPlusTwoPovBhcPp$ points under the central uplift to $\genSurvivorMinusFivePovBhcPp$ points under a 5 per cent wage decline, and the Gini change from $\genSurvivorPlusTwoGiniPp$ to $\genSurvivorMinusFiveGiniPp$ points. The additional loss is spread across survivors rather than concentrated as total earnings loss, and the assumed positive wage pass-through is a fiscal offset in this grid.
+\subsection{What moves the central cost}
+\label{sec:results-breakeven}
 
-\subsection{The age and gender dimensions}
-\label{sec:results-agegender}
+The central cost is small relative to its components, so modest changes in three assumptions remove it. Table~\ref{tab:breakeven} reports the value of each at which the central cost is zero, holding the other two at their central values.
 
-The incidence axis has a within-family age structure. Under exposure-proportional incidence, workers aged 16--24 account for \genAgeCentralYoungSharePct~per cent of the displaced in the central scenario (seed 0), because young people in the UK are concentrated in low-exposure service occupations; the largest displaced group is aged \genAgeCentralLargestBand, with \genAgeCentralLargestSharePct~per cent. The junior-concentrated family of Table~\ref{tab:incidence} reweights displacement probabilities towards junior workers while holding the aggregate displacement rate at 7 per cent. Because juniors are concentrated in occupation groups whose fixed quotas the tilt does not change, the shift is partial: the 16--24 share rises from \genAgeCentralYoungSharePct~to \genAgeYouthYoungSharePct~per cent and the 55--64 share moves from \genAgeCentralOlderSharePct~to \genAgeYouthOlderSharePct~per cent (seed 0), while the largest displaced group remains those aged \genAgeYouthLargestBand~(\genAgeYouthLargestSharePct~per cent). Over the 50 assignment draws the cost is \pounds \genIncJuniorCostMeanBn~$\pm$~\genIncJuniorCostSdBn~billion under the junior tilt against \pounds \genIncExposureCostMeanBn~$\pm$~\genIncExposureCostSdBn~billion under exposure-proportional incidence. The junior tilt is therefore an additional scenario assumption rather than a consequence of occupational exposure alone. % age shares: results/central.json, results/central_youth_tilted.json (seed 0)
+\begin{table}[htbp]
+\centering
+\caption{Break-even values of the central net cost}
+\label{tab:breakeven}
+\small
+\begin{tabular}{p{0.2\textwidth}p{0.15\textwidth}p{0.15\textwidth}p{0.36\textwidth}}
+\toprule
+Assumption & Central & Break-even & Basis and method \\
+\midrule
+Mean survivor-wage effect & $+2.6\%$ & $+\genBeWagePct\%$ & Seed~0; linear interpolation between the $+2.6$ and $+5$ per cent rows of Table~\ref{tab:mixedwage} \\
+Capital-income uplift & $+\genCapitalScalePct\%$ ($+0.40$pp) & $+\genBeCapitalUpliftPct\%$ ($+\genBeCapitalPp$pp) & 20 paired draws; the capital channel's receipts scaled linearly beyond the one simulated uplift \\
+Months out of work & 12 & \genBeDurMonths & 20 draws; linear between full-year loss and the 50 per cent earnings-retention run, read as six months \\
+\bottomrule
+\end{tabular}
 
-If AI adoption in practice falls hardest on juniors through recruitment rather than dismissal---as the seniority-biased hiring evidence of \citet{hosseini2026} and the early-career employment declines in AI-exposed occupations documented by \citet{brynjolfsson2025} suggest---the fiscal consequences could differ materially from the broad-based scenarios above, because junior workers contribute little income tax and National Insurance. That channel, however, operates through hiring flows that stock-based simulation frameworks such as mine do not capture by construction.
+\vspace{0.4em}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} The capital figure extrapolates from a single simulated uplift, and the duration figure rests on a run that halves annual earnings while keeping full-year unemployed status, so annual earnings withdraw UC that a real six-month spell would pay in its out-of-work months; both are approximate. Sources: results/robustness/survivor\_wage\_grid.csv, dividend\_coverage.json, duration\_takeup\_sensitivity.json.}
+\end{table}
 
-Exposure also carries a gender gradient. Employed women have a mean C-AIOE of \genGenderFemaleExposure{} against \genGenderMaleExposure{} for employed men, reflecting women's concentration in administrative, professional and associate-professional work. In the central scenario this translates into a displacement rate of \genGenderFemaleRatePct~per cent for employed women against \genGenderMaleRatePct~per cent for men (means over 20 draws): women hold \genGenderFemaleEmpSharePct~per cent of employment and account for \genGenderFemaleDispSharePct~per cent of the displaced. In the seed-0 draw, household income, counted for every person, falls by \genGenderFemaleIncomeAbsPct~per cent for women and by \genGenderMaleIncomeAbsPct~per cent for men. % results/appendix/gender_incidence.json
-A natural reading is that income pooling within couples mutes the individual asymmetry at the household level, though I have not decomposed the result and offer this as a hypothesis rather than a finding. The individual-level asymmetry itself echoes the international evidence that female employment is substantially more exposed to generative AI than male employment \citep{ilo2025}.
+Other assumptions move the cost less or in one direction. A flat 70 per cent UC take-up probability, against Microcosm's person-weighted baseline claim propensity of \genTakeupBaselinePropensityPct~per cent, raises the cost from \pounds\genDurCentralCostMeanBn~billion to \pounds\genTakeupCostMeanBn~billion (20 draws); scaling dividends to the HMRC SPI projection, which Microcosm exceeds by \genDivRatioAbsPct~per cent, raises it to \pounds\genDivSpiCostMeanBn~billion (20 draws; Online Appendix~\ref{app:dataset-change}); and a reduced-form ripple effect in which displaced workers lower other workers' wages with an assumed slope of 0.3 raises it to \pounds\genCentralRippleCostBn~billion (seed~0; Online Appendix~\ref{app:ripple}). The low and high presets of Table~\ref{tab:presets} keep the full capital uplift while scaling displacement, which is why the low preset shows a net gain.
 
-\subsection{Benefit caseloads}
-\label{sec:results-caseloads}
+\subsection{Where the displaced wage bill goes}
+\label{sec:results-closure}
 
-The fiscal aggregates above can also be read on the delivery side, as caseloads. In the central scenario (seed 0) the shock draws \genCaseloadNewUcBenunitsK,000 benefit units into Universal Credit while \genCaseloadExitUcBenunitsK,000 exit, a net caseload increase of \genCaseloadNetNewUcBenunitsK,000 benefit units, and annual UC spending rises by \pounds \genCaseloadUcSpendChangeBn~billion from a baseline of \pounds \genCaseloadUcBaselineBn~billion, of which \pounds \genCaseloadHousingBn~billion is the housing element within paid awards. The high scenario adds \genCaseloadHighNetK,000 net new benefit units and \pounds \genCaseloadHighSpendBn~billion, and the low scenario \genCaseloadLowNetK,000 benefit units and \pounds \genCaseloadLowSpendBn~billion. Caseload responses vary with incidence: the junior-concentrated family adds \genCaseloadJuniorNetK,000 net benefit units at a cost of \pounds \genCaseloadJuniorSpendBn~billion. Two accounting notes apply: only the benefit-unit figures are net of exits---the corresponding household and person counts (\genCaseloadNewUcHouseholdsK,000 and \genCaseloadNewUcPersonsK,000 in the central scenario) are gross new entrants---and the housing element is measured within paid awards, slightly overstating housing-specific cash. % results/caseloads/summary.csv
+The central scenario imposes the capital uplift independently of the labour shock, and its government balance counts no corporation tax. Table~\ref{tab:closure} replaces the uplift with an explicit account of where the displaced wage bill goes, on the seed-0 draw where every flow is available. Displaced workers lose \pounds\genFaWageBillBn~billion of earnings and survivors gain \pounds\genFaSurvivorGainBn~billion, so labour income falls by \pounds\genFaNetLabourBn~billion. The central scenario instead adds \pounds\genFaCapUpliftBn~billion of household capital income (\pounds\genFaDivUpliftBn~billion of dividends and \pounds\genFaIntUpliftBn~billion of interest).
+
+In the closed account a share $\phi$ of the net labour-income fall reappears as company profit, which pays corporation tax at 25 per cent; companies pay out \genFaPayoutPct~per cent of post-tax profit, and a share $s$ of that reaches UK households, the remainder going to overseas owners and pension funds, whose returns the household simulation does not tax. Household dividends pay tax at the \genFaDivTaxRatePct~per cent average rate the simulated capital channel implies. The interest uplift has no counterpart in this account. The closed balance keeps the displacement and survivor-wage channels and their interaction and replaces the capital channel with corporation tax and dividend tax on the implied payout.
+
+\begin{table}[htbp]
+\centering
+\caption{A closed account of the displaced wage bill (seed 0, \pounds bn a year)}
+\label{tab:closure}
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+$\phi$ & UK & Profits & Corporation & Household & Dividend & Exchequer \\
+ & share $s$ & & tax & dividends & tax & cost \\
+\midrule
+\genFactorRows
+% source: emit_tex_values.py emit_revision() from wage_margin_central.json, survivor_wage_grid.csv, dividend_coverage_draws.csv
+\bottomrule
+\end{tabular}
+
+\vspace{0.4em}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Profits are $\phi$ times the net labour-income fall (\pounds\genFaNetLabourBn~billion). Payout ratio \genFaPayoutPct~per cent. The seed-0 central cost with the exogenous capital uplift is \pounds\genFaHeadlineSeedZeroBn~billion. Static accounting: no corporation-tax incidence, allowances or profit shifting, and dividend tax at the capital channel's average rate. Adding the \pounds\genFaEmployerNiBn~billion of net employer NI saved to profits would raise each profit figure by $\phi$ times that amount.}
+\end{table}
+
+Only when nearly all of the net labour-income fall becomes profit and the payout reaches UK households does the closed account return less than the central cost; at $\phi=0.5$ the cost roughly doubles. The central capital uplift adds more dividend income (\pounds\genFaDivUpliftBn~billion) than the closed account delivers to households even at $\phi=1$ and $s=1$ (\pounds\genFaHhDivPhiOneShareOneBn~billion), so the central scenario's sign rests on a capital uplift that the labour shock alone does not finance. This account supersedes the earlier labour-tax gap exercise, which priced corporation tax with the capital shock off and counted no dividends.
+
+\subsection{A benchmark against the OBR}
+\label{sec:results-obr}
+
+The OBR's March 2026 outlook includes a technological-displacement scenario in which equilibrium unemployment rises to \genObrUnempScenPct~per cent against \genObrUnempBasePct~per cent in the central forecast for 2030, higher productivity leaves GDP unchanged, and real earnings do not rise, so the labour share falls and the profit share rises \citep[Box~2.2]{obr2026}. Borrowing is higher by an average of \pounds\genObrBorrowingBn~billion a year: receipts are \pounds\genObrReceiptsLostBn~billion lower, net of higher corporation tax, and welfare spending is \pounds\genObrWelfareAddedBn~billion higher \citep[para.~6.18]{obr2026}. The OBR scenario is closest to the closed account of Table~\ref{tab:closure} with $\phi$ near one and no survivor-wage gain, on a much smaller head count. At the displacement channel's cost of \pounds\genCostPerDisplacedGbp{} per displaced worker, \pounds\genObrBorrowingBn~billion corresponds to about \genObrImpliedDisplacedM~million displaced employees, against \genCentralMcDisplacedMeanM~million in the central case. The comparison is indicative: the OBR counts VAT and corporation tax, which this simulation holds fixed or omits, its welfare figure covers all benefits rather than the household-level entitlements simulated here, and its scenario does not allocate unemployment across occupations. Its long-term counterpart, in which the wage share of GDP halves by 2075--76, lowers tax receipts by nearly 4 percentage points of GDP because wages and salaries carry an average effective tax rate of 46 per cent against 27 per cent on profits \citep[Box~4.1]{obr2026frs}. A run specified for the next revision sizes displacement to the OBR's unemployment rise with flat earnings and no capital windfall and compares its receipts and welfare with the OBR's line by line.

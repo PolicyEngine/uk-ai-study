@@ -355,6 +355,9 @@ DIRECTIONS = {
     "genCompPhiOneGapSignedBn": -1, "genCompPhiZeroGovSignedBn": -1,
     "genDivDiffCostBn": 1, "genCovDivUniformDiffCostSignedBn": 1,
     "genCovDivBandedDiffCostSignedBn": 1, "genCovSavUniformDiffCostSignedBn": 1,
+    # closed factor-income account: gain at phi=1, s=1; cost at phi=s=0.5
+    "genFaClosedPhiOneShareOneSignedBn": -1, "genFaClosedPhiHalfShareHalfSignedBn": 1,
+    "genBeCapitalPp": 1,
     # gender: household income falls for both sexes
     "genGenderFemaleIncomePct": -1, "genGenderMaleIncomePct": -1,
 }
@@ -606,7 +609,7 @@ def emit_extended() -> None:
     s5 = "incidence/summary_five.csv"
     fam_labels = [("exposure", "Exposure-proportional"), ("junior", "Junior-concentrated"),
                   ("compression", "Expertise-compression"), ("uniform", "Uniform"),
-                  ("klein_top_loaded", "Klein-anchored stress test")]
+                  ("klein_top_loaded", "Top-loaded stress test")]
     for fam, Fam in FAMILY_MACRO.items():
         emit(f"genInc{Fam}PovBhcSdPp", lambda fam=fam: jload(imc)[fam]["poverty_change_bhc_pp"]["sd"], "{:.2f}", imc)
         emit(f"genInc{Fam}PovAhcMeanPp", lambda fam=fam: jload(imc)[fam]["poverty_change_ahc_pp"]["mean"], "{:.2f}", imc)
@@ -1275,6 +1278,26 @@ def emit_revision() -> None:
     for fam, Fam in FAMILY_MACRO.items():
         emit(f"genFamPerWorker{Fam}Gbp", lambda fam=fam: round(fam_per_worker(fam), -2), "{:,.0f}", d5)
 
+
+    # --- OBR March 2026 benchmark constants (analysis/next_runs.py) ---------
+    import next_runs as nr
+    src = "next_runs.py (OBR EFO March 2026, Box 2.2 and para 6.18)"
+    emit("genObrUnempBasePct", lambda: nr.OBR_UNEMPLOYMENT_BASE_PCT, "{:.1f}", src)
+    emit("genObrUnempScenPct", lambda: nr.OBR_UNEMPLOYMENT_SCENARIO_PCT, "{:.1f}", src)
+    emit("genObrBorrowingBn", lambda: nr.OBR_BORROWING_BN, "{:.0f}", src)
+    emit("genObrReceiptsLostBn", lambda: nr.OBR_RECEIPTS_BN, "{:.0f}", src)
+    emit("genObrWelfareAddedBn", lambda: nr.OBR_WELFARE_BN, "{:.0f}", src)
+    emit("genObrImpliedDisplacedM",
+         lambda: nr.OBR_BORROWING_BN * 1e9 / ra.cost_per_displaced(csv(dcd))["mean_gbp"] / 1e6, "{:.2f}", dcd)
+
+    # --- ratios stated in the conclusions ------------------------------------
+    emit("genMarginPovRatio", lambda: jload("central.json")["poverty_rate_change_bhc"]
+         / jload("wage_margin_central.json")["poverty_rate_change_bhc"], "{:.0f}", "central.json")
+    emit("genIncStylisedCostRatio",
+         lambda: jload("robustness/incidence_monte_carlo.json")["compression"]["exchequer_cost_bn"]["mean"]
+         / jload("robustness/incidence_monte_carlo.json")["uniform"]["exchequer_cost_bn"]["mean"], "{:.0f}",
+         "robustness/incidence_monte_carlo.json")
+
     # --- B12 exposure-index comparison adjusted to the mean displaced count --
     ix = "robustness/index_sensitivity_full.json"
 
@@ -1291,7 +1314,7 @@ def emit_revision() -> None:
     emit("genIndexAdjCostMaxBn", lambda: max(ix_adj(k, "exchequer_cost_bn") for k in jload(ix)["results"]),
          "{:.1f}", ix)
     labels = [("c_aioe", "C-AIOE (central)"), ("felten_aioe", "Felten AIOE"),
-              ("eloundou_beta", "Eloundou beta"), ("dsit_aioe", "DSIT AIOE"), ("dsit_llm", "DSIT LLM")]
+              ("eloundou_beta", "Eloundou beta"), ("dsit_aioe", "DfE AIOE"), ("dsit_llm", "DfE LLM")]
 
     def index_adj_rows():
         d = jload(ix)["results"]
