@@ -114,6 +114,19 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
                         ("closed_k0375", -1.0), ("closed_k01875", 14.0), ("closed_k009375", 15.0),
                         ("closed_k075", -9.0)]}
     (tmp_path / "next_runs/capital_variants.json").write_text(json.dumps(cap))
+    # the summaries are valid only with their draws (REQUIRES); the OBR lines
+    # come from the draws: welfare = UC + other cash benefits, without
+    # childcare support and statutory pay (split columns)
+    draws = pd.DataFrame({
+        "seed": [0, 1], "exchequer_cost_bn": [9.5, 9.5], "household_basis_cost_bn": [7.5, 7.5],
+        "income_tax_change_bn": [-5.0, -5.0], "ni_employee_change_bn": [-1.0, -1.0],
+        "employer_ni_change_bn": [-2.0, -2.0], "uc_change_bn": [1.0, 1.0], "benefits_change_bn": [1.5, 1.5],
+        "childcare_change_bn": [-0.3, -0.3], "statutory_pay_change_bn": [-0.2, -0.2],
+        "displaced_weighted_m": [0.5, 0.5], "public_paybill_displaced_bn": [6.0, 6.0],
+        "wage_bill_lost_bn": [24.0, 24.0], "certified_data_build_id": "fake"})
+    draws.to_csv(tmp_path / "next_runs/obr_benchmark_draws.csv", index=False)
+    draws.assign(variant="cap10").head(1).to_csv(tmp_path / "next_runs/capital_variants_draws.csv", index=False)
+    monkeypatch.setattr(etv, "EXPECTED_CSV", {})
     for name, val in [("R", tmp_path), ("_checked", {}), ("lines", []), ("missing", []), ("emitted", set()),
                       ("values", {})]:
         monkeypatch.setattr(etv, name, val)
@@ -123,9 +136,10 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
     assert etv.missing == []
     assert "\\newcommand{\\genObrRatePct}{1.71}" in text
     assert "\\newcommand{\\genObrCostMeanBn}{9.5}" in text
-    # receipts = household-basis cost - benefits + lost employer NI = 7 - 1.5 + 2
-    assert "\\newcommand{\\genObrReceiptsBn}{7.5}" in text
-    assert "\\newcommand{\\genObrWelfareBn}{1.5}" in text
+    # receipts = income tax + employee NI + employer NI lost = 5 + 1 + 2
+    assert "\\newcommand{\\genObrReceiptsBn}{8.0}" in text
+    # welfare = benefits - childcare - statutory pay = 1.5 + 0.3 + 0.2
+    assert "\\newcommand{\\genObrWelfareBn}{2.0}" in text
     assert "\\newcommand{\\genCapClosedOneCostMeanSignedBn}{-1.0}" in text or \
         "\\newcommand{\\genCapClosedOneCostMeanBn}{-1.0}" in text
     assert "Closed, $\\phi=1$, payout 50\\% & -1.0" in text.replace("$-1.0$", "-1.0")

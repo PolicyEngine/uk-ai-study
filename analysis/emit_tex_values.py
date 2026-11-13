@@ -185,6 +185,10 @@ REQUIRES = {
     "robustness/dividend_coverage.json": ["robustness/dividend_coverage_draws.csv"],
     "tax_composition/composition_grid.csv": ["tax_composition/composition_sims.csv"],
     "tax_composition/recycling_case.json": ["tax_composition/composition_sims.csv"],
+    # runs 15 and 16: summaries valid only with their complete, current draws
+    "next_runs/obr_benchmark.json": ["next_runs/obr_benchmark_draws.csv"],
+    "next_runs/obr_household_deciles.csv": ["next_runs/obr_benchmark_draws.csv"],
+    "next_runs/capital_variants.json": ["next_runs/capital_variants_draws.csv"],
 }
 _checked: dict[str, str | None] = {}
 
@@ -292,6 +296,7 @@ TABLE_ROW_MACROS = {
     "genPresetRows", "genIndexRows", "genIncidenceRows", "genWageMarginRows",
     "genMixedRows", "genSurvivorRows", "genJobLossRows", "genPolicyRows", "genRippleRows",
     "genFactorRows", "genIndexAdjRows", "genPresetMcRows", "genPolicyMcRows", "genCapVariantRows",
+    "genObrLineRows", "genObrDecileRows",
 }
 
 
@@ -1335,13 +1340,16 @@ def emit_revision() -> None:
                     m(c["poverty_change_bhc_pp"]["mean"], SIGNED2),
                     m(c["poverty_change_ahc_pp"]["mean"], SIGNED2),
                     m(c["relative_poverty_change_bhc_pp"]["mean"], SIGNED2),
-                    m(c["gini_change_pp"]["mean"], SIGNED2)]))
+                    m(c["gini_change_pp"]["mean"], SIGNED2),
+                    # public-sector pay bill of the displaced, seeds 0-19
+                    # (beside the balance, not netted from it)
+                    f"{_central_paybill()['mean']:.1f}"]))
             else:
                 d = jload(rel)
                 out.append(row_tex([
                     label, f"{d['displaced_weighted'] / 1e6:.2f}", m(d["exchequer_cost"] / 1e9, "{:.1f}"),
                     m(d["poverty_rate_change_bhc"] * 100, SIGNED2), m(d["poverty_rate_change_ahc"] * 100, SIGNED2),
-                    "--", m((d["gini_shocked"] - d["gini_baseline"]) * 100, SIGNED2)]))
+                    "--", m((d["gini_shocked"] - d["gini_baseline"]) * 100, SIGNED2), "--"]))
         return "\n".join(out)
     emit("genPresetMcRows", preset_rows_mc, "{}", mc)
 
@@ -1401,12 +1409,12 @@ def emit_next_runs() -> None:
         emit(f"genObr{N}Mean{unit}", lambda key=key: jload(ob)["summary"][key]["mean"],
              "{:.2f}" if unit != "Bn" else "{:.1f}", ob)
         emit(f"genObr{N}Se{unit}", lambda key=key: jload(ob)["summary"][key]["se"], "{:.2f}", ob)
-    # the OBR's split: receipts lost (household taxes + employer NI) and
-    # welfare (cash benefits) added
-    emit("genObrReceiptsBn", lambda: jload(ob)["summary"]["household_basis_cost_bn"]["mean"]
-         - jload(ob)["summary"]["benefits_change_bn"]["mean"]
-         - jload(ob)["summary"]["employer_ni_change_bn"]["mean"], "{:.1f}", ob)
-    emit("genObrWelfareBn", lambda: jload(ob)["summary"]["benefits_change_bn"]["mean"], "{:.1f}", ob)
+    # the OBR's split: receipts lost (income tax, employee and employer NI)
+    # and welfare added. household_benefits also carries childcare support and
+    # statutory pay, which fall with employment and are not OBR welfare, so
+    # welfare is UC plus the other cash benefits (post_next_runs.obr_lines).
+    emit("genObrReceiptsBn", lambda: _obr_lines()["receipts"], "{:.1f}", ob)
+    emit("genObrWelfareBn", lambda: _obr_lines()["welfare"], "{:.1f}", ob)
     cv = "next_runs/capital_variants.json"
     for k, N in CAPITAL_VARIANT_MACRO.items():
         emit(f"genCap{N}CostMeanBn", lambda k=k: jload(cv)[k]["exchequer_cost_bn"]["mean"], SIGNED1, cv)
@@ -1420,6 +1428,162 @@ def emit_next_runs() -> None:
             m(d[k]["poverty_change_bhc_pp"]["mean"], SIGNED2), m(d[k]["gini_change_pp"]["mean"], SIGNED2),
             f"{d[k]['capital_income_added_bn']['mean']:.1f}"]) for k, lab in CAPITAL_VARIANT_LABELS)
     emit("genCapVariantRows", cap_rows, "{}", cv)
+
+
+def _obr_lines() -> dict:
+    import post_next_runs as pn
+    validate("next_runs/obr_benchmark.json")
+    return pn.obr_lines(csv("next_runs/obr_benchmark_draws.csv"))
+
+
+_CV_DRAWS = "next_runs/capital_variants_draws.csv"
+
+
+def _complete_variants() -> dict:
+    """Run-16 variants with all 20 seeds under the current build and
+    next_runs.py fingerprint (run 16 writes variant by variant)."""
+    import post_next_runs as pn
+    d = read_stamped_csv(R / _CV_DRAWS)
+    fp = code_fingerprint(ROOT / "analysis" / "next_runs.py")
+    out = {}
+    for v in dict.fromkeys(d["variant"].astype(str)):
+        try:
+            out[v] = pn.complete_variant(d, v, _build_id(), fp)
+        except pn.Incomplete:
+            pass
+    return out
+
+
+def _variant(name: str):
+    import post_next_runs as pn
+    try:
+        return _complete_variants()[name]
+    except KeyError:
+        raise Pending(f"{_CV_DRAWS}: variant {name} not complete") from None
+
+
+def _central_paybill() -> dict:
+    import post_next_runs as pn
+    v = _complete_variants()
+    if not v:
+        raise Pending(f"{_CV_DRAWS}: no complete variant")
+    return pn.public_paybill(v)
+
+
+def emit_post() -> None:
+    """Macros from analysis/post_next_runs.py (runs 15-16 post-processing)."""
+    import post_next_runs as pn
+    ob = "next_runs/obr_benchmark.json"
+    obd = "next_runs/obr_benchmark_draws.csv"
+    L = _obr_lines
+    for k, N in [("income_tax", "IncomeTax"), ("ni_employee", "NiEmployee"), ("ni_employer", "NiEmployer"),
+                 ("uc", "Uc"), ("other_benefits", "OtherBen"), ("childcare", "Childcare"),
+                 ("statutory_pay", "StatPay"), ("total", "Total"), ("household_basis", "HhBasis"),
+                 ("paybill", "Paybill"), ("wage_bill", "WageBill")]:
+        emit(f"genObrLine{N}Bn", lambda k=k: L()[k], "{:.1f}" if k not in ("uc", "other_benefits", "childcare",
+                                                                         "statutory_pay") else "{:.2f}", obd)
+    emit("genObrCostPerDisplacedGbp", lambda: round(L()["cost_per_displaced_gbp"], -2), "{:,.0f}", obd)
+    emit("genObrUcShareWageBillPct", lambda: 100 * L()["uc"] / L()["wage_bill"], "{:.1f}", obd)
+    emit("genObrDraws", lambda: len(csv(obd)), "{:d}", obd)
+    emit("genObrLabourForceM", lambda: jload(ob)["labour_force_m"], "{:.1f}", ob)
+    emit("genObrUnempRiseMicrocosmPct", lambda: jload(ob)["labour_force_components"]["unemployment_rate_pct"],
+         "{:.1f}", ob)
+
+    def obr_line_rows():
+        a = L()
+        obr = jload(ob)["obr"]
+
+        def r(label, val, comp="", fmt="{:.1f}"):
+            return row_tex([label, m(val, fmt), comp])
+        return "\n".join([
+            r(r"\quad Income tax", a["income_tax"]), r(r"\quad Employee NI", a["ni_employee"]),
+            r(r"\quad Employer NI", a["ni_employer"]),
+            r(r"Receipts lost", a["receipts"], f"{obr['receipts_bn']:.0f}"),
+            r(r"\quad Universal Credit", a["uc"], "", "{:.2f}"),
+            r(r"\quad Other cash benefits", a["other_benefits"], "", "{:.2f}"),
+            r(r"Welfare added", a["welfare"], f"{obr['welfare_bn']:.0f}", "{:.2f}"),
+            r(r"Childcare support", a["childcare"], "--", "{:.2f}"),
+            r(r"Statutory sick, maternity and paternity pay", a["statutory_pay"], "--", "{:.2f}"),
+            r(r"Debt interest", 0.0, "included", "{:.0f}").replace("$0$", "--"),
+            r"\midrule",
+            r(r"Change in borrowing", a["cost"], f"{obr['borrowing_bn']:.0f}"),
+            r"\midrule",
+            r(r"\emph{Memo:} household basis (income tax, employee NI, benefits)", a["household_basis"], "--"),
+            r(r"\emph{Memo:} public-sector pay bill of the displaced", a["paybill"], "--"),
+        ])
+    emit("genObrLineRows", obr_line_rows, "{}", obd)
+
+    # decile stabilisation, run 15 household arrays (20 draws)
+    hd = "next_runs/obr_household_deciles.csv"
+
+    def hdec():
+        d = csv(hd)
+        if set(d["draws"]) != {20}:
+            raise Pending(f"{hd}: not 20 draws")
+        return d.set_index("decile")
+
+    def obr_decile_rows():
+        d = hdec()
+        out = []
+        for k in [str(i) for i in range(1, 11)] + ["all"]:
+            x = d.loc[k]
+            lab = "All" if k == "all" else k
+            row = row_tex([lab, m(x.market_change, "{:.2f}"), m(x.benefit_change, "{:.2f}"),
+                           m(x.tax_change, "{:.2f}"), m(x.net_income_change, "{:.2f}"),
+                           f"{100 * x.tax_benefit_share:.0f}", f"{100 * x.stabilisation_net:.0f}"])
+            out.append((r"\midrule" + "\n" if k == "all" else "") + row)
+        return "\n".join(out)
+    emit("genObrDecileRows", obr_decile_rows, "{}", hd)
+    emit("genObrStabTbAllPct", lambda: 100 * hdec().loc["all", "tax_benefit_share"], "{:.0f}", hd)
+    emit("genObrStabNetAllPct", lambda: 100 * hdec().loc["all", "stabilisation_net"], "{:.0f}", hd)
+    emit("genObrStabTbDTenPct", lambda: 100 * hdec().loc["10", "tax_benefit_share"], "{:.0f}", hd)
+    emit("genObrStabTbMinPct", lambda: 100 * hdec().loc[[str(i) for i in range(2, 10)], "tax_benefit_share"].min(),
+         "{:.0f}", hd)
+    emit("genObrStabTbMaxPct", lambda: 100 * hdec().loc[[str(i) for i in range(2, 10)], "tax_benefit_share"].max(),
+         "{:.0f}", hd)
+    emit("genObrMarketDTenSharePct",
+         lambda: 100 * hdec().loc["10", "market_change"] / hdec().loc["all", "market_change"], "{:.0f}", hd)
+
+    # public-sector pay bill of the central displaced (any complete run-16
+    # variant: they share the displaced set seed by seed)
+    paybill = _central_paybill
+    emit("genCentralPaybillMeanBn", lambda: paybill()["mean"], "{:.1f}", _CV_DRAWS)
+    emit("genCentralPaybillSdBn", lambda: paybill()["sd"], "{:.1f}", _CV_DRAWS)
+    emit("genCentralPaybillDraws", lambda: paybill()["draws"], "{:d}", _CV_DRAWS)
+
+    # capital break-even interpolated between +39.8% (central) and +60% (cap60)
+    dcd = "robustness/dividend_coverage_draws.csv"
+
+    def be():
+        c = csv(dcd)
+        return pn.capital_breakeven(c[c.run == "central"], _variant("cap60"))
+    emit("genBeCapInterpUpliftPct", lambda: be()["uplift_pct"], "{:.0f}", _CV_DRAWS)
+    emit("genBeCapInterpPp", lambda: be()["pp"], "{:.2f}", _CV_DRAWS)
+    emit("genCapSixtyDrawCostMeanBn", lambda: be()["cost_at_x1_bn"], SIGNED1, _CV_DRAWS)
+    emit("genCapCentralTwentyCostMeanBn", lambda: be()["cost_at_x0_bn"], "{:.1f}", dcd)
+
+    # UK rules a displaced worker meets (policyengine-uk parameters, 2026-27)
+    src = "policyengine-uk parameters"
+    uc = "universal_credit"
+    emit("genUcSingleOldMonthGbp", lambda: pn.pe_parameter(f"{uc}/standard_allowance/amount.yaml", key="SINGLE_OLD"),
+         "{:,.2f}", src)
+    emit("genUcCoupleOldMonthGbp", lambda: pn.pe_parameter(f"{uc}/standard_allowance/amount.yaml", key="COUPLE_OLD"),
+         "{:,.2f}", src)
+    emit("genUcTaperPct", lambda: 100 * pn.pe_parameter(f"{uc}/means_test/reduction_rate.yaml"), "{:.0f}", src)
+    emit("genUcWorkAllowanceHousingGbp",
+         lambda: pn.pe_parameter(f"{uc}/means_test/work_allowance.yaml", key="with_housing"), "{:,.0f}", src)
+    emit("genUcWorkAllowanceNoHousingGbp",
+         lambda: pn.pe_parameter(f"{uc}/means_test/work_allowance.yaml", key="without_housing"), "{:,.0f}", src)
+    emit("genUcCapitalLimitGbp", lambda: pn.pe_parameter(f"{uc}/means_test/capital/limit.yaml"), "{:,.0f}", src)
+    emit("genJsaContribWeekGbp", lambda: pn.pe_parameter("JSA/contrib/amount_over_25.yaml"), "{:.2f}", src)
+
+    # age: share of 16-24 employment in the lowest exposure tertile (baseline)
+    am = "robustness/age_exposure_moments.csv"
+    emit("genAgeYoungLowTertilePct", lambda: 100 * float(csv(am).query("age_band == '16-24' and exposure_tertile == 1")
+                                                          ["share_of_band_employment"].iloc[0]), "{:.0f}", am)
+    # OBR Fiscal risks and sustainability (July 2026), Box 4.1
+    emit("genObrFrsSubstitutionPct", lambda: 10, "{:d}", "OBR FRS July 2026 Box 4.1")
+    emit("genObrFrsComplementPct", lambda: 30, "{:d}", "OBR FRS July 2026 Box 4.1")
 
 
 def main() -> None:
@@ -1637,6 +1801,8 @@ def main() -> None:
 
     emit_extended()
     emit_revision()
+    emit_next_runs()
+    emit_post()
     check_directions()
 
     # --- write -------------------------------------------------------------
