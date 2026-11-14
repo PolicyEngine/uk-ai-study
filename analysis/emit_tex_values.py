@@ -373,6 +373,8 @@ DIRECTIONS = {
     # closed factor-income account: gain at phi=1, s=1; cost at phi=s=0.5
     "genFaClosedPhiOneShareOneSignedBn": -1, "genFaClosedPhiHalfShareHalfSignedBn": 1,
     "genBeCapitalPp": 1,
+    # wage cuts alone lower the Gini (the cuts are graded to exposure)
+    "genWcCutOnlyGiniMeanSignedPp": -1,
     # gender: household income falls for both sexes
     "genGenderFemaleIncomePct": -1, "genGenderMaleIncomePct": -1,
 }
@@ -1780,6 +1782,11 @@ def emit_wage_cut() -> None:
         return "\n".join(out)
     emit("genWcMarginRows", rows, "{}", WAGE_CUT_DRAWS)
 
+    # wage cuts alone (no uplift, no capital shock): poverty and the Gini
+    def cut_mean(col):
+        return guard(lambda: float(pw.variant_rows(wd(), "cut_only")[col].mean()))
+    emit("genWcCutOnlyPovBhcMeanPp", lambda: cut_mean("poverty_change_bhc_pp"), "{:.2f}", WAGE_CUT_DRAWS)
+    emit("genWcCutOnlyGiniMeanSignedPp", lambda: cut_mean("gini_change_pp"), SIGNED2, WAGE_CUT_DRAWS)
     # absorption: pence of cost per pound of earnings removed, wage cuts alone
     emit("genAbsCutGovPct", lambda: 100 * cut()["gov_balance"], "{:.0f}", WAGE_CUT_DRAWS)
     emit("genAbsCutHhPct", lambda: 100 * cut()["household"], "{:.0f}", WAGE_CUT_DRAWS)
