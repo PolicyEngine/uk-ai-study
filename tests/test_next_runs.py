@@ -151,8 +151,8 @@ def test_emitter_next_run_macros_on_fake_outputs(tmp_path, monkeypatch):
     assert "\\newcommand{\\genObrWelfareBn}{2.0}" in text
     assert "\\newcommand{\\genCapClosedOneCostMeanSignedBn}{-1.0}" in text or \
         "\\newcommand{\\genCapClosedOneCostMeanBn}{-1.0}" in text
-    assert "Closed, $\\phi=1$, payout 50\\% & -1.0 $\\pm$ 0.0 & 4.0" in text
-    assert "Interest and dividends $+10\\%$ & 15.0 $\\pm$ 0.0 & --" in text
+    assert "Closed, $\\phi=1$, payout 50\\% & $-1.0$ $\\pm$ 0.0 & 4.0" in text
+    assert "Interest and dividends $+10\\%$ & $15.0$ $\\pm$ 0.0 & --" in text
 
 
 def test_labour_force_counts_active_adults_only():
