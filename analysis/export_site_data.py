@@ -115,7 +115,7 @@ def main() -> None:
             "junior": "Junior-concentrated",
             "compression": "Expertise-compression",
             "uniform": "Uniform",
-            "klein_top_loaded": "Klein-anchored stress test",
+            "klein_top_loaded": "Top-loaded stress test",
         }
         with open(OUT / "incidence.csv", "w", newline="") as f:
             w = csv.writer(f)
