@@ -27,43 +27,39 @@ Usage:
 
 from __future__ import annotations
 
+import gc
+
 import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.data import microsimulation
+from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.shocks import (
     PRESETS,
     ShockScenario,
     apply_shocks,
     build_shocked_simulation,
     draw_displaced,
+    realised_displacement_rate,
 )
 from uk_ai_study.runner import build_person_table as canonical_person_table, gini
 
-DATA = Path("data")
 OUT = Path("results/jr16")
 PERIOD = 2026
 N_DRAWS = 50
 
 
 def build_person_table():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
-
-    dataset = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    sim = Microsimulation(dataset=dataset)
+    sim = microsimulation()
 
     def calc(v, entity="person"):
         return sim.calculate(v, period=PERIOD, map_to=entity).values
 
     persons = canonical_person_table(
-        sim,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-        extra_variables=("household_id",),
+        sim, PERIOD, extra_variables=("household_id",)
     )
 
     # deciles of equivalised household disposable income (HBAI concept,
@@ -74,7 +70,7 @@ def build_person_table():
     ranks = np.empty(len(equiv), dtype=float)
     ranks[order] = cw / cw[-1]
     persons["decile"] = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
-    return dataset, sim, persons
+    return sim, persons
 
 
 def figs_4_1_to_4_3(persons):
@@ -162,9 +158,9 @@ def _household_deciles(sim, period=PERIOD):
     return np.clip(np.ceil(ranks * 10).astype(int), 1, 10), hw
 
 
-def fig_4_4(dataset, baseline_sim, persons):
+def fig_4_4(baseline_sim, persons):
     shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
-    shocked_sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
+    shocked_sim = build_shocked_simulation(baseline_sim, shocked_table, PERIOD)
 
     base, shock = _household_frame(baseline_sim), _household_frame(shocked_sim)
     deciles, hw = _household_deciles(baseline_sim)
@@ -205,7 +201,7 @@ GRID_COLUMNS = [
 ]
 
 
-def run_grid(dataset, baseline_sim, persons, resume: bool = False):
+def run_grid(baseline_sim, persons, resume: bool = False):
     def hh_metrics(sim):
         hw = sim.calculate("household_weight", period=PERIOD, map_to="household").values
         hn = sim.calculate("hbai_household_net_income", period=PERIOD, map_to="household").values
@@ -223,32 +219,29 @@ def run_grid(dataset, baseline_sim, persons, resume: bool = False):
         }
 
     base = hh_metrics(baseline_sim)
-    out_path = OUT / "grid.csv"
-    # resume is opt-in and fingerprint-aware: a stale-schema CSV is never
-    # silently reused (#1, finding 8)
-    done = set()
-    rows = []
-    if resume and out_path.exists():
-        prev = pd.read_csv(out_path)
-        if list(prev.columns) == GRID_COLUMNS:
-            done = set(zip(prev["unemployment_pct"], prev["wage_pct"]))
-            rows = prev.to_dict("records")
-        else:
-            print("existing grid.csv has a different schema; recomputing all cells")
+    from uk_ai_study.checkpoint import Checkpoint
 
+    # resume is opt-in and stamp-checked: a checkpoint from another data
+    # build or code version is refused, never silently reused (#1, finding 8)
+    ckpt = Checkpoint(OUT / "grid.csv", ("unemployment_pct", "wage_pct"),
+                      resume=resume, script=__file__)
+    done = ckpt.done
     for u in range(0, 11):
         for w in range(0, 6):
             if (u, w) in done:
                 continue
             scenario = ShockScenario(f"u{u}_w{w}", u / 100, w / 100)
             shocked_table = apply_shocks(persons, scenario, seed=0)
-            sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
+            sim = build_shocked_simulation(baseline_sim, shocked_table, PERIOD)
             m = hh_metrics(sim)
             delta_rev = m["net_revenue"] - base["net_revenue"]
-            rows.append(
+            ckpt.append(
                 {
                     "unemployment_pct": u,
                     "wage_pct": w,
+                    # seed-0 cell: the realised share of employees displaced
+                    "realised_displacement_rate": realised_displacement_rate(
+                        persons, shocked_table["displaced"].to_numpy()),
                     "avg_disposable_income_change_pct": 100 * (m["mean_hni"] / base["mean_hni"] - 1),
                     # change in net revenue (IT + NI - household benefits) in
                     # £bn, and re-expressed against gross IT+NI receipts; the
@@ -259,20 +252,21 @@ def run_grid(dataset, baseline_sim, persons, resume: bool = False):
                     "gini_change_pp": 100 * (m["gini"] - base["gini"]),
                 }
             )
-            pd.DataFrame(rows)[GRID_COLUMNS].to_csv(out_path, index=False)
+            del sim
+            gc.collect()
             print(f"u={u} w={w} done", flush=True)
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     mode = sys.argv[1] if len(sys.argv) > 1 else "figs"
-    dataset, baseline_sim, persons = build_person_table()
+    baseline_sim, persons = build_person_table()
     if mode == "figs":
         figs_4_1_to_4_3(persons)
-        fig_4_4(dataset, baseline_sim, persons)
+        fig_4_4(baseline_sim, persons)
         print("figs 4.1-4.4 written")
     elif mode == "grid":
-        run_grid(dataset, baseline_sim, persons, resume="--resume" in sys.argv)
+        run_grid(baseline_sim, persons, resume="--resume" in sys.argv)
         print("grid complete")
 
 

@@ -13,6 +13,7 @@ Outputs results/robustness/index_sensitivity_full.json + index_sensitivity.png.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -22,26 +23,23 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.data import soc_major_group
+from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.runner import gini
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
-DATA = Path("data")
 OUT = Path("results/robustness")
 PERIOD = 2026
 SEED = 0
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 MEASURES = ("c_aioe", "felten_aioe", "eloundou_beta", "dsit_aioe", "dsit_llm")
 CENTRAL_MEASURE = "c_aioe"
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
     persons = pd.DataFrame(
         {
@@ -53,7 +51,7 @@ def main():
             "weight": calc("person_weight"),
         }
     )
-    persons["soc_major_group"] = attach_soc_major_group(persons["person_id"], ADULT)
+    persons["soc_major_group"] = soc_major_group(baseline, PERIOD)
     th = exposure_for_major_group(persons["soc_major_group"], "complementarity_theta")
 
     # unmatched employees carry the EMPLOYMENT-WEIGHTED (survey-weight) mean
@@ -95,7 +93,7 @@ def main():
         p = persons.copy()
         p["exposure"] = _weighted_fill(e)
         table = apply_shocks(p, PRESETS["central"], seed=SEED)
-        sim = build_shocked_simulation(ds, baseline, table, PERIOD)
+        sim = build_shocked_simulation(baseline, table, PERIOD)
         sh = m(sim)
         disp = table["displaced"].to_numpy()
         results[measure] = {
@@ -110,6 +108,7 @@ def main():
         }
         print(measure, {k: round(v, 3) for k, v in results[measure].items()}, flush=True)
         del sim, table
+        gc.collect()
 
     central_cost = results[CENTRAL_MEASURE]["exchequer_cost_bn"]
     for measure, r in results.items():

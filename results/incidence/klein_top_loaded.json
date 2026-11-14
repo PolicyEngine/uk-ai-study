@@ -1,37 +1,38 @@
 {
   "family": "klein_top_loaded",
-  "displaced_weighted_m": 1.6232701539993286,
-  "exchequer_cost_bn": 34.170732544,
-  "poverty_change_bhc_pp": 2.2219964548282567,
-  "poverty_change_ahc_pp": 2.5137124187378594,
-  "gini_change_pp": 0.9869308975680391,
+  "displaced_weighted_m": 2.0373430252075195,
+  "realised_displacement_rate": 0.07026713565403182,
+  "exchequer_cost_bn": 29.280141312,
+  "poverty_change_bhc_pp": 2.6837950387199356,
+  "poverty_change_ahc_pp": 3.404875050357395,
+  "gini_change_pp": 1.582257312666946,
   "decile_transition_share_pct": {
-    "1": 0.01464349590241909,
-    "2": 0.22714583575725555,
-    "3": 0.6391424536705017,
-    "4": 0.9823275208473206,
-    "5": 1.4898929595947266,
-    "6": 2.3143723011016846,
-    "7": 3.2113149166107178,
-    "8": 3.9903316497802734,
-    "9": 5.7361555099487305,
-    "10": 7.252708911895752
+    "1": 0.18858003616333008,
+    "2": 0.46695205569267273,
+    "3": 0.7217478156089783,
+    "4": 0.8209644556045532,
+    "5": 1.820025086402893,
+    "6": 2.5725505352020264,
+    "7": 4.141024589538574,
+    "8": 4.746789455413818,
+    "9": 5.5966596603393555,
+    "10": 8.291754722595215
   },
   "decile_income_change_pct": {
-    "1": 1.1395652294158936,
-    "2": 0.19049908220767975,
-    "3": -0.6615767478942871,
-    "4": -0.9456326365470886,
-    "5": -2.3025166988372803,
-    "6": -2.7932870388031006,
-    "7": -3.968428611755371,
-    "8": -4.548862934112549,
-    "9": -6.2784600257873535,
-    "10": -7.981125831604004
+    "1": 2.0058679580688477,
+    "2": -0.044335223734378815,
+    "3": -0.43493202328681946,
+    "4": -0.47056031227111816,
+    "5": -1.6967995166778564,
+    "6": -2.7235913276672363,
+    "7": -4.880654811859131,
+    "8": -3.8757808208465576,
+    "9": -4.344500541687012,
+    "10": -3.8181586265563965
   },
   "london_composition_no_tilt": {
-    "london_share_of_displaced_pct": 15.120348930358887,
-    "london_displacement_rate_pct": 8.270076751708984
+    "london_share_of_displaced_pct": 20.174198150634766,
+    "london_displacement_rate_pct": 9.873003005981445
   },
   "provenance": {
     "source": "Klein Teeselink (2025), 'Generative AI and Labor Market Outcomes: Evidence from the United Kingdom', SSRN 5516798; KCL press release 2025-09.",
@@ -55,7 +56,7 @@
       "low_wage_multiplier_floor": 0.6,
       "high_wage_multiplier": 9.6,
       "junior_proxy": "junior positions proxied by age < 25 (KT's concept is seniority, not age; under-25s are ~2% of the displaced given the wage-tier tilt)",
-      "wage_tier_split": "weighted median of employee earnings (FRS person earnings proxy for KT's firm pay tiers)",
+      "wage_tier_split": "weighted median of employee earnings (Microcosm person earnings proxy for KT's firm pay tiers)",
       "composite": "multiplicative combination of exposure x junior x wage-tier channels (independence imposed)",
       "aggregate_shock": "central preset (7% displacement, +2.6% wages, +0.4pp capital) \u2014 KT shapes incidence, not size"
     }

@@ -3,11 +3,12 @@
 Doorley, K., O'Connor, S., O'Shea, R. & Tuda, D. (2026), *Artificial
 intelligence and income inequality in Ireland*, ESRI/Dept. of Finance
 Jointly-published Report No. 16 — replicated for the UK with PolicyEngine UK
-in place of SWITCH, FRS in place of SILC.
+in place of SWITCH, Microcosm UK 2024-25 (FRS-based, calibrated) in place
+of SILC.
 """
 
+from uk_ai_study.data import microsimulation, soc_major_group
 from uk_ai_study.exposure import (
-    attach_soc_major_group,
     exposure_for_major_group,
     load_major_group_exposure,
 )
@@ -19,8 +20,9 @@ __all__ = [
     "ScenarioResult",
     "ShockScenario",
     "apply_shocks",
-    "attach_soc_major_group",
     "exposure_for_major_group",
     "load_major_group_exposure",
+    "microsimulation",
+    "soc_major_group",
     "run_scenario",
 ]

@@ -9,7 +9,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.exposure import attach_soc_major_group, exposure_for_major_group
+from uk_ai_study.checkpoint import certified_data_build_id
+from uk_ai_study.data import microsimulation, soc_major_group
+from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.shocks import (
     PRESETS,
     RIPPLE_PRESETS,
@@ -21,6 +23,7 @@ from uk_ai_study.shocks import (
     apply_shocks,
     apply_wage_margin_shock,
     build_shocked_simulation,
+    realised_displacement_rate,
 )
 
 AGE_BANDS = ((16, 24), (25, 34), (35, 44), (45, 54), (55, 64), (65, 200))
@@ -54,6 +57,15 @@ class ScenarioResult:
     # (share of the baseline wage bill) and the realised aggregate cut
     gross_cut_share_target: float | None = None
     gross_cut_realised: float | None = None
+    # weighted baseline employees and the share of them this draw actually
+    # displaced: one draw realises the prescribed quota only up to sampling
+    # noise (seed 0 central: 6.76 per cent against 7)
+    employees_weighted: float | None = None
+    realised_displacement_rate: float | None = None
+    # per-capita change by decile under the alternative rankings of
+    # ``decile_rankings`` (the HBAI ranking above is the main measure)
+    decile_income_change_by_ranking: dict = field(default_factory=dict)
+    certified_data_build_id: str | None = None
 
 
 def per_capita_household_income(
@@ -79,6 +91,185 @@ def per_capita_household_income(
     return household_income / household_size
 
 
+#: Households whose personal pension contributions exceed both this floor and
+#: their earnings are excluded in the decile-ranking exclusion check (the
+#: same rule the review applied: a few such records sit in decile 1 only
+#: because HBAI income subtracts the contributions).
+LARGE_PPC_FLOOR = 10_000.0
+DECILE_RANKINGS = ("hbai", "pre_pension", "hbai_excl_large_ppc")
+
+
+def weighted_deciles(values: np.ndarray, weights: np.ndarray) -> np.ndarray:
+    """Deciles 1-10 of ``values`` with person weights (JR16 convention)."""
+    # values keep their dtype: argsort can order ties differently in float32
+    # and float64, and every script ranks the raw float32 model output
+    # weights keep their dtype too: a float64 cumulative sum moves tied
+    # boundary records relative to the float32 one every script uses
+    values = np.asarray(values)
+    weights = np.asarray(weights)
+    order = np.argsort(values)
+    cum = np.cumsum(weights[order])
+    ranks = np.empty(len(values), dtype=float)
+    ranks[order] = cum / cum[-1]
+    return np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
+
+
+def household_to_person(sim, values_h: np.ndarray, period: int) -> np.ndarray:
+    """Broadcast a household-level array to its members."""
+    hh_ids = sim.calculate("household_id", period=period, map_to="household").values
+    person_hh = sim.calculate("household_id", period=period, map_to="person").values
+    index = pd.Series(np.arange(len(hh_ids)), index=hh_ids)
+    return np.asarray(values_h)[index.loc[person_hh].to_numpy()]
+
+
+def ranking_inputs(sim, period: int) -> dict:
+    """Household arrays behind the alternative decile rankings."""
+
+    def h(v):
+        return np.asarray(sim.calculate(v, period=period, map_to="household").values, dtype=float)
+
+    return {
+        "hbai": h("hbai_household_net_income"),
+        "equiv_hbai": h("equiv_hbai_household_net_income"),
+        "equivalisation": h("household_equivalisation_bhc"),
+        "pension_contributions": h("employee_pension_contributions")
+        + h("personal_pension_contributions"),
+        "personal_pension_contributions": h("personal_pension_contributions"),
+        "earnings": h("employment_income") + h("self_employment_income"),
+    }
+
+
+def decile_rankings_from_inputs(inputs: dict, to_person, weights: np.ndarray) -> dict:
+    """Person-level (deciles, include) for each ranking in DECILE_RANKINGS.
+
+    ``hbai``: baseline equivalised HBAI income (the main measure).
+    ``pre_pension``: the same income before employee and personal pension
+    contributions, which HBAI subtracts, equivalised the same way.
+    ``hbai_excl_large_ppc``: the main ranking, with households whose personal
+    pension contributions exceed both LARGE_PPC_FLOOR and their earnings left
+    out of every decile.
+    """
+    main_values = inputs.get("equiv_hbai_person")
+    if main_values is None:
+        main_values = to_person(inputs["equiv_hbai"])
+    main = weighted_deciles(main_values, weights)
+    eqv = inputs["equivalisation"]
+    pre = np.divide(
+        inputs["hbai"] + inputs["pension_contributions"], eqv,
+        out=np.zeros_like(eqv), where=eqv > 0,
+    )
+    large = (inputs["personal_pension_contributions"] > LARGE_PPC_FLOOR) & (
+        inputs["personal_pension_contributions"] > np.maximum(inputs["earnings"], 0.0)
+    )
+    everyone = np.ones(len(weights), dtype=bool)
+    return {
+        "hbai": (main, everyone),
+        "pre_pension": (weighted_deciles(to_person(pre), weights), everyone),
+        "hbai_excl_large_ppc": (main, ~to_person(large).astype(bool)),
+        "_large_ppc_households": large,
+    }
+
+
+def decile_rankings(sim, period: int, weights: np.ndarray) -> dict:
+    inputs = ranking_inputs(sim, period)
+    # the main ranking uses the person-level model output exactly as every
+    # other script does, so its deciles are identical to theirs
+    inputs["equiv_hbai_person"] = sim.calculate(
+        "equiv_hbai_household_net_income", period=period, map_to="person"
+    ).values
+    return decile_rankings_from_inputs(
+        inputs, lambda v: household_to_person(sim, v, period), weights
+    )
+
+
+def decile_mean_change(delta, weights, deciles, include) -> dict:
+    """Person-weighted mean of ``delta`` by decile over included persons."""
+    out = {}
+    for d in range(1, 11):
+        m = (deciles == d) & include
+        out[int(d)] = float(np.average(delta[m], weights=weights[m])) if m.any() else float("nan")
+    return out
+
+
+#: Exchequer-cost components (fix for the headline framing). Taxes are
+#: person-level, spending household-level; ``other_income_tax`` is income tax
+#: net of the dividend and savings income tax it contains. The cost of a
+#: component is minus the change in a tax, or plus the change in a spending
+#: line; ``other`` is the residual against the full gov_balance change, so
+#: the components always sum to the headline cost.
+CHILDCARE_VARIABLES = (
+    "tax_free_childcare",
+    "extended_childcare_entitlement",
+    "universal_childcare_entitlement",
+    "targeted_childcare_entitlement",
+    "wales_childcare_offer",
+)
+COST_COMPONENTS = (
+    "dividend_tax",
+    "savings_tax",
+    "other_income_tax",
+    "employee_ni",
+    "employer_ni",
+    "universal_credit",
+    "childcare",
+)
+TAX_COMPONENTS = ("dividend_tax", "savings_tax", "other_income_tax", "employee_ni", "employer_ni")
+
+
+def cost_component_totals(sim, period: int) -> dict:
+    """Weighted totals (£) behind the cost decomposition, one simulation."""
+    pw = np.asarray(sim.calculate("person_weight", period=period, map_to="person").values, dtype=float)
+    hw = np.asarray(sim.calculate("household_weight", period=period, map_to="household").values, dtype=float)
+
+    def p(v):
+        return float((np.asarray(sim.calculate(v, period=period, map_to="person").values, dtype=float) * pw).sum())
+
+    def h(v):
+        return float((np.asarray(sim.calculate(v, period=period, map_to="household").values, dtype=float) * hw).sum())
+
+    income_tax = p("income_tax")
+    dividend_tax = p("dividend_income_tax")
+    savings_tax = p("savings_income_tax")
+    employee_ni = p("national_insurance")
+    benefits = h("household_benefits")
+    return {
+        "gov_balance": h("gov_balance"),
+        "income_tax": income_tax,
+        "dividend_tax": dividend_tax,
+        "savings_tax": savings_tax,
+        "other_income_tax": income_tax - dividend_tax - savings_tax,
+        "employee_ni": employee_ni,
+        "employer_ni": p("ni_employer"),
+        "universal_credit": h("universal_credit"),
+        "childcare": sum(h(v) for v in CHILDCARE_VARIABLES),
+        "household_benefits": benefits,
+        # the narrow cash basis of the JR16 grid: IT + employee NI - benefits
+        "narrow_cash_balance": income_tax + employee_ni - benefits,
+    }
+
+
+def cost_decomposition(base: dict, shocked: dict) -> dict:
+    """Exchequer cost (£bn, positive = cost) split by component.
+
+    Returns the total (from gov_balance), each COST_COMPONENTS entry,
+    ``other`` (the residual), ``excluding_employer_ni`` and the narrow cash
+    basis with its gap to the gov_balance total.
+    """
+    total = (base["gov_balance"] - shocked["gov_balance"]) / 1e9
+    out = {"total": total}
+    for k in COST_COMPONENTS:
+        delta = (shocked[k] - base[k]) / 1e9
+        out[k] = -delta if k in TAX_COMPONENTS else delta
+    out["other"] = total - sum(out[k] for k in COST_COMPONENTS)
+    out["income_tax"] = out["dividend_tax"] + out["savings_tax"] + out["other_income_tax"]
+    out["excluding_employer_ni"] = total - out["employer_ni"]
+    out["narrow_cash"] = (base["narrow_cash_balance"] - shocked["narrow_cash_balance"]) / 1e9
+    out["gov_balance_minus_narrow_cash"] = total - out["narrow_cash"]
+    if not np.isclose(sum(out[k] for k in COST_COMPONENTS) + out["other"], total, rtol=0, atol=1e-9):
+        raise AssertionError("cost components do not sum to the gov_balance cost")
+    return out
+
+
 def gini(values: np.ndarray, weights: np.ndarray) -> float:
     # bottom-code at zero: negative incomes make the Gini exceed 1
     values = np.clip(np.asarray(values, float), 0.0, None)
@@ -94,14 +285,14 @@ def gini(values: np.ndarray, weights: np.ndarray) -> float:
 def build_person_table(
     sim,
     period: int,
-    adult_tab_path: str | Path,
     *,
     extra_variables: tuple[str, ...] = (),
 ) -> pd.DataFrame:
     """Build the canonical shock person table used by every analysis.
 
-    Missing SOC matches receive survey-employment-weighted exposure and
-    complementarity means.  Keeping this construction here prevents the
+    Occupation is Microcosm's ``soc2020_major_group`` (1-9, NaN when none is
+    recorded). Employees without a major group receive the
+    survey-employment-weighted exposure and complementarity means.  Keeping this construction here prevents the
     central runner and extension scripts from silently defining different
     versions of the same exposure scenario.
     """
@@ -112,9 +303,7 @@ def build_person_table(
         {v: sim.calculate(v, period=period, map_to="person").values for v in variables}
     )
     table["weight"] = sim.calculate("person_weight", period=period, map_to="person").values
-    table["soc_major_group"] = attach_soc_major_group(
-        table["person_id"], adult_tab_path
-    )
+    table["soc_major_group"] = soc_major_group(sim, period)
     employed = table["employment_income"].to_numpy(dtype=float) > 0
     weights = table["weight"].to_numpy(dtype=float)
 
@@ -163,15 +352,10 @@ def _metrics(sim, period: int) -> dict:
 
 
 def run_scenario(
-    dataset_path: str | Path,
-    adult_tab_path: str | Path,
     scenario: ShockScenario | str,
     period: int = 2026,
     seed: int = 0,
 ) -> ScenarioResult:
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
-
     if isinstance(scenario, str):
         scenario = (
             PRESETS.get(scenario)
@@ -179,10 +363,9 @@ def run_scenario(
             or WAGE_MARGIN_PRESETS[scenario]
         )
 
-    dataset = UKSingleYearDataset(file_path=str(dataset_path))
-    baseline = Microsimulation(dataset=dataset)
+    baseline = microsimulation()
 
-    persons = build_person_table(baseline, period, adult_tab_path)
+    persons = build_person_table(baseline, period)
 
     if isinstance(scenario, WageMarginScenario):
         # the seed drives the paired central displacement draw the gross cut
@@ -193,7 +376,7 @@ def run_scenario(
     else:
         shocked_table = apply_shocks(persons, scenario, seed=seed)
 
-    shocked = build_shocked_simulation(dataset, baseline, shocked_table, period)
+    shocked = build_shocked_simulation(baseline, shocked_table, period)
     displaced = shocked_table["displaced"].to_numpy()
 
     base, shock = _metrics(baseline, period), _metrics(shocked, period)
@@ -203,18 +386,16 @@ def run_scenario(
     # per-capita household disposable income change (£ per person)
     income_delta = shock["hni_pc"] - base["hni_pc"]
     # weighted deciles of baseline EQUIVALISED household disposable income
-    # (HBAI concept, person-level, survey-weighted) — the JR16 convention
-    equiv = baseline.calculate(
-        "equiv_hbai_household_net_income", period=period, map_to="person"
-    ).values
-    order = np.argsort(equiv)
-    cum = np.cumsum(weight[order])
-    ranks = np.empty(len(equiv), dtype=float)
-    ranks[order] = cum / cum[-1]
-    deciles = np.clip(np.ceil(ranks * 10).astype(int), 1, 10)
-    decile_change = {
-        int(d): float(np.average(income_delta[deciles == d], weights=weight[deciles == d]))
-        for d in range(1, 11)
+    # (HBAI concept, person-level, survey-weighted) — the JR16 convention —
+    # plus the pre-pension-contribution ranking and the exclusion check
+    rankings = decile_rankings(baseline, period, weight)
+    deciles = rankings["hbai"][0]
+    decile_change = decile_mean_change(
+        income_delta, weight, deciles, np.ones(len(weight), dtype=bool)
+    )
+    by_ranking = {
+        name: decile_mean_change(income_delta, weight, *rankings[name])
+        for name in DECILE_RANKINGS
     }
     band_share, band_income = {}, {}
     displaced_w = float(weight[displaced].sum())
@@ -239,6 +420,10 @@ def run_scenario(
         age_band_income_change=band_income,
         gross_cut_share_target=shocked_table.attrs.get("gross_cut_share_target"),
         gross_cut_realised=shocked_table.attrs.get("gross_cut_realised"),
+        employees_weighted=float(weight[persons["employment_income"].to_numpy() > 0].sum()),
+        realised_displacement_rate=realised_displacement_rate(persons, displaced),
+        decile_income_change_by_ranking=by_ranking,
+        certified_data_build_id=certified_data_build_id(),
     )
 
 

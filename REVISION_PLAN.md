@@ -1,5 +1,12 @@
 # Revision plan (referee + code audit + literature scan, 14 July 2026)
 
+> **Status note (November 2026).** This is the July 2026 plan, kept for the record.
+> The study now runs on Microcosm UK 2024-25 (see README, "Data"), which supersedes
+> item 10 (the plain-FRS vs enhanced-FRS reconciliation; the enhanced-dataset stage
+> was removed) and the `frs_2024_25.h5` pinning in item 13 (the dataset is now pinned
+> through the policyengine.py release bundle and `uv.lock`). Numbers quoted below are
+> from the earlier FRS-based results.
+
 Verdict: **Major revision, but the paper is worth saving.** The gap (UK AI tax-benefit
 incidence) is real and still open, but PolicyEngine's own `ai-inequality` project lists
 PolicyEngine-UK as its next extension — scoop risk within months. Move fast; prioritise

@@ -1,0 +1,10 @@
+{
+  "persons_rows": 182418,
+  "households_rows": 78181,
+  "population_m": 69.34883117675781,
+  "employees_rows": 72504,
+  "employees_m": 28.994251251220703,
+  "employees_with_major_group_share": 0.9967789649963379,
+  "adults_16plus_with_major_group_share": 0.8966096639633179,
+  "employee_kish_effective_n": 5810.01123046875
+}

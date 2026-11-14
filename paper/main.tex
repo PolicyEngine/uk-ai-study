@@ -10,11 +10,16 @@
 \definecolor{peteal}{HTML}{39C6C0}      % PolicyEngine teal accent
 \usepackage{sectsty}
 \allsectionsfont{\color{paperblue}}
+\PassOptionsToPackage{hyphens}{url}
 \usepackage[colorlinks=true, citecolor=paperblue, linkcolor=paperblue, urlcolor=paperblue]{hyperref}
 \usepackage[hang,flushmargin]{footmisc}
 \usepackage{natbib}
 \bibliographystyle{apalike}
 \input{values_generated} % machine-generated numeric macros from results/
+% A figure whose PNG has not been generated yet prints a visible placeholder
+% instead of stopping the build (the rerun fills results/ stage by stage).
+\let\GENincludegraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{\IfFileExists{#2}{\GENincludegraphics[#1]{#2}}{\fbox{\parbox{.6\textwidth}{\centering\textbf{\textcolor{red}{pending figure}}\\\footnotesize\detokenize{#2}}}}}
 
 \title{\bfseries Who bears the AI shock?\\[0.15cm] The distributional and fiscal incidence in the UK\thanks{\textbf{Acknowledgements:} I thank Max Ghenis and Seyed Mahdi Hosseini for valuable comments and helpful discussions.}\\[0.7cm]}
 \author{Vahid Ahmadi\thanks{Research Associate at PolicyEngine. Email: \href{mailto:vahid@policyengine.org}{vahid@policyengine.org}.}}
@@ -24,11 +29,13 @@
 \maketitle
 
 \begin{abstract}
-\noindent I study how the simulated household and fiscal effects of an AI labour-market shock in the United Kingdom vary with its incidence. Linking occupation-level AI exposure to workers in the 2024--25 Family Resources Survey, I use PolicyEngine UK to simulate employment, wage and capital-income shocks across 66 shock-size combinations and five displacement-incidence families that hold aggregate displacement fixed. In the central 7 per cent displacement calibration, the mean Exchequer cost is \pounds \genCentralMcCostMeanBn~billion per year and absolute before-housing-costs poverty rises by \genCentralMcPovBhcMeanPp~percentage points. Incidence matters fiscally: the same aggregate shock costs \pounds \genIncUniformCostMeanBn~billion under uniform incidence and up to \pounds \genIncKleinCostMeanBn~billion under a top-loaded stress test, while poverty varies less. The Gini rises in every displacement scenario examined; shifting the same earnings loss from job losses to occupation-level wage cuts instead raises the fiscal cost, leaves poverty nearly unchanged and slightly lowers the Gini. Both incidence and the adjustment margin matter for household outcomes and the public finances.
+\noindent I estimate how much of an AI-driven labour-market shock the UK tax-benefit system absorbs and who bears the rest. I link occupation-level AI exposure to workers in Microcosm, a calibrated microdataset built from the 2024--25 Family Resources Survey, and use PolicyEngine UK to run displacement, survivor-wage and capital-income shocks through the tax-benefit system at household level. Two comparisons hold the size of the shock fixed. First, reallocating the same expected number of displaced workers (7 per cent of employees) across four stylised incidence rules changes the annual Exchequer cost from \pounds\genIncUniformCostMeanBn~billion to \pounds\genIncCompressionCostMeanBn~billion; a top-loaded stress test reaches \pounds\genIncKleinCostMeanBn~billion. Second, delivering the same gross earnings loss through wage cuts rather than job losses raises the cost from \pounds\genWcJobCostMeanBn~billion to \pounds\genWcWageCostMeanBn~billion and lowers the rise in absolute poverty from \genWcJobPovBhcMeanPp~to \genWcWagePovBhcMeanPp~percentage points (means over \genWcDraws~paired draws, with the survivor-wage and capital channels on in both). Without those channels, job loss costs the Exchequer \genAbsJobGovPct~pence per pound of earnings lost (\genAbsJobGovJsaPct~pence if every displaced worker claims Universal Credit and new-style Jobseeker's Allowance) and wage cuts \genAbsCutGovPct~pence, employer National Insurance included. Averaged over 50 draws, the exposure-proportional central case costs \pounds\genCentralMcCostMeanBn~billion a year, the net of a displacement cost of \pounds\genChannelMcDispCostAbsBn~billion (20-draw mean) and receipts from assumed survivor-wage and capital-income gains; on one draw it turns into a net gain at a survivor-wage effect of \genBeWagePct~per cent.
 \end{abstract}
 
 \medskip
 \noindent\textbf{Keywords:} artificial intelligence, labour market, microsimulation, poverty, inequality, public finances
+
+\noindent\textbf{JEL classification:} H22, H24, H53, I32, J23, O33
 
 \newpage
 \input{sections/intro}
@@ -37,6 +44,7 @@
 \input{sections/results}
 \input{sections/policy}
 \input{sections/discussion}
+\label{pg:mainend}% last page of the main text
 
 \clearpage
 \input{sections/references}

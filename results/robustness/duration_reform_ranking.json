@@ -2,27 +2,27 @@
   "description": "R1 (retention-consistent wage insurance) vs R2 (UC +20% standard allowance) under the half-earnings-retention variant of the central shock (50% earnings retention, full-year unemployed status; not a six-month spell); poverty deltas vs the retention-shocked no-reform world; seeds 0-4.",
   "n_draws": 5,
   "r1_cost_bn": {
-    "mean": 10.55852676909528,
-    "sd": 0.15091271685048688
+    "mean": 13.046152272236792,
+    "sd": 0.35340359570091956
   },
   "r1_pov_bhc_pp": {
-    "mean": -0.3559613143484419,
-    "sd": 0.04169178500391842
+    "mean": -0.44874593258897394,
+    "sd": 0.1564275695556637
   },
   "r2_cost_bn": {
-    "mean": 5.383553023999999,
-    "sd": 0.014072887994649468
+    "mean": 6.585837158400001,
+    "sd": 0.0384712117535946
   },
   "r2_pov_bhc_pp": {
-    "mean": -0.6361461197261005,
-    "sd": 0.017594090663672044
+    "mean": -0.5712321906595299,
+    "sd": 0.007152554163487199
   },
   "r1_cost_per_pp_bn": {
-    "mean": 29.969687327097176,
-    "sd": 3.3225259701937593
+    "mean": 31.36465183856824,
+    "sd": 8.553916295206266
   },
   "r2_cost_per_pp_bn": {
-    "mean": 8.468254082213512,
-    "sd": 0.24867586602090608
+    "mean": 11.53064120280043,
+    "sd": 0.16049499959963526
   }
 }

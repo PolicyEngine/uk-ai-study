@@ -1,8 +1,18 @@
 """Workstream 2: the labour->profits tax-composition channel (OBR FRS-2026
 Box 4.1 style pricing).
 
-Static accounting layered ON TOP of the JR16 microsimulation grid. In each
-displacement scenario a wage bill W_lost disappears from labour taxation.
+Static accounting layered on top of its own displacement-only
+microsimulations. In each displacement scenario a wage bill W_lost
+disappears from labour taxation.
+
+Capital shock OFF throughout. The composition question is the labour-tax
+gap, so every simulation here (the u = 1..10 displacement cells and both
+runs of the recycling case) holds interest and dividend income at baseline.
+The earlier version read the phi = 0 revenue change from the zero-wage
+column of results/jr16/grid.csv, whose cells carry the +0.4pp capital
+shock, so the capital channel's extra income tax leaked into the labour
+gap. Each cell now has its own capital-off simulation (seed 0, wage uplift
+0), against the unshocked baseline.
 Composition counterfactual: a fraction phi of W_lost reappears as corporate
 profits taxed at the UK corporation tax main rate (25%), instead of being
 taxed as labour at the ACTUAL average effective IT+NICs rate on the
@@ -25,8 +35,8 @@ recycled amount is W_lost * phi * (1 - CT_MAIN_RATE) * payout, distributed
 pro-rata over the observed household dividend distribution (payout ratio
 treated as a parameter, 0.5 — roughly the long-run FTSE dividend payout
 ratio; no UK-specific AI-firm evidence, so it is a parameter, not an
-estimate). ONE extra PolicyEngine simulation prices the phi=0.5 case
-against the no-recycling central scenario.
+estimate). Two simulations price the phi=0.5 case against the no-recycling central
+scenario, both with the capital shock off.
 
 Caveats printed into the outputs: static accounting; incidence of CT (on
 wages, prices, or shareholders) NOT modelled; no behavioural response; CT
@@ -35,6 +45,8 @@ or profit shifting).
 
 Outputs (results/tax_composition/):
   composition_grid.csv       - u x phi grid of revenue accounting
+  composition_sims.csv       - per-u capital-off simulation checkpoint
+                               (stamped; continued only with --resume)
   recycling_case.json        - phi=0.5 dividend-recycling simulation
   revenue_shortfall_phi.png  - net revenue shortfall (GBP bn) vs phi
 
@@ -68,6 +80,7 @@ CT_MAIN_RATE = 0.25
 PHIS = [0.25, 0.5, 0.75, 1.0]
 PAYOUT_RATIO = 0.5  # parameter, see module docstring
 SEED = 0  # same seed as the jr16 grid, so draws line up cell-for-cell
+NO_CAPITAL = 0.0  # capital shock off: labour-tax gap only
 
 INCOME_COMPONENTS = (
     "employment_income",
@@ -91,18 +104,51 @@ def labour_tax_attribution(baseline_sim, persons):
     return it_ni * share  # per-person GBP attributable to labour
 
 
-def composition_grid(persons, labour_tax, grid_path):
-    """u x phi accounting grid; labour-side net revenue comes from the
-    existing jr16 grid (w=0 column) where available."""
+def narrow_and_full_balance(sim) -> dict:
+    """Narrow cash basis (IT + NI - household benefits, as in the JR16 grid)
+    and the full gov_balance, £."""
+    pw = sim.calculate("person_weight", period=PERIOD, map_to="person").values
+    hw = sim.calculate("household_weight", period=PERIOD, map_to="household").values
+    it = float((sim.calculate("income_tax", period=PERIOD, map_to="person").values * pw).sum())
+    ni = float((sim.calculate("national_insurance", period=PERIOD, map_to="person").values * pw).sum())
+    bh = float((sim.calculate("household_benefits", period=PERIOD, map_to="household").values * hw).sum())
+    gov = float((sim.calculate("gov_balance", period=PERIOD, map_to="household").values * hw).sum())
+    return {"narrow": it + ni - bh, "gov_balance": gov}
+
+
+def capital_off_cells(baseline_sim, persons):
+    """u = 1..10 displacement-only, capital-off simulations (seed 0)."""
+    import gc
+
+    from uk_ai_study.checkpoint import Checkpoint
+
+    base = narrow_and_full_balance(baseline_sim)
+    ckpt = Checkpoint(OUT / "composition_sims.csv", ("unemployment_pct",), script=__file__)
+    for u in range(1, 11):
+        if ckpt.is_done(u):
+            continue
+        scenario = ShockScenario(f"u{u}_nocap", u / 100, 0.0, capital_return_increase=NO_CAPITAL)
+        table = apply_shocks(persons, scenario, seed=SEED)
+        sim = build_shocked_simulation(baseline_sim, table, PERIOD)
+        m = narrow_and_full_balance(sim)
+        del sim
+        gc.collect()
+        ckpt.append({
+            "unemployment_pct": u,
+            "net_revenue_change_bn": (m["narrow"] - base["narrow"]) / 1e9,
+            "gov_balance_change_bn": (m["gov_balance"] - base["gov_balance"]) / 1e9,
+        })
+        print(f"composition u={u} (capital off) done", flush=True)
+    cells = ckpt.read().set_index("unemployment_pct")
+    if sorted(cells.index) != list(range(1, 11)):
+        raise ValueError("composition simulation checkpoint is incomplete")
+    return cells
+
+
+def composition_grid(persons, labour_tax, cells):
+    """u x phi accounting grid on the capital-off simulations."""
     weight = persons["weight"].to_numpy()
     emp = persons["employment_income"].to_numpy()
-
-    jr16 = None
-    if grid_path.exists():
-        g = pd.read_csv(grid_path)
-        jr16 = g[g["wage_pct"] == 0].set_index("unemployment_pct")[
-            "net_revenue_change_bn"
-        ]
 
     rows = []
     for u in range(0, 11):
@@ -110,29 +156,34 @@ def composition_grid(persons, labour_tax, grid_path):
             w_lost = 0.0
             t_lab = np.nan
             lab_tax_lost = 0.0
+            net_rev_bn = gov_bn = 0.0  # no shock at all: identical to baseline
         else:
-            scenario = ShockScenario(f"u{u}", u / 100, 0.0)
+            scenario = ShockScenario(f"u{u}", u / 100, 0.0, capital_return_increase=NO_CAPITAL)
             displaced = draw_displaced(persons, scenario, seed=SEED)
             w_lost = float((emp * weight)[displaced].sum())
             lab_tax_lost = float((labour_tax * weight)[displaced].sum())
             t_lab = lab_tax_lost / w_lost
-        # net revenue change (IT+NI-benefits) from the microsimulation,
-        # displacement-only column (wage uplift 0), same seed
-        net_rev_bn = float(jr16.loc[u]) if jr16 is not None and u in jr16.index else np.nan
+            net_rev_bn = float(cells.loc[u, "net_revenue_change_bn"])
+            gov_bn = float(cells.loc[u, "gov_balance_change_bn"])
         for phi in PHIS:
             ct = phi * CT_MAIN_RATE * w_lost
             rows.append(
                 {
                     "unemployment_pct": u,
                     "phi": phi,
+                    "capital_shock": False,
                     "w_lost_bn": w_lost / 1e9,
                     "effective_labour_tax_rate": t_lab,
                     "labour_tax_lost_bn": lab_tax_lost / 1e9,
                     "ct_recouped_bn": ct / 1e9,
-                    # microsim labour-side net revenue change plus the CT
-                    # recoup; negative = shortfall
+                    # capital-off displacement-only net revenue change (narrow
+                    # cash basis, IT + NI - benefits) plus the CT recoup;
+                    # negative = shortfall
                     "net_revenue_change_with_ct_bn": net_rev_bn + ct / 1e9,
                     "microsim_net_revenue_change_bn": net_rev_bn,
+                    # the same cell on the full gov_balance basis (adds
+                    # employer NI and the other gov_balance lines)
+                    "microsim_gov_balance_change_bn": gov_bn,
                     # pure composition delta: taxing phi*W_lost at 25% CT
                     # instead of the whole W_lost at the effective labour rate
                     "delta_vs_full_labour_taxation_bn": (phi * CT_MAIN_RATE * w_lost - lab_tax_lost) / 1e9,
@@ -183,10 +234,14 @@ def hh_metrics(sim):
     }
 
 
-def recycling_case(dataset, baseline_sim, persons, labour_tax):
+def recycling_case(baseline_sim, persons, labour_tax):
     """phi=0.5 dividend-recycling simulation vs the no-recycling central
-    scenario. ONE extra Microsimulation (run sequentially, freed after use)."""
-    scenario = PRESETS["central"]
+    scenario, both with the capital shock OFF (labour-tax gap only), run
+    sequentially and freed after use."""
+    scenario = ShockScenario(
+        "central_nocap", PRESETS["central"].displacement_rate,
+        PRESETS["central"].wage_uplift, capital_return_increase=NO_CAPITAL,
+    )
     shocked_table = apply_shocks(persons, scenario, seed=SEED)
     displaced = shocked_table["displaced"].to_numpy()
     weight = persons["weight"].to_numpy()
@@ -197,13 +252,13 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
     deciles = persons["decile"].to_numpy()
 
     # no-recycling central scenario
-    sim = build_shocked_simulation(dataset, baseline_sim, shocked_table, PERIOD)
+    sim = build_shocked_simulation(baseline_sim, shocked_table, PERIOD)
     central = hh_metrics(sim)
     del sim
 
     # recycling: distribute W_lost * phi * (1 - CT) * payout pro-rata over
-    # the observed dividend distribution (baseline shares == shocked shares,
-    # since the capital shock scales every dividend by the same factor).
+    # the observed dividend distribution (baseline shares; the capital shock
+    # is off here, so the shocked dividends equal the baseline ones).
     # Dividends come out of post-corporation-tax profit (R2-8): CT at the
     # 25% main rate is charged on phi*W_lost, and only the after-CT residual
     # is available for distribution.
@@ -213,7 +268,7 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
     agg_div = float((div * weight).sum())
     recycled_table = shocked_table.copy()
     recycled_table["dividend_income"] = div * (1 + recycled / agg_div)
-    sim = build_shocked_simulation(dataset, baseline_sim, recycled_table, PERIOD)
+    sim = build_shocked_simulation(baseline_sim, recycled_table, PERIOD)
     recyc = hh_metrics(sim)
     del sim
 
@@ -228,7 +283,9 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
 
     dm_base, dm_c, dm_r = decile_means(base), decile_means(central), decile_means(recyc)
     result = {
-        "scenario": "central (7% displacement, +2.6% wages, +0.4pp capital return), seed 0",
+        "scenario": "central displacement and wages (7% displacement, +2.6% wages), "
+                    "capital shock OFF, seed 0",
+        "capital_shock": False,
         "phi": phi,
         "payout_ratio": PAYOUT_RATIO,
         "displaced_wage_bill_bn": w_lost / 1e9,
@@ -264,13 +321,14 @@ def recycling_case(dataset, baseline_sim, persons, labour_tax):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    dataset, baseline_sim, persons = build_person_table()
+    baseline_sim, persons = build_person_table()
     labour_tax = labour_tax_attribution(baseline_sim, persons)
 
-    grid = composition_grid(persons, labour_tax, Path("results/jr16/grid.csv"))
+    cells = capital_off_cells(baseline_sim, persons)
+    grid = composition_grid(persons, labour_tax, cells)
     shortfall_figure(grid)
 
-    result = recycling_case(dataset, baseline_sim, persons, labour_tax)
+    result = recycling_case(baseline_sim, persons, labour_tax)
 
     c = grid[(grid["unemployment_pct"] == 7) & (grid["phi"] == 0.5)].iloc[0]
     print(json.dumps({
@@ -279,6 +337,7 @@ def main():
         "central_labour_tax_lost_bn": c["labour_tax_lost_bn"],
         "central_phi05_ct_recouped_bn": c["ct_recouped_bn"],
         "central_phi05_delta_vs_full_labour_bn": c["delta_vs_full_labour_taxation_bn"],
+        "central_capital_off_net_revenue_change_bn": c["microsim_net_revenue_change_bn"],
         "recycling_minus_central": result["recycling_minus_central"],
     }, indent=2))
 

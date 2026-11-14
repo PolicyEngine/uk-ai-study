@@ -19,6 +19,7 @@ to duration_reform_draws.csv).
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -37,23 +38,19 @@ from policy_counterfactuals import (  # noqa: E402
     build_sim, hh_state, metrics_from_state, person_calc, hh_calc,
 )
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 5
 RETENTION = 0.5
 CSV = OUT / "duration_reform_draws.csv"
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
     from policyengine_uk.system import system
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    baseline = microsimulation()
+    persons = build_person_table(baseline, PERIOD)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
@@ -75,13 +72,13 @@ def main():
         for k in ("SINGLE_YOUNG", "SINGLE_OLD", "COUPLE_YOUNG", "COUPLE_OLD")
     }
 
-    done = set()
-    if CSV.exists():
-        done = set(pd.read_csv(CSV)["seed"])
+    from uk_ai_study.checkpoint import Checkpoint
+
+    ckpt = Checkpoint(CSV, ("seed",), script=__file__)
 
     scenario = PRESETS["central"]
     for seed in range(N_DRAWS):
-        if seed in done:
+        if ckpt.is_done(seed):
             continue
         table = apply_shocks(persons, scenario, seed=seed)
         displaced = table["displaced"].to_numpy()
@@ -89,9 +86,10 @@ def main():
         table = table.copy()
         table["employment_income"] = np.where(displaced, RETENTION * base_emp, emp)
 
-        sim0 = build_sim(ds, base_arrays, table)
+        sim0 = build_sim(base_arrays, table)
         s0 = hh_state(sim0)
         del sim0
+        gc.collect()
         m0 = metrics_from_state(s0, pw_by_hh)
 
         # R1 duration-consistent wage insurance
@@ -105,9 +103,10 @@ def main():
         transfer_hh = np.bincount(p2h, weights=transfer_p, minlength=len(s0["hw"]))
         m1 = metrics_from_state(s0, pw_by_hh, extra_hh_income=transfer_hh)
 
-        simr = build_sim(ds, base_arrays, table, reform=r2_reform)
+        simr = build_sim(base_arrays, table, reform=r2_reform)
         sr = hh_state(simr)
         del simr
+        gc.collect()
         mr = metrics_from_state(sr, pw_by_hh)
         cost_r2 = s0["gov"] - sr["gov"]
 
@@ -120,10 +119,13 @@ def main():
         }
         row["r1_cost_per_pp_bn"] = row["r1_cost_bn"] / -row["r1_pov_bhc_pp"] if row["r1_pov_bhc_pp"] < 0 else None
         row["r2_cost_per_pp_bn"] = row["r2_cost_bn"] / -row["r2_pov_bhc_pp"] if row["r2_pov_bhc_pp"] < 0 else None
-        pd.DataFrame([row]).to_csv(CSV, mode="a", header=not CSV.exists(), index=False)
+        ckpt.append(row)
         print(f"duration reforms seed {seed} done", flush=True)
 
-    d = pd.read_csv(CSV)
+    d = ckpt.read()
+    if sorted(d["seed"]) != list(range(N_DRAWS)):
+        raise ValueError("duration-reform checkpoint is incomplete or duplicated")
+    d = d.drop(columns=["certified_data_build_id", "code_fingerprint"])
     summary = {
         "description": "R1 (retention-consistent wage insurance) vs R2 (UC +20% "
                        "standard allowance) under the half-earnings-retention "

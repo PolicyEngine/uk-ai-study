@@ -1,6 +1,6 @@
 """Run all presets and write results to results/.
 
-Usage: python analysis/run_all.py [--data-dir DATA] [--period 2026]
+Usage: python analysis/run_all.py [--period 2026] [--scenarios ...]
 """
 
 import argparse
@@ -14,19 +14,15 @@ ALL_PRESETS = list(PRESETS) + list(RIPPLE_PRESETS) + list(WAGE_MARGIN_PRESETS)
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", default="data")
     parser.add_argument("--period", type=int, default=2026)
     parser.add_argument("--scenarios", nargs="*", default=ALL_PRESETS)
     args = parser.parse_args()
 
-    data = Path(args.data_dir)
-    dataset = data / "frs_2024_25.h5"
-    adult_tab = data / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
     results = Path("results")
     results.mkdir(exist_ok=True)
 
     for name in args.scenarios:
-        result = run_scenario(dataset, adult_tab, name, period=args.period)
+        result = run_scenario(name, period=args.period)
         write_result(result, results / f"{name}.json")
         print(
             f"{name}: exchequer £{result.exchequer_cost/1e9:.1f}bn, "

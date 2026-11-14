@@ -1,40 +1,40 @@
 {
   "scenario": "brynjolfsson_canaries_2025",
-  "displaced_weighted_total": 20333.78125,
-  "share_of_employed_displaced": 0.0008830181905068457,
-  "exchequer_cost_bn": 0.16146432,
-  "poverty_change_bhc_pp": 0.015542164792334279,
-  "gini_change_pp": 0.008740160482556547,
+  "displaced_weighted_total": 53666.0,
+  "share_of_employed_displaced": 0.0018509186338633299,
+  "exchequer_cost_bn": 0.441810944,
+  "poverty_change_bhc_pp": 0.04901314394513273,
+  "gini_change_pp": 0.014866520976908326,
   "age_bands": {
     "16-24": {
-      "displaced_weighted": 15295.8330078125,
-      "displacement_rate_of_employed": 0.01036154106259346,
-      "mean_per_capita_income_change": -46.89903832057514
+      "displaced_weighted": 43196.19140625,
+      "displacement_rate_of_employed": 0.013631409034132957,
+      "mean_per_capita_income_change": -70.11930416108378
     },
     "25-34": {
-      "displaced_weighted": 5037.94921875,
-      "displacement_rate_of_employed": 0.0010536707704886794,
-      "mean_per_capita_income_change": -7.186705232628363
+      "displaced_weighted": 10469.8076171875,
+      "displacement_rate_of_employed": 0.001529863802716136,
+      "mean_per_capita_income_change": -20.490801730289885
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -3.738474327314298
+      "mean_per_capita_income_change": -0.004136720927653089
     },
     "45-54": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -7.7998299616680935
+      "mean_per_capita_income_change": -25.117189291960866
     },
     "55-64": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -2.74957540427179
+      "mean_per_capita_income_change": -2.98274506752203
     },
     "65-+": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -1.6086601308945725
+      "mean_per_capita_income_change": -2.689141060024975
     }
   }
 }

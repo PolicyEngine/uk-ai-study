@@ -126,38 +126,47 @@ def prescribed_systematic_sample(
     return selected
 
 
-def draw_displaced(
-    persons: pd.DataFrame,
-    scenario: ShockScenario,
-    seed: int = 0,
-) -> np.ndarray:
-    """Boolean displaced mask per eq 3.4 (employees only)."""
-    if not 0.0 <= scenario.displacement_rate <= 1.0:
-        raise ValueError("displacement_rate must be between zero and one")
-    rng = np.random.default_rng(seed)
+def _employee_groups(persons: pd.DataFrame):
+    """Employee mask, min-shifted exposure and pseudo-grouped SOC codes."""
     earnings = persons["employment_income"].to_numpy(dtype=float)
     weight = persons["weight"].to_numpy(dtype=float)
     if np.any(~np.isfinite(weight)) or np.any(weight <= 0):
         raise ValueError("weights must be finite and positive")
     employed = earnings > 0
-    if not employed.any():
-        return np.zeros(len(persons), dtype=bool)
     exposure = persons["exposure"].to_numpy(dtype=float)
-    if np.any(~np.isfinite(exposure[employed])):
+    if employed.any() and np.any(~np.isfinite(exposure[employed])):
         raise ValueError("exposure must be present and finite for every employee")
     # JR16 normalises C-AIOE so the least-exposed sector scores 0 (and thus
     # receives no eq 3.4 job losses); the raw standardised score is negative
     # for low-exposure groups, which would corrupt the quota weights.
-    exposure = exposure - exposure[employed].min()
+    if employed.any():
+        exposure = exposure - exposure[employed].min()
     # Employees without an observed SOC code form their own pseudo-group
     # (carrying their mean-imputed exposure), so the displacement universe is
     # ALL employees and matches the wage-uplift universe (#1, finding 7).
     group = np.where(
-        np.isfinite(persons["soc_major_group"].to_numpy()),
-        persons["soc_major_group"].to_numpy(),
+        np.isfinite(persons["soc_major_group"].to_numpy(dtype=float)),
+        persons["soc_major_group"].to_numpy(dtype=float),
         -1.0,
     )
-    total_quota = scenario.displacement_rate * float(weight[employed].sum())
+    return employed, weight, exposure, group
+
+
+def group_quotas(persons: pd.DataFrame, displacement_rate: float) -> dict:
+    """Prescribed eq 3.4 quotas per SOC major group (deterministic).
+
+    Returns ``{group: {"employment": weighted employees, "quota": weighted
+    displaced quota, "quota_rate": quota / employment}}``; group ``-1`` is
+    the pseudo-group of employees without a recorded SOC code. These are the
+    rates the sampler targets in expectation; any single draw realises them
+    only up to systematic-sampling noise.
+    """
+    if not 0.0 <= displacement_rate <= 1.0:
+        raise ValueError("displacement_rate must be between zero and one")
+    employed, weight, exposure, group = _employee_groups(persons)
+    if not employed.any():
+        return {}
+    total_quota = displacement_rate * float(weight[employed].sum())
     groups = np.unique(group[employed])
     # group quotas proportional to employment x mean exposure
     emp_w = {g: float(weight[employed & (group == g)].sum()) for g in groups}
@@ -169,14 +178,36 @@ def draw_displaced(
     if sum(raw.values()) <= 0:
         # degenerate case (uniform exposure): allocate by employment alone
         raw = {g: emp_w[g] for g in groups}
-        exposure = np.ones_like(exposure)
     scale = total_quota / sum(raw.values())
+    return {
+        float(g): {
+            "employment": emp_w[g],
+            "quota": raw[g] * scale,
+            "quota_rate": raw[g] * scale / emp_w[g],
+        }
+        for g in groups
+    }
+
+
+def draw_displaced(
+    persons: pd.DataFrame,
+    scenario: ShockScenario,
+    seed: int = 0,
+) -> np.ndarray:
+    """Boolean displaced mask per eq 3.4 (employees only)."""
+    if not 0.0 <= scenario.displacement_rate <= 1.0:
+        raise ValueError("displacement_rate must be between zero and one")
+    rng = np.random.default_rng(seed)
+    employed, weight, _, group = _employee_groups(persons)
+    if not employed.any():
+        return np.zeros(len(persons), dtype=bool)
+    quotas = group_quotas(persons, scenario.displacement_rate)
     displaced = np.zeros(len(persons), dtype=bool)
 
     age = persons["age"].to_numpy()
-    for g in groups:
+    for g, q in quotas.items():
         members = np.flatnonzero(employed & (group == g))
-        quota = raw[g] * scale
+        quota = q["quota"]
         if quota <= 0:
             continue
         # prescribed first-order inclusion probabilities: pi_i proportional
@@ -192,6 +223,14 @@ def draw_displaced(
             weight[members], quota, m, rng
         )
     return displaced
+
+
+def realised_displacement_rate(persons: pd.DataFrame, displaced: np.ndarray) -> float:
+    """Weighted displaced employees / weighted baseline employees."""
+    weight = persons["weight"].to_numpy(dtype=float)
+    employed = persons["employment_income"].to_numpy(dtype=float) > 0
+    denom = float(weight[employed].sum())
+    return float(weight[np.asarray(displaced) & employed].sum()) / denom if denom else 0.0
 
 
 def apply_shocks(
@@ -433,13 +472,12 @@ def _gradient_values(
             raise ValueError(f"unknown gradient: {scenario.gradient!r}")
         gradient_weights = load_pss_weights()
     # per-major-group weights: accept any dict/Series keyed by major group
-    # (1-9 or FRS 1000-9000); employees without a SOC code get the
-    # employment-weighted mean weight (mirroring mean-imputed exposure)
+    # (1-9); employees without a SOC code get the employment-weighted mean
+    # weight (mirroring mean-imputed exposure)
     weights = pd.Series(gradient_weights, dtype=float)
     if (weights < 0).any():
         raise ValueError("gradient weights must be non-negative")
     codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
-    codes = codes.where(codes < 10, codes / 1000)
     g = codes.map(weights).to_numpy(dtype=float)
     w = persons["weight"].to_numpy(dtype=float)
     matched = employed & np.isfinite(g)
@@ -610,7 +648,6 @@ def compute_inflow_shares(
     weight = persons["weight"].to_numpy(dtype=float)
     employed = persons["employment_income"].to_numpy(dtype=float) > 0
     codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
-    codes = codes.where(codes < 10, codes / 1000)  # accept 1-9 or FRS 1000-9000
     group = codes.to_numpy(dtype=float)
 
     dest = routing.columns
@@ -660,7 +697,6 @@ def apply_ripple_shocks(
 
     earnings = persons["employment_income"].to_numpy(dtype=float)
     codes = pd.to_numeric(persons["soc_major_group"], errors="coerce")
-    codes = codes.where(codes < 10, codes / 1000)
     cut_rate = codes.map(eta * s).fillna(0.0).to_numpy(dtype=float)
     survivors = (earnings > 0) & ~displaced
     new = shocked["employment_income"].to_numpy(dtype=float).copy()
@@ -676,11 +712,18 @@ def apply_ripple_shocks(
 #: inputs are zeroed so displaced workers do not remain in_work (hours > 0
 #: keeps UC childcare, tax-free childcare and extended childcare paying),
 #: do not keep deducting pension contributions from zero earnings, and do
-#: not draw statutory pay.
+#: not draw statutory pay. Personal pension contributions are zeroed too:
+#: Microcosm carries some very large ones (up to ~£81k a year), and HBAI
+#: income subtracts them, so a displaced worker who kept paying them would
+#: show an implausible fall below their benefit income. Employer and
+#: bonus-sacrifice contributions end with the job.
 TRANSITION_ZEROED_VARIABLES = (
     "hours_worked",
     "employee_pension_contributions",
     "pension_contributions_via_salary_sacrifice",
+    "pension_contributions_via_bonus_sacrifice",
+    "personal_pension_contributions",
+    "employer_pension_contributions",
     "statutory_maternity_pay",
     "statutory_paternity_pay",
     "statutory_sick_pay",
@@ -694,7 +737,7 @@ SHOCKED_INCOME_VARIABLES = (
 
 
 def build_shocked_simulation(
-    dataset, baseline_sim, shocked_table, period, reform=None, base_arrays=None
+    baseline_sim, shocked_table, period, reform=None, base_arrays=None
 ):
     """One shared constructor for the shocked simulation (every pipeline).
 
@@ -707,9 +750,9 @@ def build_shocked_simulation(
     the baseline simulation for memory); otherwise they are calculated from
     ``baseline_sim``.
     """
-    from policyengine_uk import Microsimulation
+    from uk_ai_study.data import microsimulation
 
-    sim = Microsimulation(dataset=dataset, reform=reform)
+    sim = microsimulation(reform=reform)
     for column in SHOCKED_INCOME_VARIABLES:
         sim.set_input(column, period, shocked_table[column].to_numpy(dtype=float))
     displaced = shocked_table["displaced"].to_numpy()

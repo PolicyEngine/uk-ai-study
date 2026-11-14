@@ -45,9 +45,9 @@ from uk_ai_study.shocks import (
     PRESETS,
     build_shocked_simulation,
     prescribed_systematic_sample,
+    realised_displacement_rate,
 )
 
-DATA = Path("data")
 OUT = Path("results/incidence")
 PERIOD = 2026
 SEED = 0
@@ -137,18 +137,12 @@ def measured_table(
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-        extra_variables=("region",),
+    persons = build_person_table(baseline, PERIOD, extra_variables=("region",),
     )
 
     equiv = calc("equiv_hbai_household_net_income")
@@ -187,13 +181,14 @@ def main():
     }
 
     table = measured_table(persons, scenario, LONDON_MULT_CENTRAL)
-    sim = build_shocked_simulation(ds, baseline, table, PERIOD)
+    sim = build_shocked_simulation(baseline, table, PERIOD)
     m = metrics(sim)
     displaced = table["displaced"].to_numpy()
     delta = m["hni"] - b["hni"]
     rec = {
         "family": "klein_top_loaded",
         "displaced_weighted_m": float(w[displaced].sum() / 1e6),
+        "realised_displacement_rate": realised_displacement_rate(persons, displaced),
         "exchequer_cost_bn": (b["gov"] - m["gov"]) / 1e9,
         "poverty_change_bhc_pp": 100 * (m["pov_bhc"] - b["pov_bhc"]),
         "poverty_change_ahc_pp": 100 * (m["pov_ahc"] - b["pov_ahc"]),
@@ -234,7 +229,7 @@ def main():
                 "junior_proxy": "junior positions proxied by age < 25 (KT's concept "
                                 "is seniority, not age; under-25s are ~2% of the "
                                 "displaced given the wage-tier tilt)",
-                "wage_tier_split": "weighted median of employee earnings (FRS person "
+                "wage_tier_split": "weighted median of employee earnings (Microcosm person "
                                    "earnings proxy for KT's firm pay tiers)",
                 "composite": "multiplicative combination of exposure x junior x "
                              "wage-tier channels (independence imposed)",

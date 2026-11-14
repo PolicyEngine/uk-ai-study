@@ -5,12 +5,12 @@
   "transition_share_definition": "transition_share_decileN_pct = share of persons in baseline equivalised-income decile N who are displaced (weighted); it is NOT the share of households pushed down a decile.",
   "results": {
     "c_aioe": {
-      "exchequer_cost_bn": 18.209980416,
-      "poverty_change_bhc_pp": 1.8069433542672653,
-      "gini_change_pp": 1.0383741096702703,
-      "transition_share_decile1_pct": 0.6389977931976318,
-      "transition_share_decile10_pct": 5.342141628265381,
-      "displaced_weighted_m": 1.5572571754455566,
+      "exchequer_cost_bn": 7.378010112,
+      "poverty_change_bhc_pp": 1.9500770397753775,
+      "gini_change_pp": 1.4992733421534954,
+      "transition_share_decile1_pct": 0.47875258326530457,
+      "transition_share_decile10_pct": 5.611846923828125,
+      "displaced_weighted_m": 1.9594855308532715,
       "conclusions": {
         "gini_rises": true,
         "transition_gradient_rises_with_income": true,
@@ -19,40 +19,40 @@
       "all_three_survive": true
     },
     "felten_aioe": {
-      "exchequer_cost_bn": 18.137546752,
-      "poverty_change_bhc_pp": 1.8352155921865982,
-      "gini_change_pp": 1.0530030480470076,
-      "transition_share_decile1_pct": 0.49750834703445435,
-      "transition_share_decile10_pct": 5.440489292144775,
-      "displaced_weighted_m": 1.5743342638015747,
+      "exchequer_cost_bn": 9.305194496,
+      "poverty_change_bhc_pp": 2.922060777755078,
+      "gini_change_pp": 1.9111730510791736,
+      "transition_share_decile1_pct": 0.6884498000144958,
+      "transition_share_decile10_pct": 6.183685779571533,
+      "displaced_weighted_m": 2.155458927154541,
       "conclusions": {
         "gini_rises": true,
         "transition_gradient_rises_with_income": true,
-        "fiscal_cost_within_20pct_of_central": true
+        "fiscal_cost_within_20pct_of_central": false
       },
-      "all_three_survive": true
+      "all_three_survive": false
     },
     "eloundou_beta": {
-      "exchequer_cost_bn": 20.382449664,
-      "poverty_change_bhc_pp": 2.02621993800903,
-      "gini_change_pp": 1.099797458384555,
-      "transition_share_decile1_pct": 0.31924110651016235,
-      "transition_share_decile10_pct": 4.785903453826904,
-      "displaced_weighted_m": 1.615854263305664,
+      "exchequer_cost_bn": 3.366813696,
+      "poverty_change_bhc_pp": 2.0986490687486508,
+      "gini_change_pp": 1.81959598246757,
+      "transition_share_decile1_pct": 0.84113609790802,
+      "transition_share_decile10_pct": 4.949517250061035,
+      "displaced_weighted_m": 1.948927640914917,
       "conclusions": {
         "gini_rises": true,
         "transition_gradient_rises_with_income": true,
-        "fiscal_cost_within_20pct_of_central": true
+        "fiscal_cost_within_20pct_of_central": false
       },
-      "all_three_survive": true
+      "all_three_survive": false
     },
     "dsit_aioe": {
-      "exchequer_cost_bn": 18.18624,
-      "poverty_change_bhc_pp": 2.044943008738392,
-      "gini_change_pp": 1.1800173595563068,
-      "transition_share_decile1_pct": 0.36349380016326904,
-      "transition_share_decile10_pct": 4.890209674835205,
-      "displaced_weighted_m": 1.6451053619384766,
+      "exchequer_cost_bn": 5.941690368,
+      "poverty_change_bhc_pp": 2.2683915407250983,
+      "gini_change_pp": 1.7158780191065315,
+      "transition_share_decile1_pct": 0.7301725149154663,
+      "transition_share_decile10_pct": 4.962619781494141,
+      "displaced_weighted_m": 1.8915461301803589,
       "conclusions": {
         "gini_rises": true,
         "transition_gradient_rises_with_income": true,
@@ -61,18 +61,18 @@
       "all_three_survive": true
     },
     "dsit_llm": {
-      "exchequer_cost_bn": 16.66809856,
-      "poverty_change_bhc_pp": 1.8304015564261311,
-      "gini_change_pp": 0.9424431894832663,
-      "transition_share_decile1_pct": 0.4283987879753113,
-      "transition_share_decile10_pct": 5.798840045928955,
-      "displaced_weighted_m": 1.6016099452972412,
+      "exchequer_cost_bn": 5.114298368,
+      "poverty_change_bhc_pp": 2.0748505399896393,
+      "gini_change_pp": 1.6488260904892305,
+      "transition_share_decile1_pct": 0.6705772280693054,
+      "transition_share_decile10_pct": 6.235249042510986,
+      "displaced_weighted_m": 1.9897098541259766,
       "conclusions": {
         "gini_rises": true,
         "transition_gradient_rises_with_income": true,
-        "fiscal_cost_within_20pct_of_central": true
+        "fiscal_cost_within_20pct_of_central": false
       },
-      "all_three_survive": true
+      "all_three_survive": false
     }
   }
 }

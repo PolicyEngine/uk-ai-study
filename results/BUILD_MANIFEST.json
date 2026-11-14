@@ -1,37 +1,36 @@
 {
-  "git_commit": "e85be0ba8b24661977dee70373b44859a4c8caea",
+  "git_commit": "88d2acc3975cfa4b926e2a0330ba8f74f1d7abf1",
   "git_dirty_at_build": false,
   "invoking_checkout_dirty_at_start": false,
   "started_utc": null,
-  "finished_utc": "2026-07-29T10:40:29Z",
+  "finished_utc": "2026-11-13T12:43:15Z",
   "recovery_note": "Attested existing results tree without a full clean-room rerun; see git history for which stages were added or repaired since the last full attested build.",
   "python": {
-    "version": "3.13.3",
+    "version": "3.13.15",
     "implementation": "CPython",
-    "executable": "/Users/janansadeqian/uk-ai-study/.venv/bin/python3"
+    "executable": "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python"
   },
   "package_versions": {
     "uk-ai-study": "0.1.0",
-    "policyengine-uk": "2.89.2",
-    "policyengine-core": "3.30.2",
-    "policyengine-uk-data": null,
+    "policyengine": "6.16.1",
+    "policyengine-uk": "2.174.1",
+    "policyengine-core": "3.33.3",
     "numpy": "2.5.1",
     "pandas": "3.0.3",
-    "matplotlib": "3.11.1",
-    "geopandas": "1.1.4"
+    "matplotlib": "3.11.1"
   },
   "stages": [
     {
       "stage": "presets",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/run_all.py"
       ]
     },
     {
       "stage": "jr16_figs",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/replicate_jr16.py",
         "figs"
       ]
@@ -39,7 +38,7 @@
     {
       "stage": "jr16_grid",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/replicate_jr16.py",
         "grid"
       ]
@@ -47,21 +46,21 @@
     {
       "stage": "incidence",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/incidence_scenarios.py"
       ]
     },
     {
       "stage": "measured_incidence",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/measured_incidence.py"
       ]
     },
     {
       "stage": "appendix_fast",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/appendix.py",
         "fast"
       ]
@@ -69,7 +68,7 @@
     {
       "stage": "appendix_decomp",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/appendix.py",
         "decomp"
       ]
@@ -77,7 +76,7 @@
     {
       "stage": "appendix_grids",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/appendix.py",
         "grids"
       ]
@@ -85,305 +84,282 @@
     {
       "stage": "robustness",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/robustness.py",
-        "all"
+        "fast"
       ]
     },
     {
       "stage": "monte_carlo",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/monte_carlo_families.py"
       ]
     },
     {
       "stage": "index_sensitivity",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/index_sensitivity.py"
       ]
     },
     {
       "stage": "duration_takeup",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/sensitivity_duration_takeup.py"
       ]
     },
     {
       "stage": "duration_reforms",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/sensitivity_duration_reforms.py"
       ]
     },
     {
       "stage": "wage_tier",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/sensitivity_wage_tier.py"
       ]
     },
     {
       "stage": "mixed_wage_adjustment",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/sensitivity_mixed_wage_adjustment.py"
       ]
     },
     {
-      "stage": "enhanced_dataset",
+      "stage": "dividend_coverage",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
-        "analysis/sensitivity_enhanced_dataset.py"
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
+        "analysis/sensitivity_dividend_coverage.py"
       ]
     },
     {
       "stage": "paper_scenarios",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/paper_scenarios.py"
       ]
     },
     {
       "stage": "policy",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/policy_counterfactuals.py"
       ]
     },
     {
       "stage": "caseloads",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/caseloads.py"
       ]
     },
     {
       "stage": "tax_composition",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/tax_composition.py"
       ]
     },
     {
       "stage": "gender",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/gender.py"
       ]
     },
     {
       "stage": "poverty_decomposition",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/poverty_decomposition.py"
       ]
     },
     {
       "stage": "recession_backcast",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/recession_backcast.py"
-      ]
-    },
-    {
-      "stage": "geo_impact",
-      "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
-        "analysis/geo_impact.py"
-      ]
-    },
-    {
-      "stage": "geo_choropleth",
-      "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
-        "analysis/geo_choropleth.py"
       ]
     },
     {
       "stage": "figures",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/figures.py"
       ]
     },
     {
       "stage": "tex_values",
       "cmd": [
-        "/Users/janansadeqian/uk-ai-study/.venv/bin/python3",
+        "/private/tmp/claude-501/-Users-vahid/59114aef-a9b7-4663-a8bc-32b2c6146551/scratchpad/ai-study-pr/.venv/bin/python",
         "analysis/emit_tex_values.py"
       ]
     },
     {
       "stage": "paper_pdf",
       "cmd": [
-        "latexmk",
-        "-pdf",
-        "-interaction=nonstopmode",
-        "-halt-on-error",
-        "-cd",
+        "tectonic",
+        "--keep-logs",
         "paper/main.tex"
       ]
     }
   ],
   "script_sha256": {
-    "analysis/appendix.py": "bc5f1ebbefb967101a34af6cced8ae51d343b02563d95323dd63e439ec205a4b",
+    "analysis/appendix.py": "794c775f3914a7cfd265e01d4e44f0a8113f06fe89cc9d3070043e84b9cebdd4",
     "analysis/build_pss_crosswalk.py": "2e37305a6e41ce885c37e51d5fde33bd92f87bf5ef5002b6b95dab50806d070f",
     "analysis/build_ripple_routing.py": "4f49abe94802a2dbcc2c0d96b6876f019ee2d531317ca190ffb40705b43fa3b5",
-    "analysis/caseloads.py": "290792b45a4ffb4e56fd936f16b9668fab92f6ac03453f16d0e7157cbf7188e9",
-    "analysis/download_data.py": "2e9c862ed71c2d00581203166239233ae8f1a0bd332776cd7b676d59644f2193",
-    "analysis/emit_tex_values.py": "b37106a8b316a383a6aa055925ebb0f105bd829fc1fe8684dc71a6c7d970b747",
+    "analysis/caseloads.py": "6c72f3e3a300952fe96bd6c72f81f3af576301b39b554cf42ba54282eec1d39b",
+    "analysis/download_data.py": "efc08ad770a0beadeb97ca9ee9f4fec95474d02f7565255ec5cf93ca539ee050",
+    "analysis/emit_tex_values.py": "fc37c8d4e3f5fcebc0d4f67f70cc802efde840e5524699c6a3f9f3c8251bab44",
     "analysis/figstyle.py": "2993ad5510b9573c9d8661d6dddf1359b1ae996c5d76b5cad17712674294dccc",
-    "analysis/figures.py": "be17eb1eeb4f29319e46fb0329279e1c1d06eb30810356609ad83a454d9ea6a9",
-    "analysis/gender.py": "138c814e13d11fce67149c9d84f99c4423fb6c31d560b205f9e0e5f94bc701ad",
-    "analysis/geo_choropleth.py": "85ac4f0cca5392639d048c79cefc30fc28a58e60f746ffc572a87942fc50a2e2",
-    "analysis/geo_impact.py": "0fb565ba54a9355880ffea338e876ad2e901f37eabb761ea7a8b4c9f3721f1cd",
-    "analysis/incidence_scenarios.py": "4cee4da1a1135aade44c83b176fb8a104a6bd149013d3748c95ffb92d4f817ec",
-    "analysis/index_sensitivity.py": "5939c978aa9cdcca4045d7b74341651519971991cc9159e5045aa234a1465757",
-    "analysis/measured_incidence.py": "7f9e41c39cc764c58eb1c637094dab8aa7155a7dd56e6573523ead5b769d9bfe",
-    "analysis/monte_carlo_families.py": "79d20332215bef7f14612c69fe3718c972f2e7cd4c4ef0dfb47a74355c4f2432",
-    "analysis/paper_scenarios.py": "ad0c5a822b6cd92e6c3b1ea62306b24a1a8076fe65258bec14b028e2f650a4b8",
-    "analysis/policy_counterfactuals.py": "cdc29d7853e54eaec8d59e837e9d806da898b631687f4e3f39bc313cd4a3aab0",
-    "analysis/poverty_decomposition.py": "041cddd5cb2ddc49dcca8a2a0a6ce43679ac41ce4adaf5e773494a7a0b729a14",
-    "analysis/rebuild.py": "207c5c704a29b6241ff59c5d240a7a79edb1c59e06617f16210e974ed1013e84",
-    "analysis/recession_backcast.py": "e4e004173a7684bb8dd9e75cfb0a20e62be55ef6e5f92e585f752e65902db421",
+    "analysis/figures.py": "85c7d6e094e48e0f6a7697b4189e0d49ad6802de7c0884dace9732d335288039",
+    "analysis/gender.py": "27b5727321a097d681c7dea056753e95c9cc88cfaa65d3b04957e0e13f1dc778",
+    "analysis/incidence_scenarios.py": "266567f0a40ea63405abb8abb5ce2434a72bc7829258dc33b59625b6a72b11da",
+    "analysis/index_sensitivity.py": "978ab7a0c0d63f2593f3f5a51f17f47a54d209fae642b1f57c4114f64f3b48ca",
+    "analysis/measured_incidence.py": "4ce9ccd043d7d06ba140ce769906df6ef43013acc2ce01884f6cde5f3f8e44ca",
+    "analysis/monte_carlo_families.py": "4bfbc1b2aa204e80160d2a53fad39457c4123e17d8737907a153e4d5aa288fb7",
+    "analysis/next_runs.py": "2a8c80909addcf9b753d26ed7efd6c50e4883a84ad727de7c82266590a594cbe",
+    "analysis/paper_scenarios.py": "b7bef9214d7b5d2b5209f1c38164d938b8ed9ecb0eb5f8b56e89bc96d80f139a",
+    "analysis/policy_counterfactuals.py": "5adcf0a861b1c10f978de112fd66ce7e8226f8ae53cae686f903c4658c12134e",
+    "analysis/poverty_decomposition.py": "6afb8f72edc37b42617ab2746b9add7a3979f37d45e5688139f9a54ff7471fdc",
+    "analysis/rebuild.py": "77b72fb571e4e8280f17e11d144eae538c1a12d49448843e9a388fd725437a84",
+    "analysis/recession_backcast.py": "f13032c270db3f63aa9d0d21533b01f4ddf0f46f191c6fb0e62c51a55dc24ec3",
     "analysis/replicate_gov_spending_5yr.py": "ee3385327ff12d42665067dcdc56b4fcc5252db4104251c0a02511becc4396d4",
-    "analysis/replicate_jr16.py": "d2289de3b6bb38639e4691f586d519a5a697883437163ae60892080e458e42a3",
-    "analysis/robustness.py": "9d4f618a28f72c202081da1a6365b687905ab253db09defcec9c3485386177b1",
-    "analysis/run_all.py": "55b99c4a390831d1f583d64112b9d192ad25c803964c6410cd3efb965cd60e04",
-    "analysis/sensitivity_duration_reforms.py": "c41c8536adcb3a5079e33657ad197946a5e34146ebace9a8a448fcd3e7ea04a6",
-    "analysis/sensitivity_duration_takeup.py": "48a53bd9025bd4ecad16ccc5d1232d20bff814b6073394d1b4da0d37fb7d10fa",
-    "analysis/sensitivity_enhanced_dataset.py": "73a6b55cd360c1ee8fa2fccaf00cd164248dfea75ff09fb9c47ca67a655c9f3c",
-    "analysis/sensitivity_mixed_wage_adjustment.py": "6cb0a76c507941fd963268eed97bda930d41c322140c6cda3f4ab8013a8b9f8b",
-    "analysis/sensitivity_wage_tier.py": "cf16193505688774c67e094060b1a8ca62b3cd7dcfaa14b11d2f413ffd235508",
-    "analysis/tax_composition.py": "c4539142138eb6a6d5d8827d051a4d79850288933fa48814d0299d3799d92b0d",
-    "uk_ai_study/__init__.py": "1593d7669615f12945ccd09e7041f9509d9679ececde4074008f4072fcbd61e5",
-    "uk_ai_study/exposure.py": "2375296cd9520138e7be5d8b766058d643727afca5d7fc78d9dd2aa009714eee",
-    "uk_ai_study/runner.py": "0fab349d24f49c532ea3459d9680ba48e5aef1aa4d14a95110ac7189247d9758",
-    "uk_ai_study/shocks.py": "d8a20949d4fb855f2a3435bc53e1c08538945d0060e3b0ce5907acc6cf6b0752"
+    "analysis/replicate_jr16.py": "2f86e4d38abd54277fb4fe6a9188244f14f1afc1a32d0c43f89ee3d7b8086e90",
+    "analysis/revision_accounting.py": "fe13fc254dfc11c69793f3448ce2666eeb1f9a77449d482344dd855ff55f9cc4",
+    "analysis/robustness.py": "a98d4538634dac95f1e59e395c8b1a6bd8f16e1f5177e79a71e32e7492a5bbc3",
+    "analysis/run_all.py": "c1d77c4cca49091f7c46dce8fbca642f4f25038fe658f9304bb757411de2088b",
+    "analysis/sensitivity_dividend_coverage.py": "5d590b6e286b5d802ffab787c4790a899647a2f62c1bb5cbc2ab6dc622bb2f91",
+    "analysis/sensitivity_duration_reforms.py": "687a97b561dba41d7ca34db49f3bcb70fb85b171564944ceda197f3c43243d1c",
+    "analysis/sensitivity_duration_takeup.py": "9c7425411c7632319d906b53af61a3bec2643e4a2ed481bbd7e0e93a7374ff90",
+    "analysis/sensitivity_mixed_wage_adjustment.py": "41ddc9ce22214523d7f7203f8ef5dc6897af76dca35c6a4ceafefae6869a8697",
+    "analysis/sensitivity_wage_tier.py": "950e78875abc90799d65b51787983cdb76cccf8ed44be9ac8d6b8e05e4b3ee6a",
+    "analysis/tax_composition.py": "c9183bdcd1477599b3cbf266861dc554caf3b744bd1ece0e50488094f6158527",
+    "uk_ai_study/__init__.py": "a9517050d950899c078b463621f2768e30fcea2595a7450df535aa52247d17cd",
+    "uk_ai_study/checkpoint.py": "6a82fef90f5380a1afd919ad6c1d593baf659214d54afefcdf116bc7a3fd5694",
+    "uk_ai_study/data.py": "398d1b5ddf70af4e0427eb2313cbb15fde8614696dd10a912760ac1959c5c54a",
+    "uk_ai_study/exposure.py": "dd949cc38e56077c3c6aec7821e0617cfa4418515c1312f0c9f8737dbf65e442",
+    "uk_ai_study/runner.py": "383ae1f09d12951a9e6714752d643d74b523754534fad7c062ec16b46689d27d",
+    "uk_ai_study/shocks.py": "076a77698ef0bbb2671e365199bcc3eb94661db1bd41605cc2b4c2c988172b6a"
   },
   "inputs": {
-    "data/constituencies_2024.csv": "f4f35d61ffc004190c438a7e1583caefd85054f962671a00069aedd0a1b5b737",
-    "data/enhanced_frs_2023_24.h5": "584ae33d80ca0431254610a3f8254d132da73477d31966d6446282861ecae50d",
-    "data/frs_2024_25.h5": "623802aad0f7eef76df8a0ce1b19933b5648ac97486d5b01d371e7c7d374ba40",
-    "data/frs_2024_25/UKDA-9563-tab/tab/adult.tab": "4eaea0809a7ccca0fddeb98e358771e4a6e5ebb81b21c4fac4070fc9d227658d",
-    "data/parliamentary_constituency_weights.h5": "f33e267b29ea6c4f9e4f9b900c3547444d3d2aaf0d32b5f66a66effb5a092ed0",
-    "data/uk_constituencies_2024.geojson": "9b7f2920bd722faaf9cdd82c4e4b18885fe03efdd94fb5c740d79abe39054099"
+    "data/microcosm_uk_2024_25.h5": "0a9b77db1c0dee2693cb2d47bad68da34cb662916eee4829942bcd45de581f25"
   },
   "presentation_files": {
-    "paper/values_generated.tex": "f535e850a97cc7500c428469e6f5a5305a32a954cbf7172ee5a279ccd1ef5cb3",
-    "paper/main.pdf": "92e1bea0e1d55674352befc5ff9ab03c9398a93bdba70ec742a810a3640bee2d"
+    "paper/values_generated.tex": "30094a68cd59527289092bf5d01bf190c56f5403c6800d6160806ac7257f6dcd",
+    "paper/main.pdf": "b68334d22a951f91d1f81c1d050a5d0e0dad948675f6fabbda4526de17603060"
   },
   "seed_policy": "headline single-draw results use seed 0; incidence and policy Monte Carlo use paired seeds 0..49; other sensitivities declare their own fixed draw budgets",
   "non_generated": [],
   "files": {
-    "appendix/b11_grid_no_capital.png": "d6d99b9d03c2ee79ea520523b08e1e4ab5e3ffd22f13b04a5d9ec3c0969bdbe2",
-    "appendix/b1_market_income_less_capital.png": "dd6f286f05ea182760bdda45cad392ae29c02b98faec40dce94264c9afb8a2a2",
-    "appendix/b2_capital_income.png": "7242376d40d39c338b01dd6453c20ef371481f604514d956e4a0d93707bc09a6",
-    "appendix/b3_benefits.png": "edce87188e8bd860c85ba0a3c27bc2f2e6afad48d40fa8e30033cf1efc2b7159",
-    "appendix/b4_tax_and_ni.png": "6cb770d1769c21ef84e4b6002a9e9c38a917c909f9bbe8f93587a638bed714a2",
-    "appendix/b5_disposable_income.png": "ca4f1208b4863f1cdb9f85efce85908b13e6418169e3ef6d42f815465da3c414",
-    "appendix/b7_uniform_vs_ai_decile.csv": "10ed07a290314d77cd5702fe07dc2848d44be983af3b265511a1c4b115acdf6a",
-    "appendix/b7_uniform_vs_ai_decile.png": "87991ae67014ca4903cecd88243ebc4aa9e435a4a38a15b9dff70eae54e90f26",
-    "appendix/b8_alternative_index_decile.csv": "a0ead0001ff63f061aa262ffba7bb605f4cb07061d1d24e6af74a770b91e4e4b",
-    "appendix/b8_alternative_index_decile.png": "3ac8d5091db09eae791de3fba8b583f89dbdda2e71c60155bbd844bae4cfb0e8",
-    "appendix/b9_grid_by_decile.png": "f5c6d1adeb466046be2061f75cb9c51954a8f23fdd3a625eb78ff98e0397401b",
-    "appendix/baseline_distributions.csv": "63696883326e21eae98621319467d8a05e983cfeec57aff2fe687c86ce29bb37",
-    "appendix/complementarity_incidence_by_decile.png": "cb96154dc387f334bbb4c58ba64e7d6fc22b683dc815a1cbd0a2954a4e470eb4",
-    "appendix/decomposition_ci.csv": "d8c218c8060f2b25760f535d1f550379fa88d1c216e0867826a8ac2f102fd7dc",
-    "appendix/decomposition_ci.png": "0a8d39d8aef2533637279edda73352dde4e18c85367fb33b81828e1ac3eb326d",
-    "appendix/exposure_incidence_by_decile.png": "7e7be11c756a7f0c02b0b30a41a8a50b5bdb3cba9d0147b141624e1facc6ab8d",
-    "appendix/gender_incidence.json": "cca8a90c66d064e96a3a3580cd761449302289003c615278518725ef926b82d0",
-    "appendix/grid_deciles_capital.csv": "6fc86eb78c474bf7dd67839b6e5c7df42f89687af71ce6f46808fab81ea7832b",
-    "appendix/job_loss_by_major_group.csv": "36196aff672d31c72fbeb02322f083aa57e8fbb60a77f3d0662d85bbb5b81bc8",
-    "caseloads/caseloads.png": "98e8917bc1d0731975f9645216d1225db2a61dd396463a1f511735df5d6226c9",
-    "caseloads/central.json": "d441c2ea38993988191e3f2b468527cee20d0e5b226d798192a8c6c7c7a8b5d5",
-    "caseloads/high.json": "33d09769a3c69d0aff08eba7afc8d13250e79f309a2e17f0237ab2632e7034ae",
-    "caseloads/incidence_compression.json": "f76abeb44065375c0f09f89726f8c750e171c7259b0eaae5f49cbfee34693ce1",
-    "caseloads/incidence_exposure.json": "d92d8a08187b822bd3fe59cb60d3eedce8db3d4b5bfd68f035001b95338e16a0",
-    "caseloads/incidence_junior.json": "faf2ebb0b00241a2947a845508d9aeb1a710646eed78fea3f68b557f5af8c2aa",
-    "caseloads/incidence_uniform.json": "04685c511cbfef75ec2adea594090933fe5938d269cc61bba79153f5afd34f46",
-    "caseloads/low.json": "3a3f94b1d6027ff6ebc502d10cbfb39055acff2be495e31e63e8bc4e58271fa2",
-    "caseloads/summary.csv": "099ecaaaac655659fcc99c8ce747f027390077f7a9044f8fadacd5007b94368e",
-    "central.json": "59a851321ca77e21b89cadfabd8c01581169640e730d31a2012f6175ab0f22e4",
-    "central_ripple.json": "19b1274b47bf8c5d7957e9d92e9b8615c1fc20bde739c370451c06d06a26d564",
-    "central_ripple_high.json": "cd73fbd70dbb4ac8d5cbd6743da45f30fc9549b2e80964a38b574e6b41f47bbd",
-    "central_ripple_low.json": "a2e27668bc473814d61ffd3830caeaf7be323d5b9130c7e9ff27cdac300b2e22",
-    "central_youth_tilted.json": "fd0785c2c0bd5b31db607e9cafe7a01f5e765c18d5f7190158e8de7f54f85583",
-    "geo/constituency_impacts.csv": "a7b34821b06c69f55dcb4b2c3f8d008f02429533e92f6eb7b158b35ce6a9e273",
-    "geo/hexmap_displacement.png": "0b95ca8bb4a347eeb2895b38e7c1faae5fc1f9ead24eea3f6136f5294d808ee4",
-    "geo/hexmap_income_change.png": "aa645c8bed2b2f1d1fb0a3bdcbea8f2e30a1594f852781b8b9682f428dcba7c6",
-    "geo/imputation_notes.json": "ea1f899447d82f4c8e9cc31d08a7fabb8a5873610bc6fec283b2503e46553535",
-    "geo/map_displacement.png": "f33e4f4cff9c365cd2bc3fd1f002ecda039e9ea1cac67d871f125cbce4032c54",
-    "geo/map_income_change.png": "d9904b916e0032e253900889209cb30ba8d694ff85eb5d5b211e5cae5450a858",
-    "geo/region_summary.csv": "5a0935a6a0cc0cb9bb5e206af01d8e3ba66952f00bf450faf3fc8e7d5341adf4",
-    "high.json": "1a391b04c3ba21489eeb03dd07b39963252108f42fb3c2ba8bd414df37a29aed",
-    "incidence/compression.json": "5d22018107c576bbd2de838c566c48c4d115366ddff4346592a6503b7e0972d5",
-    "incidence/compression_compound.json": "6a0bbdb5662a1948c12d4d7fc18c3a3db815d7618597e287839be3cc74df982c",
-    "incidence/exposure.json": "971bd278383a2952e57f2464800a7d6eafcb7331683f2e8a4608810a10dccdd9",
-    "incidence/incidence_families.png": "861242ce096cd386e3db8867984194f302a05af77f74f22e8abf2e106aa654e8",
-    "incidence/junior.json": "2f778212a1b5190142f762ffe1813666233caab776bcbd0c899e304e8d3ebab4",
-    "incidence/klein_top_loaded.json": "2428e23fa72425c4ac85beb8daa7b777d2d4f54845808106e018f26bd9f7b502",
-    "incidence/summary.csv": "45ce33c06730f4642e41e8a7702643721d1b197449590eb8310f74c350d0baef",
-    "incidence/summary_five.csv": "dcc9db02273c984ed401a9579aadb64ea7d63a5c738d5d3c22a791c8b611513c",
-    "incidence/uniform.json": "fc39aa37532179eb61c68f62e54353e7b2f507f2657488bfa472e43793c38eb2",
-    "incidence/uniform_compound.json": "552bd361ee796e3b774b897d468179aa3ccc12dc6cf54328bfe965c31044c05c",
-    "jr16/fig4_1_transition.png": "403542378ae3374e3aa9b8e8892b3c2ff63786a033e2ce90cc0eb87181390e6f",
-    "jr16/fig4_1_transition_by_decile.csv": "2772039307d24b603be29522bcac4fa7ff29a09ddcd63a69b62328d631074a66",
-    "jr16/fig4_2_wage_gain_by_decile.csv": "8b900d6b5cc6de5b21fa47c638354ddd8702c58829599d84b418acc85fb49dfd",
-    "jr16/fig4_2_wages.png": "36b363730236782bd5a28734697afcc4d09496a5f870753b93c25f771f712d9b",
-    "jr16/fig4_3_capital.png": "943618da2ee1ab1051f1af831fc5fdb337771de32acada035f33eeb74485adda",
-    "jr16/fig4_3_capital_by_decile.csv": "8b90f1c003d83ffcf3cc5fd52792a14474052fe9eeb1b0aa739ae0c4ad083f8a",
-    "jr16/fig4_4_decomposition.csv": "2b329c9db37d9c26f0362925bfe9702c7bef7154c9f6296d4b3c219d866ff7bf",
-    "jr16/fig4_4_decomposition.png": "fea590a93816bd17da71e462d749c0484f18d8d04a3813146f229d8a6bf67291",
-    "jr16/fig4_5_disposable_grid.png": "cb39710feb9ba3462b0659b6e85d3e8e41635d41efcb1986786bb057189ba246",
-    "jr16/fig4_6_exchequer_grid.png": "a1bf2cec82c0d234621a77750692ec9f3bad9293cf79be12dee7067fbb6c70b9",
-    "jr16/fig4_7_gini_grid.png": "ffb44db59fd5892ead0cf59f7345374cb7647e784cf820b9a1a66da31b9070f6",
-    "jr16/grid.csv": "1d646281badada96ed1b2765ba4db7591674b37e20ba6d6277365c7bba53016b",
-    "low.json": "d2a4b291c5a7f6c9bf8eb6c0d2d52461c9c16d7fb2da730e76752dc6deb75795",
-    "paper_scenarios/brynjolfsson_canaries_2025.json": "44d778396a9724a273147eb028c99688b4d6598fdb35d8500944eeb2b07e79e3",
-    "paper_scenarios/hosseini_lichtinger_2026.json": "2785bec9247010b4d36e9d9065f16ab25639119d4c2e49b1d15ed8e2c087e46b",
-    "paper_scenarios/hosseini_lichtinger_2026_adopter_scaled.json": "36d9af1d40e3b0a71fce58484173dff121f8b33254ca282edb058f76cd8324d3",
-    "paper_scenarios/klein_teeselink_2025.json": "b26396d0a6d03c21c3549e2ba37ca6fe15fbc08a364b3b0b12d2aedfbfc25c1a",
-    "policy/R1_wage_insurance_exposure.json": "33d22804294b8ad8acb0fc2bc2deae7315acb7379463399a165bc51ff70dc785",
-    "policy/R1_wage_insurance_junior.json": "84f3b790b12d7291a7d4f03f987da9a70c3b87eaff3d0bd161475097348020be",
-    "policy/R1_wage_insurance_uniform.json": "81f364b8544ce4ca29e645a36f413808291d8690fd0d973c79af466a4dd26ffb",
-    "policy/R2_uc_circuit_breaker_exposure.json": "c3e69a8f4c0ad722207eaa794262168a3fedd7b2aa96bc022350f5bd8894faa5",
-    "policy/R3_cap_suspension_taper_cut_exposure.json": "4268e9342baf86e82ce164f3ef9de6b138f33d9a59776a9ff95bd40202ba1d2b",
-    "policy/policy_reforms.png": "087f19a77112167cc0eb6948a77b5407506e617c4849d4d4ac174e85d261051e",
-    "policy/summary.csv": "556a3343af6d9bcb7f50302726b0a7925e2744386c8bf3e2ae70575ad5692c1f",
-    "robustness/age_exposure_moments.csv": "e9588f85f78176baeff8f5985e3f69460fc34d6f36ee53a0abfa3005c9f4ba26",
-    "robustness/central_draws.csv": "ff838e6bd7ddeb0c9da68eeeec5123f2717e25010638f899ca174579ab94cda5",
-    "robustness/central_monte_carlo.json": "a5dbcb8c98eb9b8aebeffb412388bb7880341ce2ca21a4df77d048d34c085d31",
-    "robustness/duration_reform_draws.csv": "6e7cceb7b8782f99ba820aa36630b97215985ae222e0eed466cf50ab6dc7582d",
-    "robustness/duration_reform_ranking.json": "20b493b99fd01f590c84fc53185539bf0b1fa81dabd5791a919361dc717a525e",
-    "robustness/duration_takeup_draws.csv": "116990beb65d96807c7f62447e86d9e143fa44f7e723e75e2a59506f3c145bd2",
-    "robustness/duration_takeup_sensitivity.json": "c35b32db969a67c22d5cb27c31b388bfd9ec9d230f93096b5a8bcf949c5f1a97",
-    "robustness/enhanced_dataset_cells.csv": "e43aa7fc0da657566027a7f48e60b12fdfddbe071fa110125284c9b98808644b",
-    "robustness/enhanced_dataset_central.json": "2e595b473da5235efb575a4d363d68aa8098707b5fe7547764b1a00cca0eadda",
-    "robustness/exposure_sensitivity.json": "1d3c2b64f56f5f5c78ef6e5f9c1ea0edd5002377385618b93cb822990546e874",
-    "robustness/frs_vs_ashe_occupation.csv": "c06ee344d5aa4c663247e17fe31f7f0f4f8a96d5af1eef2209e503ea06f3d9f7",
-    "robustness/incidence_draws_five.csv": "7564e77236790d45d43f5bc540ca4ab1be87b15eb40f128ed095c6d95f760023",
-    "robustness/incidence_monte_carlo.json": "a4d701ead619323dfc19ee89f012c4385ed77cf0e97aeb47f0610be6ad832808",
-    "robustness/index_sensitivity.png": "25a3bd05e692934f53e10f7cc971c9a1bb8d9a15727047eff123713195e9d921",
-    "robustness/index_sensitivity_full.json": "bd3768aad4c315f93e4f1fe9ea3f0dda802522fc5d0e91fe14d788f770c92029",
-    "robustness/measured_wage_tier_draws.csv": "775aebc51c48d72f2d0feab7f4c04a982e3c51f59f4be70e4b0e8d5efa24a95b",
-    "robustness/measured_wage_tier_sensitivity.json": "715329ea2aa8d9084ab31c03dcce3dbf9fd54ac44add0b288c681ed771cf2064",
-    "robustness/mixed_adjustment.csv": "74b065dc611000ea2ada78d566170b28520b276b9d4fb3510bc99d36da488b86",
-    "robustness/mixed_wage_adjustment.json": "376e2d9ab0d19d0a0308c6f3bd65121822014aa9812680f9fe16fe7e10d24b8e",
-    "robustness/policy_draws.csv": "6d16207169871b4d6dbbcf61764678853beb181812de59517ce96e449531a252",
-    "robustness/policy_monte_carlo.json": "838fe786b177d86fac464c4d50a6748bfca5ed3e99a1ac5540d365f0e046e0d3",
-    "robustness/poverty_decomposition.json": "4562d627803291715029009dbfb1381c32149b98688b275c4da426bec1b484e7",
-    "robustness/recession_backcast.json": "2caaff14bc44e541a16dc6b99b70cf9b05d4dd0c6ef0176f2418360a7b8336e8",
-    "robustness/sensitivity_run.log": "84607d2cc80e7d75be2a749caf4d6d1462e937b7809b5f198289a8ae88619500",
-    "robustness/survivor_wage_grid.csv": "cfa0aa851cce155f3c9c95e1a07f917efdb72b0709ca457b83512112f15320c7",
-    "robustness/uniform_comparator.json": "516abd6c896349ade9a9f5d21ff408a3a4917d6db677fb6fe1a61d538a197283",
-    "tax_composition/composition_grid.csv": "4093d4b2416452ee6cbe43a1583de36b0d619a8c45a65c47ed085ea8a2cc662a",
-    "tax_composition/recycling_case.json": "b7d1f2a7fb3dbdc4355d3ae27adb771bbfea938023f98714424a894b115567b3",
-    "tax_composition/revenue_shortfall_phi.png": "b7b1db3dcc2be5a6df599c8b49d152a9cda9a4ec9f261cdc205c49213b610b3a",
-    "wage_margin_central.json": "0baf7e56626beb2f57a5bf5a2a8450c5092731766e64213720717808c8cf7635",
-    "wage_margin_pss.json": "26b46eee7102d940c0a7434b73086475775b7673831ca84a229fcbf327cf4490"
+    "appendix/b11_grid_no_capital.png": "09e5a3f25b8189db9b1e596d00a723c61a1abe3dfe1d55fa622c2ce47ddd03fb",
+    "appendix/b1_market_income_less_capital.png": "c502092bb6e19f99b01fa50bb4edf970b0dca1129ef5d26d7a1f6fbe15d02673",
+    "appendix/b2_capital_income.png": "f87f5fe65327c9d27188f0c1b07e534b3f5ba9dd74341d71d7c32ec1402d348b",
+    "appendix/b3_benefits.png": "0cdb4c4b4e814b0e8cff1b5c5fb3d28b392cd355973c8d67ed0cbd572c53c900",
+    "appendix/b4_tax_and_ni.png": "57d9423e22a0096e186d783111463f1fdc0f1eb0ab27627b5d8064666cdab7c3",
+    "appendix/b5_disposable_income.png": "9b8dbd139fc919e2c4f76208cad5a869198fee3cfd5d1ed992abe052000e0603",
+    "appendix/b7_uniform_vs_ai_decile.csv": "e889b5592581c1bf95e8b25a6fe9e70a0f9fa4a777168a2721a5f17766175270",
+    "appendix/b7_uniform_vs_ai_decile.png": "900c4bbbf5a43f914e95754a80eb0cc75013c95caa5fe652d0811c30a708faee",
+    "appendix/b8_alternative_index_decile.csv": "e4323aa4285f6780c09d63da58595d65c06d7b77d1b4ae53ea6bf3a95c92538d",
+    "appendix/b8_alternative_index_decile.png": "8cf31328e87fec2520acac7a21dadb082185e51dbdba01557985ed0a474138b4",
+    "appendix/b9_grid_by_decile.png": "1115fdec85c25ca742c4dc8bec3f2af78ec6fb046a82bc12760a537a2facb723",
+    "appendix/baseline_distributions.csv": "356ec9b88ac9ddc6ba97f34517a8787e1ef7f44dbf73bb467a556a0a0de0f3d5",
+    "appendix/complementarity_incidence_by_decile.png": "ebac9113732006df4b4d21d0843bb0d14e22e3a9736272c0de43fcc57fe98dd4",
+    "appendix/decile_ranking_sensitivity.csv": "3e7ba9d550f7db049ca11a08978ba10d6781035b712d7170c95d66830feb91a8",
+    "appendix/decomposition_ci.csv": "76e3add00cfce803169d8f756c2b6e131b1a06ba833e2b31b31ce70b93468526",
+    "appendix/decomposition_ci.png": "58db09f2d5b5d2567364f7f3aa8c2e860178eb9a472727833cceb25f1aab0e10",
+    "appendix/exposure_incidence_by_decile.png": "593e46a52e67312bd0b13d912d99df1e09aa95b1c86f5211ffa03047e2705eeb",
+    "appendix/gender_incidence.json": "39baff77554252d418dab57c8d46943773b115b1679d80b461b1fcde89cfd8fb",
+    "appendix/grid_deciles_capital.csv": "a49dc13da9b8b3d72373542baa00ff0d87943bd5d83119f5c9f2328e2f90787e",
+    "appendix/job_loss_by_major_group.csv": "ef45c5cf0c271b29cef83b21540134036c055a7e4d33a29d8d211ffa9de3c057",
+    "caseloads/caseloads.png": "3f3655dafd0cc7908a21bd7b747f83acb8d1f2c2255958642df1ece9ff03880c",
+    "caseloads/central.json": "3403a4df17d4cbdad964872ea2cf59ba6069c30b8410d096f12564fa6538b44e",
+    "caseloads/high.json": "b1608a620cbd8b8618f22872f3c357f981afb141bc0a7086c76d10a871ebaf00",
+    "caseloads/incidence_compression.json": "0c3953fda72cb45ec6fdbeaa36033488635a405f9e7067c8713021f474d43964",
+    "caseloads/incidence_exposure.json": "3292d479030981f98289bdd0fcdcb92b9dfd380245a41d3501f089bf40099022",
+    "caseloads/incidence_junior.json": "d62da005fc313de8429dca6cd16b6a897347ab97a11a016698c3cfb50ca711a9",
+    "caseloads/incidence_uniform.json": "ec44b9bcabe14559926331bdfc6ee508ea220a9337b6891360c02fc22431a9da",
+    "caseloads/low.json": "15b70acd8542959f9a958079b30eee3309117674c7ffb9447b1d2357f64d8e7a",
+    "caseloads/summary.csv": "dba904eeedc43040326c7d94060278932456a9c85c3378e2610c7db2c09f5ea7",
+    "central.json": "21abea7e7bc8ffec336da697e2792e77ec045b120f81fcd5b94be8afbe4da0c4",
+    "central_ripple.json": "e1605088676456e3c17a7192407355cbb1b6f7c80d96aa6e86116e1f2835e3da",
+    "central_ripple_high.json": "3aea7b609c2db5881d39c6be9acd9499246d3768ace5165555a424d4bc1952e8",
+    "central_ripple_low.json": "9a048cfb2d044406584cc5acf1601030d11c33ab44bb1a4c530638807fef7a14",
+    "central_youth_tilted.json": "378c8971818c1e74ac48cc204330a80235fbdea1200a404d46dc387ebae99a92",
+    "high.json": "78b59db5250c82e08a82a9366638ae6ec7fce009f7533b6d29bce1d139da26bd",
+    "incidence/compression.json": "607dda9226f4a7fd0054c562059ae8802f887e87dfbf4ed3f8f2f04ed7095996",
+    "incidence/compression_compound.json": "9c0dbd3dd62f5064728a636e38e39c5d8a7ef42332b1d6028829d213f20ea241",
+    "incidence/exposure.json": "7241d45b7c6c3c997b6355e389b31dc88f9f0c815a8ab360c7dc1186e325cbed",
+    "incidence/incidence_families.png": "80630ba770e983531a28cc8f20840da0a269cec711a81e3214242ca1b428e75b",
+    "incidence/junior.json": "05164613b1a3a9166e15aca4844139deb395407dfee0ccd00b6d30b0f230655f",
+    "incidence/klein_top_loaded.json": "cd629699949702bac7200b606f43fd76287851bcf4d8ff43561c83fb4167ef3c",
+    "incidence/summary.csv": "c70648657cee71388078c69840d202ae7a0cbeba37ac01d2a33e036321bd029d",
+    "incidence/summary_five.csv": "0720fa2c03c5bbd997fdadab97201468d56677d755ec5f11d57d5a662af62950",
+    "incidence/uniform.json": "c0a51d6267e435f87960495d335c830d2f4e79a01c950bf239008b5d6f8b6678",
+    "incidence/uniform_compound.json": "140560b045db52903d7526de8dfaa5b288f03f56bc4eb215c43fbe0ed549b7e6",
+    "jr16/fig4_1_transition.png": "33ed69f046db7b369e3aa3b319eb346f472255824d11fc394b60024eecd35cfd",
+    "jr16/fig4_1_transition_by_decile.csv": "de7ffdffaee08fe3084dd15a067b3d0dc575ad55c529d2a23e5a531439eebafb",
+    "jr16/fig4_2_wage_gain_by_decile.csv": "51038333a18b550c6902603e5edc255d6175f99d3eaeb64d5cc2e4afe7578b59",
+    "jr16/fig4_2_wages.png": "8cc41071b412f61560026551e5780ae21d68ba23d7bec03e25b56c1df32e67d8",
+    "jr16/fig4_3_capital.png": "a68c136945dce68141014f3c28656014f8bb448a43e757775350d972e755b838",
+    "jr16/fig4_3_capital_by_decile.csv": "24d6bc0b4ea414f97f71efc0b69ea86acde79baffc17ca06f02bba0e8eebd63f",
+    "jr16/fig4_4_decomposition.csv": "d6bccf2a82a003d53b1d795596af32d70616dc353e014840be3f9b92d53cd32f",
+    "jr16/fig4_4_decomposition.png": "cf98a412b670178a79d4c63e154f5fe9cf0750e12361711779002fa80e9a4113",
+    "jr16/fig4_5_disposable_grid.png": "7bde25690e094ae6f4738e190cf2d6a92e867db83aa4404ad0428413db0c4185",
+    "jr16/fig4_6_exchequer_grid.png": "790914ee857980950fcf602a53c0c805f9043bb293924adc9b4276924ab02bd7",
+    "jr16/fig4_7_gini_grid.png": "0b2572c902fd5df037b3a55dcf7f04d2f7c06753704829b088ac44ef976c0e8d",
+    "jr16/grid.csv": "cff1b174f1c5dc687f18174a0d1b2db7f26f84a4eed488ad0826c79c23ae066d",
+    "low.json": "1b83e43f1806cbad0cc930ae48b61fd885214ba4f761cd1916f935edd612e254",
+    "paper_scenarios/brynjolfsson_canaries_2025.json": "a686e05d5a51d1852e947b1506b32690af87d2d25ca6a1cf0d1a55b9eebf1370",
+    "paper_scenarios/hosseini_lichtinger_2026.json": "5cc3d392179c079df8930bdf2095e08e34cfe4ee4730246ea89421ce666c677e",
+    "paper_scenarios/hosseini_lichtinger_2026_adopter_scaled.json": "4f3b828e5382306fea81fe52e1657d11d424a491639c878b596cf7afee17ebfc",
+    "paper_scenarios/klein_teeselink_2025.json": "c2a6f6639bb9131093501802d703c7a6affa7fd9640d37958bac353bb68448d2",
+    "policy/R1_wage_insurance_exposure.json": "8821b316e032977588d4b5b158de386a7ec100ca508d4c3d4838460115e894a1",
+    "policy/R1_wage_insurance_junior.json": "562df6f1d94ae8a4bd751b27140f201bb7e795490247cb72feb0ae4b582a121d",
+    "policy/R1_wage_insurance_uniform.json": "a1c0c35f80663c85c45171a2feb3139444c9a874e5795fd269c1f5e057006e1a",
+    "policy/R2_uc_circuit_breaker_exposure.json": "998c94ba24988e67b4df8e00781efd43ef1a53d9cb430cbb8768c7566bd28a0d",
+    "policy/R3_cap_suspension_taper_cut_exposure.json": "7e06d07b3b8a21ed1874e8569ca5264f12c7bb1b0b1aed34bd6b779e3fd9f016",
+    "policy/policy_reforms.png": "62e02578405bb84038febb68caae2063aebcb6360d15a4223fad090f02af08d0",
+    "policy/summary.csv": "ae27da3f75e361aa05ed752d3aca1e8135e3cff9988e7bb09d598cc8d969a273",
+    "robustness/age_exposure_moments.csv": "ca09abb4c21d9e847b5fa38767bc752a73174d3163476f3ec72b441848eeab7c",
+    "robustness/central_cost_components_draws.csv": "4f2d998cf831da629f00c5656457898ebfba009338e82934f0b533e1fa340cb5",
+    "robustness/central_cost_decomposition.json": "b2797640635720f49b4d65ce9f4a91da1c43bdefee481d348a6898dfd6597f99",
+    "robustness/central_monte_carlo.json": "f76be0e5ede027e7733c2b6bbc459701038e4bd1338741282061f7e0aedb9049",
+    "robustness/dividend_coverage.json": "685e640394963ecba46ee6ae2a2952398f20930b9f4c86ae536df7e225b6af8f",
+    "robustness/dividend_coverage_draws.csv": "d41f4811e23ee0966bdec482540acc039eb07df90f8810521d8fee02a6c9af53",
+    "robustness/duration_reform_draws.csv": "43d3813db0f60c60ee154a30b7d787aff52edad1fac3048a899506ac1dd988b8",
+    "robustness/duration_reform_ranking.json": "f2533c4ea9877d67e4e18617ef8578b3b2ca88c6707b2f99286a19cad67d3fce",
+    "robustness/duration_takeup_draws.csv": "a40ad28b177858cfe4c31c0ae2f1c85f6f0d376f72136a470861e85fb67d7f52",
+    "robustness/duration_takeup_sensitivity.json": "d0f165b65c3998870e92489b2f479a11e5dcd98881f6f27634582f95a6bc80d0",
+    "robustness/exposure_sensitivity.json": "f0fc0b465c343ad9e58a12aef3c6313c1943afd0657183d67485c19cdd153eb7",
+    "robustness/incidence_draws_five.csv": "8efa05da7db0312be9084dba16c07f19d9226ca39618f944210eb1b8bcba7d62",
+    "robustness/incidence_monte_carlo.json": "a366fb7b2d6aa09b6475660d153ea877cbe58581744c9d8b209d1478b826b635",
+    "robustness/index_sensitivity.png": "d6b8941733524a271e2c89ce721aacc6c41d9b0d618b8a7638ef1c17ea7535a7",
+    "robustness/index_sensitivity_full.json": "e427f93b9bd8cd254c64c00315c71bbf5982561b840b8a79aa99ace70869e6a1",
+    "robustness/measured_wage_tier_draws.csv": "5bccfb2882eeae5826d424144be385fc97bb7c5972cd962404baf4baa5ff64e9",
+    "robustness/measured_wage_tier_sensitivity.json": "8f3b138f66ba0fd3c7aa2d8e73998aa53ded7c98375dbeeae17ad8eeb0031e49",
+    "robustness/mixed_adjustment.csv": "3531b07cd9ee8953a056ee423dec33559fd0014dd04d43b119896d800e252c9d",
+    "robustness/mixed_wage_adjustment.json": "281887c28c423e818da1031f086ff7a37973b469374a2c758bee0ce60a1a07e8",
+    "robustness/occupation_coverage.json": "3467f149a4e4292a73f73deef3a0c0889cdf9f808d39b33c37a79775e9f8bfbc",
+    "robustness/occupation_vs_ashe.csv": "154eaa5bbe00fd82a23e29458a00c0ef87990309a17b72c794984b4585b38926",
+    "robustness/policy_draws.csv": "ee48ea1a5a9cd78ada039522829c68e83695cb265388d8f530aa86210790c3be",
+    "robustness/policy_monte_carlo.json": "02214ea34381aa9ef61bae482bbdf285a6283e193d7a753389acfc77972fbcaf",
+    "robustness/poverty_decomposition.json": "aa35c383c24e2dfd7125483d3e2ef498804ebd13591fb8a549a7716b7f7dca99",
+    "robustness/recession_backcast.json": "01b65a0f6f7020e2e102865e90e37a708e8e633ed86b185aac61af47ce16f008",
+    "robustness/sensitivity_run.log": "ea4c802c2a654198d173b329c5661edd0817cbdd09b4f31c329b1e2723487040",
+    "robustness/survivor_wage_grid.csv": "019862be7c82c85c7a4dba5658fc8000665e567bb65e13827349a0019e7f4e72",
+    "robustness/uniform_comparator.json": "9339f33195427c2b7085598ce4fe07fc9814d59e4e75df802068eae87e384ac6",
+    "tax_composition/composition_grid.csv": "7140404a861ebb91133be1c7539262f951b7f76b4b86cf07419e1e2e5264e870",
+    "tax_composition/composition_sims.csv": "48e5475e138cba23751d0d3a714e7d701f5999d3063289dffa5913dfa822f390",
+    "tax_composition/recycling_case.json": "9075663af3bd620c0c124db6744840b794c60e2a63506a600ac8d36e9dec290a",
+    "tax_composition/revenue_shortfall_phi.png": "5a42f6fdf950c62118c577336eb011ed070d1fef57d7c621d3705af80efb6a8a",
+    "wage_margin_central.json": "7ce14b469b000921ce2f947df433ac8c26ef96b7e1f1ee08fb5d8f363a99f706",
+    "wage_margin_pss.json": "1afd685e06e33751dacd3458c9078083150693d80d7ddd2d3d0394f247b6b8e6"
   }
 }
