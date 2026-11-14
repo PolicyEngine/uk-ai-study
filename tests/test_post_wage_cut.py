@@ -136,3 +136,30 @@ def test_review_macros_on_committed_results(monkeypatch):
     assert 0 < int(vals["genObrBenefitShareOfAbsorbedPct"]) < 20
     assert float(vals["genWcJobCostMeanTwoDpBn"]) + float(vals["genWcPairCostDiffTwoDpBn"]) == pytest.approx(
         float(vals["genWcWageCostMeanTwoDpBn"]), abs=0.011)
+
+
+def test_closed_account_crossovers_on_committed_results(monkeypatch):
+    """The closed cost is linear in phi; the crossovers reproduce Table 8."""
+    import re
+    import emit_tex_values as etv
+    root = Path(__file__).resolve().parents[1] / "results"
+    if not (root / "robustness" / "dividend_coverage.json").exists():
+        pytest.skip("results not present")
+    monkeypatch.setattr(etv, "lines", [])
+    monkeypatch.setattr(etv, "missing", [])
+    monkeypatch.setattr(etv, "emitted", set())
+    monkeypatch.setattr(etv, "values", {})
+    etv.emit_revision()
+    vals = dict(re.findall(r"\\newcommand\{\\(\w+)\}\{([^}]*)\}", "\n".join(etv.lines)))
+    new = ["genFaPhiCentralShareOne", "genFaPhiCentralShareHalf", "genFaPhiZeroShareOne", "genFaDivUnfinancedBn",
+           "genIndexSlopeResidSdBn", "genAbsJobRestPct"]
+    assert not [m for m in etv.missing if any(n in m for n in new)], etv.missing
+    assert 0 < float(vals["genFaPhiCentralShareOne"]) < float(vals["genFaPhiCentralShareHalf"]) < 1
+    assert float(vals["genFaPhiCentralShareOne"]) < float(vals["genFaPhiZeroShareOne"]) < 1
+    c0 = etv._factor(0.0, 1.0)["closed_cost_bn"]
+    c1 = etv._factor(1.0, 1.0)["closed_cost_bn"]
+    mid = etv._factor(0.5, 1.0)["closed_cost_bn"]
+    assert mid == pytest.approx((c0 + c1) / 2)
+    assert float(vals["genFaDivUnfinancedBn"]) == pytest.approx(
+        float(vals["genFaDivUpliftBn"]) - float(vals["genFaHhDivPhiOneShareOneBn"]), abs=0.11)
+    assert int(vals["genAbsJobRestPct"]) == int(vals["genAbsJobGovPct"]) - int(vals["genAbsJobHhPct"])
