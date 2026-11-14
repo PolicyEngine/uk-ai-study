@@ -18,7 +18,7 @@ A value written $a \pm b$ is a mean and the standard deviation across assignment
 \section{Online appendix}
 \label{sec:online-appendix}
 
-This appendix is intended for online publication.
+I intend this appendix for online publication.
 
 \subsection{Wage and capital channel profiles}
 
@@ -145,7 +145,7 @@ at the single-draw level. % results/appendix/b7_uniform_vs_ai_decile.csv
 \label{app:grid}
 
 To move beyond the presets I simulate a grid of 66 scenarios, crossing eleven displacement rates (0 to 10 per cent of employees, allocated in proportion to exposure, as in the presets) with six wage uplifts (0 to 5 per cent), each combined with the capital income channel, all under exposure-proportional incidence. Figure~\ref{fig:griddisp} maps the change in average household disposable income. The corners bracket the range: with a 5 per cent wage gain and no job loss, average disposable income changes by $\genGridDispMaxPct$ per cent; with 10 per cent displacement and no wage gain it changes by $\genGridDispMinPct$ per cent. % results/jr16/grid.csv
-The capital channel shifts the whole surface upwards: on its own (no displacement, no wage gain) it raises average disposable income by $\genGridCapOnlyDispPct$ per cent. With no wage growth, average disposable income still rises at 3 per cent displacement ($\genGridDispThreeZeroPct$ per cent) and first falls at 4 per cent ($\genGridDispFourZeroPct$ per cent); at the central 7 per cent displacement rate it falls with up to 4 per cent wage growth ($\genGridDispSevenFourPct$ per cent) and rises slightly with 5 per cent ($\genGridDispSevenFivePct$ per cent). Whether AI raises or lowers average living standards in this grid therefore depends on the balance between displacement and wage growth, and on the assumed capital-return shock, all of which are uncertain.
+The capital channel shifts the whole surface upwards: on its own (no displacement, no wage gain) it raises average disposable income by $\genGridCapOnlyDispPct$ per cent. With no wage growth, average disposable income still rises at 3 per cent displacement ($\genGridDispThreeZeroPct$ per cent) and first falls at 4 per cent ($\genGridDispFourZeroPct$ per cent); at the central 7 per cent displacement rate it falls with up to 4 per cent wage growth ($\genGridDispSevenFourPct$ per cent) and rises with 5 per cent ($\genGridDispSevenFivePct$ per cent). Whether AI raises or lowers average living standards in this grid therefore depends on the balance between displacement and wage growth, and on the assumed capital-return shock, all of which are uncertain.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.85\textwidth]{../results/jr16/fig4_5_disposable_grid.png}
@@ -210,7 +210,7 @@ origin--destination pairs), so I fall back on employment-proportional
 routing, with each origin row proportional to destination employment
 shares from the same ASHE 2025 employment weights used throughout the
 paper. For each destination group I compute the proportional
-labour-supply inflow $s_l$ (routed displaced FTE over baseline
+labour-supply inflow $s_l$ (routed displaced full-time-equivalent workers over baseline
 employment), and every non-displaced employee in group $l$ takes a wage
 cut of $\eta \times s_l$ of baseline earnings, composed additively with
 the $+2.6$ per cent uplift. The parameter $\eta$ is an \emph{assumed
@@ -248,8 +248,8 @@ central scenario exactly.}
 \end{table}
 
 Under this specification, the ripple channel loads mainly on the Exchequer. At $\eta =
-0.3$ the fiscal cost rises by \pounds \genRippleCostRiseBn~billion, from \pounds \genCentralCostBn{} to
-\pounds \genCentralRippleCostBn~billion, because thin, widespread wage cuts across the
+0.3$ the fiscal cost rises by \pounds \genRippleCostRiseBn~billion to
+\pounds \genCentralRippleCostBn~billion, because wage cuts of about 2 per cent across the
 non-displaced workforce forgo income tax and National Insurance at the
 margin. The distributional estimates move less: BHC poverty rises by
 \genRipplePovExtraPp~points more than in the central run (Table~\ref{tab:ripple} gives the Gini change); the cuts are imposed on employed workers concentrated in

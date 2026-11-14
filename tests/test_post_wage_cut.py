@@ -113,3 +113,26 @@ def test_emit_wage_cut_macros_on_the_committed_run(monkeypatch):
     assert float(vals["genWcWageCostMeanBn"]) > float(vals["genWcJobCostMeanBn"])
     assert float(vals["genWcWagePovBhcMeanPp"]) < float(vals["genWcJobPovBhcMeanPp"])
     assert "genWcMarginRows" in etv.emitted
+
+
+def test_review_macros_on_committed_results(monkeypatch):
+    """Household shares and closed-account crossovers (read only)."""
+    import re
+    import emit_tex_values as etv
+    root = Path(__file__).resolve().parents[1] / "results"
+    if not (root / "next_runs" / "obr_household_deciles.csv").exists():
+        pytest.skip("run 15 not present")
+    monkeypatch.setattr(etv, "lines", [])
+    monkeypatch.setattr(etv, "missing", [])
+    monkeypatch.setattr(etv, "emitted", set())
+    monkeypatch.setattr(etv, "values", {})
+    etv.emit_review()
+    etv.emit_wage_cut()
+    vals = dict(re.findall(r"\\newcommand\{\\(\w+)\}\{([^}]*)\}", "\n".join(etv.lines)))
+    assert not etv.missing, etv.missing
+    # households bear what the stabilisation coefficient leaves
+    assert 50 < int(vals["genObrHhBearPct"]) < 80
+    assert 50 < int(vals["genWcCutOnlyHhBearPct"]) < int(vals["genObrHhBearPct"])
+    assert 0 < int(vals["genObrBenefitShareOfAbsorbedPct"]) < 20
+    assert float(vals["genWcJobCostMeanTwoDpBn"]) + float(vals["genWcPairCostDiffTwoDpBn"]) == pytest.approx(
+        float(vals["genWcWageCostMeanTwoDpBn"]), abs=0.011)

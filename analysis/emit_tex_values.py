@@ -1281,6 +1281,18 @@ def emit_revision() -> None:
     emit("genFaCtPhiOneBn", lambda: _factor(1.0, 1.0)["corporation_tax_bn"], "{:.1f}", dv)
     emit("genFaHhDivPhiOneShareOneBn", lambda: _factor(1.0, 1.0)["household_dividends_bn"], "{:.1f}", dv)
 
+    # The closed cost is linear in phi: the phi at which it equals a target
+    # (the seed-0 central cost, or zero), by UK-household share.
+    def phi_at(target, share):
+        c0, c1 = _factor(0.0, share)["closed_cost_bn"], _factor(1.0, share)["closed_cost_bn"]
+        return (c0 - target) / (c0 - c1)
+    emit("genFaPhiCentralShareOne", lambda: phi_at(one("headline_cost_bn"), 1.0), "{:.2f}", dv)
+    emit("genFaPhiCentralShareHalf", lambda: phi_at(one("headline_cost_bn"), 0.5), "{:.2f}", dv)
+    emit("genFaPhiZeroShareOne", lambda: phi_at(0.0, 1.0), "{:.2f}", dv)
+    # dividend uplift of the central scenario beyond the closed account's maximum
+    emit("genFaDivUnfinancedBn", lambda: one("dividend_uplift_assumed_bn") - _factor(1.0, 1.0)["household_dividends_bn"],
+         "{:.1f}", dv)
+
     def factor_rows():
         out = []
         for phi, share in FACTOR_CELLS:
@@ -1343,6 +1355,14 @@ def emit_revision() -> None:
         v = jload(ix)["results"][key]
         return ra.count_adjusted(v[col], v["displaced_weighted_m"], sl, mu)
     emit("genIndexSlopeCostBn", lambda: ra.count_slope(csv(d5), "exchequer_cost_bn")[0], "{:.1f}", d5)
+
+    def slope_resid_sd():
+        d = csv(d5)
+        d = d[d["family"] == "exposure"]
+        x, y = d["displaced_weighted_m"].to_numpy(), d["exchequer_cost_bn"].to_numpy()
+        b, a = np.polyfit(x, y, 1)
+        return float(np.std(y - (a + b * x), ddof=2))
+    emit("genIndexSlopeResidSdBn", slope_resid_sd, "{:.1f}", d5)
     for key, N in [("c_aioe", "Caioe"), ("felten_aioe", "Felten"), ("eloundou_beta", "Eloundou"),
                    ("dsit_aioe", "DsitAioe"), ("dsit_llm", "DsitLlm")]:
         emit(f"genIndexAdj{N}CostBn", lambda key=key: ix_adj(key, "exchequer_cost_bn"), "{:.1f}", ix)
@@ -1466,11 +1486,25 @@ def emit_next_runs() -> None:
     def cap_rows():
         d = capsum()
         return "\n".join(row_tex([
-            lab, f"{d[k]['cost']:.1f} $\\pm$ {d[k]['cost_se']:.1f}",
+            lab, f"{d[k]['cost']:.1f} $\\pm$ {d[k]['cost_se'] * np.sqrt(d[k]['draws']):.1f}",
             "--" if np.isnan(d[k]["corporation_tax"]) else f"{d[k]['corporation_tax']:.1f}",
             m(d[k]["pov"], SIGNED2), m(d[k]["gini"], SIGNED2),
             f"{d[k]['capital_added']:.1f}"]) for k, lab in CAPITAL_VARIANT_LABELS)
     emit("genCapVariantRows", cap_rows, "{}", cv)
+
+
+def emit_review() -> None:
+    """Shares the referee round asked for, from run 15's decile table."""
+    hd = "next_runs/obr_household_deciles.csv"
+
+    def allrow():
+        d = csv(hd)
+        return d[d["decile"].astype(str) == "all"].iloc[0]
+    emit("genObrHhBearPct", lambda: 100 * float(allrow()["net_income_change"]) / float(allrow()["market_change"]),
+         "{:.0f}", hd)
+    emit("genObrBenefitShareOfAbsorbedPct",
+         lambda: 100 * float(allrow()["benefit_change"])
+         / (float(allrow()["benefit_change"]) - float(allrow()["tax_change"])), "{:.0f}", hd)
 
 
 def _obr_lines() -> dict:
@@ -1777,7 +1811,7 @@ def emit_wage_cut() -> None:
         for lab, k in [(f"Job loss (central), {d['draws']} draws", "job"),
                        (f"Wage cuts, C-AIOE gradient, {d['draws']} draws", "wage")]:
             out.append(row_tex([
-                lab, f"{d['cost'][k]:.1f} $\\pm$ {d['cost'][k + '_se']:.1f}",
+                lab, f"{d['cost'][k]:.1f} $\\pm$ {d['cost'][k + '_se'] * np.sqrt(d['draws']):.1f}",
                 m(d["pov_bhc"][k], SIGNED2), m(d["pov_ahc"][k], SIGNED2), m(d["gini"][k], SIGNED2)]))
         out.append(row_tex([
             "Wage cuts, PSS gradient, seed 0", f"{pss['exchequer_cost'] / 1e9:.1f}",
@@ -1791,6 +1825,15 @@ def emit_wage_cut() -> None:
         return guard(lambda: float(pw.variant_rows(wd(), "cut_only")[col].mean()))
     emit("genWcCutOnlyPovBhcMeanPp", lambda: cut_mean("poverty_change_bhc_pp"), "{:.2f}", WAGE_CUT_DRAWS)
     emit("genWcCutOnlyGiniMeanSignedPp", lambda: cut_mean("gini_change_pp"), SIGNED2, WAGE_CUT_DRAWS)
+    # two-decimal twins so the paired difference adds up in the text
+    emit("genWcJobCostMeanTwoDpBn", lambda: mc()["cost"]["job"], "{:.2f}", dcd)
+    emit("genWcWageCostMeanTwoDpBn", lambda: mc()["cost"]["wage"], "{:.2f}", WAGE_CUT_DRAWS)
+    emit("genWcPairCostDiffTwoDpBn", lambda: mc()["cost"]["diff"], "{:.2f}", WAGE_CUT_DRAWS)
+    # pence of each pound of earnings lost through wage cuts alone that
+    # reaches household disposable income (1 - stabilisation coefficient)
+    emit("genWcCutOnlyHhBearPct",
+         lambda: 100 * cut_mean("net_income_change_bn") / cut_mean("market_income_change_bn"), "{:.0f}",
+         WAGE_CUT_DRAWS)
     # absorption: pence of cost per pound of earnings removed, wage cuts alone
     emit("genAbsCutGovPct", lambda: 100 * cut()["gov_balance"], "{:.0f}", WAGE_CUT_DRAWS)
     emit("genAbsCutHhPct", lambda: 100 * cut()["household"], "{:.0f}", WAGE_CUT_DRAWS)
@@ -2022,6 +2065,7 @@ def main() -> None:
     emit_post()
     emit_takeup()
     emit_wage_cut()
+    emit_review()
     check_directions()
 
     # --- write -------------------------------------------------------------
