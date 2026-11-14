@@ -1486,7 +1486,7 @@ def emit_next_runs() -> None:
     def cap_rows():
         d = capsum()
         return "\n".join(row_tex([
-            lab, f"{d[k]['cost']:.1f} $\\pm$ {d[k]['cost_se'] * np.sqrt(d[k]['draws']):.1f}",
+            lab, f"${d[k]['cost']:.1f}$ $\\pm$ {d[k]['cost_se'] * np.sqrt(d[k]['draws']):.1f}",
             "--" if np.isnan(d[k]["corporation_tax"]) else f"{d[k]['corporation_tax']:.1f}",
             m(d[k]["pov"], SIGNED2), m(d[k]["gini"], SIGNED2),
             f"{d[k]['capital_added']:.1f}"]) for k, lab in CAPITAL_VARIANT_LABELS)
@@ -1811,7 +1811,7 @@ def emit_wage_cut() -> None:
         for lab, k in [(f"Job loss (central), {d['draws']} draws", "job"),
                        (f"Wage cuts, C-AIOE gradient, {d['draws']} draws", "wage")]:
             out.append(row_tex([
-                lab, f"{d['cost'][k]:.1f} $\\pm$ {d['cost'][k + '_se'] * np.sqrt(d['draws']):.1f}",
+                lab, f"${d['cost'][k]:.1f}$ $\\pm$ {d['cost'][k + '_se'] * np.sqrt(d['draws']):.1f}",
                 m(d["pov_bhc"][k], SIGNED2), m(d["pov_ahc"][k], SIGNED2), m(d["gini"][k], SIGNED2)]))
         out.append(row_tex([
             "Wage cuts, PSS gradient, seed 0", f"{pss['exchequer_cost'] / 1e9:.1f}",
