@@ -107,8 +107,8 @@ FRS 2024-25 file (`frs_2024_25.h5`) plus a join to the raw UKDA `adult.tab`
 for occupation. That file had two build defects (household-level variables
 attached in row order rather than by serial number, giving about 62m people
 and 22.9m employees; and dividends joined on the wrong person key, leaving
-eight records with any dividends), so the study moved to Microcosm. The paper's
-appendix compares the headline results across the two datasets.
+eight records with any dividends), so the study moved to Microcosm. Every result from
+the earlier file is superseded; PR #18 records the change.
 
 ## Reproduce
 
