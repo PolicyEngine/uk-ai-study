@@ -174,6 +174,9 @@ EXPECTED_CSV = {
     # UC take-up = 1 and new-style JSA: (disp_only seed 0 + obr and central
     # seeds 0-19) x (takeup1, jsa)
     "takeup/takeup_draws.csv": (82, _keys("scenario", "variant", "seed"), "displaced_takeup_runs.py"),
+    # wage-cut household run: (table3, cut_only) x seeds 0-19; its own
+    # fingerprint (package + script + next_runs.py) is checked in emit_wage_cut
+    "wage_cut/wage_cut_draws.csv": (40, _keys("variant", "seed"), None),
 }
 #: summaries that are only valid with their (complete, current) checkpoint
 REQUIRES = {
@@ -300,7 +303,7 @@ TABLE_ROW_MACROS = {
     "genPresetRows", "genIndexRows", "genIncidenceRows", "genWageMarginRows",
     "genMixedRows", "genSurvivorRows", "genJobLossRows", "genPolicyRows", "genRippleRows",
     "genFactorRows", "genIndexAdjRows", "genPresetMcRows", "genPolicyMcRows", "genCapVariantRows",
-    "genObrLineRows", "genObrDecileRows",
+    "genObrLineRows", "genObrDecileRows", "genWcMarginRows",
 }
 
 
@@ -375,14 +378,22 @@ DIRECTIONS = {
 }
 
 
-#: (larger, smaller): orderings the prose states. The discussion and the
-#: introduction say the Exchequer absorbs more of each pound lost through wage
-#: cuts than through job loss, including with full UC take-up and new-style
-#: JSA for the displaced; a take-up run that overturns that fails the emit.
+#: (larger, smaller): orderings the prose states. The abstract, the
+#: introduction and the conclusions say the Exchequer absorbs more of each
+#: pound lost through wage cuts than through job loss, on the government
+#: balance and on the household basis, including with full UC take-up and
+#: new-style JSA for the displaced; a run that overturns that fails the emit.
 ORDERINGS = (
-    ("genAbsWageGovPct", "genAbsJobGovPct"),
-    ("genAbsWageGovPct", "genAbsJobGovTakeupPct"),
-    ("genAbsWageGovPct", "genAbsJobGovJsaPct"),
+    ("genAbsCutGovPct", "genAbsJobGovPct"),
+    ("genAbsCutGovPct", "genAbsJobGovDrawsPct"),
+    ("genAbsCutGovPct", "genAbsJobGovTakeupPct"),
+    ("genAbsCutGovPct", "genAbsJobGovJsaPct"),
+    ("genAbsCutHhPct", "genAbsJobHhPct"),
+    ("genAbsCutHhPct", "genAbsJobHhTakeupPct"),
+    ("genAbsCutHhPct", "genAbsJobHhJsaPct"),
+    # the margin comparison: wage cuts cost more and raise poverty less
+    ("genWcWageCostMeanBn", "genWcJobCostMeanBn"),
+    ("genWcJobPovBhcMeanPp", "genWcWagePovBhcMeanPp"),
 )
 
 
@@ -1706,6 +1717,80 @@ def emit_takeup() -> None:
     emit("genTkJsaTaxWords", lambda: "counts it as taxable income" if jload(TAKEUP_JSON)["jsa"]["taxed_by_model"]
          else "does not tax it", "{}", TAKEUP_JSON)
 
+WAGE_CUT_DRAWS = "wage_cut/wage_cut_draws.csv"
+
+
+def emit_wage_cut() -> None:
+    """The wage-cut household run (analysis/wage_cut_household.py; post-
+    processing in analysis/post_wage_cut.py): the margin comparison over 20
+    paired draws and the absorption of a wage cut on both bases."""
+    import post_wage_cut as pw
+    dcd = "robustness/dividend_coverage_draws.csv"
+
+    def wd():
+        d = csv(WAGE_CUT_DRAWS)
+        import wage_cut_household as wc
+        got = set(d["code_fingerprint"].astype(str))
+        if got != {wc.fingerprint()}:
+            raise Pending(f"{WAGE_CUT_DRAWS} was written by other code ({sorted(got)}, current {wc.fingerprint()})")
+        return d
+
+    def guard(f):
+        try:
+            return f()
+        except pw.Incomplete as exc:
+            raise Pending(str(exc)) from None
+
+    def mc():
+        return guard(lambda: pw.margin_comparison(wd(), csv(dcd)))
+
+    def cut():
+        return guard(lambda: pw.cut_absorption(wd()))
+
+    def job():
+        return guard(lambda: pw.job_absorption(wd(), csv(dcd)))
+
+    emit("genWcDraws", lambda: mc()["draws"], "{:d}", WAGE_CUT_DRAWS)
+    emit("genWcGrossCutSharePct", lambda: mc()["gross_cut_share_pct"], "{:.2f}", WAGE_CUT_DRAWS)
+    for key, N, fmt, dfmt in [("cost", "Cost", "{:.1f}", "{:.1f}"), ("pov_bhc", "PovBhc", "{:.2f}", "{:.2f}"),
+                              ("pov_ahc", "PovAhc", "{:.2f}", "{:.2f}"), ("gini", "Gini", "{:.2f}", "{:.2f}")]:
+        unit = "Bn" if key == "cost" else "Pp"
+        emit(f"genWcJob{N}Mean{unit}", lambda key=key: mc()[key]["job"], fmt, dcd)
+        emit(f"genWcWage{N}Mean{unit}", lambda key=key: mc()[key]["wage"], fmt, WAGE_CUT_DRAWS)
+        # magnitude of the paired difference (wage cuts minus job loss)
+        emit(f"genWcPair{N}DiffAbs{unit}", lambda key=key: abs(mc()[key]["diff"]), dfmt, WAGE_CUT_DRAWS)
+        emit(f"genWcPair{N}DiffSe{unit}", lambda key=key: mc()[key]["diff_se"], "{:.2f}", WAGE_CUT_DRAWS)
+    emit("genWcPairCostDiffMinBn", lambda: mc()["cost"]["diff_min"], "{:.1f}", WAGE_CUT_DRAWS)
+    emit("genWcPairPovBhcDiffSmallestAbsPp", lambda: abs(mc()["pov_bhc"]["diff_max"]), "{:.2f}", WAGE_CUT_DRAWS)
+    emit("genWcWageRelPovBhcMeanSignedPp", lambda: mc()["relative_pov_bhc_wage"], SIGNED2, WAGE_CUT_DRAWS)
+
+    def rows():
+        d = mc()
+        pss = jload("wage_margin_pss.json")
+        out = []
+        for lab, k in [(f"Job loss (central), {d['draws']} draws", "job"),
+                       (f"Wage cuts, C-AIOE gradient, {d['draws']} draws", "wage")]:
+            out.append(row_tex([
+                lab, f"{d['cost'][k]:.1f} $\\pm$ {d['cost'][k + '_se']:.1f}",
+                m(d["pov_bhc"][k], SIGNED2), m(d["pov_ahc"][k], SIGNED2), m(d["gini"][k], SIGNED2)]))
+        out.append(row_tex([
+            "Wage cuts, PSS gradient, seed 0", f"{pss['exchequer_cost'] / 1e9:.1f}",
+            m(pss["poverty_rate_change_bhc"] * 100, SIGNED2), m(pss["poverty_rate_change_ahc"] * 100, SIGNED2),
+            m((pss["gini_shocked"] - pss["gini_baseline"]) * 100, SIGNED2)]))
+        return "\n".join(out)
+    emit("genWcMarginRows", rows, "{}", WAGE_CUT_DRAWS)
+
+    # absorption: pence of cost per pound of earnings removed, wage cuts alone
+    emit("genAbsCutGovPct", lambda: 100 * cut()["gov_balance"], "{:.0f}", WAGE_CUT_DRAWS)
+    emit("genAbsCutHhPct", lambda: 100 * cut()["household"], "{:.0f}", WAGE_CUT_DRAWS)
+    emit("genAbsCutErNiPct", lambda: 100 * cut()["employer_ni"], "{:.0f}", WAGE_CUT_DRAWS)
+    emit("genAbsCutGrossBn", lambda: cut()["gross_cut_bn"], "{:.1f}", WAGE_CUT_DRAWS)
+    emit("genAbsCutUcBn", lambda: cut()["uc_bn"], "{:.1f}", WAGE_CUT_DRAWS)
+    # job loss on the government balance over the same 20 seeds
+    emit("genAbsJobGovDrawsPct", lambda: 100 * job()["gov_balance"], "{:.0f}", dcd)
+    emit("genAbsJobGovDrawsMinPct", lambda: 100 * job()["gov_balance_min"], "{:.0f}", dcd)
+    emit("genAbsJobGovDrawsMaxPct", lambda: 100 * job()["gov_balance_max"], "{:.0f}", dcd)
+
 
 def main() -> None:
     # --- presets -----------------------------------------------------------
@@ -1925,6 +2010,7 @@ def main() -> None:
     emit_next_runs()
     emit_post()
     emit_takeup()
+    emit_wage_cut()
     check_directions()
 
     # --- write -------------------------------------------------------------

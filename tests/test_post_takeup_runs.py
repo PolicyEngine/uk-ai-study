@@ -142,7 +142,7 @@ def test_ordering_guard_flags_a_reversal(monkeypatch):
     import emit_tex_values as etv
     monkeypatch.setattr(etv, "missing", [])
     monkeypatch.setattr(etv, "emitted", set())
-    monkeypatch.setattr(etv, "values", {"genAbsWageGovPct": 54.0, "genAbsJobGovPct": 42.0,
+    monkeypatch.setattr(etv, "values", {"genAbsCutGovPct": 54.0, "genAbsJobGovPct": 42.0,
                                         "genAbsJobGovJsaPct": 55.0})
     monkeypatch.setattr(etv, "DIRECTIONS", {})
     etv.check_directions()
