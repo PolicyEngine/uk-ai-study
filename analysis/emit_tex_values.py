@@ -1305,6 +1305,10 @@ def emit_revision() -> None:
     emit("genAbsJobGovPct", lambda: 100 * absorb()["job_loss_gov_balance"], "{:.0f}", sw)
     emit("genAbsJobHhPct", lambda: 100 * absorb()["job_loss_household"], "{:.0f}", sw)
     emit("genAbsWageGovPct", lambda: 100 * absorb()["wage_cut_gov_balance"], "{:.0f}", sw)
+    # the part of the job-loss figure outside the household basis (employer
+    # NI): the difference of the two printed values, so the text adds up
+    emit("genAbsJobRestPct", lambda: round(100 * absorb()["job_loss_gov_balance"])
+         - round(100 * absorb()["job_loss_household"]), "{:.0f}", sw)
     dcd = "robustness/dividend_coverage_draws.csv"
     emit("genCostPerDisplacedGbp", lambda: round(ra.cost_per_displaced(csv(dcd))["mean_gbp"], -2), "{:,.0f}", dcd)
     emit("genCostPerDisplacedSdGbp", lambda: round(ra.cost_per_displaced(csv(dcd))["sd_gbp"], -2), "{:,.0f}", dcd)
