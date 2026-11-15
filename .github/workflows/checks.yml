@@ -22,7 +22,3 @@ jobs:
           git diff --exit-code paper/values_generated.tex
       - name: Results and presentation files match the attestation
         run: uv run python analysis/rebuild.py --check
-      - name: Restamped checkpoints still verify against the pre-restamp code
-        run: |
-          git fetch --no-tags --prune --unshallow origin || true
-          uv run python analysis/restamp_checkpoints.py --check

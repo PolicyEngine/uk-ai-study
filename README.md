@@ -158,8 +158,12 @@ modules each stage imports, and duplicated constants were moved to one place
 but did change the fingerprints that stamp the committed draws, so the draws
 were restamped rather than rerun: `analysis/restamp_checkpoints.py` proves
 every edit non-behavioural (identical normalised syntax trees before and
-after; newly covered helper modules last changed before the draws were
-written) and then replaces only the stamp. `results/RESTAMP_LOG.json`
+after) and that each helper module newly covered by a fingerprint was last
+changed in git before the commit that wrote the draws, and then replaces
+only the stamp. The git check establishes commit order; it cannot show what
+an uncommitted working tree held when the draws ran. The tool is a one-off:
+it restamps from the pre-fix commit only, and the next rerun stamps the
+draws afresh. `results/RESTAMP_LOG.json`
 records the old and new fingerprint of every checkpoint and the verdict for
 every file the fingerprints cover.
 

@@ -550,6 +550,12 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def portable_cmd(cmd: list[str]) -> list[str]:
+    """A stage command as recorded in the attestation: the interpreter by
+    name, so no machine-specific (or temporary) path enters the repository."""
+    return [Path(c).name if c == PY else c for c in cmd]
+
+
 def package_versions(names) -> dict[str, str | None]:
     """Installed distribution versions, with explicit nulls for source-only deps."""
     versions = {}
@@ -739,7 +745,7 @@ def attest_existing(results_dir: Path, source_root: Path, note: str | None = Non
             )
         ),
         "stages": [
-            {"stage": s["stage"], "cmd": s["cmd"]} for s in topo_order(MANIFEST)
+            {"stage": s["stage"], "cmd": portable_cmd(s["cmd"])} for s in topo_order(MANIFEST)
         ],
         "script_sha256": {
             str(f.relative_to(source_root)): sha256(f)
@@ -910,7 +916,7 @@ def build(manifest, keep_build=False, only_stages=None):
                     "matplotlib",
                     )
             ),
-            "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],
+            "stages": [{"stage": s["stage"], "cmd": portable_cmd(s["cmd"])} for s in ordered],
             "script_sha256": {
                 str(f.relative_to(wt)): sha256(f)
                 for f in sorted((wt / "analysis").glob("*.py"))
