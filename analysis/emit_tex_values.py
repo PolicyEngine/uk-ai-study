@@ -1456,9 +1456,8 @@ def emit_revision() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Runs 15 and 16 (specified 13 Nov 2026, not yet run). NOT called from
-# main(): call it there, and use its macros in the .tex, once
-# results/next_runs/ holds attested outputs (see analysis/next_runs.py).
+# Runs 15 and 16 (run 13 Nov 2026; results/next_runs/, stages obr_benchmark
+# and capital_variants of rebuild.py).
 # ---------------------------------------------------------------------------
 CAPITAL_VARIANT_LABELS = [
     ("cap10", r"Interest and dividends $+10\%$"), ("cap20", r"Interest and dividends $+20\%$"),
@@ -1698,6 +1697,10 @@ def emit_takeup() -> None:
     (analysis/post_takeup_runs.py; draws from displaced_takeup_runs.py)."""
     import next_runs as nr
     import post_takeup_runs as pt
+
+    tkj = "takeup/takeup_runs.json"
+    emit("genJsaLelWeeks", lambda: jload(tkj)["jsa"]["earnings_condition_gbp"]
+         / jload(tkj)["jsa"]["lower_earnings_limit_week"], "{:.0f}", tkj)
     ob = "next_runs/obr_benchmark.json"
     obd = "next_runs/obr_benchmark_draws.csv"
 

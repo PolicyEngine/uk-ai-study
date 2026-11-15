@@ -280,10 +280,18 @@ def incidence_families():
 
 
 #: reform -> (label, colour); listed in the order the paper defines them
+from policy_counterfactuals import (  # noqa: E402  (reform parameters, one source)
+    TAPER_CUT_TO,
+    UC_UPLIFT,
+    WAGE_INSURANCE_CAP,
+    WAGE_INSURANCE_RATE,
+)
+
 POLICY_STYLE = {
-    "R1_wage_insurance": ("R1: wage insurance (50% of lost earnings, cap £15,000)", BLUE),
-    "R2_uc_circuit_breaker": ("R2: UC standard allowance +20%", AQUA),
-    "R3_cap_suspension_taper_cut": ("R3: benefit cap suspended, UC taper 45%", YELLOW),
+    "R1_wage_insurance": (f"R1: wage insurance ({WAGE_INSURANCE_RATE:.0%} of lost earnings, "
+                          f"cap £{WAGE_INSURANCE_CAP:,.0f})", BLUE),
+    "R2_uc_circuit_breaker": (f"R2: UC standard allowance +{UC_UPLIFT - 1:.0%}", AQUA),
+    "R3_cap_suspension_taper_cut": (f"R3: benefit cap suspended, UC taper {TAPER_CUT_TO:.0%}", YELLOW),
 }
 
 

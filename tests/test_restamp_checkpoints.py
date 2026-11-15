@@ -69,3 +69,19 @@ def test_restamp_text_touches_only_the_stamp_column():
     assert out == text.replace("cOLD", "cNEW")
     with pytest.raises(SystemExit):
         rs.restamp_text(text.replace("1,2.5,b,cOLD", "1,2.5,b,cOTHER"), "cOLD", "cNEW", rows=2)
+
+
+def test_changed_constant_with_no_local_use_is_caught(tmp_path):
+    """A constant read only from another module (m.X) must keep its value
+    (Fable 5.2 review of the fixes, S4)."""
+    old = {"analysis/stage.py": "X = 0.07\n"}
+    new = {"analysis/stage.py": "X = 0.08\n"}
+    with pytest.raises(SystemExit, match="changed from 0.07 to 0.08"):
+        _cmp(tmp_path, old, new)
+
+
+def test_removed_constant_is_caught(tmp_path):
+    old = {"analysis/stage.py": "X = 0.07\ndef f():\n    return 1\n"}
+    new = {"analysis/stage.py": "def f():\n    return 1\n"}
+    with pytest.raises(SystemExit, match="was removed"):
+        _cmp(tmp_path, old, new)

@@ -141,8 +141,11 @@ write household arrays outside the repository
 ### What the attestation covers
 
 `results/BUILD_MANIFEST.json` attests the hashes of the committed tree; it
-is not a record that every file came out of one clean-room build. The last
-full clean-room build predates five stages: `obr_benchmark` and
+is not a record that any file came out of a recorded clean-room build. Most
+stages come from the full Microcosm rerun that ended on 13 Nov 2026, which
+was itself attested in place with `--attest-existing` (its manifest has no
+start time and says it was not a full clean-room rerun from that commit).
+Five stages postdate that rerun: `obr_benchmark` and
 `capital_variants` (runs 15 and 16, 13 Nov 2026), `obr_household_deciles`,
 `takeup` (14 Nov 2026) and `wage_cut` (13 Nov 2026). Each was run on its own
 against the same certified Microcosm build and committed. The attestation
@@ -159,8 +162,11 @@ but did change the fingerprints that stamp the committed draws, so the draws
 were restamped rather than rerun: `analysis/restamp_checkpoints.py` proves
 every edit non-behavioural (identical normalised syntax trees before and
 after) and that each helper module newly covered by a fingerprint was last
-changed in git before the commit that wrote the draws, and then replaces
-only the stamp. The git check establishes commit order; it cannot show what
+changed in git no later than the commit that wrote the draws, and then replaces
+only the stamp. The same `--check` also reports, without enforcing,
+whether every other changed module is equivalent (tooling such as the
+emitter, `figures.py` and `rebuild.py` changes on purpose). The git check
+establishes commit order; it cannot show what
 an uncommitted working tree held when the draws ran. The tool is a one-off:
 it restamps from the pre-fix commit only, and the next rerun stamps the
 draws afresh. `results/RESTAMP_LOG.json`

@@ -48,15 +48,13 @@ ARRAYS_DIR = ROOT.parent / "ai-study-household-arrays"
 BACKUP_ARRAYS_DIR = Path.home() / "uk-ai-study-rerun-backup" / "household-arrays"
 SEEDS = tuple(range(20))
 from uk_ai_study.data import PERIOD  # noqa: E402
-from uk_ai_study.shocks import (  # noqa: E402
-    BASELINE_CAPITAL_RETURN,
-    CAPITAL_RETURN_INCREASE,
-    CORPORATION_TAX_RATE,
-)
+from uk_ai_study.shocks import CORPORATION_TAX_RATE as CT_RATE  # noqa: E402
 
-#: capital-income uplift of the central scenario (per cent): 1.405/1.005 - 1
-CENTRAL_UPLIFT_PCT = 100 * ((BASELINE_CAPITAL_RETURN + CAPITAL_RETURN_INCREASE) / BASELINE_CAPITAL_RETURN - 1)
-BASELINE_RETURN_PCT = 100 * BASELINE_CAPITAL_RETURN
+#: capital-income uplift of the central scenario (per cent): 1.405/1.005 - 1.
+#: Kept as the literal expression so the committed post-processing is
+#: bit-identical; tests/test_post_next_runs.py ties both to uk_ai_study.shocks.
+CENTRAL_UPLIFT_PCT = 100 * (1.405 / 1.005 - 1)
+BASELINE_RETURN_PCT = 1.005
 #: first day of the simulated fiscal year (UK benefit rates change in April)
 FY_START = f"{PERIOD}-04-01"
 PE_PARAMS = Path("policyengine_uk") / "parameters" / "gov" / "dwp"
@@ -113,7 +111,6 @@ def capital_breakeven(central: pd.DataFrame, cap60: pd.DataFrame,
 #: phi of each closed run-16 variant (kappa = (1 - CT) x phi x payout x UK
 #: share; see CAPITAL_VARIANTS in next_runs.py)
 CLOSED_PHI = {"closed_k0375": 1.0, "closed_k01875": 0.5, "closed_k009375": 0.25, "closed_k075": 1.0}
-CT_RATE = CORPORATION_TAX_RATE
 
 
 def capital_variant_summary(draws: pd.DataFrame) -> dict:

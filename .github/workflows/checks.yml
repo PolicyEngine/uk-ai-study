@@ -5,7 +5,11 @@ name: checks
 # results/BUILD_MANIFEST.json, and runs the unit tests (fakes only).
 on:
   push:
+    branches: [main]
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   checks:

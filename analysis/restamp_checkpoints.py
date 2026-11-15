@@ -157,6 +157,40 @@ def _package_constants(root: Path, module: str) -> dict:
     return module_constants(ast.parse(path.read_text()))
 
 
+def resolved_constants(src: str, root: Path) -> dict:
+    """Module-level literal constants of ``src``, whether assigned here or
+    imported from the package, resolved to their values."""
+    tree = ast.parse(src)
+    consts = module_constants(tree)
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            src_consts = _package_constants(root, node.module)
+            for alias in node.names:
+                if alias.name in src_consts:
+                    consts[alias.asname or alias.name] = src_consts[alias.name]
+    return consts
+
+
+def check_constants(rel: str, old_src: str, old_root: Path, new_src: str, new_root: Path,
+                    renames: dict | None = None) -> None:
+    """Every module-level constant of the old file must still exist with the
+    same value, so a constant read from another module (``m.X``) cannot change
+    unnoticed. New constants are allowed: their uses are inlined and compared."""
+    renames = renames or {}
+    old = {renames.get(k, k): v for k, v in resolved_constants(old_src, old_root).items()}
+    new = resolved_constants(new_src, new_root)
+    for name, value in old.items():
+        if name not in new:
+            assigned = any(isinstance(n, ast.Name) and n.id == name and isinstance(n.ctx, ast.Store)
+                           for n in ast.walk(ast.parse(new_src)))
+            raise SystemExit(f"{rel}: module constant {name} = {value!r} "
+                             + ("is now computed, so its value is not proved equal"
+                                if assigned else "was removed; a reader in another module would change"))
+        if new[name] != value or type(new[name]) is not type(value):
+            raise SystemExit(f"{rel}: module constant {name} changed from {value!r} to "
+                             f"{new[name]!r}: behavioural change")
+
+
 def normalise(src: str, root: Path, rel: str, renames: dict | None = None,
               exempt_functions=()) -> str:
     """Canonical AST dump of ``src`` (file ``rel`` of the tree at ``root``)."""
@@ -220,6 +254,7 @@ def compare(rel: str, old_root: Path, new_root: Path) -> str:
     if old_s == new_s:
         return "identical"
     ex = EXEMPT_FUNCTIONS.get(rel, {})
+    check_constants(rel, old_s, old_root, new_s, new_root, RENAMES.get(rel))
     a = normalise(old_s, old_root, rel, RENAMES.get(rel), ex)
     b = normalise(new_s, new_root, rel, None, ex)
     if a != b:
@@ -350,6 +385,23 @@ def run(old_ref: str, apply: bool) -> dict:
                                  "csv_last_written": csv_commit[:9],
                                  "newly_covered_helpers": helpers, "covered_files": files}
         log["file_verdicts"] = verdicts
+        # every other changed module (unstamped stages, post-processing,
+        # tooling): reported, not enforced, so the record says which edits
+        # are provably non-behavioural and which are not
+        others = {}
+        for f in sorted(set(p.relative_to(ROOT).as_posix()
+                            for d in ("analysis", "uk_ai_study") for p in (ROOT / d).glob("*.py"))
+                        - set(verdicts)):
+            old_p = old_root / f
+            if not old_p.is_file():
+                others[f] = "new file"
+            elif old_p.read_text() != (ROOT / f).read_text():
+                try:
+                    others[f] = compare(f, old_root, ROOT)
+                except SystemExit as exc:
+                    msg = str(exc).removeprefix(f"{f}: ").split("; the draws it covers")[0]
+                    others[f] = f"NOT equivalent: {msg}"
+        log["other_changed_files"] = others
     if apply and new_texts:
         for rel, text in new_texts.items():
             (ROOT / rel).write_text(text)
@@ -373,6 +425,9 @@ def main() -> None:
         print(f"{rel}: {r['old_fingerprint']} -> {r['new_fingerprint']} ({r['rows']} rows"
               + (f", {r['state']})" if "state" in r else ")"))
     for f, v in sorted(log["file_verdicts"].items()):
+        print(f"  {f}: {v}")
+    print("Other changed modules (reported, not enforced):")
+    for f, v in log["other_changed_files"].items():
         print(f"  {f}: {v}")
     print("APPLIED" if args.apply else "CHECK OK (nothing written)")
 

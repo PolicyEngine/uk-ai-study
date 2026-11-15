@@ -136,3 +136,12 @@ def test_emitter_writes_revision_macros_from_results():
                  "genAbsJobGovPct", "genCostPerDisplacedGbp", "genIndexAdjRows", "genPolicyMcRows"):
         assert f"\\newcommand{{\\{name}}}" in text
         assert f"\\newcommand{{\\{name}}}{{\\GENPENDING" not in text
+
+
+def test_capital_constants_agree_with_the_shock_module():
+    """One source for the capital return (review of PR #18, Low)."""
+    from uk_ai_study.shocks import BASELINE_CAPITAL_RETURN as B, CAPITAL_RETURN_INCREASE as I
+
+    assert ra.BASE_RETURN_PCT == pytest.approx(100 * B, abs=1e-12)
+    assert ra.RETURN_SHOCK_PP == pytest.approx(100 * I, abs=1e-12)
+    assert ra.CAPITAL_SCALE == pytest.approx((B + I) / B - 1, abs=1e-12)

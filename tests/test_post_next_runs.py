@@ -103,3 +103,11 @@ def test_pe_parameter_reads_the_rate_in_force():
     assert pn.pe_parameter("universal_credit/means_test/capital/limit.yaml") == 16_000
     single = pn.pe_parameter("universal_credit/standard_allowance/amount.yaml", key="SINGLE_OLD")
     assert 350 < single < 500
+
+
+def test_capital_constants_agree_with_the_shock_module():
+    """One source for the capital return (review of PR #18, Low)."""
+    from uk_ai_study.shocks import BASELINE_CAPITAL_RETURN as B, CAPITAL_RETURN_INCREASE as I
+
+    assert pn.BASELINE_RETURN_PCT == pytest.approx(100 * B, abs=1e-12)
+    assert pn.CENTRAL_UPLIFT_PCT == pytest.approx(100 * ((B + I) / B - 1), abs=1e-9)

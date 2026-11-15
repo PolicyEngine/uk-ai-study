@@ -660,6 +660,22 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
                         problems.append(f"MISSING   {rel}  (attested presentation file absent)")
                     elif sha256(p) != presentation[rel]:
                         problems.append(f"STALE     {rel}  (presentation hash != attestation)")
+            # the code that produced the attested tree must be the code in
+            # the checkout: every attested script hash must still match
+            for rel, digest in att.get("script_sha256", {}).items():
+                p = ROOT / rel
+                if not p.exists():
+                    problems.append(f"SCRIPT-DELETED {rel}  (attested script absent)")
+                elif sha256(p) != digest:
+                    problems.append(f"SCRIPT-STALE {rel}  (code changed since the attestation; "
+                                    "re-attest or rebuild)")
+            for p in sorted(list((ROOT / "analysis").glob("*.py")) + list((ROOT / "uk_ai_study").glob("*.py"))):
+                rel = str(p.relative_to(ROOT))
+                if att.get("script_sha256") and rel not in att["script_sha256"]:
+                    problems.append(f"SCRIPT-UNATTESTED {rel}  (not in attestation)")
+            if att.get("git_dirty_at_build"):
+                problems.append("DIRTY     attestation was written from a checkout with uncommitted "
+                                "changes to tracked files")
             outside = att.get("outside_clean_room", {})
             if outside:
                 notes.append("attestation lists stages whose current outputs did not come out of a clean-room build "
@@ -693,6 +709,18 @@ def attest_existing(results_dir: Path, source_root: Path, note: str | None = Non
     """
     if check(MANIFEST, results_dir=results_dir, verify_hashes=False):
         raise SystemExit("cannot attest an invalid or incomplete build tree")
+    # tracked files other than the attestation itself must be committed, so
+    # git_commit and the recorded hashes describe the same code
+    dirty = [
+        line for line in subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=source_root, capture_output=True, text=True, check=True,
+        ).stdout.splitlines()
+        if not line.endswith(f"results/{ATTESTATION}")
+    ]
+    if dirty:
+        raise SystemExit("refusing to attest: tracked files have uncommitted changes:\n"
+                         + "\n".join(dirty))
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=source_root,
@@ -717,8 +745,8 @@ def attest_existing(results_dir: Path, source_root: Path, note: str | None = Non
     )
     attestation = {
         "git_commit": commit,
-        "git_dirty_at_build": False,
-        "invoking_checkout_dirty_at_start": False,
+        "git_dirty_at_build": bool(dirty),  # refused above, so always False
+        "invoking_checkout_dirty_at_start": bool(dirty),
         "started_utc": None,
         "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "recovery_note": note or (

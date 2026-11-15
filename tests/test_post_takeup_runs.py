@@ -115,7 +115,8 @@ def test_emit_takeup_macros(monkeypatch):
                                          "flag_true_share_newly_entitled": 0.47, "over_capital_limit_share": 0.41,
                                          "other_earner_share": 0.58, "owner_share": 0.70}},
                  "existing_unemployed": {"flag_true_share_entitled": 0.88, "uc_per_person_gbp": 6045.0},
-                 "jsa": {"taxed_by_model": True}}}
+                 "jsa": {"taxed_by_model": True, "lower_earnings_limit_week": 129.0,
+                         "earnings_condition_gbp": 6450.0}}}
     monkeypatch.setattr(etv, "csv", lambda rel: files[rel].copy())
     monkeypatch.setattr(etv, "jload", lambda rel: jsons[rel])
     etv.emit_takeup()
@@ -123,6 +124,7 @@ def test_emit_takeup_macros(monkeypatch):
     assert not etv.missing, etv.missing
     assert vals["genObrWelfarePerUnempGbp"] == "6,100"  # 3bn / (1.4% of 35m)
     assert vals["genObrCashBenefitsPence"] == "2.9"
+    assert vals["genJsaLelWeeks"] == "50"
     assert vals["genObrBenefitsPence"] == "1.7"
     assert vals["genDollsUkBenefitsPct"] == "16.3"
     assert vals["genDollsUkTotalPct"] == "41.5"
