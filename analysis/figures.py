@@ -44,6 +44,7 @@ from figstyle import (
 JR16 = Path("results/jr16")
 APPENDIX = Path("results/appendix")
 INCIDENCE = Path("results/incidence")
+ROBUSTNESS = Path("results/robustness")
 
 
 def _bar_labels(ax, xs, ys, fmt="{:.1f}", pad_frac=0.02):
@@ -70,13 +71,11 @@ def fig4_2():
     d = pd.read_csv(JR16 / "fig4_2_wage_gain_by_decile.csv")
     fig, ax = plt.subplots(figsize=SINGLE)
     y = 100 * d["pct_change_employment_income"]
-    # gradient spans only ~2.50-2.72%, so use a non-zero baseline to keep the
-    # decile differences visible in the bars (axis truncated, values labelled)
     ax.bar(d["decile"], y, color=BLUE)
     _bar_labels(ax, d["decile"], y, fmt="{:.2f}", pad_frac=0.004)
     decile_ax(ax, "Change in employment income (%)\nnon-transitioning population")
-    pad = (y.max() - y.min()) * 0.25
-    ax.set_ylim(y.min() - pad, y.max() + pad * 1.6)
+    # zero baseline: bar heights must be proportional to the values
+    ax.set_ylim(0, y.max() * 1.12)
     save(fig, JR16 / "fig4_2_wages.png")
 
 
@@ -84,7 +83,7 @@ def fig4_3():
     d = pd.read_csv(JR16 / "fig4_3_capital_by_decile.csv")
     fig, ax = plt.subplots(figsize=SINGLE)
     y = 100 * d["share_of_all_capital_income"]
-    ax.bar(d["decile"], y, color=YELLOW)
+    ax.bar(d["decile"], y, color=BLUE)
     _bar_labels(ax, d["decile"], y)
     decile_ax(ax, "Share of all interest and dividend income (%)")
     save(fig, JR16 / "fig4_3_capital.png")
@@ -150,8 +149,7 @@ def grid_heatmaps(g):
         ax.set_yticks(range(len(piv.index)), piv.index)
         ax.set_xlabel("Displacement scenario (% of employees)")
         ax.set_ylabel("Wage scenario (% increase)")
-        ax.set_title(title)
-        fig.colorbar(im, ax=ax, shrink=0.8)
+        fig.colorbar(im, ax=ax, shrink=0.8, label=title)
         save(fig, JR16 / fname)
 
 
@@ -164,7 +162,6 @@ def decomposition_ci():
            color=BLUE, error_kw={"ecolor": INK2, "lw": 1})
     ax.axhline(0, color=INK, lw=0.8)
     decile_ax(ax, "Change in disposable income (%)")
-    ax.set_title("Central scenario, mean of 20 draws with 95% CI")
     save(fig, APPENDIX / "decomposition_ci.png")
 
 
@@ -185,8 +182,7 @@ def b9_b11():
         ax.tick_params(labelsize=8)
     fig.supxlabel("Displacement scenario (% of employees)", fontsize=10)
     fig.supylabel("Wage scenario (% increase)", fontsize=10)
-    fig.suptitle("Change in disposable income by baseline decile across the scenario grid (%)")
-    fig.colorbar(im, ax=axes, shrink=0.7)
+    fig.colorbar(im, ax=axes, shrink=0.7, label="Change in disposable income (%)")
     fig.savefig(APPENDIX / "b9_grid_by_decile.png", dpi=DPI, bbox_inches="tight")
     plt.close(fig)
 
@@ -200,8 +196,7 @@ def b9_b11():
     ax.set_yticks(range(len(piv.index)), piv.index)
     ax.set_xlabel("Displacement scenario (% of employees)")
     ax.set_ylabel("Wage scenario (% increase)")
-    ax.set_title("Average change in household disposable income (%), no capital shock")
-    fig.colorbar(im, ax=ax, shrink=0.8)
+    fig.colorbar(im, ax=ax, shrink=0.8, label="Average change in household disposable income (%)")
     save(fig, APPENDIX / "b11_grid_no_capital.png")
 
 
@@ -239,19 +234,23 @@ def incidence_families():
     axl.set_ylim(bottom=0)
     axl.set_title("Who is displaced, by income decile")
 
-    # Right panel: same families as points; identified by the shared legend
-    # below (no per-point annotations).
+    # Right panel: 50-draw means with +/-1 SD bars (the basis of the text and
+    # Table tab:incidence), not the seed-0 point, which is a bottom-tail draw
+    # for poverty and reorders the families. Identified by the shared legend.
+    draws = pd.read_csv(ROBUSTNESS / "incidence_draws_five.csv")
+    stats = draws.groupby("family")[["exchequer_cost_bn", "poverty_change_bhc_pp"]].agg(["mean", "std"])
     for name, (label, color) in FAMILY_STYLE.items():
-        x = fams[name]["exchequer_cost_bn"]
-        y = fams[name]["poverty_change_bhc_pp"]
+        x, xs = stats.loc[name, ("exchequer_cost_bn", "mean")], stats.loc[name, ("exchequer_cost_bn", "std")]
+        y, ys = stats.loc[name, ("poverty_change_bhc_pp", "mean")], stats.loc[name, ("poverty_change_bhc_pp", "std")]
+        axr.errorbar(x, y, xerr=xs, yerr=ys, fmt="none", ecolor=color, elinewidth=1, alpha=0.6, zorder=2)
         axr.scatter(x, y, s=90, color=color, edgecolor="white", lw=1, zorder=3)
     axr.set_xlabel("Exchequer cost (£ billion per year)")
-    axr.set_ylabel("Change in BHC poverty rate (pp)")
-    # data-driven limits (a fixed 12-35 window clipped families whose cost
-    # falls outside it)
-    costs = [fams[n]["exchequer_cost_bn"] for n in FAMILY_STYLE]
-    pad = 0.12 * (max(costs) - min(costs) or 1.0)
-    axr.set_xlim(min(costs) - pad, max(costs) + pad)
+    axr.set_ylabel("Change in absolute BHC poverty (pp)")
+    lo = (stats[("exchequer_cost_bn", "mean")] - stats[("exchequer_cost_bn", "std")]).min()
+    hi = (stats[("exchequer_cost_bn", "mean")] + stats[("exchequer_cost_bn", "std")]).max()
+    pad = 0.06 * (hi - lo)
+    axr.set_xlim(min(0, lo - pad), hi + pad)
+    axr.set_ylim(bottom=0)
     axr.grid(axis="x", visible=True)
     axr.set_title("What it costs vs poverty impact")
 
@@ -261,6 +260,37 @@ def incidence_families():
     fig.tight_layout(rect=[0, 0.07, 1, 1])
     fig.savefig(INCIDENCE / "incidence_families.png", dpi=DPI, bbox_inches="tight")
     plt.close(fig)
+
+
+def appendix_restyle():
+    """House-style redraw of the CSV-backed appendix charts (B.1-B.5, B.7,
+    B.8): no in-figure titles (the caption carries them), blue for single
+    series, green for the uniform rule as in the incidence figure. Reads the
+    CSVs analysis/appendix.py wrote; runs no simulation and leaves that
+    stage's code (and so its fingerprinted values) untouched."""
+    base = pd.read_csv(APPENDIX / "baseline_distributions.csv")
+    for name in ["b1_market_income_less_capital", "b2_capital_income", "b3_benefits",
+                 "b4_tax_and_ni", "b5_disposable_income"]:
+        fig, ax = plt.subplots(figsize=SINGLE)
+        y = base[name].to_numpy()
+        ax.bar(base["decile"], y, color=BLUE)
+        _bar_labels(ax, base["decile"], y)
+        decile_ax(ax, "£ billion per year")
+        save(fig, APPENDIX / f"{name}.png")
+    for csv, (c1, l1), (c2, l2, col2), fname in [
+        ("b7_uniform_vs_ai_decile.csv", ("ai_shock_pct", "AI shock (exposure-allocated)"),
+         ("uniform_shock_pct", "Uniform shock", GREEN), "b7_uniform_vs_ai_decile.png"),
+        ("b8_alternative_index_decile.csv", ("c_aioe_pct", "C-AIOE (main)"),
+         ("eloundou_pct", "Eloundou et al. beta", YELLOW), "b8_alternative_index_decile.png"),
+    ]:
+        d = pd.read_csv(APPENDIX / csv)
+        fig, ax = plt.subplots(figsize=SINGLE)
+        ax.bar(d["decile"] - 0.2, d[c1], width=0.38, label=l1, color=BLUE)
+        ax.bar(d["decile"] + 0.2, d[c2], width=0.38, label=l2, color=col2)
+        ax.axhline(0, color=INK, lw=0.8)
+        decile_ax(ax, "Change in disposable income (%)")
+        legend_below(ax, ncol=2)
+        save(fig, APPENDIX / fname)
 
 
 def main():
@@ -276,6 +306,7 @@ def main():
     decomposition_ci()
     b9_b11()
     incidence_families()
+    appendix_restyle()
     print("figures written to results/jr16, results/appendix and results/incidence")
 
 
