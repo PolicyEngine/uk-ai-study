@@ -209,6 +209,17 @@ FAMILY_STYLE = {
 }
 
 
+SHORT_LABEL = {"exposure": "Exposure-proportional", "junior": "Junior-concentrated",
+               "compression": "Expertise compression", "uniform": "Uniform",
+               "klein_top_loaded": "Top-loaded"}
+# (dx in £bn, dy in pp, ha, va) offsets for the point labels
+POINT_LABEL = {"exposure": (0.9, -0.30, "left", "top"),
+               "junior": (0.0, 0.62, "center", "bottom"),
+               "compression": (0.5, 0.12, "left", "bottom"),
+               "uniform": (0.0, -0.30, "center", "top"),
+               "klein_top_loaded": (0.0, -0.32, "center", "top")}
+LEADER = {"exposure", "junior"}
+
 def incidence_families():
     """Two-panel comparison of the five incidence families (same aggregate
     shock): decile transition shares (left) and the exchequer-cost /
@@ -242,8 +253,15 @@ def incidence_families():
     for name, (label, color) in FAMILY_STYLE.items():
         x, xs = stats.loc[name, ("exchequer_cost_bn", "mean")], stats.loc[name, ("exchequer_cost_bn", "std")]
         y, ys = stats.loc[name, ("poverty_change_bhc_pp", "mean")], stats.loc[name, ("poverty_change_bhc_pp", "std")]
-        axr.errorbar(x, y, xerr=xs, yerr=ys, fmt="none", ecolor=color, elinewidth=1, alpha=0.6, zorder=2)
-        axr.scatter(x, y, s=90, color=color, edgecolor="white", lw=1, zorder=3)
+        axr.errorbar(x, y, xerr=xs, yerr=ys, fmt="none", ecolor=color, elinewidth=1, alpha=0.45, zorder=2)
+        axr.scatter(x, y, s=45, color=color, edgecolor="white", lw=0.8, zorder=3)
+        # direct labels: exposure and junior sit almost on top of each other
+        # (their 50-draw means differ by ~£0.3bn and ~0.03pp), so label both
+        dx, dy, ha, va = POINT_LABEL.get(name, (0.6, 0.06, "left", "bottom"))
+        axr.annotate(SHORT_LABEL[name], (x, y), xytext=(x + dx, y + dy), ha=ha, va=va,
+                     fontsize=8.5, color=INK2, zorder=4,
+                     arrowprops=(dict(arrowstyle="-", color=MUTED, lw=0.6, shrinkA=1, shrinkB=4)
+                                 if name in LEADER else None))
     axr.set_xlabel("Exchequer cost (£ billion per year)")
     axr.set_ylabel("Change in absolute BHC poverty (pp)")
     lo = (stats[("exchequer_cost_bn", "mean")] - stats[("exchequer_cost_bn", "std")]).min()
