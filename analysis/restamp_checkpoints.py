@@ -9,8 +9,8 @@ simulation computes: the fingerprint now also hashes the sibling modules a
 stage imports (finding M8), every script takes ``PERIOD`` from
 ``uk_ai_study.data`` instead of redeclaring it (M7), duplicated constants come
 from one place, and docstrings, comments and one local variable name were
-reworded. Rerunning about 40 hours of simulation to refresh a hash would add
-nothing, so this script restamps instead, and only after proving each edit is
+reworded. Rerunning every stamped stage to refresh a hash would add nothing, so this
+script restamps instead, and only after proving each edit is
 non-behavioural.
 
 What it proves, per stamped CSV (``--check`` proves and writes nothing;
