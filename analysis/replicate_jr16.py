@@ -48,7 +48,7 @@ from uk_ai_study.shocks import (
 from uk_ai_study.runner import build_person_table as canonical_person_table, gini
 
 OUT = Path("results/jr16")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 N_DRAWS = 50
 
 

@@ -32,7 +32,7 @@ from uk_ai_study.runner import build_person_table, gini
 from uk_ai_study.shocks import ShockScenario, apply_shocks, build_shocked_simulation
 
 OUT = Path("results/robustness")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 SEEDS = range(5)
 
 #: LFS UK unemployment rate rose ~2.6pp between 2008Q1 and 2010Q1.

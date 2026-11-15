@@ -70,7 +70,7 @@ from uk_ai_study.shocks import (  # noqa: E402
 
 OUT = ROOT / "results" / "robustness"
 CSV = OUT / "dividend_coverage_draws.csv"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 N_DRAWS = 20
 SPI_THRESHOLD = 12_570
 #: SPI 2026 projection by total-income band (incomes_projection.csv @ fa4ebe9), £

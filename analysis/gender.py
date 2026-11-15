@@ -3,7 +3,7 @@
 Writes results/appendix/gender_incidence.json (paper §5.6). Recovered from
 the original generating session — see uk-ai-study#1, finding 8.
 
-Usage: python analysis/gender.py [--period 2026] [--draws 20]
+Usage: python analysis/gender.py [--period YEAR] [--draws 20]
 """
 
 import argparse
@@ -13,14 +13,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from uk_ai_study.data import microsimulation, soc_major_group
+from uk_ai_study.data import PERIOD, microsimulation, soc_major_group
 from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--period", type=int, default=2026)
+    parser.add_argument("--period", type=int, default=PERIOD)
     parser.add_argument("--draws", type=int, default=20)
     args = parser.parse_args()
     P = args.period

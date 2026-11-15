@@ -58,7 +58,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 OUT = ROOT / "results" / "next_runs"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 SEEDS = tuple(range(20))
 CT_RATE = 0.25
 BASELINE_CAPITAL_RETURN = 0.01005

@@ -1179,6 +1179,9 @@ def emit_extended() -> None:
     # --- data coverage (Microcosm occupation) -------------------------------
     oc = "robustness/occupation_vs_ashe.csv"
     emit("genOccMaxAbsDiffPp", lambda: csv(oc)["diff_pp"].abs().max(), "{:.1f}", oc)
+    # simulation year label (uk_ai_study.data.PERIOD = PolicyEngine period)
+    from uk_ai_study.data import PERIOD as _P
+    emit("genSimTaxYear", f"{_P}--{(_P + 1) % 100:02d}", "{}", "uk_ai_study.data.PERIOD")
     ov = "robustness/occupation_coverage.json"
     emit("genDataHouseholds", lambda: jload(ov)["households_rows"], "{:,d}", ov)
     emit("genDataPersons", lambda: jload(ov)["persons_rows"], "{:,d}", ov)

@@ -53,7 +53,7 @@ from uk_ai_study.shocks import (
 )
 
 OUT = Path("results/incidence")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 SEED = 0
 #: Default draw tilt toward the elite (top-earnings x high-exposure) group in
 #: the compression family. Parameterised for sensitivity runs (R2-6a):

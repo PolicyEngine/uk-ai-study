@@ -182,7 +182,9 @@ def decile_stabilisation(per_draw: list[pd.DataFrame]) -> pd.DataFrame:
     return mean.reset_index()
 
 
-def load_arrays(name: str, dirs=(ARRAYS_DIR, BACKUP_ARRAYS_DIR)) -> dict:
+def load_arrays(name: str, dirs=(ARRAYS_DIR,)) -> dict:
+    # no fallback to BACKUP_ARRAYS_DIR: it holds arrays from an earlier
+    # simulation year, which must never be mixed into this year's results
     for d in dirs:
         f = Path(d) / f"{name}.npz"
         if f.exists():
@@ -191,25 +193,27 @@ def load_arrays(name: str, dirs=(ARRAYS_DIR, BACKUP_ARRAYS_DIR)) -> dict:
     raise FileNotFoundError(f"{name}.npz not in {[str(d) for d in dirs]}")
 
 
-def pe_parameter(rel: str, date: str = "2026-04-01", key: str | None = None) -> float:
-    """Value in force at ``date`` of a policyengine-uk parameter YAML under
-    gov/dwp (``key`` selects a child of a parameter node)."""
-    import importlib.util
+def pe_parameter(rel: str, date: str | None = None, key: str | None = None) -> float:
+    """Value in force at ``date`` (default: 1 April of the simulation year) of
+    a policyengine-uk parameter under gov/dwp; ``key`` selects a child node.
 
-    import yaml
-    spec = importlib.util.find_spec("policyengine_uk")
-    path = Path(spec.origin).parent / "parameters" / "gov" / "dwp" / rel
-    node = yaml.safe_load(path.read_text())
+    Read through the model's parameter tree, not the raw YAML, so uprated
+    values for years without an explicit YAML entry are included."""
+    from policyengine_uk import CountryTaxBenefitSystem
+
+    from uk_ai_study.data import PERIOD
+    date = date or f"{PERIOD}-04-01"
+    global _PE_PARAMS
+    try:
+        params = _PE_PARAMS
+    except NameError:
+        params = _PE_PARAMS = CountryTaxBenefitSystem().parameters
+    node = params.gov.dwp
+    for part in rel.removesuffix(".yaml").split("/"):
+        node = getattr(node, part)
     if key is not None:
-        node = node[key]
-    vals = {str(k): v for k, v in node["values"].items()}  # YAML parses dates
-    best = max((k for k in vals if k <= date), default=None)
-    if best is None:
-        raise KeyError(f"{rel}: no value in force at {date}")
-    v = vals[best]
-    if isinstance(v, dict):
-        v = v["value"]
-    return float(v)
+        node = getattr(node, key)
+    return float(node(date))
 
 
 def main() -> None:  # pragma: no cover - needs the household arrays

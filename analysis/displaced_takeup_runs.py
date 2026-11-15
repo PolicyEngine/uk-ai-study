@@ -71,7 +71,7 @@ OUT = ROOT / "results" / "takeup"
 DRAWS = OUT / "takeup_draws.csv"
 DECILES = OUT / "takeup_deciles.csv"
 SUMMARY = OUT / "takeup_runs.json"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 SEEDS = tuple(range(20))
 VARIANTS = ("takeup1", "jsa")
 #: execution order: the three-simulation absorption case first

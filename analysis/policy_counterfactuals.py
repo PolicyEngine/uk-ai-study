@@ -60,7 +60,7 @@ from uk_ai_study.shocks import (
 from incidence_scenarios import shocked_table_for  # noqa: E402
 
 OUT = ROOT / "results" / "policy"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 SEED = 0
 YEAR_SPAN = f"{PERIOD}-01-01.{PERIOD}-12-31"
 

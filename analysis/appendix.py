@@ -35,9 +35,7 @@ from figstyle import (
 )
 
 OUT = Path("results/appendix")
-PERIOD = 2026
-
-
+from uk_ai_study.data import PERIOD  # noqa: E402
 def setup():
     from uk_ai_study.data import microsimulation, soc_major_group
     from uk_ai_study.exposure import exposure_for_major_group

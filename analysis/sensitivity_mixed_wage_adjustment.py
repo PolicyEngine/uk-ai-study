@@ -34,7 +34,7 @@ from uk_ai_study.shocks import (
 )
 
 OUT = Path("results/robustness")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402
 SEED = 0
 LAMBDAS = (0.0, 0.25, 0.5, 0.75, 1.0)
 SURVIVOR_WAGE_EFFECTS = (-0.05, -0.026, 0.0, 0.026, 0.05)

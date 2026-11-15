@@ -38,7 +38,7 @@ def exposure_sensitivity():
     results = {}
     for measure in ("c_aioe", "dsit_aioe", "eloundou_beta"):
         baseline = microsimulation()
-        calc = lambda v: baseline.calculate(v, period=2026, map_to="person").values
+        calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
         persons = pd.DataFrame(
             {
                 "person_id": calc("person_id"),
@@ -66,22 +66,22 @@ def exposure_sensitivity():
         persons["complementarity"] = _weighted_fill(th)
 
         shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
-        sim = build_shocked_simulation(baseline, shocked_table, 2026)
+        sim = build_shocked_simulation(baseline, shocked_table, PERIOD)
 
         def m(s):
-            hw = s.calculate("household_weight", period=2026, map_to="household").values
-            eq = s.calculate("equiv_hbai_household_net_income", period=2026, map_to="household").values
-            n = s.calculate("household_count_people", period=2026, map_to="household").values
-            pw = s.calculate("person_weight", period=2026, map_to="person").values
+            hw = s.calculate("household_weight", period=PERIOD, map_to="household").values
+            eq = s.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
+            n = s.calculate("household_count_people", period=PERIOD, map_to="household").values
+            pw = s.calculate("person_weight", period=PERIOD, map_to="person").values
             return {
-                "gov": float((s.calculate("gov_balance", period=2026, map_to="household").values * hw).sum()),
-                "pov": float(np.average(s.calculate("in_poverty_bhc", period=2026, map_to="person").values, weights=pw)),
+                "gov": float((s.calculate("gov_balance", period=PERIOD, map_to="household").values * hw).sum()),
+                "pov": float(np.average(s.calculate("in_poverty_bhc", period=PERIOD, map_to="person").values, weights=pw)),
                 "gini": gini(eq, hw * n),
             }
 
         b, sh = m(baseline), m(sim)
         # decile gradient of displacement (top vs bottom decile share)
-        equiv = baseline.calculate("equiv_hbai_household_net_income", period=2026, map_to="person").values
+        equiv = baseline.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="person").values
         w = persons["weight"].to_numpy()
         order = np.argsort(equiv)
         cw = np.cumsum(w[order]); ranks = np.empty(len(equiv)); ranks[order] = cw / cw[-1]
@@ -106,7 +106,7 @@ def uniform_comparator():
     from uk_ai_study.runner import gini
     from uk_ai_study.shocks import apply_shocks, build_shocked_simulation
     baseline = microsimulation()
-    calc = lambda v: baseline.calculate(v, period=2026, map_to="person").values
+    calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
     persons = pd.DataFrame(
         {
             "person_id": calc("person_id"),
@@ -123,16 +123,16 @@ def uniform_comparator():
     persons["complementarity"] = 1.0
 
     shocked_table = apply_shocks(persons, PRESETS["central"], seed=0)
-    sim = build_shocked_simulation(baseline, shocked_table, 2026)
+    sim = build_shocked_simulation(baseline, shocked_table, PERIOD)
 
     def m(s):
-        hw = s.calculate("household_weight", period=2026, map_to="household").values
-        eq = s.calculate("equiv_hbai_household_net_income", period=2026, map_to="household").values
-        n = s.calculate("household_count_people", period=2026, map_to="household").values
-        pw = s.calculate("person_weight", period=2026, map_to="person").values
+        hw = s.calculate("household_weight", period=PERIOD, map_to="household").values
+        eq = s.calculate("equiv_hbai_household_net_income", period=PERIOD, map_to="household").values
+        n = s.calculate("household_count_people", period=PERIOD, map_to="household").values
+        pw = s.calculate("person_weight", period=PERIOD, map_to="person").values
         return {
-            "gov": float((s.calculate("gov_balance", period=2026, map_to="household").values * hw).sum()),
-            "pov": float(np.average(s.calculate("in_poverty_bhc", period=2026, map_to="person").values, weights=pw)),
+            "gov": float((s.calculate("gov_balance", period=PERIOD, map_to="household").values * hw).sum()),
+            "pov": float(np.average(s.calculate("in_poverty_bhc", period=PERIOD, map_to="person").values, weights=pw)),
             "gini": gini(eq, hw * n),
         }
 
@@ -151,7 +151,7 @@ def cross_sectional_moments():
     earnings by age band within exposure tertiles (cross-section only)."""
     from uk_ai_study.data import microsimulation
     sim = microsimulation()
-    calc = lambda v: sim.calculate(v, period=2026, map_to="person").values
+    calc = lambda v: sim.calculate(v, period=PERIOD, map_to="person").values
     persons = pd.DataFrame(
         {"person_id": calc("person_id"), "age": calc("age"),
          "employment_income": calc("employment_income"), "weight": calc("person_weight")}
@@ -190,7 +190,7 @@ def validation_vs_ashe():
     """Microcosm major-group employee distribution vs ASHE 2025 jobs weights."""
     from uk_ai_study.data import microsimulation
     sim = microsimulation()
-    calc = lambda v: sim.calculate(v, period=2026, map_to="person").values
+    calc = lambda v: sim.calculate(v, period=PERIOD, map_to="person").values
     empinc = calc("employment_income")
     w = calc("person_weight")
     soc = soc_major_group(sim, PERIOD)
@@ -210,7 +210,7 @@ def validation_vs_ashe():
     has = np.isfinite(soc)
     coverage = {
         "persons_rows": int(len(w)),
-        "households_rows": int(len(sim.calculate("household_weight", period=2026, map_to="household").values)),
+        "households_rows": int(len(sim.calculate("household_weight", period=PERIOD, map_to="household").values)),
         "population_m": float(w.sum() / 1e6),
         "employees_rows": int(employed.sum()),
         "employees_m": float(w[employed].sum() / 1e6),
