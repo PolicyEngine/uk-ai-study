@@ -25,13 +25,13 @@ Scenario & Displaced & Exchequer cost & \multicolumn{3}{c}{$\Delta$ Poverty (pp)
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Exchequer cost is the fall in the government balance; a negative cost is a net gain. Low: 1 per cent displacement, no wage gain. Central: 7 per cent displacement, 2.6 per cent wage gain. High: 13 per cent displacement, 2.6 per cent wage gain. The capital shock applies in every row. Abs.: absolute line fixed at baseline; Rel.: 60 per cent of the shocked median. The relative line is reported for the central case only. Public pay bill: earnings, employer NI and employer pension contributions of displaced public-sector employees (\pounds bn, mean over \genCentralPaybillDraws~draws), reported beside the cost and not netted from it.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Cost: fall in the government balance (negative = net gain). Low: 1 per cent displacement, no wage gain; central: 7 per cent, 2.6 per cent wage gain; high: 13 per cent, 2.6 per cent. Capital shock in every row. Abs.: line fixed at baseline; Rel.: 60 per cent of the shocked median. Public pay bill of displaced public-sector employees (\genCentralPaybillDraws~draws), not netted from the cost.}
 \end{table}
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=.65\textwidth]{../results/jr16/fig4_1_transition.png}
-\caption{Share of each equivalised disposable income decile that moves from employment to unemployment, central scenario. Means over 50 draws with 95 per cent intervals for the mean.}
+\caption{Share of each income decile moving from employment to unemployment, central scenario (50-draw means, 95 per cent intervals).}
 \label{fig:transition}
 \end{figure}
 
@@ -62,7 +62,7 @@ Figure~\ref{fig:decomp} splits the change into market income, benefits, and taxe
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.95\textwidth]{../results/jr16/fig4_4_decomposition.png}
-\caption{Change in market income, benefits, and taxes and contributions by baseline decile, central scenario (single draw, seed 0), as a share of baseline HBAI disposable income. The residual collects perimeter items (council tax, pension deductions) inside the HBAI concept.}
+\caption{Change in market income, benefits, and taxes and contributions by decile, central scenario (seed 0), as a share of baseline disposable income. The residual is council tax and pension deductions.}
 \label{fig:decomp}
 \end{figure}
 
@@ -85,7 +85,7 @@ Decile & Market & Benefits & Income tax & Disposable & Tax and & $1-\Delta Y_D/\
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means over \genObrDraws~draws of household flows summed within baseline deciles of equivalised HBAI income (households ranked with person weights, summed with household weights). Income tax and NI are household income tax and employee NI. ``Tax and benefits'' is (change in benefits $-$ change in income tax and NI) divided by the market-income loss; the last column also counts the other items between market and HBAI disposable income, chiefly pension contributions, which job loss removes. Decile~1 is subject to the ranking caveat above.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means over \genObrDraws~draws, by baseline decile of equivalised HBAI income. ``Tax and benefits'': change in benefits minus change in income tax and employee NI, over the market-income loss; the last column adds the other items between market and disposable income, chiefly pension contributions. Decile~1: see the ranking caveat.}
 \end{table}
 
 The household-basis share is not comparable with the unemployment-shock coefficients of \citet{dolls2012}, whose working paper reports \genDollsUkTotalPct~per cent for the UK, \genDollsUkBenefitsPct~points of it from benefits \citep[Table~3]{dolls2010wp}. Four differences separate the designs. First, take-up: they assume full take-up, whereas here the displaced benefit units entitled to UC claim it at the rate reported in Section~\ref{sec:results-channels}, against \genTkUnempFlagEntitledPct~per cent of entitled units with an unemployed member in the baseline. Second, who becomes unemployed: they reweight the sample towards people who are already unemployed, whereas the displaced here lose \pounds\genObrMeanLostEarningsGbp{} of earnings on average, and of their benefit units \genTkOverCapitalPct~per cent hold capital above the UC limit, \genTkOtherEarnerPct~per cent have another earner and \genTkOwnerPct~per cent own their home. Third, contributory benefits: reweighting gives the added unemployed the unemployment insurance that the survey's unemployed report, whereas the simulation pays no new-style JSA to the newly displaced. Fourth, incidence: exposure-proportional displacement places most of the market-income loss in the upper half of the distribution (Table~\ref{tab:stabilisation}). The comparison therefore neither confirms nor contradicts their result.
@@ -114,7 +114,7 @@ Displacement rule & Displaced & Exchequer cost & \multicolumn{2}{c}{$\Delta$ Pov
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means $\pm$ standard deviations across 50 shared assignment draws; divide a standard deviation by $\sqrt{50}$ for the standard error of the mean. Every rule has the same expected displaced count. The top-loaded stress test multiplies exposure-proportional probabilities by a junior factor (1.29) and wage-tier factors (9.6 above and 0.6 below median person earnings).}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means $\pm$ standard deviations across 50 draws; every rule has the same expected displaced count. Top-loaded: exposure-proportional probabilities times a junior factor (1.29) and wage-tier factors (9.6 above, 0.6 below median earnings).}
 \end{table}
 
 Because the rules share assignment seeds, I compare them draw by draw; the rules select different workers within a seed, so the pairing removes little of the draw noise. Uniform incidence costs \pounds\genPairUniExpCostMeanAbs~billion less than exposure-proportional incidence (paired 95 per cent interval $[\genPairUniExpCostLo, \genPairUniExpCostHi]$) and expertise compression \pounds\genPairCompExpCostMeanAbs~billion more ($[\genPairCompExpCostLo, \genPairCompExpCostHi]$); the junior tilt lowers the cost by \pounds\genPairJunExpCostMeanAbs~billion, an interval that includes zero ($[\genPairJunExpCostLo, \genPairJunExpCostHi]$), because the tilt operates within fixed occupation quotas and young workers sit mostly in low-exposure groups. These intervals describe assignment noise across 50 draws and narrow as draws are added; they carry no information about survey sampling or about which rule is right.
@@ -126,7 +126,7 @@ Figure~\ref{fig:incidence} shows the decile pattern behind these differences. Un
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.95\textwidth]{../results/incidence/incidence_families.png}
-\caption{The central shock under the five displacement rules: share of each baseline decile moving to unemployment (left) and Exchequer cost against the change in absolute BHC poverty (right). Left: single draw (seed 0). Right: means over 50 draws, with bars of one standard deviation across draws, as in Table~\ref{tab:incidence}.}
+\caption{Five displacement rules: who is displaced, by decile (left, seed 0), and Exchequer cost against the rise in absolute BHC poverty (right, 50-draw means $\pm$ one standard deviation).}
 \label{fig:incidence}
 \end{figure}
 
@@ -154,7 +154,7 @@ Scenario & Exchequer cost & \multicolumn{2}{c}{$\Delta$ Poverty (pp)} & $\Delta$
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} The first two rows are means over seeds 0--19, the cost with the standard deviation across draws. Each wage-cut draw removes the wage bill of the same seed's displaced workers before the 2.6 per cent uplift and the capital shock, which apply in all rows; the uplift reaches every employee in the wage-cut rows and the survivors in the job-loss row. The wage-cut rows displace no one; cuts are proportional to the stated occupation gradient. The PSS row is a single draw (seed~0), on which the C-AIOE gradient costs \pounds\genWageMarginCentralCostBn~billion.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} First two rows: means $\pm$ standard deviations over seeds 0--19; wage cuts remove the wage bill of the same seed's displaced workers. The 2.6 per cent uplift and capital shock apply in all rows (to all employees under wage cuts, to survivors under job loss). PSS row: seed~0 (C-AIOE gradient on that draw: \pounds\genWageMarginCentralCostBn~billion).}
 \end{table}
 
 The margin changes what each lost pound costs the Exchequer. Employers pay NI on top of earnings, so the cost per pound has two parts: the household basis of Section~\ref{sec:microsim}, which is the part of the lost pound that income tax, employee NI and benefits absorb, and employer NI. Displacement alone, with no wage or capital channel, costs the government balance \genAbsJobGovDrawsPct~pence per pound of earnings removed (\genWcDraws~draws, range \genAbsJobGovDrawsMinPct--\genAbsJobGovDrawsMaxPct~pence). At central scale the household-basis split of displacement alone is available for seed~0 only, where job loss costs \genAbsJobGovPct~pence: \genAbsJobHhPct~pence on the household basis, in line with Table~\ref{tab:stabilisation}, and \genAbsJobRestPct~pence of employer NI. The same gross loss delivered as wage cuts alone costs \genAbsCutGovPct~pence: \genAbsCutHhPct~pence on the household basis and \genAbsCutErNiPct~pence of employer NI (\genWcDraws~draws). Employer NI is of similar size on the two margins, so the gap between them arises in income tax, employee NI and benefits. Measured on HBAI disposable income, households bear \genObrHhBearPct~pence of each pound lost through job loss in the OBR-sized run (Table~\ref{tab:stabilisation}, where lost pension contributions also count) and \genWcCutOnlyHhBearPct~pence of each pound lost through the central-sized wage cuts (\genWcDraws~draws). With every displaced benefit unit claiming UC, job loss costs \genAbsJobGovTakeupPct~pence on the government balance and \genAbsJobHhTakeupPct~pence on the household basis, and with new-style JSA as well \genAbsJobGovJsaPct~and \genAbsJobHhJsaPct~pence; both remain below the wage-cut figures. I do not apply full take-up to the wage-cut runs, where it could only add UC spending. The ordering of the two margins is a result for this shock rather than a property of the UK system: its job losses fall on workers with above-average earnings, and many of them have capital, working partners or owned homes, and its wage cuts are graded to exposure, so they fall on earnings taxed at higher marginal rates. A wage cut removes pounds taxed at the worker's marginal rates of income tax and NI, and for UC claimants adds UC at the taper rate; job loss removes whole earnings, including the slice covered by the personal allowance and NI thresholds, and the UC it adds is less than the tax it forgoes. Poverty moves the other way: concentrated losses push displaced households across the line, while the same loss spread across employees outside the least-exposed group moves few households below it. Without the survivor-wage uplift and the capital shock, the wage cuts raise BHC poverty by \genWcCutOnlyPovBhcMeanPp~points and change the Gini by $\genWcCutOnlyGiniMeanSignedPp$ points (\genWcDraws~draws), because the cuts are graded to exposure and exposed occupations pay more; the Gini rise in the wage-cut rows of Table~\ref{tab:wagemargin} comes from the other two channels. Displacement alone raises BHC poverty by \genChannelMcDispPovBhcAbsPp~points on the same seeds.
@@ -181,7 +181,7 @@ Scenario & Displaced & Exchequer cost & $\Delta$ Poverty & $\Delta$ Gini \\
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} In the first panel C-AIOE-graded survivor cuts fill the gap between the thinned displacement draw and the fixed gross loss; $\lambda=1$ is the central draw. The second panel holds the displaced and the capital shock fixed and changes the mean survivor-wage effect, keeping the complementarity gradient.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Panel 1: C-AIOE-graded survivor cuts fill the gap between the thinned displacement draw and the fixed gross loss ($\lambda=1$ is the central draw). Panel 2: displaced set and capital shock fixed; the mean survivor-wage effect varies.}
 \end{table}
 
 \subsection{What moves the central cost}
@@ -205,10 +205,19 @@ Months out of work & 12 & \genBeDurMonths & 20 draws; linear between full-year l
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Capital: from a \pounds\genCapCentralTwentyCostMeanBn~billion cost at $+\genCapitalScalePct$ per cent to a \pounds\genCapSixtyDrawCostMeanAbsBn~billion gain at $+60$ per cent. Duration: from \pounds\genDurCentralCostMeanBn~billion at 12 months to a \pounds\genDurSixMoCostMeanAbsBn~billion gain when annual earnings halve; that run withdraws UC a six-month spell would pay, so the true break-even is shorter. Full take-up and new-style JSA move each break-even further away.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Linear interpolation. Capital: \pounds\genCapCentralTwentyCostMeanBn~billion cost at $+\genCapitalScalePct$ per cent to \pounds\genCapSixtyDrawCostMeanAbsBn~billion gain at $+60$ per cent. Duration: \pounds\genDurCentralCostMeanBn~billion at 12 months to \pounds\genDurSixMoCostMeanAbsBn~billion gain at half annual earnings, which withdraws UC a six-month spell would pay, so the true break-even is shorter. Full take-up and new-style JSA move each break-even further away.}
 \end{table}
 
 Other assumptions move the cost less or in one direction. A flat 70 per cent UC take-up probability for every benefit unit, in place of Microcosm's drawn flags (a person-weighted claim propensity of \genTakeupBaselinePropensityPct~per cent), raises take-up among the displaced and raises the cost from \pounds\genDurCentralCostMeanBn~billion to \pounds\genTakeupCostMeanBn~billion (20 draws). Setting take-up to one for the displaced alone gives \pounds\genTkCentralTakeupCostMeanBn~billion, and with new-style JSA as well \pounds\genTkCentralJsaCostMeanBn~billion (20 draws paired with the central draws, changes of $\genTkCentralTakeupCostDiffBn$ and $\genTkCentralJsaCostDiffBn$ billion); the rise in absolute BHC poverty becomes \genTkCentralTakeupPovBhcMeanPp~and \genTkCentralJsaPovBhcMeanPp~points, and that in the Gini \genTkCentralTakeupGiniMeanPp~and \genTkCentralJsaGiniMeanPp~points. A reduced-form ripple effect in which displaced workers lower other workers' wages with an assumed slope of 0.3 raises the central cost to \pounds\genCentralRippleCostBn~billion (seed~0; Online Appendix~\ref{app:ripple}). The low and high presets of Table~\ref{tab:presets} keep the full capital uplift while scaling displacement, which is why the low preset shows a net gain.
+
+The survivor-wage assumption matters for living standards as well as for the Exchequer. Figure~\ref{fig:griddisp} crosses displacement rates of 0 to 10 per cent with wage uplifts of 0 to 5 per cent, with the capital shock on and exposure-proportional incidence (single draw). At the central 7 per cent displacement rate, average household disposable income falls with up to 4 per cent wage growth ($\genGridDispSevenFourPct$ per cent) and rises with 5 per cent ($\genGridDispSevenFivePct$ per cent); with no wage growth it first falls at 4 per cent displacement ($\genGridDispFourZeroPct$ per cent). Online Appendix~\ref{app:grid} reports the grid's fiscal and inequality measures.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=.85\textwidth]{../results/jr16/fig4_5_disposable_grid.png}
+\caption{Change in average household disposable income (per cent) by displacement rate and wage uplift (seed 0).}
+\label{fig:griddisp}
+\end{figure}
 
 \paragraph{Dividend coverage.} Because the capital channel scales dividends proportionally, its fiscal size depends on how much dividend income the data carry. Restricted to people with total income of at least \pounds 12{,}570, the population the HMRC Survey of Personal Incomes covers, Microcosm's 2026 dividend income is \pounds\genDivTaxpayerBn~billion, \genDivRatioAbsPct~per cent \genDivRatioDirection{} the SPI projection for the same year (\pounds\genDivSpiBn~billion: the SPI 2023--24 outturn projected to 2026 by PolicyEngine's data pipeline).\footnote{The projection is \texttt{incomes\_projection.csv} in the policyengine-uk-data repository (commit fa4ebe9), the source of Microcosm's own SPI calibration targets. Microcosm matches the SPI targets band by band up to \pounds 1 million of total income; in the untargeted band above it Microcosm holds \pounds\genDivTopBandMicrocosmBn~billion of dividends against \pounds\genDivTopBandSpiBn~billion in the projection.} Three scaled variants, each over \genDivDraws{} draws paired with the unscaled central run, scale the variable in both the baseline and the shocked runs for people above the threshold. Scaling dividends by one factor (\genDivScaleFactor) to the SPI total raises the central cost from \pounds\genDivCentralCostMeanBn~billion to \pounds\genCovDivUniformCostMeanBn~billion (a paired increase of \pounds\genCovDivUniformDiffCostAbsBn~billion) and changes the Gini response by $\genCovDivUniformDiffGiniSignedPp$ points; scaling dividends band by band to the SPI band totals (top-band factor \genDivTopBandFactor) gives \pounds\genCovDivBandedCostMeanBn~billion (an increase of \pounds\genCovDivBandedDiffCostAbsBn~billion); and scaling savings interest by \genSavScaleFactor{} to the SPI total of \pounds\genSavSpiBn~billion gives \pounds\genCovSavUniformCostMeanBn~billion (an increase of \pounds\genCovSavUniformDiffCostAbsBn~billion). These are sensitivities: the data do not show whether the gap reflects top-income dividends the projection misses or calibration error, and the draw spread does not capture it, because the capital uplift is the same in every draw.
 % results/robustness/dividend_coverage.json
@@ -232,7 +241,7 @@ Index & (m) & Raw & Adjusted & adj.\ (pp) & adj.\ (pp) & (\%) & (\%) \\
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Single draw, seed 0, 2026. Adjusted columns subtract the 50-draw OLS slope of each outcome on the displaced count (exposure-proportional draws) times the draw's deviation from the 50-draw mean count. D1 and D10: percentages of persons in the bottom and top baseline deciles who move to unemployment.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Seed 0. Adjusted columns remove the effect of the draw's displaced count, using the 50-draw OLS slope. D1, D10: share of persons in the bottom and top deciles moving to unemployment.}
 \end{table}
 
 \subsection{Where the displaced wage bill goes}
@@ -258,7 +267,7 @@ $\phi$ & UK & Profits & Corporation & Household & Dividend & Exchequer \\
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Profits are $\phi$ times the net labour-income fall (\pounds\genFaNetLabourBn~billion). Payout ratio \genFaPayoutPct~per cent. The seed-0 central cost with the exogenous capital uplift is \pounds\genFaHeadlineSeedZeroBn~billion. Static accounting: no corporation-tax incidence, allowances or profit shifting, and dividend tax at the capital channel's average rate. Adding the \pounds\genFaEmployerNiBn~billion of net employer NI saved to profits would raise each profit figure by $\phi$ times that amount.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Profits are $\phi$ times the net labour-income fall (\pounds\genFaNetLabourBn~billion); payout ratio \genFaPayoutPct~per cent. Static accounting: no corporation-tax incidence, allowances or profit shifting. Seed-0 central cost with the exogenous capital uplift: \pounds\genFaHeadlineSeedZeroBn~billion.}
 \end{table}
 
 The closed cost falls linearly in $\phi$. It costs less than the central case when $\phi$ exceeds \genFaPhiCentralShareOne~with $s=1$ or \genFaPhiCentralShareHalf~with $s=0.5$, and it reaches zero at $\phi=\genFaPhiZeroShareOne$ with $s=1$ and at no $\phi\le 1$ with $s=0.5$. The central capital uplift adds more dividend income (\pounds\genFaDivUpliftBn~billion) than the closed account delivers to households at $\phi=1$ and $s=1$ (\pounds\genFaHhDivPhiOneShareOneBn~billion), so \pounds\genFaDivUnfinancedBn~billion of the central scenario's dividend uplift has no counterpart in the labour shock.
@@ -282,5 +291,5 @@ Capital variant & Exchequer cost & Corporation & $\Delta$ Poverty & $\Delta$ Gin
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means $\pm$ standard deviations across seeds 0--19; every row shares the central displaced set and survivor-wage uplift. $\phi$ is the share of the net labour-income fall that becomes profit; payout is the share of post-tax profit that companies distribute, all of it to UK households, so a 50 per cent payout corresponds to $s=1$ in Table~\ref{tab:closure}. The cost of a closed row is net of the corporation tax in the next column.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Means $\pm$ standard deviations over seeds 0--19, with the central displaced set and wage uplift. $\phi$: share of the net labour-income fall that becomes profit; payout: share of post-tax profit paid to UK households (50 per cent is $s=1$ in Table~\ref{tab:closure}). Closed-row costs are net of the corporation tax shown.}
 \end{table}

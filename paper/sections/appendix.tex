@@ -49,7 +49,7 @@ Figure~\ref{fig:decomp-ci} reports the 20-draw decile profile of the central sce
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.75\textwidth]{../results/appendix/decomposition_ci.png}
-\caption{Change in household disposable income by baseline decile, central scenario: mean and 95 per cent interval for the mean across 20 assignment draws. Each household's change is weighted by its number of members.}
+\caption{Change in disposable income by decile, central scenario: mean and 95 per cent interval over 20 draws, person-weighted.}
 \label{fig:decomp-ci}
 \end{figure}
 
@@ -144,14 +144,14 @@ at the single-draw level. % results/appendix/b7_uniform_vs_ai_decile.csv
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/b7_uniform_vs_ai_decile.png}
-\caption{Disposable income change by decile: exposure-allocated versus uniform shock, central parameters (seed 0; each household weighted by its number of members).}
+\caption{Disposable income change by decile: exposure-allocated versus uniform shock (seed 0, person-weighted).}
 \label{fig:b7}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/b8_alternative_index_decile.png}
-\caption{Disposable income change by decile under the C-AIOE and the Eloundou et al.\ exposure index (seed 0; each household weighted by its number of members).}
+\caption{Disposable income change by decile under the C-AIOE and the Eloundou et al.\ index (seed 0, person-weighted).}
 \label{fig:b8}
 \end{figure}
 
@@ -161,13 +161,6 @@ at the single-draw level. % results/appendix/b7_uniform_vs_ai_decile.csv
 
 To move beyond the presets I simulate a grid of 66 scenarios, crossing eleven displacement rates (0 to 10 per cent of employees, allocated in proportion to exposure, as in the presets) with six wage uplifts (0 to 5 per cent), each combined with the capital income channel, all under exposure-proportional incidence. Figure~\ref{fig:griddisp} maps the change in average household disposable income. The corners bracket the range: with a 5 per cent wage gain and no job loss, average disposable income changes by $\genGridDispMaxPct$ per cent; with 10 per cent displacement and no wage gain it changes by $\genGridDispMinPct$ per cent. % results/jr16/grid.csv
 The capital channel shifts the whole surface upwards: on its own (no displacement, no wage gain) it raises average disposable income by $\genGridCapOnlyDispPct$ per cent. With no wage growth, average disposable income still rises at 3 per cent displacement ($\genGridDispThreeZeroPct$ per cent) and first falls at 4 per cent ($\genGridDispFourZeroPct$ per cent); at the central 7 per cent displacement rate it falls with up to 4 per cent wage growth ($\genGridDispSevenFourPct$ per cent) and rises with 5 per cent ($\genGridDispSevenFivePct$ per cent). Whether AI raises or lowers average living standards in this grid therefore depends on the balance between displacement and wage growth, and on the assumed capital-return shock, all of which are uncertain.
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.85\textwidth]{../results/jr16/fig4_5_disposable_grid.png}
-\caption{Change in average household disposable income (per cent) across the 66-cell grid of displacement rates and wage uplifts (single draw, seed 0).}
-\label{fig:griddisp}
-\end{figure}
-
 The grid's fiscal measure is narrower than the government balance behind the headline cost of Section~\ref{sec:results-channels}: it is income tax plus National Insurance minus cash benefit expenditure as simulated on the household microdata, without employer National Insurance. Over the 50 central draws the narrow cash basis shows a net gain of \pounds\genCostNarrowCashAbsBn~billion, against a cost of \pounds\genCostTotalAbsBn~billion on the government balance; the gap of \pounds\genCostBasisGapAbsBn~billion matches the employer National Insurance component of \pounds\genCostEmployerNiAbsBn~billion, so the two measures should not be read off the same surface. On the narrow basis the grid spans a gain of \pounds\genGridRevGainBn~billion (5 per cent wage growth, no displacement) to a loss of \pounds\genGridRevLossBn~billion in the worst cell (10 per cent displacement, no wage growth). The capital shock alone adds \pounds\genGridCapOnlyRevBn~billion of net revenue. At the central displacement rate, net revenue falls by \pounds\genGridRevSevenZeroAbsBn~billion with no wage offset and rises by \pounds\genGridRevSevenThreeAbsBn~billion with a 3 per cent wage uplift. % results/jr16/grid.csv
 
 Figure~\ref{fig:gridgini} maps the change in the Gini coefficient across the same grid. The Gini rises in all \genGridCells{} cells, from $\genGridGiniMinSignedPp$ percentage points in the capital-only cell (no displacement, no wage gain) to $\genGridGiniMaxSignedPp$ points at the far corner. The capital-only cell shows the capital channel's contribution, which arises because the uplift accrues mainly to the top decile; displacement adds to it by pushing affected households down the distribution, and the wage uplift by lifting surviving workers further from workless and low-income households. Because each cell is a single draw on uneven weights, the Gini change is not strictly monotone in the displacement rate; the cross-draw spread reported for the central scenario (Section~\ref{sec:results-channels}) indicates the scale of that noise. Within the model, inequality rises even though the displacement shock lands mainly on higher earners.
@@ -175,7 +168,7 @@ Figure~\ref{fig:gridgini} maps the change in the Gini coefficient across the sam
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.85\textwidth]{../results/jr16/fig4_7_gini_grid.png}
-\caption{Change in the Gini coefficient of equivalised HBAI disposable income (percentage points) across the 66-cell scenario grid. The Gini rises in every cell.}
+\caption{Change in the Gini coefficient (percentage points) by displacement rate and wage uplift (seed 0).}
 \label{fig:gridgini}
 \end{figure}
 Figure~\ref{fig:b9} facets the full 66-cell scenario grid by baseline
@@ -198,7 +191,7 @@ not generated solely by the capital channel.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{../results/appendix/b9_grid_by_decile.png}
-\caption{Change in household disposable income across the scenario grid, faceted by baseline income decile. Single draw, seed 0; each household weighted by its number of members.}
+\caption{Change in household disposable income across the grid, by decile (seed 0, person-weighted).}
 \label{fig:b9}
 \end{figure}
 
@@ -256,10 +249,7 @@ $\eta$ & Cost (\pounds bn) & $\Delta$Pov.\ BHC (pp) & $\Delta$Pov.\ AHC (pp) & $
 \end{tabular}
 
 \vspace{2pt}
-\parbox{\textwidth}{\footnotesize Single draw, seed 0, 2026. $\eta$ is
-the author-chosen wage sensitivity applied to each destination
-group's proportional labour-supply inflow. $\eta = 0$ reproduces the
-central scenario exactly.}
+\parbox{\textwidth}{\footnotesize Seed 0. $\eta$: assumed wage sensitivity to each group's labour-supply inflow; $\eta = 0$ is the central scenario.}
 \end{table}
 
 Under this specification, the ripple channel loads mainly on the Exchequer. At $\eta =
@@ -295,7 +285,7 @@ I simulate the closest equivalent the household model allows. Displacement adds 
 \end{tabular}
 
 \vspace{0.4em}
-\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Positive values add to borrowing. Simulation: \genObrRatePct~per cent of employees displaced, exposure-proportional, no survivor-wage or capital change; means over \genObrDraws~draws. Childcare support and statutory pay are in the model's benefit total but are not welfare in the OBR's sense, so they are separate lines. The OBR's receipts include VAT and corporation tax, which the simulation holds fixed or omits, and its borrowing includes debt interest; its two rounded lines sum to its borrowing figure.}
+\parbox{0.92\textwidth}{\footnotesize\emph{Note:} Positive values add to borrowing. Simulation: \genObrRatePct~per cent of employees displaced, no survivor-wage or capital change, \genObrDraws~draws. The OBR's receipts include VAT and corporation tax, which the simulation omits, and its borrowing includes debt interest.}
 \end{table}
 
 The two sets of numbers measure different things in four ways. First, timing: the OBR figures average the forecast years, over which the unemployment gap builds up as the central forecast falls back to its equilibrium rate by 2030, whereas the simulation applies the full \genObrUnempRisePp-point rise in one year, so the OBR's average spans years in which the gap is still opening and is smaller than its effect once the full rise is in place. Second, coverage: the OBR's receipts include VAT on lower consumption and corporation tax on higher profits, and its borrowing includes debt interest; the simulation has neither consumption nor profit responses. Third, the OBR's welfare figure covers all welfare spending, including the contributory benefits that the central simulation does not pay to the newly displaced. Fourth, the OBR's scenario does not allocate unemployment across occupations, whereas exposure-proportional incidence displaces higher earners, whose income tax and NI make up most of the simulated cost. The long-term counterpart in the OBR's fiscal risks report, in which the wage share of GDP halves by 2075--76, lowers tax receipts by nearly 4 percentage points of GDP because wages and salaries carry an average effective tax rate of 46 per cent against 27 per cent on profits \citep[Box~4.1]{obr2026frs}.
