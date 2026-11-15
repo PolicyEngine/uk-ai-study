@@ -165,7 +165,9 @@ after) and that each helper module newly covered by a fingerprint was last
 changed in git no later than the commit that wrote the draws, and then replaces
 only the stamp. The same `--check` also reports, without enforcing,
 whether every other changed module is equivalent (tooling such as the
-emitter, `figures.py` and `rebuild.py` changes on purpose). The git check
+emitter, `figures.py` and `rebuild.py` changes on purpose, and
+`post_next_runs.py` reports a change only because its parameter date is now
+built from `PERIOD`, giving the same string). The git check
 establishes commit order; it cannot show what
 an uncommitted working tree held when the draws ran. The tool is a one-off:
 it restamps from the pre-fix commit only, and the next rerun stamps the
