@@ -1,9 +1,9 @@
 {
-  "git_commit": "5eabdafccbf1a7f065c923584c922a54be7027a4",
+  "git_commit": "28395e437ed0271904bfbeddb8c5b7bd05bbc275",
   "git_dirty_at_build": false,
   "invoking_checkout_dirty_at_start": false,
   "started_utc": null,
-  "finished_utc": "2026-11-15T21:41:53Z",
+  "finished_utc": "2026-11-15T21:43:45Z",
   "recovery_note": "Attested the committed results tree and presentation files at this commit without a clean-room rerun (review of PR #18, 15 Nov 2026). These hashes attest the committed files, not a rebuild: outside_clean_room lists every stage whose current outputs did not come out of a clean-room build, and why. A full clean-room rebuild (analysis/rebuild.py) would regenerate every output from empty results/ and needs the private Microcosm dataset and long runs.",
   "outside_clean_room": {
     "obr_benchmark": "run 15, run on its own on 13 Nov 2026 against the certified build and committed; draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
@@ -292,7 +292,7 @@
     "analysis/recession_backcast.py": "93d6f7baedaa6454cbd0d63d75560e5d825344dc9650bc3822269c78ede88b9b",
     "analysis/replicate_gov_spending_5yr.py": "ee3385327ff12d42665067dcdc56b4fcc5252db4104251c0a02511becc4396d4",
     "analysis/replicate_jr16.py": "7835eb6de2afd98376a64ca3a7d6a3cdb270dcb4edc6b466bd60b94da9acb70c",
-    "analysis/restamp_checkpoints.py": "d00c802444c42430e0d66f0a1f549788cc7a9c3dc002d4118cffc7e9a5f7f858",
+    "analysis/restamp_checkpoints.py": "ae52edece224871f9cdbe61b55822edc75078c5ef5d3fb58fa2b06d5516efbc0",
     "analysis/revision_accounting.py": "0ece6bedf776b1e3dab7d11784948db8dbef9ae75665963b350b2de1b3146dae",
     "analysis/robustness.py": "cff53f6e9541e4c7168b3a515950dd7be4272dde89e8c506105cbeb9cad14f8b",
     "analysis/run_all.py": "c1d77c4cca49091f7c46dce8fbca642f4f25038fe658f9304bb757411de2088b",
