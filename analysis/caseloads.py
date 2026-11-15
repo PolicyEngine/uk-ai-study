@@ -156,7 +156,7 @@ def figure(df):
     ax2.set_ylabel("Change in annual UC spending (£bn/yr)")
     ax2.grid(axis="x", visible=False)
     fs.legend_below(ax2, 2)
-    fig.suptitle("Universal Credit caseload and spending response, 2026", fontsize=11)
+    fig.suptitle(f"Universal Credit caseload and spending response, {PERIOD}", fontsize=11)
     fs.save(fig, OUT / "caseloads.png")
 
 

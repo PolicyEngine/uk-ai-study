@@ -130,12 +130,12 @@ def test_spi_scaling_reaches_spi_totals_on_taxpayers_only():
     for method in ("uniform", "banded"):
         f, table = dc.scaling_factors(div, w, ti, "dividend_income", method)
         taxpayer = ti >= dc.SPI_THRESHOLD
-        assert (div * f * w)[taxpayer].sum() == pytest.approx(dc.SPI_DIVIDENDS_2026, rel=1e-9)
+        assert (div * f * w)[taxpayer].sum() == pytest.approx(dc.SPI_DIVIDENDS_YEAR, rel=1e-9)
         assert (f[~taxpayer] == 1.0).all()
-        assert len(table) == len(dc.SPI_DIVIDEND_BANDS_2026)
+        assert len(table) == len(dc.SPI_DIVIDEND_BANDS_YEAR)
     # banded: each band hits its own SPI total
     f, table = dc.scaling_factors(div, w, ti, "dividend_income", "banded")
-    idx = dc.band_index(ti, list(dc.SPI_DIVIDEND_BANDS_2026))
+    idx = dc.band_index(ti, list(dc.SPI_DIVIDEND_BANDS_YEAR))
     top = len(table) - 1
     assert (div * f * w)[idx == top].sum() == pytest.approx(table[top]["spi_bn"] * 1e9)
 
@@ -145,6 +145,8 @@ def test_spi_band_rows_sum_to_the_file_totals():
 
     assert sum(dc.SPI_DIVIDEND_BANDS_2026.values()) == pytest.approx(dc.SPI_DIVIDENDS_2026, rel=1e-9)
     assert sum(dc.SPI_SAVINGS_BANDS_2026.values()) == pytest.approx(dc.SPI_SAVINGS_2026, rel=1e-8)
+    assert sum(dc.SPI_DIVIDEND_BANDS_2027.values()) == pytest.approx(dc.SPI_DIVIDENDS_2027, rel=1e-9)
+    assert sum(dc.SPI_SAVINGS_BANDS_2027.values()) == pytest.approx(dc.SPI_SAVINGS_2027, rel=1e-8)
 
 
 # --- fix 7: emitter guard and signed twins ---------------------------------
