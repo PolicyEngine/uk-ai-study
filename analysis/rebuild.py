@@ -20,9 +20,9 @@ Modes
                                            and lists every missing, empty,
                                            unmapped (tracked-but-not-in-
                                            manifest) and stale file. It also
-                                           prints, as a note, the stages the
-                                           attestation records as never run
-                                           in a clean-room build.
+                                           prints, as a note, the stages
+                                           whose current outputs did not
+                                           come out of a clean-room build.
   python analysis/rebuild.py               Full clean-room rebuild:
                                            1. `git worktree add --detach` a
                                               pristine checkout of HEAD into
@@ -656,7 +656,7 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
                         problems.append(f"STALE     {rel}  (presentation hash != attestation)")
             outside = att.get("outside_clean_room", {})
             if outside:
-                notes.append("attestation records stages never run in a clean-room build "
+                notes.append("attestation lists stages whose current outputs did not come out of a clean-room build "
                              "(hashes attest the committed files, not a rebuild): "
                              + ", ".join(sorted(outside)))
 
@@ -681,7 +681,8 @@ def attest_existing(results_dir: Path, source_root: Path, note: str | None = Non
     whose stages did not all run in one clean-room build (a presentation
     stage repaired in place, or stages run separately and committed). It
     never runs simulations or publishes files itself. ``outside_clean_room``
-    maps each stage that has never run in a clean-room build to a short
+    maps each stage whose current outputs did not come out of a clean-room
+    build to a short
     provenance note; --check prints those stages on every run.
     """
     if check(MANIFEST, results_dir=results_dir, verify_hashes=False):

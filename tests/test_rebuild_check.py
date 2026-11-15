@@ -43,7 +43,7 @@ def test_check_flags_a_presentation_file_that_differs_from_the_attestation(tmp_p
     monkeypatch.setattr(rebuild, "ROOT", tmp_path)
     monkeypatch.setattr(rebuild, "tracked_results_files", lambda: ["a.csv"])
     assert rebuild.check(manifest, results_dir=results) == 0
-    assert "never run in a clean-room build" in capsys.readouterr().out
+    assert "did not come out of a clean-room build" in capsys.readouterr().out
     (paper / "values_generated.tex").write_text("% edited after attestation\n")
     assert rebuild.check(manifest, results_dir=results) == 1
     assert "STALE     paper/values_generated.tex" in capsys.readouterr().out

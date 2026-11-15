@@ -145,9 +145,10 @@ is not a record that every file came out of one clean-room build. The last
 full clean-room build predates five stages: `obr_benchmark` and
 `capital_variants` (runs 15 and 16, 13 Nov 2026), `obr_household_deciles`,
 `takeup` (14 Nov 2026) and `wage_cut` (13 Nov 2026). Each was run on its own
-against the same certified Microcosm build and committed; the attestation
-lists them under `outside_clean_room`, and `rebuild.py --check` prints them
-on every run. Their manifest stages exist, so a full `rebuild.py` would
+against the same certified Microcosm build and committed. The attestation
+lists them under `outside_clean_room`, together with the stages whose draws
+were restamped (below) and the presentation stages regenerated in the
+working tree, and `rebuild.py --check` prints that list on every run. Their manifest stages exist, so a full `rebuild.py` would
 regenerate them from empty `results/`; that full rebuild has not been rerun
 since they were added.
 
