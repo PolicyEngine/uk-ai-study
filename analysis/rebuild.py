@@ -457,6 +457,24 @@ NEXT_RUNS = [
 ]
 NEXT_RUN_NAMES = {s["stage"] for s in NEXT_RUNS}
 
+# Runs that read the NEXT_RUNS outputs or need their own drivers (run by the
+# overnight driver after the manifest stages). Declared here so --check and
+# --attest-existing account for every tracked results file.
+POST_RUNS = [
+    {"stage": "obr_post", "cmd": [PY, "analysis/post_next_runs.py"],
+     "outputs": ["next_runs/obr_household_deciles.csv"],
+     "inputs": MICROCOSM_INPUTS, "after": ["obr_benchmark", "capital_variants"]},
+    {"stage": "takeup", "cmd": [PY, "analysis/displaced_takeup_runs.py"],
+     "outputs": ["takeup/takeup_deciles.csv", "takeup/takeup_draws.csv", "takeup/takeup_runs.json"],
+     "inputs": MICROCOSM_INPUTS, "after": [], "resumable": True},
+    {"stage": "wage_cut", "cmd": [PY, "analysis/wage_cut_household.py"],
+     "outputs": ["wage_cut/wage_cut.json", "wage_cut/wage_cut_decile_family.csv",
+                 "wage_cut/wage_cut_deciles.csv", "wage_cut/wage_cut_draws.csv"],
+     "inputs": MICROCOSM_INPUTS, "after": [], "resumable": True},
+]
+# Everything a complete results tree contains (used by --check and attestation)
+CHECKED = MANIFEST + NEXT_RUNS + POST_RUNS
+
 
 # ---------------------------------------------------------------------------
 # DAG utilities
@@ -616,7 +634,7 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
     whose final presentation stage was repaired in place after all simulation
     stages completed. It never runs simulations or publishes files itself.
     """
-    if check(MANIFEST, results_dir=results_dir, verify_hashes=False):
+    if check(CHECKED, results_dir=results_dir, verify_hashes=False):
         raise SystemExit("cannot attest an invalid or incomplete build tree")
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -635,7 +653,7 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
     input_paths = sorted(
         {
             rel
-            for stage in topo_order(MANIFEST)
+            for stage in topo_order(CHECKED)
             for rel in stage.get("inputs", [])
             if (source_root / rel).is_file()
         }
@@ -668,7 +686,7 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
             )
         ),
         "stages": [
-            {"stage": s["stage"], "cmd": s["cmd"]} for s in topo_order(MANIFEST)
+            {"stage": s["stage"], "cmd": s["cmd"]} for s in topo_order(CHECKED)
         ],
         "script_sha256": {
             str(f.relative_to(source_root)): sha256(f)
@@ -916,7 +934,7 @@ def main():
         print("\nSpecified, not yet run (excluded from --check): "
               + ", ".join(f"{s['stage']} -> {s['outputs']}" for s in NEXT_RUNS))
     elif args.check:
-        sys.exit(check(MANIFEST, verify_hashes=not args.no_hashes))
+        sys.exit(check(CHECKED, verify_hashes=not args.no_hashes))
     else:
         manifest = MANIFEST
         if args.stages and NEXT_RUN_NAMES & set(args.stages):
