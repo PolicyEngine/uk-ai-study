@@ -1,13 +1,13 @@
 \section{Policy responses}
 \label{sec:policy}
 
-The existing system already absorbs part of the shock (Section~\ref{sec:results-wagemargin}). This section prices three stylised additions inside the shocked world. I simulate each on top of the central scenario for 2026 only, and the estimand is the shocked-plus-reform world minus the shocked world, with poverty lines held at their shocked values.
+The existing system already absorbs part of the shock (Section~\ref{sec:results-wagemargin}). This section prices three stylised additions inside the shocked world. I simulate each on top of the central scenario for \genModelYear~only, and the estimand is the shocked-plus-reform world minus the shocked world, with poverty measured against the same absolute line as elsewhere (Section~\ref{sec:microsim}).
 
 R1 is a wage-insurance scheme in the spirit of trade-adjustment proposals: displaced workers receive 50 per cent of lost earnings, capped at \pounds 15{,}000 a year. I implement it as a post-simulation transfer that is untaxed and disregarded by means tests, so its gross cost equals its net cost and sits at the top of the range of possible designs. R2 raises the UC standard allowance by 20 per cent, and R3 suspends the benefit cap and cuts the UC taper from 55 to 45 per cent; both are PolicyEngine parameter reforms, so their costs are net of withdrawal elsewhere in the system. The fiscal and distributional aims of these designs differ, as do their administrative requirements; Table~\ref{tab:policy} compares them on cost and on poverty only.
 
 \begin{table}[htbp]
 \centering
-\caption{Policy reforms on top of the central shock, 2026 (50 draws)}
+\caption{Policy reforms on top of the central shock, \genModelYear~(50 draws)}
 \label{tab:policy}
 \small
 \begin{tabular}{lrrrr}
@@ -29,6 +29,6 @@ Wage insurance reduces BHC poverty by \genRoneToRtwoMcPovRatio~times as much as 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.95\textwidth]{../results/policy/policy_reforms.png}
-\caption{Three reforms on top of the central shock: cost, poverty and Gini effects, and the decile distribution of gains (seed 0).}
+\caption{Three reforms on top of the central shock. Top: annual cost, change in absolute BHC poverty and change in the Gini (50-draw means $\pm$ one standard deviation, as in Table~\ref{tab:policy}). Bottom: each reform's gains by baseline income decile (seed~0).}
 \label{fig:policy}
 \end{figure}

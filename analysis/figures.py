@@ -45,6 +45,7 @@ JR16 = Path("results/jr16")
 APPENDIX = Path("results/appendix")
 INCIDENCE = Path("results/incidence")
 ROBUSTNESS = Path("results/robustness")
+POLICY = Path("results/policy")
 
 
 def _bar_labels(ax, xs, ys, fmt="{:.1f}", pad_frac=0.02):
@@ -278,6 +279,65 @@ def incidence_families():
     plt.close(fig)
 
 
+#: reform -> (label, colour); listed in the order the paper defines them
+POLICY_STYLE = {
+    "R1_wage_insurance": ("R1: wage insurance (50% of lost earnings, cap £15,000)", BLUE),
+    "R2_uc_circuit_breaker": ("R2: UC standard allowance +20%", AQUA),
+    "R3_cap_suspension_taper_cut": ("R3: benefit cap suspended, UC taper 45%", YELLOW),
+}
+
+
+def policy_reforms():
+    """Three reforms on top of the central shock (finding M2 of the review of
+    PR #18). Top: annual cost, change in absolute BHC poverty and change in
+    the Gini, 50-draw means +/- 1 SD from robustness/policy_draws.csv
+    (exposure-proportional family), the basis of Table tab:policy. Bottom:
+    each reform's gains by baseline decile at seed 0 (policy/R*_exposure.json).
+    Reforms appear in the order R1, R2, R3, not ranked."""
+    draws = pd.read_csv(ROBUSTNESS / "policy_draws.csv")
+    draws = draws[draws["family"] == "exposure"]
+    reforms = list(POLICY_STYLE)
+    assert set(draws["reform"]) == set(reforms), sorted(set(draws["reform"]))
+    assert draws.groupby("reform")["seed"].nunique().eq(50).all(), "expected 50 draws per reform"
+    stats = draws.groupby("reform")[["exchequer_cost_bn", "poverty_change_bhc_pp",
+                                     "gini_change_pp"]].agg(["mean", "std"])
+
+    fig = plt.figure(figsize=(11.0, 7.6))
+    grid = fig.add_gridspec(2, 3, height_ratios=[1, 1.15], hspace=0.45, wspace=0.35)
+    xs = np.arange(len(reforms))
+    colors = [POLICY_STYLE[r][1] for r in reforms]
+    for k, (col, ylabel) in enumerate([
+            ("exchequer_cost_bn", "Annual cost (£ billion)"),
+            ("poverty_change_bhc_pp", "Change in absolute BHC poverty (pp)"),
+            ("gini_change_pp", "Change in Gini (pp)")]):
+        ax = fig.add_subplot(grid[0, k])
+        m = [stats.loc[r, (col, "mean")] for r in reforms]
+        sd = [stats.loc[r, (col, "std")] for r in reforms]
+        ax.bar(xs, m, yerr=sd, color=colors, width=0.6, capsize=3,
+               error_kw={"elinewidth": 0.8, "ecolor": INK})
+        ax.axhline(0, color=INK, lw=0.8)
+        ax.set_xticks(xs)
+        ax.set_xticklabels([r.split("_")[0] for r in reforms])
+        ax.set_ylabel(ylabel)
+        ax.grid(axis="x", visible=False)
+
+    ax = fig.add_subplot(grid[1, :])
+    width = 0.27
+    handles = []
+    for i, r in enumerate(reforms):
+        with open(POLICY / f"{r}_exposure.json") as f:
+            shares = json.load(f)["decile_benefit_share_pct"]
+        label, color = POLICY_STYLE[r]
+        handles.append(ax.bar(np.arange(1, 11) + (i - 1) * width,
+                              [shares[str(d)] for d in range(1, 11)],
+                              width=width, color=color, label=label))
+    decile_ax(ax, "Share of the reform's gains (%, seed 0)")
+    fig.legend(handles, [POLICY_STYLE[r][0] for r in reforms], loc="lower center",
+               ncol=1, frameon=False, bbox_to_anchor=(0.5, -0.06))
+    fig.savefig(POLICY / "policy_reforms.png", dpi=DPI, bbox_inches="tight")
+    plt.close(fig)
+
+
 def appendix_restyle():
     """House-style redraw of the CSV-backed appendix charts (B.1-B.5, B.7,
     B.8): no in-figure titles (the caption carries them), blue for single
@@ -322,8 +382,9 @@ def main():
     decomposition_ci()
     b9_b11()
     incidence_families()
+    policy_reforms()
     appendix_restyle()
-    print("figures written to results/jr16, results/appendix and results/incidence")
+    print("figures written to results/jr16, results/appendix, results/incidence and results/policy")
 
 
 if __name__ == "__main__":

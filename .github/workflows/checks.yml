@@ -1,0 +1,28 @@
+name: checks
+
+# No simulation runs here: the Microcosm dataset is private. The job checks
+# that the committed results, macros and PDF agree with each other and with
+# results/BUILD_MANIFEST.json, and runs the unit tests (fakes only).
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Unit tests
+        run: uv run pytest -q
+      - name: Macros regenerate identically from results/ (none pending)
+        run: |
+          uv run python analysis/emit_tex_values.py --strict
+          git diff --exit-code paper/values_generated.tex
+      - name: Results and presentation files match the attestation
+        run: uv run python analysis/rebuild.py --check
+      - name: Restamped checkpoints still verify against the pre-restamp code
+        run: |
+          git fetch --no-tags --prune --unshallow origin || true
+          uv run python analysis/restamp_checkpoints.py --check

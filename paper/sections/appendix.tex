@@ -7,11 +7,11 @@
 
 Displacement is a random draw of which employees lose their jobs, subject to occupation-group quotas. Within each draw, ordering keys are uniform within the group, so a record's inclusion probability does not depend on its calibrated weight. Each result rests on one of the following bases.
 
-Means over 50 paired draws (seeds 0--49) underlie the central scenario (Table~\ref{tab:presets}) and its cost by component, the five displacement rules (Table~\ref{tab:incidence} and the right panel of Figure~\ref{fig:incidence}), the policy reforms (Table~\ref{tab:policy}), the decile transition and wage-gain profiles, and the regression slope used to adjust the index comparison.
+Means over 50 paired draws (seeds 0--49) underlie the central scenario (Table~\ref{tab:presets}) and its cost by component, the five displacement rules (Table~\ref{tab:incidence} and the right panel of Figure~\ref{fig:incidence}), the policy reforms (Table~\ref{tab:policy} and the top panels of Figure~\ref{fig:policy}), the decile transition and wage-gain profiles, and the regression slope used to adjust the index comparison.
 
 Means over 20 paired draws (seeds 0--19), with identical displacement in every run of a seed, underlie the channel split and cost per displaced worker, the dividend-coverage runs, the capital variants (Table~\ref{tab:capvariants}) and the capital break-even, the public-sector pay bill, the duration and take-up sensitivities, the take-up = 1 and new-style JSA variants of the central scenario, the margin comparison (Table~\ref{tab:wagemargin}, except its PSS row) and the absorption of wage cuts, the 20-draw decile profile (Online Appendix Figure~\ref{fig:decomp-ci}) and the gender displacement rates. The OBR benchmark (Table~\ref{tab:stabilisation} and Online Appendix Table~\ref{tab:obr}) uses the same seeds at a lower displacement rate, so it pairs with the other runs by seed, not by person; its take-up = 1 and new-style JSA variants pair with it person by person.
 
-Single draws at seed~0 underlie the low and high presets, the shock-size grid and its variants, the PSS-gradient wage cuts and the mixed-margin table, the survivor-wage panel and its break-even, the factor-income account, the household-basis absorption of job loss and its take-up = 1 and new-style JSA variants, the decile decomposition (Figure~\ref{fig:decomp}), the left panel of Figure~\ref{fig:incidence}, the index and ripple sensitivities and the caseloads. Seed~0 ranks \genSeedZeroRankPovBhc{} of 50 on the BHC poverty change, \genSeedZeroRankGini{} on the Gini change and \genSeedZeroRankCost{} on cost among the exposure-proportional draws, so its cost sits near the mean and its poverty and Gini changes near the bottom of the range.
+Single draws at seed~0 underlie the low and high presets, the shock-size grid and its variants, the PSS-gradient wage cuts and the mixed-margin table, the survivor-wage panel and its break-even, the factor-income account, the household-basis absorption of job loss and its take-up = 1 and new-style JSA variants, the decile decomposition (Figure~\ref{fig:decomp}), the left panel of Figure~\ref{fig:incidence}, the decile shares of the policy reforms' gains (bottom panel of Figure~\ref{fig:policy}), the index and ripple sensitivities and the caseloads. Seed~0 ranks \genSeedZeroRankPovBhc{} of 50 on the BHC poverty change, \genSeedZeroRankGini{} on the Gini change and \genSeedZeroRankCost{} on cost among the exposure-proportional draws, so its cost sits near the mean and its poverty and Gini changes near the bottom of the range.
 
 Means over five draws (seeds 0--4) underlie the 2008--10 backcast, and means over \genDurReformDraws{} draws underlie the duration-consistent policy ranking.
 
@@ -25,7 +25,7 @@ I intend this appendix for online publication.
 
 \subsection{Wage and capital channel profiles}
 
-Survivor wage gains run from \genWageGainDOnePct~per cent in the bottom decile to \genWageGainDTenPct~per cent in the top (Figure~\ref{fig:wages}), because complementarity varies little across the deciles in which people work. Capital income is concentrated: the top decile holds \pounds\genCapTopBn~billion of the \pounds\genCapTotalBn~billion baseline total, the top two deciles \genCapTopTwoSharePct~per cent and the bottom decile \genCapBottomSharePct~per cent (Figure~\ref{fig:capital}).
+Survivor wage gains run from \genWageGainDOnePct~per cent in the bottom decile (on the HBAI ranking, whose bottom decile is sensitive to how households are ranked; Section~\ref{sec:results-deciles}) to \genWageGainDTenPct~per cent in the top (Figure~\ref{fig:wages}), because complementarity varies little across the deciles in which people work. Capital income is concentrated: the top decile holds \pounds\genCapTopBn~billion of the \pounds\genCapTotalBn~billion baseline total, the top two deciles \genCapTopTwoSharePct~per cent and the bottom decile \genCapBottomSharePct~per cent (Figure~\ref{fig:capital}).
 
 \begin{figure}[htbp]
 \centering
@@ -142,7 +142,7 @@ $\genBSevenUniDTenSignedPct$ per cent. The two draws displace different numbers 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{../results/appendix/b7_uniform_vs_ai_decile.png}
-\caption{Disposable income change by decile: exposure-allocated versus uniform shock (seed 0, person-weighted).}
+\caption{Disposable income change by decile: exposure-allocated versus uniform shock (seed 0, person-weighted). Decile~1 depends on the household ranking (Section~\ref{sec:results-deciles}).}
 \label{fig:b7}
 \end{figure}
 
@@ -215,8 +215,8 @@ origin--destination pairs), so I fall back on employment-proportional
 routing, with each origin row proportional to destination employment
 shares from the same ASHE 2025 employment weights used throughout the
 paper. For each destination group I compute the proportional
-labour-supply inflow $s_l$ (routed displaced full-time-equivalent workers over baseline
-employment), and every non-displaced employee in group $l$ takes a wage
+labour-supply inflow $s_l$ (routed displaced workers over baseline employment, both weighted
+person counts), and every non-displaced employee in group $l$ takes a wage
 cut of $\eta \times s_l$ of baseline earnings, composed additively with
 the $+2.6$ per cent uplift. The parameter $\eta$ is an \emph{assumed
 inverse-demand slope}---the proportional wage decline per unit
@@ -274,7 +274,7 @@ I simulate the closest equivalent the household model allows. Displacement adds 
 \begin{tabular}{p{0.5\textwidth}rr}
 \toprule
  & This paper & OBR \\
- & (2026, \genObrDraws~draws) & (average over the forecast) \\
+ & (\genModelYear, \genObrDraws~draws) & (average over the forecast) \\
 \midrule
 \genObrLineRows
 % source: results/next_runs/obr_benchmark_draws.csv (run 15); OBR EFO March 2026, para. 6.18
@@ -302,7 +302,7 @@ The two sets of numbers measure different things in four ways. First, timing: th
  & Ireland (SWITCH, SILC) & UK (this paper) \\
 \midrule
 Central shock conventions & 7\% / +2.6\% / +0.4pp & identical \\
-Incidence of displacement & concentrated in upper deciles & \genTransDOnePct\% (bottom) to \genTransDTenPct\% (top decile) \\
+Incidence of displacement & concentrated in upper deciles & \genTransDOnePct\% (bottom, HBAI ranking) to \genTransDTenPct\% (top decile) \\
 Gini response & rises in every scenario & rises under every rule and in every shocked grid cell \\
 \bottomrule
 \end{tabular}

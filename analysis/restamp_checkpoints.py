@@ -312,9 +312,20 @@ def run(old_ref: str, apply: bool) -> dict:
             d = pd.read_csv(ROOT / rel, dtype={"code_fingerprint": str})
             seen = set(d["code_fingerprint"])
             old_fp = old_fingerprint(old_root, script)
-            if seen != {old_fp}:
-                raise SystemExit(f"{rel}: stamps {sorted(seen)} != old-ref fingerprint {old_fp}; "
-                                 "the draws were not current at the old ref")
+            new_fp = new_fingerprint(script)
+            if seen == {old_fp}:
+                state = "pending"
+            elif seen == {new_fp}:
+                # already restamped: the proofs below are rerun, and the log
+                # must say this checkpoint was restamped from old_fp
+                prev = json.loads(LOG.read_text())["files"].get(rel, {}) if LOG.exists() else {}
+                if prev.get("old_fingerprint") != old_fp or prev.get("new_fingerprint") != new_fp:
+                    raise SystemExit(f"{rel}: carries the current fingerprint but {LOG.name} "
+                                     "does not record its restamp from the old ref")
+                state = "restamped"
+            else:
+                raise SystemExit(f"{rel}: stamps {sorted(seen)} match neither the old-ref "
+                                 f"fingerprint {old_fp} nor the current one {new_fp}")
             files = sorted(covered_files(old_root, script))
             for f in files:
                 if f not in verdicts:
@@ -331,18 +342,22 @@ def run(old_ref: str, apply: bool) -> dict:
                     raise SystemExit(f"{rel}: newly covered helper {f} changed (at {h_commit[:9]}) "
                                      f"after the draws were last written ({csv_commit[:9]})")
                 helpers.append({"file": f, "last_changed": h_commit[:9]})
-            new_fp = new_fingerprint(script)
             text = (ROOT / rel).read_text()
-            new_texts[rel] = restamp_text(text, old_fp, new_fp, len(d)) if new_fp != old_fp else text
-            log["files"][rel] = {"script": f"analysis/{script}", "rows": len(d),
+            if state == "pending" and new_fp != old_fp:
+                new_texts[rel] = restamp_text(text, old_fp, new_fp, len(d))
+            log["files"][rel] = {"script": f"analysis/{script}", "rows": len(d), "state": state,
                                  "old_fingerprint": old_fp, "new_fingerprint": new_fp,
                                  "csv_last_written": csv_commit[:9],
                                  "newly_covered_helpers": helpers, "covered_files": files}
         log["file_verdicts"] = verdicts
-    if apply:
+    if apply and new_texts:
         for rel, text in new_texts.items():
             (ROOT / rel).write_text(text)
+        for r in log["files"].values():
+            r.pop("state")
         LOG.write_text(json.dumps(log, indent=2) + "\n")
+    elif apply:
+        print("nothing to restamp: every checkpoint already carries the current fingerprint")
     return log
 
 
@@ -355,7 +370,8 @@ def main() -> None:
     args = ap.parse_args()
     log = run(args.old_ref, apply=args.apply)
     for rel, r in log["files"].items():
-        print(f"{rel}: {r['old_fingerprint']} -> {r['new_fingerprint']} ({r['rows']} rows)")
+        print(f"{rel}: {r['old_fingerprint']} -> {r['new_fingerprint']} ({r['rows']} rows"
+              + (f", {r['state']})" if "state" in r else ")"))
     for f, v in sorted(log["file_verdicts"].items()):
         print(f"  {f}: {v}")
     print("APPLIED" if args.apply else "CHECK OK (nothing written)")

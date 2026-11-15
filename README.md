@@ -1,6 +1,6 @@
 # uk-ai-study
 
-**Who bears the AI shock? The distributional and fiscal incidence in the UK.** Who loses work is at least as uncertain as how much work is lost, so this study treats incidence — exposure-proportional, junior-concentrated, uniform, and author-designed top-loaded stress tests — as an explicit scenario axis rather than assuming the shock hits the top. The UK pairs one of the most AI-exposed workforces in the advanced economies with a tax-benefit system designed to insure shocks at the bottom of the income distribution. This study traces AI's employment, wage and capital shocks through the full UK tax-benefit system with PolicyEngine UK, using the scenario architecture of Doorley, O'Connor, O'Shea & Tuda (2026), *Artificial intelligence and income inequality in Ireland*, ESRI/DoF Report 16 ([PDF](https://www.esri.ie/system/files/publications/JR16_0.pdf)).
+**Who bears the AI shock? The distributional and fiscal incidence in the UK.** Who loses work is at least as uncertain as how much work is lost, so this study treats incidence — exposure-proportional, junior-concentrated, uniform, and author-designed top-loaded stress tests — as an explicit scenario axis rather than assuming the shock hits the top. This study traces AI's employment, wage and capital shocks through the full UK tax-benefit system with PolicyEngine UK, using the scenario architecture of Doorley, O'Connor, O'Shea & Tuda (2026), *Artificial intelligence and income inequality in Ireland*, ESRI/DoF Report 16 ([PDF](https://www.esri.ie/system/files/publications/JR16_0.pdf)).
 
 The study asks: if generative AI displaces some workers, raises the wages of
 the rest, and raises returns to capital, what happens to the Exchequer,
@@ -50,11 +50,16 @@ only employees (positive employment income) enter the employment shock.
   ([#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), findings 6 and
   R2-5). Displaced workers are fully out of work:
   `employment_income = 0`, `hours_worked = 0`, employee pension
-  contributions, salary sacrifice and statutory pay zeroed,
+  contributions (employee, employer, salary- and bonus-sacrifice and
+  personal), hours and statutory sick, maternity and paternity pay zeroed
+  (`TRANSITION_ZEROED_VARIABLES`; personal contributions are zeroed because
+  Microcosm carries some very large ones that HBAI income subtracts),
   `employment_status = UNEMPLOYED` (the shared transition constructor
   `build_shocked_simulation`, finding 4).
 - **Wage (eq 3.5):** surviving workers get % uplifts ∝ θ, normalised by the
-  employment-weighted mean θ over baseline workers (JR16-literal — the
+  employment-weighted mean θ over baseline workers, so the uplift averages
+  the headline rate over all baseline employees but is paid to survivors
+  only (JR16-literal — the
   estimand decision on
   [#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), finding 5;
   per-seed conservation tested in `tests/test_shocks.py`).
@@ -68,7 +73,7 @@ every preset, as in all JR16 scenarios):
 |---|---|---|---|
 | `central` | 7% | +2.6% | JR16's central calibration (§3.2), converting Briggs & Kodnani (2023) task-exposure and productivity figures into displacement and wage rates |
 | `low` | 1% | 0% | Sensitivity case; JR16 §3.2 attributes ~1% to Acemoglu (2025), but his 0.9–1.1% is a ten-year GDP figure, not an employment effect ([#1](https://github.com/PolicyEngine/uk-ai-study/issues/1), finding 11) |
-| `high` | 13% | +2.6% | Brynjolfsson, Chandar & Chen — 13% per early drafts (Nov 2025 version: 16%); cohort-specific relative decline treated as economy-wide absolute, upper bound |
+| `high` | 13% | +2.6% | Sensitivity case, not tied to a current source: the version of Brynjolfsson, Chandar & Chen the paper cites (Aug 2026) reports a 19% relative employment decline for 22–25-year-olds in the most exposed US jobs (Nov 2025 version: 16%). A cohort-specific relative decline treated as an economy-wide absolute rate, so an upper bound; changing it requires rerunning the preset |
 | `central_youth_tilted` | 7% | +2.6% | + Klein Teeselink (2025) junior/total ratio 5.8/4.5 tilting draws toward ages 16–24 |
 
 The `youth_displacement_multiplier` extends JR16 (which draws randomly within
@@ -123,10 +128,39 @@ uv run pytest tests/                      # unit tests
 ```
 
 `analysis/rebuild.py --dry-run` lists every stage and its outputs;
-`--check` verifies `results/` against `results/BUILD_MANIFEST.json`. A full
-rebuild runs roughly 950 Microcosm simulations; each needs several GB of
-memory, so run one stage at a time on a laptop. `data/` is gitignored;
-`results/` holds aggregates only.
+`--check` verifies `results/` and the committed `paper/values_generated.tex`
+and `paper/main.pdf` against the hashes in `results/BUILD_MANIFEST.json`. A
+full rebuild runs roughly 950 Microcosm simulations for the original stages
+plus about 350 for runs 15 and 16, the take-up runs and the wage-cut run;
+each needs several GB of memory, so run one stage at a time on a laptop. `data/` is gitignored;
+`results/` holds aggregates only. Runs 15 and 16 and the wage-cut run also
+write household arrays outside the repository
+(`../ai-study-household-arrays`, `../ai-study-wage-cut-arrays`);
+`results/next_runs/obr_household_deciles.csv` is rebuilt from the first.
+
+### What the attestation covers
+
+`results/BUILD_MANIFEST.json` attests the hashes of the committed tree; it
+is not a record that every file came out of one clean-room build. The last
+full clean-room build predates five stages: `obr_benchmark` and
+`capital_variants` (runs 15 and 16, 13 Nov 2026), `obr_household_deciles`,
+`takeup` (14 Nov 2026) and `wage_cut` (13 Nov 2026). Each was run on its own
+against the same certified Microcosm build and committed; the attestation
+lists them under `outside_clean_room`, and `rebuild.py --check` prints them
+on every run. Their manifest stages exist, so a full `rebuild.py` would
+regenerate them from empty `results/`; that full rebuild has not been rerun
+since they were added.
+
+In November 2026 the code fingerprint was extended to cover the sibling
+modules each stage imports, and duplicated constants were moved to one place
+(review of PR #18, findings M7 and M8). Those edits changed no simulation
+but did change the fingerprints that stamp the committed draws, so the draws
+were restamped rather than rerun: `analysis/restamp_checkpoints.py` proves
+every edit non-behavioural (identical normalised syntax trees before and
+after; newly covered helper modules last changed before the draws were
+written) and then replaces only the stamp. `results/RESTAMP_LOG.json`
+records the old and new fingerprint of every checkpoint and the verdict for
+every file the fingerprints cover.
 
 Long stages checkpoint every draw or grid cell to CSV. Each row is stamped
 with the certified Microcosm build id and a fingerprint of the code that
@@ -147,13 +181,18 @@ visible boxed "pending" for any value whose source is missing, incomplete
   the realised weighted count displaced varies around the 7% quota. Report
   Monte Carlo means (50 draws for the incidence families and policy runs).
 - **Dividend coverage**: Microcosm's 2026 dividend total runs above the HMRC
-  SPI projection for 2026, mostly above £1m of total income;
+  SPI projection for that year, mostly above £1m of total income;
   `analysis/sensitivity_dividend_coverage.py` reruns the central scenario
   with dividends scaled to the SPI total.
 - **Occupation of SPI-drawn records** is imputed from income, not observed.
-- Displaced workers are current-period unemployed; JR16's "9+ months
-  unemployed, contributory benefits exhausted" contract is not fully
-  expressible in PolicyEngine UK inputs.
+- Displaced workers are current-period unemployed for the full year;
+  JR16's "9+ months unemployed, contributory benefits exhausted" contract is
+  not fully expressible in PolicyEngine UK inputs. Under the central
+  assumption they keep their benefit unit's survey-drawn UC take-up flag and
+  receive no new-style JSA; `analysis/displaced_takeup_runs.py` reports
+  runs with full take-up and with new-style JSA.
+- **Model year**: `uk_ai_study.data.PERIOD = 2026`, which PolicyEngine UK
+  runs on 2026-27 tax and benefit rates; every script imports it.
 - Self-employed are outside all shocks (as in JR16).
 - No constituency or local-authority breakdown: the earlier maps used the
   enhanced FRS 2023-24 and were dropped with it. Microcosm's dense
@@ -166,6 +205,6 @@ visible boxed "pending" for any value whose source is missing, incomplete
 - Felten, Raj & Seamans (2021) (AIOE).
 - Briggs & Kodnani (2023), Goldman Sachs.
 - Acemoglu (2025), *Economic Policy* 40(121).
-- Brynjolfsson, Chandar & Chen (2025), "Canaries in the Coal Mine?".
+- Brynjolfsson, Chandar & Chen (2026), "Canaries in the Coal Mine?", August 2026 version (first circulated August 2025).
 - Klein Teeselink (2025), SSRN 5516798.
 - Hosseini & Lichtinger (2026), SSRN 5425555.

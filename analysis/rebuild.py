@@ -11,13 +11,18 @@ Modes
                                            DAG, per-stage commands, declared
                                            outputs and dependencies. No work.
   python analysis/rebuild.py --check       Verify the current results/ tree
-                                           against the manifest (and, if
-                                           present, against
-                                           results/BUILD_MANIFEST.json
-                                           hashes). Exits non-zero and lists
-                                           every missing, empty, unmapped
-                                           (tracked-but-not-in-manifest) and
-                                           stale file.
+                                           against the manifest and against
+                                           results/BUILD_MANIFEST.json: the
+                                           per-file hashes of results/ and
+                                           the hashes of the presentation
+                                           files (paper/values_generated.tex,
+                                           paper/main.pdf). Exits non-zero
+                                           and lists every missing, empty,
+                                           unmapped (tracked-but-not-in-
+                                           manifest) and stale file. It also
+                                           prints, as a note, the stages the
+                                           attestation records as never run
+                                           in a clean-room build.
   python analysis/rebuild.py               Full clean-room rebuild:
                                            1. `git worktree add --detach` a
                                               pristine checkout of HEAD into
@@ -58,8 +63,14 @@ Design notes
   scenario internals.
 * Stage stdout/stderr is teed to results/robustness/sensitivity_run.log in
   the build root (that tracked log file is thereby regenerated too).
-* results/EXTENSIONS_SUMMARY.md is hand-written documentation, not a build
-  product; it is declared NON_GENERATED and carried through publish.
+* results/RESTAMP_LOG.json records the verified restamp of the draw
+  checkpoints (analysis/restamp_checkpoints.py); it is not a stage output,
+  so it is declared NON_GENERATED and carried through publish.
+* Household arrays of runs 15 and 16 and of the wage-cut run are written
+  outside results/ (``../ai-study-household-arrays``,
+  ``../ai-study-wage-cut-arrays`` relative to the checkout). In a clean-room
+  build "the checkout" is the temporary worktree, so the obr_benchmark stage
+  writes them beside it and obr_household_deciles reads them from there.
 """
 
 from __future__ import annotations
@@ -85,7 +96,7 @@ IGNORED_RESULT_FILES = {".DS_Store"}
 
 # Tracked files under results/ that no analysis script produces (documentation
 # etc.). Preserved verbatim across an atomic publish.
-NON_GENERATED = []
+NON_GENERATED = ["RESTAMP_LOG.json"]
 
 PY = sys.executable or "python3"
 
@@ -328,7 +339,6 @@ MANIFEST = [
             "policy/R2_uc_circuit_breaker_exposure.json",
             "policy/R3_cap_suspension_taper_cut_exposure.json",
             "policy/summary.csv",
-            "policy/policy_reforms.png",
         ],
         "inputs": MICROCOSM_INPUTS,
         "after": [],
@@ -392,49 +402,18 @@ MANIFEST = [
             "appendix/b11_grid_no_capital.png",
             "appendix/decomposition_ci.png",
             "incidence/incidence_families.png",
+            "policy/policy_reforms.png",
         ],
         "inputs": [],
-        # presentation layer: reads jr16 CSVs, appendix CSVs, incidence JSONs
-        "after": ["jr16_figs", "jr16_grid", "appendix_decomp",
-                  "appendix_grids", "incidence", "measured_incidence"],
+        # presentation layer: reads jr16 CSVs, appendix CSVs, incidence JSONs,
+        # the 50-draw policy draws and the seed-0 policy JSONs
+        # appendix_fast: appendix_restyle() redraws its B.1-B.5, B.7 and B.8
+        # PNGs from its CSVs, so it must run after that stage
+        "after": ["jr16_figs", "jr16_grid", "appendix_fast", "appendix_decomp",
+                  "appendix_grids", "incidence", "measured_incidence",
+                  "monte_carlo", "policy"],
     },
-    {
-        "stage": "tex_values",
-        "cmd": [PY, "analysis/emit_tex_values.py"],
-        "outputs": [],
-        "repo_outputs": ["paper/values_generated.tex"],
-        "inputs": [],
-        # every stage whose outputs the emitter reads
-        "after": [
-            "presets", "jr16_figs", "jr16_grid", "incidence",
-            "measured_incidence", "appendix_fast", "appendix_decomp",
-            "appendix_grids", "robustness", "monte_carlo",
-            "index_sensitivity", "duration_takeup", "duration_reforms",
-            "wage_tier", "mixed_wage_adjustment", "dividend_coverage",
-            "paper_scenarios", "policy", "caseloads", "tax_composition",
-            "gender", "poverty_decomposition", "recession_backcast",
-            "figures",
-        ],
-    },
-    {
-        "stage": "paper_pdf",
-        "cmd": LATEX_CMD,
-        "outputs": [],
-        "repo_outputs": ["paper/main.pdf"],
-        "inputs": [],
-        "after": ["tex_values"],
-    },
-]
-
-
-# ---------------------------------------------------------------------------
-# Specified but not yet run (Fiscal Studies revision, 13 Nov 2026): runs 15
-# and 16. These stages are runnable with --stages but are kept out of
-# MANIFEST, so --check and the full clean-room build ignore their outputs
-# until they exist. Promote each into MANIFEST (and into the tex_values
-# stage's "after") once its outputs are attested.
-# ---------------------------------------------------------------------------
-NEXT_RUNS = [
+    # Runs 15 and 16 (Fiscal Studies revision, run 13 Nov 2026)
     {
         "stage": "obr_benchmark",
         # labour force: Microcosm's own 16+ active population (see next_runs.py)
@@ -451,11 +430,74 @@ NEXT_RUNS = [
         "outputs": ["next_runs/capital_variants_draws.csv", "next_runs/capital_variants_deciles.csv",
                     "next_runs/capital_variants_decile_family.csv", "next_runs/capital_variants.json"],
         "inputs": MICROCOSM_INPUTS,
-        "after": [],
+        "after": ["dividend_coverage"],  # pairs with its central draws
         "resumable": True,
     },
+    {
+        "stage": "obr_household_deciles",
+        # no simulation: run 15's household arrays -> flows by decile,
+        # cross-checked against obr_benchmark_deciles.csv
+        "cmd": [PY, "analysis/post_next_runs.py"],
+        "outputs": ["next_runs/obr_household_deciles.csv"],
+        "inputs": [],
+        "after": ["obr_benchmark"],
+    },
+    {
+        "stage": "takeup",
+        "cmd": [PY, "analysis/displaced_takeup_runs.py"],
+        "outputs": ["takeup/takeup_draws.csv", "takeup/takeup_deciles.csv",
+                    "takeup/takeup_runs.json"],
+        "inputs": MICROCOSM_INPUTS,
+        # pairs with run 15 and the central dividend-coverage draws; reads
+        # the u = 7 wage bill from the tax-composition grid
+        "after": ["obr_benchmark", "dividend_coverage", "tax_composition"],
+        "log": True,
+        "resumable": True,
+    },
+    {
+        "stage": "wage_cut",
+        "cmd": [PY, "analysis/wage_cut_household.py"],
+        "outputs": ["wage_cut/wage_cut_draws.csv", "wage_cut/wage_cut_deciles.csv",
+                    "wage_cut/wage_cut_decile_family.csv", "wage_cut/wage_cut.json"],
+        "inputs": MICROCOSM_INPUTS,
+        # each draw removes the wage bill of the central draw of the same
+        # seed (asserted inside apply_wage_margin_shock); paired with the
+        # dividend-coverage central draws in post_wage_cut.py
+        "after": [],
+        "log": True,
+        "resumable": True,
+    },
+    {
+        "stage": "tex_values",
+        # --strict: a stale or incomplete source fails the build instead of
+        # printing \GENPENDING; post_takeup_runs.py and post_wage_cut.py are
+        # libraries the emitter imports, not stages
+        "cmd": [PY, "analysis/emit_tex_values.py", "--strict"],
+        "outputs": [],
+        "repo_outputs": ["paper/values_generated.tex"],
+        "inputs": [],
+        # every stage whose outputs the emitter reads
+        "after": [
+            "presets", "jr16_figs", "jr16_grid", "incidence",
+            "measured_incidence", "appendix_fast", "appendix_decomp",
+            "appendix_grids", "robustness", "monte_carlo",
+            "index_sensitivity", "duration_takeup", "duration_reforms",
+            "wage_tier", "mixed_wage_adjustment", "dividend_coverage",
+            "paper_scenarios", "policy", "caseloads", "tax_composition",
+            "gender", "poverty_decomposition", "recession_backcast",
+            "figures", "obr_benchmark", "capital_variants",
+            "obr_household_deciles", "takeup", "wage_cut",
+        ],
+    },
+    {
+        "stage": "paper_pdf",
+        "cmd": LATEX_CMD,
+        "outputs": [],
+        "repo_outputs": ["paper/main.pdf"],
+        "inputs": [],
+        "after": ["tex_values"],
+    },
 ]
-NEXT_RUN_NAMES = {s["stage"] for s in NEXT_RUNS}
 
 
 # ---------------------------------------------------------------------------
@@ -552,7 +594,7 @@ def dry_run(manifest):
 def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> int:
     outputs = all_outputs(manifest)
     tracked = tracked_results_files()
-    problems = []
+    problems, notes = [], []
 
     for rel in outputs:
         p = results_dir / rel
@@ -595,26 +637,52 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
             for rel, digest in att.get("inputs", {}).items():
                 p = ROOT / rel
                 if not p.exists():
-                    problems.append(f"INPUT-MISSING {rel}")
+                    # the dataset is private and untracked: its absence (CI,
+                    # a fresh clone) leaves the input unverified, not stale
+                    notes.append(f"input {rel} not present; its attested hash was not verified")
                 elif sha256(p) != digest:
                     problems.append(f"INPUT-STALE {rel}  (hash != attestation)")
+            # presentation layer: the committed macros and PDF must be the
+            # attested ones
+            presentation = att.get("presentation_files", {})
+            for stage in manifest:
+                for rel in stage.get("repo_outputs", []):
+                    p = ROOT / rel
+                    if rel not in presentation:
+                        problems.append(f"UNATTESTED {rel}  (presentation file not in attestation)")
+                    elif not p.exists():
+                        problems.append(f"MISSING   {rel}  (attested presentation file absent)")
+                    elif sha256(p) != presentation[rel]:
+                        problems.append(f"STALE     {rel}  (presentation hash != attestation)")
+            outside = att.get("outside_clean_room", {})
+            if outside:
+                notes.append("attestation records stages never run in a clean-room build "
+                             "(hashes attest the committed files, not a rebuild): "
+                             + ", ".join(sorted(outside)))
 
+    for n in notes:
+        print("NOTE " + n)
     if problems:
         print(f"CHECK FAILED: {len(problems)} problem(s)")
         for p in problems:
             print("  " + p)
         return 1
     print(f"CHECK OK: {len(outputs)} manifest outputs present and non-empty; "
-          f"{len(tracked)} tracked files all accounted for")
+          f"{len(tracked)} tracked files all accounted for"
+          + ("; results/ and presentation hashes match the attestation" if verify_hashes else ""))
     return 0
 
 
-def attest_existing(results_dir: Path, source_root: Path) -> None:
-    """Attest an already completed, manifest-valid isolated build.
+def attest_existing(results_dir: Path, source_root: Path, note: str | None = None,
+                    outside_clean_room: dict | None = None) -> None:
+    """Attest an already completed, manifest-valid results tree.
 
-    This recovery mode is intentionally validation-heavy: it is for a build
-    whose final presentation stage was repaired in place after all simulation
-    stages completed. It never runs simulations or publishes files itself.
+    This recovery mode is intentionally validation-heavy: it is for a tree
+    whose stages did not all run in one clean-room build (a presentation
+    stage repaired in place, or stages run separately and committed). It
+    never runs simulations or publishes files itself. ``outside_clean_room``
+    maps each stage that has never run in a clean-room build to a short
+    provenance note; --check prints those stages on every run.
     """
     if check(MANIFEST, results_dir=results_dir, verify_hashes=False):
         raise SystemExit("cannot attest an invalid or incomplete build tree")
@@ -646,15 +714,17 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
         "invoking_checkout_dirty_at_start": False,
         "started_utc": None,
         "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "recovery_note": (
+        "recovery_note": note or (
             "Attested existing results tree without a full clean-room rerun; "
             "see git history for which stages were added or repaired since "
             "the last full attested build."
         ),
+        "outside_clean_room": outside_clean_room or {},
         "python": {
             "version": platform.python_version(),
             "implementation": platform.python_implementation(),
-            "executable": PY,
+            # name only: the absolute path of a temporary venv is noise
+            "executable": Path(PY).name,
         },
         "package_versions": package_versions(
             (
@@ -751,7 +821,8 @@ def build(manifest, keep_build=False, only_stages=None):
         if build_results.exists():
             shutil.rmtree(build_results)
         for sub in ["jr16", "appendix", "robustness", "incidence", "policy",
-                    "caseloads", "paper_scenarios", "tax_composition"]:
+                    "caseloads", "paper_scenarios", "tax_composition",
+                    "next_runs", "takeup", "wage_cut"]:
             (build_results / sub).mkdir(parents=True, exist_ok=True)
 
         log_path = build_results / BUILD_LOG
@@ -826,7 +897,7 @@ def build(manifest, keep_build=False, only_stages=None):
             "python": {
                 "version": platform.python_version(),
                 "implementation": platform.python_implementation(),
-                "executable": PY,
+                "executable": Path(PY).name,
             },
             "package_versions": package_versions(
                 (
@@ -907,21 +978,25 @@ def main():
                     help="keep the temp worktree after a successful build")
     ap.add_argument("--attest-existing", type=Path,
                     help="validate and attest an existing completed results tree")
+    ap.add_argument("--note", help="with --attest-existing: the recovery note")
+    ap.add_argument("--outside-clean-room", type=Path,
+                    help="with --attest-existing: JSON file mapping each stage never "
+                         "run in a clean-room build to a provenance note")
     args = ap.parse_args()
 
     if args.attest_existing:
-        attest_existing(args.attest_existing.resolve(), ROOT)
+        outside = (json.loads(args.outside_clean_room.read_text())
+                   if args.outside_clean_room else None)
+        unknown = set(outside or {}) - {s["stage"] for s in MANIFEST}
+        if unknown:
+            raise SystemExit(f"--outside-clean-room names unknown stages: {sorted(unknown)}")
+        attest_existing(args.attest_existing.resolve(), ROOT, args.note, outside)
     elif args.dry_run:
         dry_run(MANIFEST)
-        print("\nSpecified, not yet run (excluded from --check): "
-              + ", ".join(f"{s['stage']} -> {s['outputs']}" for s in NEXT_RUNS))
     elif args.check:
         sys.exit(check(MANIFEST, verify_hashes=not args.no_hashes))
     else:
-        manifest = MANIFEST
-        if args.stages and NEXT_RUN_NAMES & set(args.stages):
-            manifest = MANIFEST + NEXT_RUNS
-        build(manifest, keep_build=args.keep_build, only_stages=args.stages)
+        build(MANIFEST, keep_build=args.keep_build, only_stages=args.stages)
 
 
 if __name__ == "__main__":
