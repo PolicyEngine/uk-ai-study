@@ -14,7 +14,7 @@ available now:
   statutory pay) and cash benefits only.
 
 From the take-up runs (analysis/displaced_takeup_runs.py,
-results/takeup/takeup_draws.csv), pending until those runs finish:
+results/takeup/takeup_draws.csv, run 14 Nov 2026):
 
 * ``variant_means`` - one scenario/variant's means, accepted only when every
   seed is present.

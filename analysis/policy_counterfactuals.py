@@ -13,7 +13,7 @@ Reforms
      (BHC and AHC alike; housing costs unchanged). Choice documented: the
      transfer is treated as non-taxable and disregarded by means tests, so
      the gross cost equals the net exchequer cost and there is no UC
-     clawback. This brackets the generous end; an in-model taxable variant
+     clawback. This places R1 at the upper end of the cost range; an in-model taxable variant
      would cost less gross but deliver less net. Poverty is recomputed by
      comparing the augmented household income to the model's own
      poverty_line_bhc / poverty_line_ahc; the reconstruction is validated
@@ -33,8 +33,8 @@ Scenario families (incidence_scenarios.py machinery, central aggregate
 shock): the headline reform R1 runs under exposure (central), junior and
 uniform incidence; R2/R3 under the central/exposure family.
 
-Outputs: results/policy/*.json, results/policy/summary.csv,
-results/policy/policy_reforms.png.
+Outputs: results/policy/*.json and results/policy/summary.csv. The figure
+results/policy/policy_reforms.png is drawn by analysis/figures.py.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ from uk_ai_study.shocks import (
 from incidence_scenarios import shocked_table_for  # noqa: E402
 
 OUT = ROOT / "results" / "policy"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
 YEAR_SPAN = f"{PERIOD}-01-01.{PERIOD}-12-31"
 
@@ -298,57 +298,8 @@ def main():
     for r in results:
         flat.append({k: v for k, v in r.items() if not isinstance(v, dict)})
     pd.DataFrame(flat).to_csv(OUT / "summary.csv", index=False)
-
-    # ---- figure: decile incidence + cost per point of poverty averted ----
-    import figstyle as fs
-
-    fs.apply_style()
-    import matplotlib.pyplot as plt
-
-    fig, axes = plt.subplots(1, 2, figsize=fs.TWOPANEL)
-    ax = axes[0]
-    central = [r for r in results if r["family"] == "exposure"]
-    colors = {"R1_wage_insurance": fs.BLUE, "R2_uc_circuit_breaker": fs.AQUA,
-              "R3_cap_suspension_taper_cut": fs.YELLOW}
-    labels = {"R1_wage_insurance": "R1 wage insurance",
-              "R2_uc_circuit_breaker": "R2 UC +20% standard allowance",
-              "R3_cap_suspension_taper_cut": "R3 cap suspension + taper 45%"}
-    width = 0.27
-    for i, r in enumerate(central):
-        shares = r["decile_benefit_share_pct"]
-        ax.bar(np.arange(1, 11) + (i - 1) * width, [shares[d] for d in range(1, 11)],
-               width=width, color=colors[r["reform"]], label=labels[r["reform"]])
-    fs.decile_ax(ax, "Share of reform benefit (%)")
-    ax.set_title("Who receives the reform (central shock)")
-    shared_handles, shared_labels = ax.get_legend_handles_labels()
-
-    ax = axes[1]
-    bars, names, cols = [], [], []
-    for r in results:
-        v = r["cost_per_pp_ahc_bn"]
-        if v is None:
-            continue
-        tag = labels[r["reform"]].split()[0]
-        names.append(f"{tag}\n{r['family']}")
-        bars.append(v)
-        cols.append(colors[r["reform"]])
-    # order bars by cost-effectiveness (cheapest £/pp first) so it reads as a ranking
-    order = sorted(range(len(bars)), key=lambda i: bars[i])
-    bars = [bars[i] for i in order]
-    names = [names[i] for i in order]
-    cols = [cols[i] for i in order]
-    ax.bar(range(len(bars)), bars, color=cols)
-    ax.set_xticks(range(len(bars)))
-    ax.set_xticklabels(names)
-    ax.set_ylabel("£bn per pp of AHC poverty averted")
-    ax.set_title("Cost-effectiveness (reform vs no-reform shocked world)")
-    ax.grid(axis="x", visible=False)
-    # One shared legend box serving both panels.
-    fig.legend(shared_handles, shared_labels, loc="lower center",
-               ncol=len(shared_labels), frameon=False, bbox_to_anchor=(0.5, -0.02))
-    fig.tight_layout(rect=[0, 0.08, 1, 1])
-    fig.savefig(OUT / "policy_reforms.png", dpi=fs.DPI, bbox_inches="tight")
-    plt.close(fig)
+    # The figure (policy/policy_reforms.png) is drawn by analysis/figures.py
+    # from the 50-draw policy_draws.csv and the seed-0 decile shares above.
 
 
 if __name__ == "__main__":

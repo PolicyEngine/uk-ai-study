@@ -30,6 +30,11 @@ import pandas as pd
 
 BASELINE_CAPITAL_RETURN = 0.01005
 CAPITAL_RETURN_INCREASE = 0.004
+#: JR16 central conventions: 7% of employees displaced, +2.6% survivor wages
+CENTRAL_DISPLACEMENT_RATE = 0.07
+CENTRAL_WAGE_UPLIFT = 0.026
+#: UK corporation tax main rate, used by the closure accounts
+CORPORATION_TAX_RATE = 0.25
 
 
 @dataclass(frozen=True)
@@ -50,17 +55,21 @@ class ShockScenario:
 #:   Acemoglu (2025), but his 0.9-1.1% is a ten-year GDP figure, not an
 #:   employment effect (uk-ai-study#1, finding 11) — read this as a
 #:   sensitivity case, not an evidence-anchored lower bound.
-#: high — Brynjolfsson, Chandar & Chen: 13% per early drafts; the Nov 2025
-#:   version reports 16%. Cohort-specific relative decline treated as an
-#:   economy-wide absolute rate — an upper bound in both respects.
+#: high — 13% displacement. Not tied to a current source: the version of
+#:   Brynjolfsson, Chandar & Chen the paper cites (August 2026) reports a
+#:   19% relative employment decline for 22-25-year-olds in the most exposed
+#:   US jobs (an earlier, November 2025 version reported 16%). Kept at 13% as
+#:   a sensitivity case; it is a cohort-specific relative decline treated as
+#:   an economy-wide absolute rate, an upper bound in both respects. Changing
+#:   it requires rerunning the high preset.
 #: central_youth_tilted — central with Klein Teeselink (2025) junior/total
 #:   employment-effect ratio 5.8/4.5 as the youth multiplier.
 PRESETS = {
-    "central": ShockScenario("central", 0.07, 0.026),
+    "central": ShockScenario("central", CENTRAL_DISPLACEMENT_RATE, CENTRAL_WAGE_UPLIFT),
     "low": ShockScenario("low", 0.01, 0.0),
-    "high": ShockScenario("high", 0.13, 0.026),
+    "high": ShockScenario("high", 0.13, CENTRAL_WAGE_UPLIFT),
     "central_youth_tilted": ShockScenario(
-        "central_youth_tilted", 0.07, 0.026, youth_displacement_multiplier=5.8 / 4.5
+        "central_youth_tilted", CENTRAL_DISPLACEMENT_RATE, CENTRAL_WAGE_UPLIFT, youth_displacement_multiplier=5.8 / 4.5
     ),
 }
 
@@ -314,7 +323,7 @@ class WageMarginScenario:
     name: str
     aggregate_earnings_loss_share: float | None = None
     gradient: str = "caioe"
-    wage_uplift: float = 0.026
+    wage_uplift: float = CENTRAL_WAGE_UPLIFT
     capital_return_increase: float = CAPITAL_RETURN_INCREASE
 
 
@@ -348,8 +357,8 @@ class MixedMarginScenario:
 
     name: str
     displacement_share: float
-    aggregate_adjustment_share: float = 0.07
-    wage_uplift: float = 0.026
+    aggregate_adjustment_share: float = CENTRAL_DISPLACEMENT_RATE
+    wage_uplift: float = CENTRAL_WAGE_UPLIFT
     capital_return_increase: float = CAPITAL_RETURN_INCREASE
 
 
@@ -607,12 +616,12 @@ class RippleScenario(ShockScenario):
 
 #: Ripple presets = central preset + ripple, eta in {0.3 central, 0.15, 0.5}.
 RIPPLE_PRESETS = {
-    "central_ripple": RippleScenario("central_ripple", 0.07, 0.026),
+    "central_ripple": RippleScenario("central_ripple", CENTRAL_DISPLACEMENT_RATE, CENTRAL_WAGE_UPLIFT),
     "central_ripple_low": RippleScenario(
-        "central_ripple_low", 0.07, 0.026, labour_demand_elasticity=0.15
+        "central_ripple_low", CENTRAL_DISPLACEMENT_RATE, CENTRAL_WAGE_UPLIFT, labour_demand_elasticity=0.15
     ),
     "central_ripple_high": RippleScenario(
-        "central_ripple_high", 0.07, 0.026, labour_demand_elasticity=0.5
+        "central_ripple_high", CENTRAL_DISPLACEMENT_RATE, CENTRAL_WAGE_UPLIFT, labour_demand_elasticity=0.5
     ),
 }
 

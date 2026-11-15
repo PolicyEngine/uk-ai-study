@@ -6,9 +6,13 @@ Every draw-level checkpoint CSV carries two stamp columns on every row:
     the Microcosm build pinned by the installed policyengine.py bundle
     (read from the bundle manifest, no simulation needed);
 ``code_fingerprint``
-    a short sha256 over ``uk_ai_study/*.py`` and the script that writes the
-    checkpoint, so a change to the shock mechanics or to the stage itself
-    invalidates its partial results.
+    a short sha256 over ``uk_ai_study/*.py``, the script that writes the
+    checkpoint and every sibling module that script imports, directly or
+    through another sibling (for example ``monte_carlo_families.py`` imports
+    ``incidence_scenarios``, ``measured_incidence`` and
+    ``policy_counterfactuals`` from ``analysis/``), so a change to the shock
+    mechanics, to the stage itself or to a helper it calls invalidates its
+    partial results.
 
 Resuming is opt-in (``--resume`` on the command line, as in
 ``replicate_jr16.py grid --resume``). Without it an existing checkpoint is
@@ -20,6 +24,7 @@ results.
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import sys
@@ -54,12 +59,43 @@ def certified_data_build_id() -> str:
     return str(build_id)
 
 
+def local_imports(script: str | Path) -> list[Path]:
+    """Sibling modules imported by ``script``, transitively, sorted by name.
+
+    A sibling is a ``<name>.py`` file in the script's own directory, imported
+    with ``import name`` or ``from name import ...`` anywhere in the file
+    (the analysis scripts put ``analysis/`` on ``sys.path``). The package
+    ``uk_ai_study`` is hashed separately and is not a sibling.
+    """
+    root = Path(script).resolve()
+    here = root.parent
+    seen: dict[str, Path] = {}
+    todo = [root]
+    while todo:
+        tree = ast.parse(todo.pop().read_text())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [a.name.split(".")[0] for a in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                names = [node.module.split(".")[0]]
+            else:
+                continue
+            for name in names:
+                f = here / f"{name}.py"
+                if f.is_file() and f != root and name not in seen:
+                    seen[name] = f
+                    todo.append(f)
+    return [seen[n] for n in sorted(seen)]
+
+
 def code_fingerprint(script: str | Path | None = None) -> str:
-    """Short sha256 over the package modules and the calling script."""
+    """Short sha256 over the package modules, the calling script and the
+    sibling modules it imports (``local_imports``)."""
     h = hashlib.sha256()
     files = sorted(PACKAGE_DIR.glob("*.py"))
     if script is not None:
         files.append(Path(script).resolve())
+        files.extend(local_imports(script))
     for f in files:
         h.update(f.name.encode())
         h.update(f.read_bytes())

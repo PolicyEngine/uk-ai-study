@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """UC take-up and new-style JSA for the displaced: runs reported beside the
-central assumption (specified 13 Nov 2026; not yet run).
+central assumption (specified 13 Nov 2026; run 14 Nov 2026, outputs committed
+under results/takeup/; stage ``takeup`` of analysis/rebuild.py).
 
 The central assumption is unchanged: every benefit unit keeps the UC take-up
 flag (``would_claim_uc``) drawn for it in the baseline data, and newly
@@ -71,13 +72,13 @@ OUT = ROOT / "results" / "takeup"
 DRAWS = OUT / "takeup_draws.csv"
 DECILES = OUT / "takeup_deciles.csv"
 SUMMARY = OUT / "takeup_runs.json"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEEDS = tuple(range(20))
 VARIANTS = ("takeup1", "jsa")
 #: execution order: the three-simulation absorption case first
 SCENARIOS = ("disp_only", "obr", "central")
 SCENARIO_SEEDS = {"disp_only": (0,), "obr": SEEDS, "central": SEEDS}
-DISP_ONLY_RATE = 0.07
+from uk_ai_study.shocks import CENTRAL_DISPLACEMENT_RATE as DISP_ONLY_RATE  # noqa: E402
 JSA_WEEKS = 26
 JSA_MIN_AGE, JSA_MAX_AGE = 18, 66  # eligible if 18 <= age < 66
 LEL_WEEKS = 50
@@ -287,7 +288,7 @@ def summarise(draws: pd.DataFrame, cols=DRAW_COLS) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Simulation driver (needs Microcosm; not run in the revision of 13 Nov 2026)
+# Simulation driver (needs Microcosm)
 # ---------------------------------------------------------------------------
 def _sim_metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
     from uk_ai_study.runner import gini

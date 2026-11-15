@@ -32,7 +32,7 @@ from uk_ai_study.runner import build_person_table
 from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 
 OUT = Path("results/robustness")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
 
 

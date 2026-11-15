@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Runs 15 and 16 of the Fiscal Studies revision: specified, not yet run.
+"""Runs 15 and 16 of the Fiscal Studies revision.
 
 Specification: the run spec written on 13 Nov 2026 (copied into the PR #18
-description). Nothing here has been executed against Microcosm; the table
-builders are unit-tested on fake person tables in
+description). Both runs were executed against Microcosm on 13 Nov 2026 and
+their outputs are committed under ``results/next_runs/``; they are stages
+``obr_benchmark`` and ``capital_variants`` of ``analysis/rebuild.py``. The
+table builders are unit-tested on fake person tables in
 ``tests/test_next_runs.py``. Run one stage at a time:
 
     python analysis/next_runs.py obr        # run 15: 20 paired draws
@@ -58,11 +60,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 OUT = ROOT / "results" / "next_runs"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEEDS = tuple(range(20))
-CT_RATE = 0.25
-BASELINE_CAPITAL_RETURN = 0.01005
-CAPITAL_RETURN_INCREASE = 0.004
+from uk_ai_study.shocks import (  # noqa: E402  (single source for the conventions)
+    BASELINE_CAPITAL_RETURN,
+    CAPITAL_RETURN_INCREASE,
+    CORPORATION_TAX_RATE as CT_RATE,
+)
 
 #: OBR, Economic and fiscal outlook, March 2026, Box 2.2: equilibrium
 #: unemployment 5.5 per cent against 4.1 per cent in the central forecast.
@@ -257,7 +261,7 @@ def public_paybill(persons: pd.DataFrame, table: pd.DataFrame, public, employer_
 
 
 # ---------------------------------------------------------------------------
-# Simulation driver (not executed in the revision of 13 Nov 2026)
+# Simulation driver (needs Microcosm)
 # ---------------------------------------------------------------------------
 def _sim_metrics(sim) -> dict:  # pragma: no cover - needs Microcosm
     from uk_ai_study.runner import gini

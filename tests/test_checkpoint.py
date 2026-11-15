@@ -26,6 +26,24 @@ def test_fingerprint_is_not_numeric_and_tracks_the_script(tmp_path):
     assert fa == code_fingerprint(a)
 
 
+def test_fingerprint_covers_imported_sibling_modules(tmp_path):
+    """Review of PR #18, M8: a helper the stage imports changes the stamp."""
+    (tmp_path / "stage.py").write_text("import helper\nfrom other import f\n")
+    (tmp_path / "helper.py").write_text("from deep import g\n")
+    (tmp_path / "other.py").write_text("def f():\n    return 1\n")
+    (tmp_path / "deep.py").write_text("def g():\n    return 1\n")
+    (tmp_path / "unused.py").write_text("x = 1\n")
+    from uk_ai_study.checkpoint import local_imports
+
+    stage = tmp_path / "stage.py"
+    assert [p.name for p in local_imports(stage)] == ["deep.py", "helper.py", "other.py"]
+    before = code_fingerprint(stage)
+    (tmp_path / "unused.py").write_text("x = 2\n")
+    assert code_fingerprint(stage) == before
+    (tmp_path / "deep.py").write_text("def g():\n    return 2\n")
+    assert code_fingerprint(stage) != before
+
+
 def test_rows_carry_the_stamp_and_resume_skips_done_units(tmp_path):
     path = tmp_path / "draws.csv"
     ck = Checkpoint(path, ("seed",), resume=False, stamp=STAMP)

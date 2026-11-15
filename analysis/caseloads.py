@@ -29,7 +29,7 @@ from uk_ai_study.shocks import PRESETS, apply_shocks, build_shocked_simulation
 from incidence_scenarios import shocked_table_for
 
 OUT = Path("results/caseloads")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
 
 PASSPORTED = ("free_school_meals", "council_tax_benefit")

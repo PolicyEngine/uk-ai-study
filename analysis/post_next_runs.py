@@ -47,9 +47,18 @@ NR = R / "next_runs"
 ARRAYS_DIR = ROOT.parent / "ai-study-household-arrays"
 BACKUP_ARRAYS_DIR = Path.home() / "uk-ai-study-rerun-backup" / "household-arrays"
 SEEDS = tuple(range(20))
+from uk_ai_study.data import PERIOD  # noqa: E402
+from uk_ai_study.shocks import (  # noqa: E402
+    BASELINE_CAPITAL_RETURN,
+    CAPITAL_RETURN_INCREASE,
+    CORPORATION_TAX_RATE,
+)
+
 #: capital-income uplift of the central scenario (per cent): 1.405/1.005 - 1
-CENTRAL_UPLIFT_PCT = 100 * (1.405 / 1.005 - 1)
-BASELINE_RETURN_PCT = 1.005
+CENTRAL_UPLIFT_PCT = 100 * ((BASELINE_CAPITAL_RETURN + CAPITAL_RETURN_INCREASE) / BASELINE_CAPITAL_RETURN - 1)
+BASELINE_RETURN_PCT = 100 * BASELINE_CAPITAL_RETURN
+#: first day of the simulated fiscal year (UK benefit rates change in April)
+FY_START = f"{PERIOD}-04-01"
 PE_PARAMS = Path("policyengine_uk") / "parameters" / "gov" / "dwp"
 
 
@@ -104,7 +113,7 @@ def capital_breakeven(central: pd.DataFrame, cap60: pd.DataFrame,
 #: phi of each closed run-16 variant (kappa = (1 - CT) x phi x payout x UK
 #: share; see CAPITAL_VARIANTS in next_runs.py)
 CLOSED_PHI = {"closed_k0375": 1.0, "closed_k01875": 0.5, "closed_k009375": 0.25, "closed_k075": 1.0}
-CT_RATE = 0.25
+CT_RATE = CORPORATION_TAX_RATE
 
 
 def capital_variant_summary(draws: pd.DataFrame) -> dict:
@@ -191,7 +200,7 @@ def load_arrays(name: str, dirs=(ARRAYS_DIR, BACKUP_ARRAYS_DIR)) -> dict:
     raise FileNotFoundError(f"{name}.npz not in {[str(d) for d in dirs]}")
 
 
-def pe_parameter(rel: str, date: str = "2026-04-01", key: str | None = None) -> float:
+def pe_parameter(rel: str, date: str = FY_START, key: str | None = None) -> float:
     """Value in force at ``date`` of a policyengine-uk parameter YAML under
     gov/dwp (``key`` selects a child of a parameter node)."""
     import importlib.util

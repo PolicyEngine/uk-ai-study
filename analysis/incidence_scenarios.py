@@ -10,7 +10,7 @@ AI displacement:
                   Canaries school): draws tilted toward ages 16-24 by the
                   KT junior/total ratio 5.8/4.5
   compression   — expertise-compression (Autor school, stylised): AI erodes
-                  elite expertise rents, so displacement draws are tilted
+                  the expertise premia of high earners, so displacement draws are tilted
                   toward the top weighted-earnings tertile of workers in
                   above-median-exposure occupations (multiplier
                   ``compression_multiplier``, default 2). An author-designed
@@ -53,9 +53,9 @@ from uk_ai_study.shocks import (
 )
 
 OUT = Path("results/incidence")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
-#: Default draw tilt toward the elite (top-earnings x high-exposure) group in
+#: Default draw tilt toward the top-tier (top-earnings x high-exposure) group in
 #: the compression family. Parameterised for sensitivity runs (R2-6a):
 #: 1.5 / 2.0 / 3.0.
 COMPRESSION_TOP_TERTILE_MULTIPLIER = 2.0
@@ -77,7 +77,7 @@ def compression_mask(
 ) -> np.ndarray:
     """Boolean displaced mask for the expertise-compression family.
 
-    Draws are tilted toward the elite group — top weighted-earnings tertile
+    Draws are tilted toward the top-tier group — top weighted-earnings tertile
     within above-median-exposure occupations — by ``multiplier`` (>= 1),
     with the eq 3.4 quota filled at the all-employee level.
     """
@@ -88,7 +88,7 @@ def compression_mask(
 
     med_exp = _weighted_tertile_threshold(exposure[employed], w[employed], 0.5)
     top_earn = _weighted_tertile_threshold(earnings[employed], w[employed], 2 / 3)
-    elite = employed & (exposure > med_exp) & (earnings >= top_earn)
+    top_tier = employed & (exposure > med_exp) & (earnings >= top_earn)
 
     quota = scenario.displacement_rate * float(w[employed].sum())
     members = np.flatnonzero(employed)
@@ -96,7 +96,7 @@ def compression_mask(
     displaced[members] = prescribed_systematic_sample(
         w[members],
         quota,
-        np.where(elite[members], float(multiplier), 1.0),
+        np.where(top_tier[members], float(multiplier), 1.0),
         np.random.default_rng(seed),
     )
     return displaced
@@ -188,7 +188,7 @@ def shocked_table_for(
     "compression_compound". "exposure" and "junior" are identical under
     either axis.
 
-    ``compression_multiplier`` (R2-6a): the elite draw tilt in the
+    ``compression_multiplier`` (R2-6a): the top-tier draw tilt in the
     compression family, default 2.0; 1.5 / 3.0 for sensitivity runs.
     """
     if family.endswith("_compound"):

@@ -49,7 +49,7 @@ from uk_ai_study.shocks import (
 )
 
 OUT = Path("results/incidence")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
 
 JUNIOR_MULT = 5.8 / 4.5          # press-release maximum-exposure scaling

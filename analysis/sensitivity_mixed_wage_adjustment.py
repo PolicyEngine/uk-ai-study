@@ -26,6 +26,7 @@ import pandas as pd
 
 from uk_ai_study.runner import build_person_table, gini
 from uk_ai_study.shocks import (
+    CENTRAL_WAGE_UPLIFT,
     MixedMarginScenario,
     ShockScenario,
     apply_mixed_margin_shock,
@@ -34,7 +35,7 @@ from uk_ai_study.shocks import (
 )
 
 OUT = Path("results/robustness")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
 LAMBDAS = (0.0, 0.25, 0.5, 0.75, 1.0)
 SURVIVOR_WAGE_EFFECTS = (-0.05, -0.026, 0.0, 0.026, 0.05)
@@ -173,7 +174,7 @@ def main() -> None:
             ),
             "common_loss_basis": "gross employment earnings before the common wage uplift",
             "mixed_wage_gradient": "C-AIOE",
-            "standard_wage_uplift": 0.026,
+            "standard_wage_uplift": CENTRAL_WAGE_UPLIFT,
             "capital_return_increase_pp": 0.4,
         },
     }

@@ -38,7 +38,7 @@ from uk_ai_study.runner import AGE_BANDS, gini, per_capita_household_income
 from uk_ai_study.shocks import ShockScenario, draw_displaced
 
 OUT = Path("results/paper_scenarios")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
 
 

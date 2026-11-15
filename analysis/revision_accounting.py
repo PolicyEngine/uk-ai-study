@@ -23,12 +23,18 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from uk_ai_study.shocks import (
+    BASELINE_CAPITAL_RETURN,
+    CAPITAL_RETURN_INCREASE,
+    CORPORATION_TAX_RATE,
+)
+
 #: JR16 return-to-capital shock: +0.4pp on a 1.005 per cent base
-BASE_RETURN_PCT = 1.005
-RETURN_SHOCK_PP = 0.4
-CAPITAL_SCALE = (BASE_RETURN_PCT + RETURN_SHOCK_PP) / BASE_RETURN_PCT - 1
+BASE_RETURN_PCT = 100 * BASELINE_CAPITAL_RETURN
+RETURN_SHOCK_PP = 100 * CAPITAL_RETURN_INCREASE
+CAPITAL_SCALE = (BASELINE_CAPITAL_RETURN + CAPITAL_RETURN_INCREASE) / BASELINE_CAPITAL_RETURN - 1
 #: corporation tax main rate used in the tax-composition exercise
-CT_RATE = 0.25
+CT_RATE = CORPORATION_TAX_RATE
 
 
 # ---------------------------------------------------------------------------

@@ -76,7 +76,7 @@ from uk_ai_study.shocks import (
 )
 
 OUT = Path("results/tax_composition")
-CT_MAIN_RATE = 0.25
+from uk_ai_study.shocks import CORPORATION_TAX_RATE as CT_MAIN_RATE  # noqa: E402
 PHIS = [0.25, 0.5, 0.75, 1.0]
 PAYOUT_RATIO = 0.5  # parameter, see module docstring
 SEED = 0  # same seed as the jr16 grid, so draws line up cell-for-cell

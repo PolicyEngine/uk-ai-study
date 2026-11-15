@@ -72,7 +72,7 @@ from policy_counterfactuals import (  # noqa: E402
 )
 
 OUT = ROOT / "results" / "robustness"
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 N_DRAWS = 50
 FAMILIES = ("exposure", "junior", "compression", "uniform", "klein_top_loaded")
 FAMILIES_R1 = ("exposure", "junior", "uniform")

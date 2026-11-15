@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Wage-cut run on the household basis: written 13 Nov 2026, not yet run.
+"""Wage-cut run on the household basis: written and run 13 Nov 2026 (outputs
+committed under results/wage_cut/; stage ``wage_cut`` of analysis/rebuild.py).
 
 Why. The paper compares job loss and wage cuts at the same gross earnings
 loss (Table 3). For job loss the household-basis absorption (income tax,
@@ -228,7 +229,7 @@ def parse_variants(argv) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Simulation driver (needs Microcosm; not executed when written)
+# Simulation driver (needs Microcosm)
 # ---------------------------------------------------------------------------
 def _append(path: Path, df: pd.DataFrame, key: dict) -> None:
     nr._append_deciles(path, df, key)
