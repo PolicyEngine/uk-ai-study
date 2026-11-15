@@ -243,7 +243,6 @@ def incidence_families():
         labels.append(label)
     decile_ax(axl, "Share transitioning to unemployment (%)")
     axl.set_ylim(bottom=0)
-    axl.set_title("Who is displaced, by income decile")
 
     # Right panel: 50-draw means with +/-1 SD bars (the basis of the text and
     # Table tab:incidence), not the seed-0 point, which is a bottom-tail draw
@@ -270,7 +269,6 @@ def incidence_families():
     axr.set_xlim(min(0, lo - pad), hi + pad)
     axr.set_ylim(bottom=0)
     axr.grid(axis="x", visible=True)
-    axr.set_title("What it costs vs poverty impact")
 
     # One shared legend box serving both panels.
     fig.legend(handles, labels, loc="lower center", ncol=len(labels),
