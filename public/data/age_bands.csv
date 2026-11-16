@@ -1,0 +1,13 @@
+scenario,age_band,displacement_share,income_change_gbp
+central,16-24,0.0533,-542.95
+central,25-34,0.1962,-886.98
+central,35-44,0.2709,-858.56
+central,45-54,0.2495,-911.26
+central,55-64,0.1811,-438.85
+central,65-+,0.049,158.27
+central_youth_tilted,16-24,0.0479,-547.11
+central_youth_tilted,25-34,0.192,-800.42
+central_youth_tilted,35-44,0.2802,-821.1
+central_youth_tilted,45-54,0.2476,-869.36
+central_youth_tilted,55-64,0.1826,-391.61
+central_youth_tilted,65-+,0.0496,149.16

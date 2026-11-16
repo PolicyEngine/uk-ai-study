@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+.toggle-row{display:flex;justify-content:center;margin-bottom:12px}
+.toggle-group{display:flex;background:#f3f4f6;border-radius:8px;padding:3px}
+.toggle-btn{padding:8px 20px;border:none;background:transparent;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;border-radius:6px;transition:all .2s}
+.toggle-btn:hover{background:#e5e7eb}
+.toggle-btn.active{background:#6B7280;color:#fff}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+const LABELS={central:'Central',central_youth_tilted:'Youth-tilted'};
+fetch('./data/age_bands.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{const c=l.split(',');return{scenario:c[0],band:c[1],share:parseFloat(c[2]),change:parseFloat(c[3])}});
+  let sel='central';
+  function render(){
+    const d=rows.filter(r=>r.scenario===sel);
+    let html='';
+    html+=`<div class="toggle-row"><div class="toggle-group">`;
+    Object.keys(LABELS).forEach(s=>{html+=`<button class="toggle-btn${s===sel?' active':''}" data-s="${s}">${LABELS[s]}</button>`});
+    html+=`</div></div>`;
+    html+=`<table><tr><th>Age band</th><th>Share of displaced workers</th><th>Average annual income change (£)</th></tr>`;
+    d.forEach(r=>{
+      const band=r.band.replace('65-+','65+');
+      html+=`<tr><td>${band}</td><td>${(r.share*100).toFixed(1)}%</td><td>${r.change<0?'−':'+'}£${Math.abs(r.change).toFixed(0)}</td></tr>`;
+    });
+    html+=`</table>`;
+  html+=`<p class="caption">Table 4: Displacement and income change by age band</p>`;
+    document.getElementById('content').innerHTML=html;
+    document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{sel=b.dataset.s;render()});
+  }
+  render();
+});
+</script>
+</body>
+</html>

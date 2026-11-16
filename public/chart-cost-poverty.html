@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Roboto',-apple-system,sans-serif;background:#fff}#chart{width:100%;height:440px}
+.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<div class="figcaption">Figure 7: What the same shock costs versus its poverty impact, by incidence family</div>
+<script>
+const COLORS={
+  exposure:'#319795',
+  junior:'#81E6D9',
+  compression:'#234E52',
+  uniform:'#94A3B8',
+  klein_top_loaded:'#FEC601'
+};
+fetch('./data/incidence.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>{
+    const c=l.split(',');
+    return{family:c[0],label:c[1],cost:+c[3],costSd:+c[4],pov:+c[5],povSd:+c[6]};
+  });
+  const traces=rows.map(r=>({
+    x:[r.cost],y:[r.pov],
+    error_x:{type:'data',array:[r.costSd],color:'#CBD5E1',thickness:1.2},
+    error_y:{type:'data',array:[r.povSd],color:'#CBD5E1',thickness:1.2},
+    name:r.label,type:'scatter',mode:'markers',
+    marker:{color:COLORS[r.family]||'#319795',size:14,line:{color:'#fff',width:1.5}},
+    hovertemplate:r.label+'<br>Cost: £%{x:.1f}bn/yr<br>Poverty: +%{y:.2f}pp<extra></extra>'
+  }));
+  Plotly.newPlot('chart',traces,{
+    xaxis:{title:'Exchequer cost (£ billion per year)',zeroline:false,showgrid:true,gridcolor:'#F2F4F7'},
+    yaxis:{title:'Change in BHC poverty rate (pp)',zeroline:false,showgrid:true,gridcolor:'#F2F4F7'},
+    legend:{orientation:'h',y:-0.25,x:0.5,xanchor:'center',font:{size:12}},
+    margin:{t:16,r:20,b:110,l:70},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+  },{displayModeBar:false,responsive:true});
+});
+</script>
+</body>
+</html>

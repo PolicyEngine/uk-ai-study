@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
+th{font-weight:600;color:#333}
+tr:nth-child(even){background:#f9fafb}
+.caption{font-weight:600;text-align:center;font-size:15px;color:#5A5A5A;margin:8px 0 4px}
+p{margin:16px 0}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/scenarios.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const lines=csv.trim().split('\n').slice(1);
+  const rows=lines.map(l=>{
+    const c=l.match(/(".*?"|[^,]+)/g);
+    return{scenario:c[0],label:c[1].replace(/"/g,''),bhc:parseFloat(c[6]),ahc:parseFloat(c[7])};
+  });
+  const central=rows.find(r=>r.scenario==='central');
+  let html=`<p>The AI shock would raise poverty in every scenario. In the central scenario, the poverty rate rises by ${central.bhc.toFixed(1)} percentage points before housing costs (BHC) and ${central.ahc.toFixed(1)} percentage points after housing costs (AHC).</p>`;
+    html+=`<table><tr><th>Scenario</th><th>Change, BHC (pp)</th><th>Change, AHC (pp)</th></tr>`;
+  rows.forEach(r=>{
+    html+=`<tr><td>${r.label}</td><td>+${r.bhc.toFixed(1)}</td><td>+${r.ahc.toFixed(1)}</td></tr>`;
+  });
+  html+=`</table>`;
+  html+=`<p class="caption">Table 4: Change in poverty rates by scenario</p>`;
+  document.getElementById('content').innerHTML=html;
+});
+</script>
+</body>
+</html>
