@@ -68,6 +68,29 @@ Further consequences for the paper:
 7. The Gini moves little across rules (1.74 to 1.86). Only uniform differs clearly (+0.07pp); the high-earner tilts slightly *lower* the Gini rise relative to exposure, not significantly.
 8. Cost per displaced worker now follows exactly from the rule's earnings profile, with no OLS adjustment.
 
+## Validation against the paper's own draws (`prototypes/replicate_draws.py`)
+
+For each seed, the sampler's real displaced mask (the pipeline's own code) is mapped to the matching saved household state and summed.
+
+- **Seeds 0–49 reproduce `results/robustness/incidence_draws_five.csv` exactly** for all five rules: maximum absolute difference £0.00005bn in cost, under 1e-14 in poverty, Gini and displaced count. The state engine is exact, not an approximation.
+- **Long run (2,000 seeds of the real sampler, which assumes nothing about dependence within households):**
+
+| Rule | Cost | BHC | AHC | Gini |
+|---|---|---|---|---|
+| Exposure | £7.24bn | 2.462 | 2.614 | 1.786 |
+| Junior | £6.93bn | 2.430 | 2.587 | 1.772 |
+| Compression | £11.30bn | 2.623 | 2.760 | 1.767 |
+| Uniform | £1.64bn | 2.462 | 2.525 | 1.856 |
+| Top-loaded | £27.69bn | 2.961 | 3.329 | 1.742 |
+
+  These equal the exact enumeration within Monte Carlo error. Independence within the household is not driving the results.
+- **Uniform minus exposure, BHC poverty:**
+  - +0.115pp (SE 0.040) over the paper's seeds 0–49;
+  - +0.00002pp (SE 0.007) over 2,000 seeds;
+  - +0.003pp exact.
+
+  The published gap was sampling noise in the 50 draws (about 3 SE from the true value), not a modelling artefact.
+
 ## Next steps (Phase 1 remainder, then Phase 2)
 
 - ~~Extend the reweighting to the other three rules~~ (done above).
