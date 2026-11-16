@@ -24,7 +24,7 @@ fetch('./data/scenarios.csv')
   });
   const c=rows['central'],hi=rows['high'];
   document.getElementById('content').innerHTML=
-    `<p>Measured income inequality would rise in every scenario modelled. In the central scenario, the Gini coefficient of equivalised (household-size-adjusted) disposable income rises by ${((c.shocked-c.base)*100).toFixed(1)} percentage points; in the high scenario, by ${((hi.shocked-hi.base)*100).toFixed(1)} percentage points.</p>`;
+    `<p>Measured income inequality would rise in every scenario modelled. In a single allocation draw of the central scenario, the Gini coefficient of equivalised (household-size-adjusted) disposable income rises by ${((c.shocked-c.base)*100).toFixed(1)} percentage points; in the high scenario, by ${((hi.shocked-hi.base)*100).toFixed(1)} percentage points.</p>`;
 });
 </script>
 </body>

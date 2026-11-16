@@ -1,6 +1,6 @@
 family,label,displaced_m,cost_mean_bn,cost_sd_bn,pov_bhc_mean_pp,pov_bhc_sd_pp,gini_mean_pp,gini_sd_pp
-exposure,Exposure-proportional,1.96,7.3,1.9,2.4,0.21,1.76,0.12
-junior,Junior-concentrated,2.0,7.0,1.6,2.43,0.23,1.77,0.11
-compression,Expertise-compression,2.02,11.3,2.6,2.65,0.21,1.78,0.11
-uniform,Uniform,2.26,1.9,2.0,2.52,0.22,1.88,0.12
+exposure,Exposure-proportional,2.04,7.3,1.9,2.4,0.21,1.76,0.12
+junior,Junior-concentrated,2.04,7.0,1.6,2.43,0.23,1.77,0.11
+compression,Expertise-compression,2.04,11.3,2.6,2.65,0.21,1.78,0.11
+uniform,Uniform,2.05,1.9,2.0,2.52,0.22,1.88,0.12
 klein_top_loaded,Top-loaded stress test,2.04,27.7,2.7,3.0,0.27,1.77,0.14

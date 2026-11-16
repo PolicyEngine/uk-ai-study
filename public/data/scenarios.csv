@@ -1,5 +1,5 @@
-scenario,label,displacement_rate,wage_uplift,displaced_workers,exchequer_cost_bn,poverty_change_bhc_pp,poverty_change_ahc_pp,gini_baseline,gini_shocked
-low,"Low (1% displacement, no wage uplift)",0.01,0.0,286696,-11.17,0.02,0.16,0.3027,0.3099
-central,"Central (7% displacement, +2.6% wages)",0.07,0.026,1962033,7.33,1.99,2.12,0.3027,0.3176
-central_youth_tilted,"Central, youth-tilted",0.07,0.026,2004690,7.27,2.31,2.38,0.3027,0.3203
-high,"High (13% displacement, +2.6% wages)",0.13,0.026,3857176,44.93,5.34,5.68,0.3027,0.3308
+scenario,label,displacement_rate,wage_uplift,displaced_workers,exchequer_cost_bn,poverty_change_bhc_pp,poverty_change_ahc_pp,gini_baseline,gini_shocked,gini_change_pp
+low,"Low (1% displacement, no wage uplift)",0.01,0.0,286696,-11.17,0.02,0.16,0.3027,0.3099,0.72
+central,"Central (7% displacement, +2.6% wages)",0.07,0.026,1962033,7.33,1.99,2.12,0.3027,0.3176,1.5
+central_youth_tilted,"Central, youth-tilted",0.07,0.026,2004690,7.27,2.31,2.38,0.3027,0.3203,1.76
+high,"High (13% displacement, +2.6% wages)",0.13,0.026,3857176,44.93,5.34,5.68,0.3027,0.3308,2.82

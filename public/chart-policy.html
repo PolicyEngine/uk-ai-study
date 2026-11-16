@@ -9,23 +9,23 @@
 </head>
 <body>
 <div id="chart"></div>
-<div class="figcaption">Figure 9: Fiscal cost, poverty averted and cost per point for each reform</div>
+<div class="figcaption">Figure 9: Fiscal cost, poverty averted and cost per point for each reform (50-draw means)</div>
 <script>
 const LABELS={
-  R1_wage_insurance:'R1: Wage<br>insurance',
-  R2_uc_circuit_breaker:'R2: UC allowance<br>+20%',
-  R3_cap_suspension_taper_cut:'R3: Cap suspension<br>+ taper cut'
+  R1:'R1: Wage<br>insurance',
+  R2:'R2: UC allowance<br>+20%',
+  R3:'R3: Cap suspension<br>+ taper cut'
 };
 const COLORS=['#319795','#4FD1C5','#81E6D9'];
-fetch('./data/policy.csv')
+fetch('./data/policy_mc.csv')
 .then(r=>r.text())
 .then(csv=>{
-  const rows=csv.trim().split('\n').slice(1).map(l=>l.match(/(".*?"|[^,]+)/g)).filter(c=>c[1]==='exposure');
+  const rows=csv.trim().split('\n').slice(1).map(l=>l.split(','));
   const y=rows.map(c=>LABELS[c[0]]||c[0]).reverse();
   const colors=COLORS.slice(0,rows.length).reverse();
   const panels=[
     {title:'Annual cost (£bn)',vals:rows.map(c=>+c[2]).reverse(),fmt:v=>'£'+v.toFixed(1)+'bn',ax:''},
-    {title:'Poverty averted, AHC (pp)',vals:rows.map(c=>-c[4]).reverse(),fmt:v=>v.toFixed(2)+'pp',ax:'2'},
+    {title:'Poverty averted, BHC (pp)',vals:rows.map(c=>-c[4]).reverse(),fmt:v=>v.toFixed(2)+'pp',ax:'2'},
     {title:'Cost per pp averted (£bn)',vals:rows.map(c=>+c[7]).reverse(),fmt:v=>'£'+v.toFixed(1)+'bn',ax:'3'}
   ];
   const traces=panels.map((p,i)=>({
