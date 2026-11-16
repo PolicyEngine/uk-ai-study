@@ -39,7 +39,7 @@ fetch('./data/policy_mc.csv')
     html+=`<tr><td>${LABELS[r.reform]||r.reform}</td><td>£${r.cost.toFixed(1)} ± ${r.costSd.toFixed(1)}</td><td>${r.pov.toFixed(2)} ± ${r.povSd.toFixed(2)}</td><td>${r.gini.toFixed(2)}</td><td>£${r.per.toFixed(1)}</td></tr>`;
   });
   html+=`</table>`;
-  html+=`<p class="caption">Table 6: Policy reforms on top of the central shock, 2027–28 (50-draw means ± standard deviation; cost per point is mean cost over mean poverty reduction)</p>`;
+  html+=`<p class="caption">Table 5: Policy reforms on top of the central shock, 2027–28 (50-draw means ± standard deviation; cost per point is mean cost over mean poverty reduction)</p>`;
   html+=`<p>Using poverty averted per pound as the sole criterion, R3 averts a percentage point of BHC poverty for £${r3.per.toFixed(1)} billion and R2 for £${r2.per.toFixed(1)} billion, against £${r1.per.toFixed(1)} billion for this wage-insurance design. Wage insurance serves different aims — earnings-loss compensation and consumption smoothing — so this is not a complete instrument ranking.</p>`;
   document.getElementById('content').innerHTML=html;
 });
