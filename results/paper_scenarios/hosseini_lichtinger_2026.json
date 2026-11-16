@@ -1,40 +1,40 @@
 {
   "scenario": "hosseini_lichtinger_2026",
-  "displaced_weighted_total": 201027.28125,
-  "share_of_employed_displaced": 0.006933349650353193,
-  "exchequer_cost_bn": 1.667694592,
-  "poverty_change_bhc_pp": 0.24930801904513855,
-  "gini_change_pp": 0.08021480827412608,
+  "displaced_weighted_total": 201288.640625,
+  "share_of_employed_displaced": 0.006933350581675768,
+  "exchequer_cost_bn": 1.728741376,
+  "poverty_change_bhc_pp": 0.2493080221835739,
+  "gini_change_pp": 0.08083986520890374,
   "age_bands": {
     "16-24": {
-      "displaced_weighted": 103611.8203125,
+      "displaced_weighted": 103746.5078125,
       "displacement_rate_of_employed": 0.03269675001502037,
-      "mean_per_capita_income_change": -155.16813086882317
+      "mean_per_capita_income_change": -158.84761430662448
     },
     "25-34": {
-      "displaced_weighted": 97415.453125,
-      "displacement_rate_of_employed": 0.014234490692615509,
-      "mean_per_capita_income_change": -209.54878855186033
+      "displaced_weighted": 97542.1015625,
+      "displacement_rate_of_employed": 0.014234492555260658,
+      "mean_per_capita_income_change": -215.98603348336277
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -13.606923032789593
+      "mean_per_capita_income_change": -13.93518764620788
     },
     "45-54": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -44.17242209454357
+      "mean_per_capita_income_change": -45.238209045100426
     },
     "55-64": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -27.156296761627534
+      "mean_per_capita_income_change": -27.823434668622657
     },
     "65-+": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -8.558949022025033
+      "mean_per_capita_income_change": -8.766015892984878
     }
   }
 }

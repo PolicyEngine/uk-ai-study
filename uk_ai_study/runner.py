@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from uk_ai_study.checkpoint import certified_data_build_id
-from uk_ai_study.data import microsimulation, soc_major_group
+from uk_ai_study.data import PERIOD, microsimulation, soc_major_group
 from uk_ai_study.exposure import exposure_for_major_group
 from uk_ai_study.shocks import (
     PRESETS,
@@ -353,7 +353,7 @@ def _metrics(sim, period: int) -> dict:
 
 def run_scenario(
     scenario: ShockScenario | str,
-    period: int = 2026,
+    period: int = PERIOD,
     seed: int = 0,
 ) -> ScenarioResult:
     if isinstance(scenario, str):

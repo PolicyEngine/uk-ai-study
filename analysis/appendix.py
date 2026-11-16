@@ -114,7 +114,6 @@ def bar_by_decile(values_bn, title, ylabel, fname, color=BLUE, fmt="{:.1f}"):
         ax.text(x, y + max(values_bn) * 0.02, fmt.format(y), ha="center",
                 va="bottom", fontsize=8, color=INK2)
     decile_ax(ax, ylabel)
-    ax.set_title(title)
     save(fig, OUT / fname)
 
 
@@ -131,7 +130,7 @@ BASELINE_META = {
 
 def plot_baseline_distributions(df):
     for name, (color, title) in BASELINE_META.items():
-        bar_by_decile(df[name].to_numpy(), title + " — UK baseline, 2026",
+        bar_by_decile(df[name].to_numpy(), title,
                       "£ billion per year", f"{name}.png", color=color)
 
 

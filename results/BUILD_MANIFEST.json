@@ -1,35 +1,17 @@
 {
-  "git_commit": "40c69953df73139c681641898f177e3c0511bfda",
+  "git_commit": "3e1ff7727c1809b566df79bef9b3e0e47d1ce981",
   "git_dirty_at_build": false,
   "invoking_checkout_dirty_at_start": false,
   "started_utc": null,
-  "finished_utc": "2026-11-15T22:02:56Z",
-  "recovery_note": "Attested the committed results tree and presentation files at this commit without a clean-room rerun (review of PR #18, 15 Nov 2026). These hashes attest the committed files, not a rebuild. Most stages come from the full Microcosm rerun that ended on 13 Nov 2026, which was itself attested in place (attest-existing), not a recorded clean-room build; outside_clean_room lists the stages run separately, restamped or regenerated since then, and why. A full clean-room rebuild (analysis/rebuild.py) would regenerate every output from empty results/ and needs the private Microcosm dataset and long runs.",
-  "outside_clean_room": {
-    "obr_benchmark": "run 15, run on its own on 13 Nov 2026 against the certified build and committed; draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "capital_variants": "run 16, run on its own on 13 Nov 2026 and committed; draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "obr_household_deciles": "rebuilt on 13 Nov 2026 from run 15's household arrays, which live outside the repository",
-    "takeup": "run on its own on 14 Nov 2026 and committed; draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "wage_cut": "run on its own on 13 Nov 2026 and committed; draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "jr16_grid": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "appendix_grids": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "monte_carlo": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "duration_takeup": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "duration_reforms": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "wage_tier": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "dividend_coverage": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "tax_composition": "draws restamped on 15 Nov 2026 (code_fingerprint column only, proved non-behavioural; results/RESTAMP_LOG.json), not rerun",
-    "figures": "redrawn in the working tree from committed CSVs (no simulation); the 16 earlier PNGs reproduce byte for byte, policy/policy_reforms.png is new (review finding M2)",
-    "tex_values": "regenerated in the working tree with --strict (0 pending)",
-    "paper_pdf": "built in the working tree with tectonic"
-  },
+  "finished_utc": "2026-11-16T08:07:09Z",
+  "recovery_note": "Attested existing results tree without a full clean-room rerun; see git history for which stages were added or repaired since the last full attested build.",
   "python": {
     "version": "3.13.15",
     "implementation": "CPython",
-    "executable": "python3"
+    "executable": "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python"
   },
   "package_versions": {
-    "uk-ai-study": "0.1.0",
+    "uk-ai-study": null,
     "policyengine": "6.16.1",
     "policyengine-uk": "2.174.1",
     "policyengine-core": "3.33.3",
@@ -41,14 +23,14 @@
     {
       "stage": "presets",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/run_all.py"
       ]
     },
     {
       "stage": "jr16_figs",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/replicate_jr16.py",
         "figs"
       ]
@@ -56,7 +38,7 @@
     {
       "stage": "jr16_grid",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/replicate_jr16.py",
         "grid"
       ]
@@ -64,21 +46,21 @@
     {
       "stage": "incidence",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/incidence_scenarios.py"
       ]
     },
     {
       "stage": "measured_incidence",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/measured_incidence.py"
       ]
     },
     {
       "stage": "appendix_fast",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/appendix.py",
         "fast"
       ]
@@ -86,7 +68,7 @@
     {
       "stage": "appendix_decomp",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/appendix.py",
         "decomp"
       ]
@@ -94,7 +76,7 @@
     {
       "stage": "appendix_grids",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/appendix.py",
         "grids"
       ]
@@ -102,7 +84,7 @@
     {
       "stage": "robustness",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/robustness.py",
         "fast"
       ]
@@ -110,151 +92,113 @@
     {
       "stage": "monte_carlo",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/monte_carlo_families.py"
       ]
     },
     {
       "stage": "index_sensitivity",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/index_sensitivity.py"
       ]
     },
     {
       "stage": "duration_takeup",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/sensitivity_duration_takeup.py"
       ]
     },
     {
       "stage": "duration_reforms",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/sensitivity_duration_reforms.py"
       ]
     },
     {
       "stage": "wage_tier",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/sensitivity_wage_tier.py"
       ]
     },
     {
       "stage": "mixed_wage_adjustment",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/sensitivity_mixed_wage_adjustment.py"
       ]
     },
     {
       "stage": "dividend_coverage",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/sensitivity_dividend_coverage.py"
       ]
     },
     {
       "stage": "paper_scenarios",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/paper_scenarios.py"
       ]
     },
     {
       "stage": "policy",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/policy_counterfactuals.py"
       ]
     },
     {
       "stage": "caseloads",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/caseloads.py"
       ]
     },
     {
       "stage": "tax_composition",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/tax_composition.py"
       ]
     },
     {
       "stage": "gender",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/gender.py"
       ]
     },
     {
       "stage": "poverty_decomposition",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/poverty_decomposition.py"
       ]
     },
     {
       "stage": "recession_backcast",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/recession_backcast.py"
       ]
     },
     {
       "stage": "figures",
       "cmd": [
-        "python3",
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
         "analysis/figures.py"
-      ]
-    },
-    {
-      "stage": "obr_benchmark",
-      "cmd": [
-        "python3",
-        "analysis/next_runs.py",
-        "obr"
-      ]
-    },
-    {
-      "stage": "capital_variants",
-      "cmd": [
-        "python3",
-        "analysis/next_runs.py",
-        "capital"
-      ]
-    },
-    {
-      "stage": "obr_household_deciles",
-      "cmd": [
-        "python3",
-        "analysis/post_next_runs.py"
-      ]
-    },
-    {
-      "stage": "takeup",
-      "cmd": [
-        "python3",
-        "analysis/displaced_takeup_runs.py"
-      ]
-    },
-    {
-      "stage": "wage_cut",
-      "cmd": [
-        "python3",
-        "analysis/wage_cut_household.py"
       ]
     },
     {
       "stage": "tex_values",
       "cmd": [
-        "python3",
-        "analysis/emit_tex_values.py",
-        "--strict"
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
+        "analysis/emit_tex_values.py"
       ]
     },
     {
@@ -264,183 +208,216 @@
         "--keep-logs",
         "paper/main.tex"
       ]
+    },
+    {
+      "stage": "obr_benchmark",
+      "cmd": [
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
+        "analysis/next_runs.py",
+        "obr"
+      ]
+    },
+    {
+      "stage": "capital_variants",
+      "cmd": [
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
+        "analysis/next_runs.py",
+        "capital"
+      ]
+    },
+    {
+      "stage": "obr_post",
+      "cmd": [
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
+        "analysis/post_next_runs.py"
+      ]
+    },
+    {
+      "stage": "takeup",
+      "cmd": [
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
+        "analysis/displaced_takeup_runs.py"
+      ]
+    },
+    {
+      "stage": "wage_cut",
+      "cmd": [
+        "/Users/vahid/uk-ai-study-rescue/env/.venv/bin/python",
+        "analysis/wage_cut_household.py"
+      ]
     }
   ],
   "script_sha256": {
-    "analysis/appendix.py": "83e0256459b794ddfa33893d2328b122d85dcdb1a2be472767a367130202604a",
+    "analysis/appendix.py": "6188cf264d52a88930f100becdc330f257bb169cdf86d5f2e8fab44b3de3fecb",
     "analysis/build_pss_crosswalk.py": "2e37305a6e41ce885c37e51d5fde33bd92f87bf5ef5002b6b95dab50806d070f",
     "analysis/build_ripple_routing.py": "4f49abe94802a2dbcc2c0d96b6876f019ee2d531317ca190ffb40705b43fa3b5",
-    "analysis/caseloads.py": "1b1fa3f93e8c864ddf9a5bb39d8c87b5953d41c760bab21ee6d9b9a8d0fa093f",
-    "analysis/displaced_takeup_runs.py": "1aedb52b6ee3176471d85548b55568c37aea7ee8b9f349e54e14b7960cffdc7a",
+    "analysis/caseloads.py": "dbb6ddee4e5583e6b688274b262c380bf4dd81694ff193f3c078b505c1d445c8",
+    "analysis/displaced_takeup_runs.py": "913105451fb67ec9bc9bf44912d527525f29c3a324ffec675d40730ed60755e1",
     "analysis/download_data.py": "efc08ad770a0beadeb97ca9ee9f4fec95474d02f7565255ec5cf93ca539ee050",
-    "analysis/emit_tex_values.py": "63857e8514880e01571ba093757749436eeb5184440cdff222720900142cf023",
+    "analysis/emit_tex_values.py": "b14602105c827b74f359b93624ce35b45cc74e184e2fcd8f4b3492c98dad1746",
     "analysis/figstyle.py": "2993ad5510b9573c9d8661d6dddf1359b1ae996c5d76b5cad17712674294dccc",
-    "analysis/figures.py": "051c7ad97dcb33536c1b45322cfeb1cb8302d568a92bc4f000914849c820d3cd",
-    "analysis/gender.py": "394ab867e96e7adac358c4ada014ae2594e2cf29330a2cbc264ab50f091fe192",
-    "analysis/incidence_scenarios.py": "e0fc10c7cb4e517830ac45eac4bef24163756456cdc4bdf98b70a59e5768ea16",
-    "analysis/index_sensitivity.py": "f078facd31c1e5046e45496331664b17f8cc509cf6ea071ee1b344d92a0323b0",
-    "analysis/measured_incidence.py": "eb1aa95152921317e28c4541748cd75176856c01bad0af5e1869bd5eee3d0325",
-    "analysis/monte_carlo_families.py": "f76d42b4f52904b36cb90b735ce042e3a7943e0b192fbb3c9cd02e10ed763efb",
-    "analysis/next_runs.py": "a83e4a5d10b7b0bcfeb5b0a9ad53b1a301d0a5e62553c7967c32fea51b80eaed",
-    "analysis/paper_scenarios.py": "6beba39dad683baf845ba8cc3fbfa6f178e4ccb41ccb2c27ec84116530ce0257",
-    "analysis/policy_counterfactuals.py": "a27baa3b8a8200bfe9a1fd7a719579d1a854ab9ac68e9b95d4cccea414679247",
-    "analysis/post_next_runs.py": "98b4677c39a5e24594aa52e92ed69fe456d641986e513c94d9da98a669c2d9d8",
-    "analysis/post_takeup_runs.py": "0d10f408e30b41123d238cfa2a00dfebb26fd0fb567d724ba7d9cdadd71a25d0",
+    "analysis/figures.py": "6d2ba18c7d3a68e7481ba54e6498bf6739d647ccfcfa5431172ebc70e58526ba",
+    "analysis/gender.py": "17955f86b64afed2b477aeb7898607aa03476d58abca7fa08fd70fab1c7b0234",
+    "analysis/incidence_scenarios.py": "c60f5737e780c7dfa40bed006c34fcbcdbcb2be5ea3c3a4065aa380b7b687823",
+    "analysis/index_sensitivity.py": "c2378b751650672eac3a0d8c5775e541c7d8912d60d59afdd8b6ed854c65bee7",
+    "analysis/measured_incidence.py": "4a041ec6bd43584d5e9e13e0781cbddb5d9c52c7adce21eabe46aa35936bb611",
+    "analysis/monte_carlo_families.py": "a316bd6b7cff564425b05ea0906495431153baa54ca3881bc7cb93ef74f35eeb",
+    "analysis/next_runs.py": "ecbc22509b5d9d4e14ba5b138c4ef0b2e4838e6088a881a28f945eac9b0481ac",
+    "analysis/paper_scenarios.py": "ef9c5a81c9c43f7389c82f3f47ce71defdc0f6c62a84477b3dcf9928ed4fd806",
+    "analysis/policy_counterfactuals.py": "a175586f15ba1dcd9411e73fbf04d45c9b59873f13d753688684f8adbc31ca8a",
+    "analysis/post_next_runs.py": "0c510f69813f1cc57746c1d4aa3def1886157fccbef18aa48c197716ff300c99",
+    "analysis/post_takeup_runs.py": "44a8e6dc8698616e790ae98758dfc747239068722916845bbfa1988fdfd41691",
     "analysis/post_wage_cut.py": "1a3a57e6468d203fec934ae7c6dc7c9fca0a702564b9c0b7bd9cac0ac1d848e2",
-    "analysis/poverty_decomposition.py": "774e1d3ab27ebf4149be89d5d94d09b0098b42462215187749b74650260f4e98",
-    "analysis/rebuild.py": "301cb0c89e8c0949b1118f5b9f4d8c5071c83adece15eee25935339d0e2e4b23",
-    "analysis/recession_backcast.py": "93d6f7baedaa6454cbd0d63d75560e5d825344dc9650bc3822269c78ede88b9b",
+    "analysis/poverty_decomposition.py": "9e1c8d4428863518df4e0713bee130004a1c3d81399855821a42d9c3bb45b040",
+    "analysis/rebuild.py": "6e983d9b08fb249c7e0b3e7bfe19146ccf40e24930d2fcba0f256c3cbe4920ce",
+    "analysis/recession_backcast.py": "a54ce81eed54bc87cb7de80eaa3c0488f5ca6f348e5518b31a5b34cb0248b9c6",
     "analysis/replicate_gov_spending_5yr.py": "ee3385327ff12d42665067dcdc56b4fcc5252db4104251c0a02511becc4396d4",
-    "analysis/replicate_jr16.py": "7835eb6de2afd98376a64ca3a7d6a3cdb270dcb4edc6b466bd60b94da9acb70c",
-    "analysis/restamp_checkpoints.py": "6e7cc1d5272b11b6f828b43b7acf71c4bc29d090a9f87f920568c5107d7d1db6",
-    "analysis/revision_accounting.py": "826b741cc781399a5f0bfc79d2d8cd16fc98f73ea9fdadababe4bd330b1fff12",
+    "analysis/replicate_jr16.py": "96aca13e42642b60595d74d8fd5d142159ce9a8e927dec75728bd8904048a8c0",
+    "analysis/revision_accounting.py": "fe13fc254dfc11c69793f3448ce2666eeb1f9a77449d482344dd855ff55f9cc4",
     "analysis/robustness.py": "cff53f6e9541e4c7168b3a515950dd7be4272dde89e8c506105cbeb9cad14f8b",
-    "analysis/run_all.py": "30b24cfc605664b80bd73714f1f7c2114186a86b928c9be0ebaa462b6abda764",
-    "analysis/sensitivity_dividend_coverage.py": "0c544035176e8493db6ac9bc70d957bcb763d017df1edbed4d4787e8f40a4939",
+    "analysis/run_all.py": "02c5b546b894d78b9d7b25d1d71daee9d09a9cddf324588acacdb8233413846e",
+    "analysis/sensitivity_dividend_coverage.py": "f2630d26a7f389ae3fa9e5a626060883c6b9499f8dd5f74d4c58e9e8d2e2ab6b",
     "analysis/sensitivity_duration_reforms.py": "687a97b561dba41d7ca34db49f3bcb70fb85b171564944ceda197f3c43243d1c",
     "analysis/sensitivity_duration_takeup.py": "9c7425411c7632319d906b53af61a3bec2643e4a2ed481bbd7e0e93a7374ff90",
-    "analysis/sensitivity_mixed_wage_adjustment.py": "49c0591643b2cbb3d0e81f1174f6bafa8a482b1c1e0ce98ff5b0b72c97b08b55",
+    "analysis/sensitivity_mixed_wage_adjustment.py": "9b43721bc8ac22ab419e04ac8c7688d6f237ae4c2af9bc65a89dd02f7426a3dd",
     "analysis/sensitivity_wage_tier.py": "950e78875abc90799d65b51787983cdb76cccf8ed44be9ac8d6b8e05e4b3ee6a",
-    "analysis/tax_composition.py": "5070f7ca3009da7497ff50799bba9687b6e816fe1da348843c6dc2cf7225e493",
-    "analysis/wage_cut_household.py": "295e555ba1cf8eda5dd3c4591920038d29a7307a94d26ea1f5101eb5792ef4b4",
+    "analysis/tax_composition.py": "c9183bdcd1477599b3cbf266861dc554caf3b744bd1ece0e50488094f6158527",
+    "analysis/wage_cut_household.py": "e97d7240826eca50f2d90a8eefc56a21d5f7e91c042ae4e3c0af15f0cfbe5ace",
     "uk_ai_study/__init__.py": "a9517050d950899c078b463621f2768e30fcea2595a7450df535aa52247d17cd",
-    "uk_ai_study/checkpoint.py": "b5eb681a6d91b6ec30d7668b160143bd8e86137d93da378c8f2f880d472a4899",
-    "uk_ai_study/data.py": "398d1b5ddf70af4e0427eb2313cbb15fde8614696dd10a912760ac1959c5c54a",
+    "uk_ai_study/checkpoint.py": "6a82fef90f5380a1afd919ad6c1d593baf659214d54afefcdf116bc7a3fd5694",
+    "uk_ai_study/data.py": "7ad7e57009b4878509d4174dffafd519d6e0cc8fde0559d5ab94b582089fd360",
     "uk_ai_study/exposure.py": "dd949cc38e56077c3c6aec7821e0617cfa4418515c1312f0c9f8737dbf65e442",
-    "uk_ai_study/runner.py": "383ae1f09d12951a9e6714752d643d74b523754534fad7c062ec16b46689d27d",
-    "uk_ai_study/shocks.py": "f31c65d8e6f76521509193db45f5f376f2b0b01b7da66ca8285d78369b3d5c0c"
+    "uk_ai_study/runner.py": "6383c57fc6f4cba46d024eaa249be571d1d0917ebc46801636c6967699e6d794",
+    "uk_ai_study/shocks.py": "076a77698ef0bbb2671e365199bcc3eb94661db1bd41605cc2b4c2c988172b6a"
   },
   "inputs": {
     "data/microcosm_uk_2024_25.h5": "0a9b77db1c0dee2693cb2d47bad68da34cb662916eee4829942bcd45de581f25"
   },
   "presentation_files": {
-    "paper/values_generated.tex": "99e3cb258204128374e2541c7ba73a2a1d35c031b4868e5b517a2f3034371c96",
-    "paper/main.pdf": "2fb8e2b24563c87ab1511f757b86dedc02e88c149dc6c4d39236e34ba0618b3a"
+    "paper/values_generated.tex": "1d07db66de288f8bb4ae93e8fd3edbf7f861d8faf0db215b218112c5f5fec2ba",
+    "paper/main.pdf": "572e2be0cff5618c363790f4cf301eb4d79cc0b9d01414749bb36c3704ddac9f"
   },
   "seed_policy": "headline single-draw results use seed 0; incidence and policy Monte Carlo use paired seeds 0..49; other sensitivities declare their own fixed draw budgets",
-  "non_generated": [
-    "RESTAMP_LOG.json"
-  ],
+  "non_generated": [],
   "files": {
-    "RESTAMP_LOG.json": "9a85338873742ea4b859db57efac4f3d6971d8010e4439d4015eb3716b21595c",
-    "appendix/b11_grid_no_capital.png": "ce4bc4e813e588e542fbeee987a3e4ce5375d11e1cab2611eaa946a4a4e10381",
-    "appendix/b1_market_income_less_capital.png": "2cefcea255f9e5c97265bb06c6da43971d97bc1b177088b0033d9724ee2804fb",
-    "appendix/b2_capital_income.png": "48306c3b9418f90b6d4f4157aadee12d276cc0c8d0e0988671559407b1d41597",
-    "appendix/b3_benefits.png": "0d03f114a63ff2ad13398af841cadce60a8da33b0621a045248ca24399ca5df3",
-    "appendix/b4_tax_and_ni.png": "4f9611e0063e889204a3564107d3da3a50603a409eacbdf5e5c634850701313c",
-    "appendix/b5_disposable_income.png": "9dec5b653b0cc19d596912c4967606d1a13d0e1741d4491dbbaa7a1b5f968223",
-    "appendix/b7_uniform_vs_ai_decile.csv": "e889b5592581c1bf95e8b25a6fe9e70a0f9fa4a777168a2721a5f17766175270",
-    "appendix/b7_uniform_vs_ai_decile.png": "b4b2f5af7872cbd741d7f5669728650be2722cafc30e88b0ef907b2986b78b0b",
-    "appendix/b8_alternative_index_decile.csv": "e4323aa4285f6780c09d63da58595d65c06d7b77d1b4ae53ea6bf3a95c92538d",
-    "appendix/b8_alternative_index_decile.png": "22f9b77252e4de1ae6c65a90c2fc768346cb7f51da7133894ad769925fd60ca1",
-    "appendix/b9_grid_by_decile.png": "a911d46d8db3264ad816ff1187b665b5dcd848ee14a33532b6c21d68014c2252",
-    "appendix/baseline_distributions.csv": "356ec9b88ac9ddc6ba97f34517a8787e1ef7f44dbf73bb467a556a0a0de0f3d5",
-    "appendix/complementarity_incidence_by_decile.png": "ebac9113732006df4b4d21d0843bb0d14e22e3a9736272c0de43fcc57fe98dd4",
-    "appendix/decile_ranking_sensitivity.csv": "3e7ba9d550f7db049ca11a08978ba10d6781035b712d7170c95d66830feb91a8",
-    "appendix/decomposition_ci.csv": "76e3add00cfce803169d8f756c2b6e131b1a06ba833e2b31b31ce70b93468526",
-    "appendix/decomposition_ci.png": "95235816738eaf9e09f6c0f43b73bfb4e6c819f8f6ffc539d00655ed54bb17e3",
-    "appendix/exposure_incidence_by_decile.png": "593e46a52e67312bd0b13d912d99df1e09aa95b1c86f5211ffa03047e2705eeb",
-    "appendix/gender_incidence.json": "39baff77554252d418dab57c8d46943773b115b1679d80b461b1fcde89cfd8fb",
-    "appendix/grid_deciles_capital.csv": "4cf917f6d250ea6bc5c9f7ebf275d6793c01387778d0d364bfa3a5456e86e503",
-    "appendix/job_loss_by_major_group.csv": "ef45c5cf0c271b29cef83b21540134036c055a7e4d33a29d8d211ffa9de3c057",
-    "caseloads/caseloads.png": "3f3655dafd0cc7908a21bd7b747f83acb8d1f2c2255958642df1ece9ff03880c",
-    "caseloads/central.json": "3403a4df17d4cbdad964872ea2cf59ba6069c30b8410d096f12564fa6538b44e",
-    "caseloads/high.json": "b1608a620cbd8b8618f22872f3c357f981afb141bc0a7086c76d10a871ebaf00",
-    "caseloads/incidence_compression.json": "0c3953fda72cb45ec6fdbeaa36033488635a405f9e7067c8713021f474d43964",
-    "caseloads/incidence_exposure.json": "3292d479030981f98289bdd0fcdcb92b9dfd380245a41d3501f089bf40099022",
-    "caseloads/incidence_junior.json": "d62da005fc313de8429dca6cd16b6a897347ab97a11a016698c3cfb50ca711a9",
-    "caseloads/incidence_uniform.json": "ec44b9bcabe14559926331bdfc6ee508ea220a9337b6891360c02fc22431a9da",
-    "caseloads/low.json": "15b70acd8542959f9a958079b30eee3309117674c7ffb9447b1d2357f64d8e7a",
-    "caseloads/summary.csv": "dba904eeedc43040326c7d94060278932456a9c85c3378e2610c7db2c09f5ea7",
-    "central.json": "21abea7e7bc8ffec336da697e2792e77ec045b120f81fcd5b94be8afbe4da0c4",
-    "central_ripple.json": "e1605088676456e3c17a7192407355cbb1b6f7c80d96aa6e86116e1f2835e3da",
-    "central_ripple_high.json": "3aea7b609c2db5881d39c6be9acd9499246d3768ace5165555a424d4bc1952e8",
-    "central_ripple_low.json": "9a048cfb2d044406584cc5acf1601030d11c33ab44bb1a4c530638807fef7a14",
-    "central_youth_tilted.json": "378c8971818c1e74ac48cc204330a80235fbdea1200a404d46dc387ebae99a92",
-    "high.json": "78b59db5250c82e08a82a9366638ae6ec7fce009f7533b6d29bce1d139da26bd",
-    "incidence/compression.json": "607dda9226f4a7fd0054c562059ae8802f887e87dfbf4ed3f8f2f04ed7095996",
-    "incidence/compression_compound.json": "9c0dbd3dd62f5064728a636e38e39c5d8a7ef42332b1d6028829d213f20ea241",
-    "incidence/exposure.json": "7241d45b7c6c3c997b6355e389b31dc88f9f0c815a8ab360c7dc1186e325cbed",
-    "incidence/incidence_families.png": "1792749d0efdd841680bca058a380e6b1177b0b9ae89bb9823f449f6a02b8784",
-    "incidence/junior.json": "05164613b1a3a9166e15aca4844139deb395407dfee0ccd00b6d30b0f230655f",
-    "incidence/klein_top_loaded.json": "cd629699949702bac7200b606f43fd76287851bcf4d8ff43561c83fb4167ef3c",
-    "incidence/summary.csv": "c70648657cee71388078c69840d202ae7a0cbeba37ac01d2a33e036321bd029d",
-    "incidence/summary_five.csv": "0720fa2c03c5bbd997fdadab97201468d56677d755ec5f11d57d5a662af62950",
-    "incidence/uniform.json": "c0a51d6267e435f87960495d335c830d2f4e79a01c950bf239008b5d6f8b6678",
-    "incidence/uniform_compound.json": "140560b045db52903d7526de8dfaa5b288f03f56bc4eb215c43fbe0ed549b7e6",
-    "jr16/fig4_1_transition.png": "33ed69f046db7b369e3aa3b319eb346f472255824d11fc394b60024eecd35cfd",
-    "jr16/fig4_1_transition_by_decile.csv": "de7ffdffaee08fe3084dd15a067b3d0dc575ad55c529d2a23e5a531439eebafb",
-    "jr16/fig4_2_wage_gain_by_decile.csv": "51038333a18b550c6902603e5edc255d6175f99d3eaeb64d5cc2e4afe7578b59",
-    "jr16/fig4_2_wages.png": "9ca2f30687e3e8fc348e3215a5cd7489ea9dda970ee1497fac43b6bd2a4ed73f",
-    "jr16/fig4_3_capital.png": "069dd84ac2f8fec134422731d2b193a121e1d6ad1e03149fcc0dfd4191aa61b4",
-    "jr16/fig4_3_capital_by_decile.csv": "24d6bc0b4ea414f97f71efc0b69ea86acde79baffc17ca06f02bba0e8eebd63f",
-    "jr16/fig4_4_decomposition.csv": "d6bccf2a82a003d53b1d795596af32d70616dc353e014840be3f9b92d53cd32f",
-    "jr16/fig4_4_decomposition.png": "cf98a412b670178a79d4c63e154f5fe9cf0750e12361711779002fa80e9a4113",
-    "jr16/fig4_5_disposable_grid.png": "986a390ea394193c16470339d8e0981d8a6fe7978198ae6d0f25dc20da88f6c8",
-    "jr16/fig4_6_exchequer_grid.png": "32492f708e1c8bee24355d3d881a732f00aecae3bdbfadf535e9bfb30c2bd136",
-    "jr16/fig4_7_gini_grid.png": "5c789a2c7febe7247ce7d85c4aa0c1397c7cc74263ce1761324713ce535fca78",
-    "jr16/grid.csv": "bc319623f6be369dd0313a300f1b999a96a310d871690022f3d88c661d06ecd6",
-    "low.json": "1b83e43f1806cbad0cc930ae48b61fd885214ba4f761cd1916f935edd612e254",
-    "next_runs/capital_variants.json": "b4871e9e13b29ce64a0b3a9146a0af092e8a230eeec267523968cdcab6c33734",
-    "next_runs/capital_variants_decile_family.csv": "b42b63a39c93f6e0bb6a12361efa6cd17912e7e29f89936c895cd234973fe718",
-    "next_runs/capital_variants_deciles.csv": "6ee1cedd2cf9bb458368d54ab9ac0d60f359e58676ef58ae80f691be51588d4c",
-    "next_runs/capital_variants_draws.csv": "ecd1fc47fe8417eba67c71c58adbe501c081a7bf0cf30b3139a2428d183d3161",
-    "next_runs/obr_benchmark.json": "adb2c5935a686448a330162d3e9a75407587301e89b30f5fd374f106de19d1cb",
-    "next_runs/obr_benchmark_decile_family.csv": "bb20b3c4121354f1f298762e3893ac8e4bb2d4dd0378cbc0150e92308e148151",
-    "next_runs/obr_benchmark_deciles.csv": "f4b54ed40e4ad5fedfe9bef6d73a391320bc1309201bc374464599fe37c7b45c",
-    "next_runs/obr_benchmark_draws.csv": "16a403ceccf5579d7c4c5d2cd8ecdf5b55244b8a8166349419e79dc0fbf5fcf0",
-    "next_runs/obr_household_deciles.csv": "ee58b7abb187508ff7c21d9bef900e11111b97e608d8810cd77b86e7c2104a86",
-    "paper_scenarios/brynjolfsson_canaries_2025.json": "a686e05d5a51d1852e947b1506b32690af87d2d25ca6a1cf0d1a55b9eebf1370",
-    "paper_scenarios/hosseini_lichtinger_2026.json": "5cc3d392179c079df8930bdf2095e08e34cfe4ee4730246ea89421ce666c677e",
-    "paper_scenarios/hosseini_lichtinger_2026_adopter_scaled.json": "4f3b828e5382306fea81fe52e1657d11d424a491639c878b596cf7afee17ebfc",
-    "paper_scenarios/klein_teeselink_2025.json": "c2a6f6639bb9131093501802d703c7a6affa7fd9640d37958bac353bb68448d2",
-    "policy/R1_wage_insurance_exposure.json": "8821b316e032977588d4b5b158de386a7ec100ca508d4c3d4838460115e894a1",
-    "policy/R1_wage_insurance_junior.json": "562df6f1d94ae8a4bd751b27140f201bb7e795490247cb72feb0ae4b582a121d",
-    "policy/R1_wage_insurance_uniform.json": "a1c0c35f80663c85c45171a2feb3139444c9a874e5795fd269c1f5e057006e1a",
-    "policy/R2_uc_circuit_breaker_exposure.json": "998c94ba24988e67b4df8e00781efd43ef1a53d9cb430cbb8768c7566bd28a0d",
-    "policy/R3_cap_suspension_taper_cut_exposure.json": "7e06d07b3b8a21ed1874e8569ca5264f12c7bb1b0b1aed34bd6b779e3fd9f016",
-    "policy/policy_reforms.png": "99ea134b1db3375e97718894e18b2a43753306023af5bb5842d8deb70f930f26",
-    "policy/summary.csv": "ae27da3f75e361aa05ed752d3aca1e8135e3cff9988e7bb09d598cc8d969a273",
-    "robustness/age_exposure_moments.csv": "ca09abb4c21d9e847b5fa38767bc752a73174d3163476f3ec72b441848eeab7c",
-    "robustness/central_cost_components_draws.csv": "b5d65db603dda9d54c0ca1b829a1f3d220405e51e7deea1de23770b597e97381",
-    "robustness/central_cost_decomposition.json": "b2797640635720f49b4d65ce9f4a91da1c43bdefee481d348a6898dfd6597f99",
-    "robustness/central_monte_carlo.json": "f76be0e5ede027e7733c2b6bbc459701038e4bd1338741282061f7e0aedb9049",
-    "robustness/dividend_coverage.json": "685e640394963ecba46ee6ae2a2952398f20930b9f4c86ae536df7e225b6af8f",
-    "robustness/dividend_coverage_draws.csv": "f643d5af146e75481d01ccba558778db2e843b92b70a73c670f66591c17f37fb",
-    "robustness/duration_reform_draws.csv": "e5f3e25f7abbb7ba41d1f9301797656ba8488b24337c35e043f56e800eb187a4",
-    "robustness/duration_reform_ranking.json": "f2533c4ea9877d67e4e18617ef8578b3b2ca88c6707b2f99286a19cad67d3fce",
-    "robustness/duration_takeup_draws.csv": "0712c2badc71d1ac22787d3aed6c02a45e4301758d0e47c6184e576d62bf3a00",
-    "robustness/duration_takeup_sensitivity.json": "d0f165b65c3998870e92489b2f479a11e5dcd98881f6f27634582f95a6bc80d0",
-    "robustness/exposure_sensitivity.json": "f0fc0b465c343ad9e58a12aef3c6313c1943afd0657183d67485c19cdd153eb7",
-    "robustness/incidence_draws_five.csv": "5f64434fa11ce1fc05c5c4702d44e8eda57ce3197f32a35b9a8a2af0a44e0098",
-    "robustness/incidence_monte_carlo.json": "a366fb7b2d6aa09b6475660d153ea877cbe58581744c9d8b209d1478b826b635",
-    "robustness/index_sensitivity.png": "d6b8941733524a271e2c89ce721aacc6c41d9b0d618b8a7638ef1c17ea7535a7",
-    "robustness/index_sensitivity_full.json": "e427f93b9bd8cd254c64c00315c71bbf5982561b840b8a79aa99ace70869e6a1",
-    "robustness/measured_wage_tier_draws.csv": "d1d41baac082c4fcfb6d3a4a784c5e1a89249a6bbc437c15fff10b3a78992fdc",
-    "robustness/measured_wage_tier_sensitivity.json": "8f3b138f66ba0fd3c7aa2d8e73998aa53ded7c98375dbeeae17ad8eeb0031e49",
-    "robustness/mixed_adjustment.csv": "3531b07cd9ee8953a056ee423dec33559fd0014dd04d43b119896d800e252c9d",
-    "robustness/mixed_wage_adjustment.json": "281887c28c423e818da1031f086ff7a37973b469374a2c758bee0ce60a1a07e8",
-    "robustness/occupation_coverage.json": "3467f149a4e4292a73f73deef3a0c0889cdf9f808d39b33c37a79775e9f8bfbc",
-    "robustness/occupation_vs_ashe.csv": "154eaa5bbe00fd82a23e29458a00c0ef87990309a17b72c794984b4585b38926",
-    "robustness/policy_draws.csv": "529aae7a7b1a5f8e20f5459c2db7e7bfb485a1f4db064bd88e685100c9857632",
-    "robustness/policy_monte_carlo.json": "02214ea34381aa9ef61bae482bbdf285a6283e193d7a753389acfc77972fbcaf",
-    "robustness/poverty_decomposition.json": "aa35c383c24e2dfd7125483d3e2ef498804ebd13591fb8a549a7716b7f7dca99",
-    "robustness/recession_backcast.json": "01b65a0f6f7020e2e102865e90e37a708e8e633ed86b185aac61af47ce16f008",
-    "robustness/sensitivity_run.log": "ea4c802c2a654198d173b329c5661edd0817cbdd09b4f31c329b1e2723487040",
-    "robustness/survivor_wage_grid.csv": "019862be7c82c85c7a4dba5658fc8000665e567bb65e13827349a0019e7f4e72",
-    "robustness/uniform_comparator.json": "9339f33195427c2b7085598ce4fe07fc9814d59e4e75df802068eae87e384ac6",
-    "takeup/takeup_deciles.csv": "9a7a92915141c030d995de130b425d0163fc659d232713133f31742c3d75af8d",
-    "takeup/takeup_draws.csv": "8b34b7a37035a7e983edfe819712a31b6aaa37283fd6a40de92b7e63e1a5d28e",
-    "takeup/takeup_runs.json": "0afca9d2a201927eda0dcf8bbae12e97590d8cd06d7d3dfc23f5904f114b52b9",
-    "tax_composition/composition_grid.csv": "7140404a861ebb91133be1c7539262f951b7f76b4b86cf07419e1e2e5264e870",
-    "tax_composition/composition_sims.csv": "49d0fd20f4051643204a4edf85b3197d4bbf1ef8db6ea896c02a124a7f4e2ab8",
-    "tax_composition/recycling_case.json": "9075663af3bd620c0c124db6744840b794c60e2a63506a600ac8d36e9dec290a",
-    "tax_composition/revenue_shortfall_phi.png": "5a42f6fdf950c62118c577336eb011ed070d1fef57d7c621d3705af80efb6a8a",
-    "wage_cut/wage_cut.json": "770fbfb9707699a8999be406baf25522a15e37b46eb3162c3bd2fdb7699b573f",
-    "wage_cut/wage_cut_decile_family.csv": "3553d819423d04231153973b3bd0f6b9f322bf7d6cc80479107378116b9e47b1",
-    "wage_cut/wage_cut_deciles.csv": "5ab2ef5dbf7cb12e5a7473d5bb4bfe079cc4b544d395e537be4f1ce1bd353045",
-    "wage_cut/wage_cut_draws.csv": "ad345e9087e52ecd4e7c9d04ef10e95695400fa4814895617e00397047c5bf5d",
-    "wage_margin_central.json": "7ce14b469b000921ce2f947df433ac8c26ef96b7e1f1ee08fb5d8f363a99f706",
-    "wage_margin_pss.json": "1afd685e06e33751dacd3458c9078083150693d80d7ddd2d3d0394f247b6b8e6"
+    "appendix/b11_grid_no_capital.png": "0db4ad7dd98ad9f145b351004eb87a144397618e5e38142153886d8dfdfc6674",
+    "appendix/b1_market_income_less_capital.png": "49c09f510fbe06a289547151daae3e3f936df0adea0bca0a3b3f1e45bd167163",
+    "appendix/b2_capital_income.png": "9181fb4d1a53e460d931de3a1011747b498db287ddaeba11688993bd3eebd307",
+    "appendix/b3_benefits.png": "a23b584ecec95e17352e940a5672804a0d04048bb7be3e5db92a08f84d879098",
+    "appendix/b4_tax_and_ni.png": "eae4b3befdf36fa93e135207d64e30e47b323cb223e86061d42fe64b6f2e04ec",
+    "appendix/b5_disposable_income.png": "e978d364922f640863c03d69cd34027dd7f5be2b721684452e5b855f3614b22e",
+    "appendix/b7_uniform_vs_ai_decile.csv": "c2c84585f30ebb82c478d4fc41c0419032063f5f6aa88ca13f0aac66f2e724ec",
+    "appendix/b7_uniform_vs_ai_decile.png": "d5b153ba147c99839bbff0166ef50b0a0e7cdd371bb10162dbdaae85746b555f",
+    "appendix/b8_alternative_index_decile.csv": "eda036f8d4c35a658058af732d7d832c94da64c4dfca259ee51c3a3de34a6e60",
+    "appendix/b8_alternative_index_decile.png": "93719b27ea16131b97e620b705ab6bb60cdb0649c633a195a790fed67af12056",
+    "appendix/b9_grid_by_decile.png": "7bea58fb67ca2c8afd3e371eb53da9f1962bb43ce314d95dc6d4763f31bd9fa2",
+    "appendix/baseline_distributions.csv": "2c7ddf85e23b1bec40478f1bb711b8234867dc8f7cae155214ae7f2ae3fd979e",
+    "appendix/complementarity_incidence_by_decile.png": "961a0809bce2d79f8d698218b47ff1a9e8ec31cca6fb8622caaa9147d9c5ab00",
+    "appendix/decile_ranking_sensitivity.csv": "fb8abf3cf0f691f93d42c8bad06385e774ec22fa31bf2515b66d685fdf6c6c4d",
+    "appendix/decomposition_ci.csv": "60c59c291f1c9a85425e780e0424354374e5ee060536bdf2d9f9d031a708e84c",
+    "appendix/decomposition_ci.png": "e930b2faa9818c2dd2f63ca19fc0f7fde44d6efd958e5d6527cab611cdc266d2",
+    "appendix/exposure_incidence_by_decile.png": "ef5f2b7df816e40b6885d988daf2add113d0aeba5ef8a78763d3673d9282cc93",
+    "appendix/gender_incidence.json": "0fdc6eeae8669c93177a437338e581475f53c11229d289fe8da12939c8d8942c",
+    "appendix/grid_deciles_capital.csv": "9c695da8c214b024968ffca9f0501a6a2ab65f2266e8978701c64afbc5bc6b49",
+    "appendix/job_loss_by_major_group.csv": "e6c7404589e6e84e9da0374113d92bd555333e9f499d354450619cd28d1af450",
+    "caseloads/caseloads.png": "f8849ca11aeefa2400e8169991db4cae0dfdf22fa7f36dbd64baf46cd3ece24d",
+    "caseloads/central.json": "9b0e3ac043dcca6df63538037a1a08e84a01c357fd7a5abd54df0c26751c7836",
+    "caseloads/high.json": "446ce002ab58c5c029bdc4b13dd1e65ea8d36b32433111b5f7aa445fc82e1adf",
+    "caseloads/incidence_compression.json": "7c5d79865a419d6f0d63c4ae49530e850fdf1ee23b61705173c2b36c59788441",
+    "caseloads/incidence_exposure.json": "918b26eacf861c64c0dba6aad19dd57d50b6e52116a255f598d57ba7e0c23cd4",
+    "caseloads/incidence_junior.json": "e2db00935843b43109e0544c19158efd6e78c2749833f68cd512e6caf3debab4",
+    "caseloads/incidence_uniform.json": "ef76b9387a2b82a9582cacf71b2c704e5682cc1a0289ef9cddf5d48d9a4a8796",
+    "caseloads/low.json": "88eb3aab3f76b8fd1d5dd3d89fc4a6b4273385d1250edd0c3fd8a6770dddcd45",
+    "caseloads/summary.csv": "0dbc3726dc904dd5116d8dae5458a05f8b6228103e9f151a7612e825b0461950",
+    "central.json": "59c49de5077cbedd62c213cc44cc2d3f4bfb93935ed07a4f30113552475c5837",
+    "central_ripple.json": "03e163ff07faa016645ee0c8c0e88252aff02ad928e0daec950fdd24aad34122",
+    "central_ripple_high.json": "4464f26338ddb2631f848a6c50c2042f28909d6dceab3b3d52c4761156abb185",
+    "central_ripple_low.json": "10265fa2387c5b10bed0a61f9d7db4cb5dafb967bbaec8125ae50b45436edb99",
+    "central_youth_tilted.json": "6b11e3bd497be5ed5481b318d950936a4dbfd807101611e52f028d2824f7f156",
+    "high.json": "ebdaa0fbebd402b01924f3ee7a17f3b7dc43c3f5114cc61d45a2e04b7b0900fc",
+    "incidence/compression.json": "a30ea83379269c3906d3cb0ca21d0544a5f68410e2101cce3a7f933e043a76b8",
+    "incidence/compression_compound.json": "00ceef1399d540e77fe548ff720b13e7ad608d754d954ee45a17b52a78a43984",
+    "incidence/exposure.json": "84bc81e9c1623e23381a845313fa34d770f0664056cf2b3428ed9cb5a707b023",
+    "incidence/incidence_families.png": "914c7e77372a63e6898cd88fb636b53d7f4b94bb169d4c3f94c1b794dca48591",
+    "incidence/junior.json": "26cf5e86cdebfe941768e8b35a01c2a2fdd0228a23bf4465eca48a0cd76a3421",
+    "incidence/klein_top_loaded.json": "2ea1d4b71915b8de686d8736083b1fed6c6bc808ce9ff3cc5f7ad6b46bd38fb7",
+    "incidence/summary.csv": "5889bd0493ad0baf8eb72503b2b32ef3aa2d12f00204d0d73d471f0131b29070",
+    "incidence/summary_five.csv": "f8e254a295c9790f027514477507e3652d03c652253ddfb009cb35ec44590327",
+    "incidence/uniform.json": "8a8d52932a0b23b545e07e6453f4230193415787cb960bc4c6be337263f19915",
+    "incidence/uniform_compound.json": "a22c698ac103f2f5a3c03ef694570cd3b59417f22de7a3c2474164b479577cb3",
+    "jr16/fig4_1_transition.png": "2e5110863c8160a034c87a9347c1f05a45910b17bd1dee753ab5457bf42be6d1",
+    "jr16/fig4_1_transition_by_decile.csv": "b6e3227ae7897a8b7b4d2f78bcc7efc2b0902eb55066916cf9f2de3f7e9604bf",
+    "jr16/fig4_2_wage_gain_by_decile.csv": "3c397b7c3e71c0f501b76162c01fe428361b292ffbd4a56be433a23260e1afbd",
+    "jr16/fig4_2_wages.png": "c070fd790cd17b7c9552d1f0909556d45fa253523ef496fee8083065e4a45613",
+    "jr16/fig4_3_capital.png": "576b13ed26b43e5625957341e5e38d3c6faea52573b6e443cf83c8a8cd55e278",
+    "jr16/fig4_3_capital_by_decile.csv": "8175f8ffcfe6512edac2899c4f7613a508ee5dae1bc0252ee8464a519b170259",
+    "jr16/fig4_4_decomposition.csv": "9980fe1f5d749febfa522835f234d99a2d721385b40b7ac52be003e781283c45",
+    "jr16/fig4_4_decomposition.png": "ec04e246246e89332a29ba386a6fd6aee14f8eee08be76bf1f70e48a02472bd3",
+    "jr16/fig4_5_disposable_grid.png": "b96b8cb9a113a255abc1d62adace936e8fb6d7095acfa3c78b24b437512ed380",
+    "jr16/fig4_6_exchequer_grid.png": "84881277c4ce26bca7a7a3b9d8ddaec976d0b8893414ff15efbbace7d5e0094a",
+    "jr16/fig4_7_gini_grid.png": "5d43f982fa37f077743c77c3ec09f07af478d570cfa4b56f7469903907e8fef6",
+    "jr16/grid.csv": "113f2c66acfde058554d452b7f88e974a0493fc7b9e11b513f9cd56ba3c99510",
+    "low.json": "52cd83c495c26b821514a6a2384569f4f867181eab1ae5d485f80c3daf5e3c32",
+    "next_runs/capital_variants.json": "0730a8f0d81fcf7bcfac68b8b2876b5a02a67c1851d1cf06e4e086ef20e71145",
+    "next_runs/capital_variants_decile_family.csv": "9ce93b961ba9937921204aa4eca79fb7705cd329add7e64b0c365e835b4fab92",
+    "next_runs/capital_variants_deciles.csv": "f37466528f9b629368fbff88cf6753b0f5504920b1a027136998278a8cf30971",
+    "next_runs/capital_variants_draws.csv": "190a24f73ccf23f3af040836825a25d134a0026f9d1c2317472ee254e4b393fc",
+    "next_runs/obr_benchmark.json": "187dc673208d05f8a986afbbafd59dc52875075ea72ab64678f44cf2cc5f3ff0",
+    "next_runs/obr_benchmark_decile_family.csv": "1326a5d9e83f83307c89fd7fa618ac4b7e83f79dcd82cd2f1fbc265dcda31f16",
+    "next_runs/obr_benchmark_deciles.csv": "91c1ae58f187904e1dfb11fd36af798ac1a27e8b3475684789c119525c313da5",
+    "next_runs/obr_benchmark_draws.csv": "c651173deb2b5f6defbfd95166798f997e6cbebd60f9d8be5a2f038eb2bc6fb3",
+    "next_runs/obr_household_deciles.csv": "c355394846e8893e14dd321121b8d025e539d18b3fa8c7523ea5d03f7687f5ea",
+    "paper_scenarios/brynjolfsson_canaries_2025.json": "7d0b6943fe51840b6babc326c879eaf85013b4759c58e106fa293cdfceb3adbb",
+    "paper_scenarios/hosseini_lichtinger_2026.json": "d48d5faa7a2e9144171df49978b2c15eb19da353d53a708fa14a83d45a3d2f96",
+    "paper_scenarios/hosseini_lichtinger_2026_adopter_scaled.json": "619e1af71331e7d7f4e9448b2c90dedd7c10a4f3d498e57fd7f0738e5e06ef02",
+    "paper_scenarios/klein_teeselink_2025.json": "36f19e662f48304d460a6745b3c2484b8afb40b8ddda13a03e0dab4c197fa206",
+    "policy/R1_wage_insurance_exposure.json": "07551b70846121ec520a124a9d28295d871e5b691bd39ae12b2b8b33d7ecd61d",
+    "policy/R1_wage_insurance_junior.json": "2b34dbecfe0090f945706fb2c5a4845abdf878273ce275869d439ff5ecb299b7",
+    "policy/R1_wage_insurance_uniform.json": "92279f4eee5723451d66ab06b111cdbc3ebaaa19e50d661e7d5f86ec80e1e529",
+    "policy/R2_uc_circuit_breaker_exposure.json": "6cd62d009c4cc78d25bdf174e77e2b20acb8072817a6568e96fdf72c77914858",
+    "policy/R3_cap_suspension_taper_cut_exposure.json": "2b7f2dd589f2bfea4c05b85facd2827e74ffe87072ffab7f7519f27406017187",
+    "policy/policy_reforms.png": "90887ef1af2ad95b2456d867ffc05951b25b7324388a9b090b943632d8cafeb0",
+    "policy/summary.csv": "bc76de77aec1b88bdebce31469c00459c8ad1a3b3b14fa9d6b4656f54c669e52",
+    "robustness/age_exposure_moments.csv": "a719462af8be7e2b486d98a16f5ab95bfc674494231c3c8f729f8c84297ff71a",
+    "robustness/central_cost_components_draws.csv": "33ec6ae0215d71413ca7817d67ef6c77767c6ab64a5b7390bf6c304e5ab9142c",
+    "robustness/central_cost_decomposition.json": "cd32c27b768728fed391603bcbc10f0fdb930e374e7d48da66d9d229ea9f7d05",
+    "robustness/central_monte_carlo.json": "c852b56e834e2f21cfcd87bf8a89e39188ccd7ea76db1bbab22a20160d02265b",
+    "robustness/dividend_coverage.json": "6989c11431e3dcec74546d16f0eaec932a35a395fb7f2427785dd14e4892475e",
+    "robustness/dividend_coverage_draws.csv": "f7869765ee8963814e6240e9fef78626bbf18a6a5bcf14ed43d97666fcedc329",
+    "robustness/duration_reform_draws.csv": "e16d595986a1c56d1ab97fd252eb13555073e99ab64e9713e24796e03a9b6879",
+    "robustness/duration_reform_ranking.json": "cba76ed77290c22ed227f82624e8c2266a4f52f7325b8397c1eb8823aef082cb",
+    "robustness/duration_takeup_draws.csv": "35dead82aed3b21bd1b341ea7e683c5949cb80a90b4161d5cfba70513e14ac8b",
+    "robustness/duration_takeup_sensitivity.json": "5b1e7b709c4efedb9af4aa8b6621e78e336ef2d86f438889655627770770c27f",
+    "robustness/exposure_sensitivity.json": "49df0239c13293aacbdc706738e79a0cd21cb622b9906da2ce2fb58c81b6c9f3",
+    "robustness/incidence_draws_five.csv": "c1090d8a21e41b0080adcfce1fd4c9eac3694d29fa982522aa764c76fb5a6205",
+    "robustness/incidence_monte_carlo.json": "295b6ba0a6e9d58c6d4cf9d94aa51961a6a4820f1eeffc80e9f0da7b16fd4fef",
+    "robustness/index_sensitivity.png": "6d96894c5426beedcaf254363da5b611e711140a05a6662a6cd1bd5bc220e490",
+    "robustness/index_sensitivity_full.json": "e5911f6382b64cdbdd7c83d68f21f8e999dafc3f624550a634b2cba647a591a3",
+    "robustness/measured_wage_tier_draws.csv": "c2cf4614fbcedfdf2a5734650640ea16d6240f5702c0817302824eec5d28d68e",
+    "robustness/measured_wage_tier_sensitivity.json": "4987de0e00d5f6e53de93011bb6b65b5368406badaa90ccf917e52a6a05cab88",
+    "robustness/mixed_adjustment.csv": "730c68af87cd1926087816a650564e01a29473be8b5b46032d5fdd38763782d5",
+    "robustness/mixed_wage_adjustment.json": "0dc5729959f2e56c57513eb2f3399ee1598bf840afb86b7864ae77bdc9671d17",
+    "robustness/occupation_coverage.json": "59f8f7b7a28441573850685ca15a670418cf0530fece7cb4c28d8ef5a619eba1",
+    "robustness/occupation_vs_ashe.csv": "6e63b9e5e998e0f0eafdfa703e513bedb0be4b33d9f0c54d13194d790a3029da",
+    "robustness/policy_draws.csv": "37c741c6870664738a8cd023d35254acb51efdebd966d2a4185f75a00f6968d1",
+    "robustness/policy_monte_carlo.json": "85e6ce3115968cc5982c350a24a3c58e1e52102b17f3ae1dc3b98b599166300a",
+    "robustness/poverty_decomposition.json": "8c956a2f56e0ee1068351e7feb6b80ef6fd4573677393800bc8dd3612736fc57",
+    "robustness/recession_backcast.json": "540da7abc086e93d7fcc73b06fd96839f5a8023b0061e98b26c4ce28c52ff33f",
+    "robustness/sensitivity_run.log": "338464aaafca4ae498e2609664f0abe2ee24aa0d8cf8d66f752924c2842e8413",
+    "robustness/survivor_wage_grid.csv": "1c5524b236e93f4ba28cbce2219b8dd2f2a6a6a4a8adb08a49492bd2bc08b437",
+    "robustness/uniform_comparator.json": "26befc953b3beed29a072c53b0dfcf1942aa7398817dbf73009adf0e9630d6ff",
+    "takeup/takeup_deciles.csv": "70a8a38703a401acfe38400eedec96b87f0159956785b77ecbfd24b7b1ad491c",
+    "takeup/takeup_draws.csv": "4144b1c14253622dfe970899b157510287d349f6e9f933879a2c215037077019",
+    "takeup/takeup_runs.json": "9b0b188f353f869b6dbbb9267853a6d02623261ab37626fdac5be5d6e5d05348",
+    "tax_composition/composition_grid.csv": "5402cf84d3f0617cf0ece23d8552a0b5efab23a91dbf506114b82a3517395074",
+    "tax_composition/composition_sims.csv": "5e9734cafedb485ef163c814a872dca5835f86fcdc957e85bb6fea3285843759",
+    "tax_composition/recycling_case.json": "1e71cf811d4856e52e97b1ab5d6f9a66894a9f5e40f28652139fc4c13c2a63e7",
+    "tax_composition/revenue_shortfall_phi.png": "dec3783f0516537a91661e10482fbada49bde7a85ad6762638a7cb8a71b4bef9",
+    "wage_cut/wage_cut.json": "699eeac25805329dd89d334ee41bf941f4e97409c460c5799809bd45ca775027",
+    "wage_cut/wage_cut_decile_family.csv": "e2e681a7ea88a971380e696af66639ec768b1ac7d192774eda0be4ae2536cd04",
+    "wage_cut/wage_cut_deciles.csv": "7adfb41933d2f8a38aa6967bc1896c829fdd07bd9c916279278ac6da3bd99b8c",
+    "wage_cut/wage_cut_draws.csv": "f9106f28448d9a227383791ebcc22921239610fc09716c6fa71f13feb08b0e05",
+    "wage_margin_central.json": "9608ef6345adb5491e67626bd5673cc23dbb82d7ac82973e66817f07d3c1c47c",
+    "wage_margin_pss.json": "37f801635d7e95be83e5a727ef4c9899eb303f307adbd29681cf36eddd44b774"
   }
 }

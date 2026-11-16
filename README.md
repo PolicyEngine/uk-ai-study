@@ -193,8 +193,8 @@ visible boxed "pending" for any value whose source is missing, incomplete
   sample size of a few thousand, so single displacement draws are noisy and
   the realised weighted count displaced varies around the 7% quota. Report
   Monte Carlo means (50 draws for the incidence families and policy runs).
-- **Dividend coverage**: Microcosm's 2026 dividend total runs above the HMRC
-  SPI projection for that year, mostly above £1m of total income;
+- **Dividend coverage**: Microcosm's dividend total for the simulation year (`PERIOD` in `uk_ai_study/data.py`, now 2027) runs above the HMRC
+  SPI projection for the same year, mostly above £1m of total income;
   `analysis/sensitivity_dividend_coverage.py` reruns the central scenario
   with dividends scaled to the SPI total.
 - **Occupation of SPI-drawn records** is imputed from income, not observed.

@@ -1,40 +1,40 @@
 {
   "scenario": "hosseini_lichtinger_2026_adopter_scaled",
-  "displaced_weighted_total": 32527.451171875,
+  "displaced_weighted_total": 32569.736328125,
   "share_of_employed_displaced": 0.0011218586005270481,
-  "exchequer_cost_bn": 0.422281216,
-  "poverty_change_bhc_pp": 0.030118101214210435,
-  "gini_change_pp": 0.018476763766539506,
+  "exchequer_cost_bn": 0.436666368,
+  "poverty_change_bhc_pp": 0.030118101857756763,
+  "gini_change_pp": 0.018564779339547144,
   "age_bands": {
     "16-24": {
-      "displaced_weighted": 3960.9345703125,
-      "displacement_rate_of_employed": 0.0012499509612098336,
-      "mean_per_capita_income_change": -4.245885574814906
+      "displaced_weighted": 3966.084228515625,
+      "displacement_rate_of_employed": 0.0012499510776251554,
+      "mean_per_capita_income_change": -4.344140817593249
     },
     "25-34": {
-      "displaced_weighted": 28566.51953125,
+      "displaced_weighted": 28603.654296875,
       "displacement_rate_of_employed": 0.004174182191491127,
-      "mean_per_capita_income_change": -68.36702650913227
+      "mean_per_capita_income_change": -70.39518990731058
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -2.295658965718807
+      "mean_per_capita_income_change": -2.353596821841254
     },
     "45-54": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -1.5132483908818442
+      "mean_per_capita_income_change": -1.5548052730254984
     },
     "55-64": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -2.7025489824419684
+      "mean_per_capita_income_change": -2.7748263681680654
     },
     "65-+": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -0.03344418494245628
+      "mean_per_capita_income_change": -0.03443244127733804
     }
   }
 }

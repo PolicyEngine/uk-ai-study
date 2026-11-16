@@ -92,12 +92,50 @@ SPI_SAVINGS_BANDS_2026 = {
     (300_000, 500_000): 749_884_622, (500_000, 1_000_000): 727_599_790,
     (1_000_000, float("inf")): 1_381_659_631,
 }
+#: SPI 2027 projection, same file and commit (used when PERIOD = 2027)
+SPI_DIVIDEND_BANDS_2027 = {
+    (12_570, 15_000): 201_290_564,
+    (15_000, 20_000): 983_448_186,
+    (20_000, 30_000): 3_830_271_882,
+    (30_000, 40_000): 5_406_089_443,
+    (40_000, 50_000): 9_661_947_090,
+    (50_000, 70_000): 14_377_897_456,
+    (70_000, 100_000): 10_858_188_159,
+    (100_000, 150_000): 7_902_092_442,
+    (150_000, 200_000): 3_968_299_698,
+    (200_000, 300_000): 4_255_857_647,
+    (300_000, 500_000): 3_945_295_062,
+    (500_000, 1_000_000): 4_393_885_462,
+    (1_000_000, float("inf")): 12_767_572_941,
+}
+SPI_SAVINGS_BANDS_2027 = {
+    (12_570, 15_000): 315_163_512,
+    (15_000, 20_000): 1_575_817_561,
+    (20_000, 30_000): 3_600_225_523,
+    (30_000, 40_000): 2_910_086_445,
+    (40_000, 50_000): 2_150_933_459,
+    (50_000, 70_000): 2_691_542_404,
+    (70_000, 100_000): 1_863_375_510,
+    (100_000, 150_000): 1_449_292_064,
+    (150_000, 200_000): 747_650_668,
+    (200_000, 300_000): 843_119_907,
+    (300_000, 500_000): 774_105_999,
+    (500_000, 1_000_000): 751_101_363,
+    (1_000_000, float("inf")): 1_426_287_428,
+}
 #: the file's 12570-inf rows; the band rows above sum to these
 SPI_DIVIDENDS_2026 = 79_969_122_354.0
 SPI_SAVINGS_2026 = 20_438_534_364.0
+SPI_DIVIDENDS_2027 = 82_552_136_032.0
+SPI_SAVINGS_2027 = 21_098_701_843.0
+#: the projection for the simulation year (PERIOD)
+SPI_DIVIDEND_BANDS_YEAR = {2026: SPI_DIVIDEND_BANDS_2026, 2027: SPI_DIVIDEND_BANDS_2027}[PERIOD]
+SPI_SAVINGS_BANDS_YEAR = {2026: SPI_SAVINGS_BANDS_2026, 2027: SPI_SAVINGS_BANDS_2027}[PERIOD]
+SPI_DIVIDENDS_YEAR = {2026: SPI_DIVIDENDS_2026, 2027: SPI_DIVIDENDS_2027}[PERIOD]
+SPI_SAVINGS_YEAR = {2026: SPI_SAVINGS_2026, 2027: SPI_SAVINGS_2027}[PERIOD]
 SPI_SOURCE = (
     "policyengine-uk-data policyengine_uk_data/storage/incomes_projection.csv "
-    "@ fa4ebe9: HMRC SPI 2023-24 outturn projected to 2026, "
+    f"@ fa4ebe9: HMRC SPI 2023-24 outturn projected to {PERIOD}, "
     "dividend_income_amount and savings_interest_income_amount by total "
     "income band, bands from 12570 (income tax payers)"
 )
@@ -107,10 +145,10 @@ SCALED_RUNS = {
     "div_banded": ("dividend_income", "banded"),
     "savings_uniform": ("savings_interest_income", "uniform"),
 }
-SPI_BANDS = {"dividend_income": SPI_DIVIDEND_BANDS_2026,
-             "savings_interest_income": SPI_SAVINGS_BANDS_2026}
-SPI_TOTALS = {"dividend_income": SPI_DIVIDENDS_2026,
-              "savings_interest_income": SPI_SAVINGS_2026}
+SPI_BANDS = {"dividend_income": SPI_DIVIDEND_BANDS_YEAR,
+             "savings_interest_income": SPI_SAVINGS_BANDS_YEAR}
+SPI_TOTALS = {"dividend_income": SPI_DIVIDENDS_YEAR,
+              "savings_interest_income": SPI_SAVINGS_YEAR}
 CHANNELS = ("displacement", "wage", "capital")
 
 
@@ -338,15 +376,15 @@ def main() -> None:
             "income below the threshold is left unchanged."
         ),
         "coverage": coverage,
-        # legacy keys kept for the paper macros (dividends, uniform factor)
-        "spi_dividends_2026_bn": SPI_DIVIDENDS_2026 / 1e9,
+        # legacy key names kept for the paper macros; values are for PERIOD
+        "spi_dividends_2026_bn": SPI_DIVIDENDS_YEAR / 1e9,
         "microcosm_dividends_2026_bn": coverage["dividend_income"]["microcosm_all_bn"],
         "microcosm_dividends_taxpayers_2026_bn": coverage["dividend_income"]["microcosm_taxpayers_bn"],
         "microcosm_dividend_holders_m": coverage["dividend_income"]["holders_m"],
         "microcosm_to_spi_ratio": coverage["dividend_income"]["microcosm_taxpayers_bn"]
-        / (SPI_DIVIDENDS_2026 / 1e9),
-        "scale_factor": SPI_DIVIDENDS_2026 / (coverage["dividend_income"]["microcosm_taxpayers_bn"] * 1e9),
-        "savings_scale_factor": SPI_SAVINGS_2026
+        / (SPI_DIVIDENDS_YEAR / 1e9),
+        "scale_factor": SPI_DIVIDENDS_YEAR / (coverage["dividend_income"]["microcosm_taxpayers_bn"] * 1e9),
+        "savings_scale_factor": SPI_SAVINGS_YEAR
         / (coverage["savings_interest_income"]["microcosm_taxpayers_bn"] * 1e9),
         "baseline_dividend_tax_bn": b["dividend_tax"] / 1e9,
         "scaling": scaling,

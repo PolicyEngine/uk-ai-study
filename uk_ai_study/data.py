@@ -21,7 +21,9 @@ import os
 
 import numpy as np
 
-PERIOD = 2026
+# Simulation year (PolicyEngine UK period 2027 = tax year 2027-28). Every
+# analysis script imports this, so the year is set here and nowhere else.
+PERIOD = 2027
 
 
 def _ensure_token() -> None:

@@ -413,6 +413,33 @@ def check_directions() -> None:
                            f"{'positive' if sign > 0 else 'negative'} direction the text states)")
 
 
+def define_used_but_missing() -> None:
+    """Define every \\gen macro the paper uses but no emit call produced.
+
+    The usual case is a magnitude twin ("...AbsBn") whose base value came out
+    unsigned (positive, or rounding to zero), so _line made no twin: it is
+    defined from the base value. Anything else gets a visible placeholder, so
+    the PDF still builds and shows "pending" instead of stopping on an
+    undefined control sequence.
+    """
+    used = set()
+    for tex in (ROOT / "paper").rglob("*.tex"):
+        if tex.name != OUT.name:
+            used |= set(re.findall(r"\\(gen[A-Za-z]+)", tex.read_text()))
+    twin_of = {abs_name(n): n for n in values}
+    for name in sorted(used - emitted):
+        base = twin_of.get(name)
+        if base is not None:
+            text = next(ln for ln in lines if ln.startswith(f"\\newcommand{{\\{base}}}"))
+            val = text[len(f"\\newcommand{{\\{base}}}{{"):-1].lstrip("+-")
+            emitted.add(name)
+            lines.append(f"\\newcommand{{\\{name}}}{{{val}}}")
+        else:
+            missing.append(f"{name} (used in paper/, never emitted: MISSING)")
+            emitted.add(name)
+            lines.append(f"\\newcommand{{\\{name}}}{{{_placeholder(name)}}} % MISSING: used in paper/, never emitted")
+
+
 def emit(name: str, value, fmt: str = "{:.1f}", source: str = ""):
     """Emit one macro; on any failure emit a visible placeholder."""
     if name in emitted:  # first definition wins (twins can pre-empt a name)
@@ -1195,6 +1222,9 @@ def emit_extended() -> None:
     # --- data coverage (Microcosm occupation) -------------------------------
     oc = "robustness/occupation_vs_ashe.csv"
     emit("genOccMaxAbsDiffPp", lambda: csv(oc)["diff_pp"].abs().max(), "{:.1f}", oc)
+    # simulation year label (uk_ai_study.data.PERIOD = PolicyEngine period)
+    from uk_ai_study.data import PERIOD as _P
+    emit("genSimTaxYear", f"{_P}--{(_P + 1) % 100:02d}", "{}", "uk_ai_study.data.PERIOD")
     ov = "robustness/occupation_coverage.json"
     emit("genDataHouseholds", lambda: jload(ov)["households_rows"], "{:,d}", ov)
     emit("genDataPersons", lambda: jload(ov)["persons_rows"], "{:,d}", ov)
@@ -2086,6 +2116,7 @@ def main() -> None:
     emit_wage_cut()
     emit_review()
     check_directions()
+    define_used_but_missing()
 
     # --- write -------------------------------------------------------------
     header = [
