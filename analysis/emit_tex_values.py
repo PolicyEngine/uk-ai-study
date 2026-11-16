@@ -1775,6 +1775,9 @@ def emit_takeup() -> None:
             emit(f"{pre}PovBhcDiffPp", lambda s=s, v=v: pt.paired_change(
                 tk(), s, v, _existing_draws(s), "poverty_change_bhc_pp"), SIGNED2, TAKEUP_DRAWS)
         emit(f"genTk{S}JsaJsaBn", lambda s=s: mean(s, "jsa", "jsa_change_bn"), "{:.2f}", TAKEUP_DRAWS)
+    # one-decimal version for the abstract
+    emit("genTkCentralJsaPovBhcMeanOneDpPp", lambda: mean("central", "jsa", "poverty_change_bhc_pp"), "{:.1f}",
+         TAKEUP_DRAWS)
     emit("genTkObrTakeupUcPerDisplacedGbp", lambda: round(mean("obr", "takeup1", "uc_per_displaced_gbp"), -1),
          "{:,.0f}", TAKEUP_DRAWS)
     emit("genTkObrJsaEligiblePct", lambda: 100 * mean("obr", "jsa", "jsa_eligible_m")
@@ -1849,6 +1852,9 @@ def emit_wage_cut() -> None:
         # magnitude of the paired difference (wage cuts minus job loss)
         emit(f"genWcPair{N}DiffAbs{unit}", lambda key=key: abs(mc()[key]["diff"]), dfmt, WAGE_CUT_DRAWS)
         emit(f"genWcPair{N}DiffSe{unit}", lambda key=key: mc()[key]["diff_se"], "{:.2f}", WAGE_CUT_DRAWS)
+    # one-decimal versions for the abstract
+    emit("genWcJobPovBhcMeanOneDpPp", lambda: mc()["pov_bhc"]["job"], "{:.1f}", dcd)
+    emit("genWcWagePovBhcMeanOneDpPp", lambda: mc()["pov_bhc"]["wage"], "{:.1f}", WAGE_CUT_DRAWS)
     emit("genWcPairCostDiffMinBn", lambda: mc()["cost"]["diff_min"], "{:.1f}", WAGE_CUT_DRAWS)
     emit("genWcPairPovBhcDiffSmallestAbsPp", lambda: abs(mc()["pov_bhc"]["diff_max"]), "{:.2f}", WAGE_CUT_DRAWS)
     emit("genWcWageRelPovBhcMeanSignedPp", lambda: mc()["relative_pov_bhc_wage"], SIGNED2, WAGE_CUT_DRAWS)
