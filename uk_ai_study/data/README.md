@@ -1,6 +1,6 @@
 # Exposure crosswalk data
 
-Provenance: built in PolicyEngine/populace#325 (SOC2020 AI-exposure crosswalk).
+Provenance: built in PolicyEngine/microcosm#325 (SOC2020 AI-exposure crosswalk).
 
 - `uk_soc2020_ai_exposure.csv` — unit-group (4-digit SOC2020) exposure indices:
   C-AIOE, complementarity θ (reconstructed from O*NET with a documented level
