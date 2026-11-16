@@ -3,6 +3,14 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{flafter}          % no float above the point where it is defined
+\usepackage[section]{placeins} % floats stay inside their own section
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
 \usepackage{xcolor}
 % Paper chrome uses the firm-microsim template blue (YGTemplate MyBlue);
 % figures use the PolicyEngine palette separately.
@@ -21,7 +29,7 @@
 \let\GENincludegraphics\includegraphics
 \renewcommand{\includegraphics}[2][]{\IfFileExists{#2}{\GENincludegraphics[#1]{#2}}{\fbox{\parbox{.6\textwidth}{\centering\textbf{\textcolor{red}{pending figure}}\\\footnotesize\detokenize{#2}}}}}
 
-\title{\bfseries Who bears the AI shock?\\[0.15cm] The distributional and fiscal incidence in the UK\thanks{\textbf{Acknowledgements:} I thank Max Ghenis and Seyed Mahdi Hosseini for valuable comments and helpful discussions.}\\[0.7cm]}
+\title{\bfseries Who bears the AI shock?\\[0.15cm] The distributional and fiscal incidence in the UK\thanks{\textbf{Acknowledgements:} I thank Max Ghenis, Seyed Mahdi Hosseini and colleagues at PolicyEngine for valuable comments and helpful discussions.}\\[0.7cm]}
 \author{Vahid Ahmadi\thanks{Research Associate at PolicyEngine. Email: \href{mailto:vahid@policyengine.org}{vahid@policyengine.org}.}}
 \date{\small \ifcase\month\or January\or February\or March\or April\or May\or June\or July\or August\or September\or October\or November\or December\fi\ \the\year}
 
@@ -29,7 +37,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent I estimate how much of an AI-driven labour-market shock the UK tax-benefit system absorbs and who bears the rest. I link occupation-level AI exposure to workers in microdata built from the 2024--25 Family Resources Survey and simulate job loss, wage and capital-income changes with PolicyEngine UK under \genModelFiscalYear~tax and benefit rules. With 7 per cent of employees displaced, the annual Exchequer cost runs from \pounds\genIncUniformCostMeanBn~to \pounds\genIncCompressionCostMeanBn~billion across four stylised rules for who loses the job, tracking displaced workers' earnings. Delivering the same gross earnings loss as wage cuts rather than job losses raises the cost by \pounds\genWcPairCostDiffAbsBn~billion but lowers the rise in absolute poverty before housing costs from \genWcJobPovBhcMeanPp~to \genWcWagePovBhcMeanPp~percentage points, because job loss concentrates losses on fewer households. These estimates keep each benefit unit's survey-drawn Universal Credit take-up decision and pay the newly displaced no contributory Jobseeker's Allowance; if every displaced worker's benefit unit claims and eligible displaced workers receive the allowance, job loss costs \pounds\genTkCentralJsaCostDiffAbsBn~billion more and raises poverty by \genTkCentralJsaPovBhcMeanPp~rather than \genWcJobPovBhcMeanPp~points (\genWcDraws~paired draws of the exposure-proportional case). Costs are net of receipts from assumed survivor-wage and capital-income gains: the exposure-proportional cost, \pounds\genCentralMcCostMeanBn~billion (50-draw mean), reaches zero (single-draw estimate) if survivors' wages rise by \genBeWagePct~rather than 2.6 per cent.
+\noindent I estimate how much of an AI-driven labour-market shock the UK tax-benefit system absorbs and who bears the rest. I link occupation-level AI exposure to microdata built from the 2024--25 Family Resources Survey and simulate job-loss, wage and capital-income changes with PolicyEngine UK for \genModelFiscalYear. Displacing 7 per cent of employees costs the Exchequer \pounds\genIncUniformCostMeanBn~to \pounds\genIncCompressionCostMeanBn~billion annually across four incidence rules. The same earnings loss through wage cuts costs \pounds\genWcPairCostDiffAbsBn~billion more but raises absolute poverty before housing costs by \genWcWagePovBhcMeanPp~rather than \genWcJobPovBhcMeanPp~points, because job loss concentrates losses on fewer households. With full Universal Credit take-up among the displaced and Jobseeker's Allowance, neither assumed above, job loss costs \pounds\genTkCentralJsaCostDiffAbsBn~billion more and raises poverty by \genTkCentralJsaPovBhcMeanPp~points. Costs are net of receipts from assumed survivor-wage and capital-income gains: the exposure-proportional cost, \pounds\genCentralMcCostMeanBn~billion, reaches zero if survivors' wages rise by \genBeWagePct~rather than 2.6 per cent.
 \end{abstract}
 
 \medskip
