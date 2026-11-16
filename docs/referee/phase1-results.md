@@ -40,8 +40,36 @@ Sampling SEs of the levels (exposure-proportional): cost £1.07bn, BHC poverty 0
 3. Report survey-sampling SEs beside every headline level and contrast; assignment noise is now zero.
 4. The deterministic method makes the grid, presets, index table and closure exact and removes the OLS index adjustment (item 4).
 
+## All five incidence rules (exact expectations, household bootstrap)
+
+Each rule is a probability vector over the same 64 saved states, taken from the rule code itself (`draw_displaced`, the youth-tilted preset, the compression top-tier tilt, the uniform flat exposure, and the top-loaded composite tilt). Expected displaced: 2.03m under every rule.
+
+| Rule | Cost (SE) | Paper 50-draw cost | BHC poverty (SE) | Paper BHC | AHC poverty | Gini |
+|---|---|---|---|---|---|---|
+| Exposure-proportional | £7.26bn (1.07) | £7.3bn | +2.46 (0.11) | +2.40 | +2.61 | +1.78 |
+| Junior | £6.90bn (1.07) | £7.0bn | +2.44 (0.11) | +2.43 | +2.59 | +1.78 |
+| Compression | £11.29bn (1.14) | £11.3bn | +2.63 (0.12) | +2.65 | +2.76 | +1.77 |
+| Uniform | £1.70bn (1.00) | £1.9bn | +2.47 (0.11) | +2.52 | +2.53 | +1.86 |
+| Top-loaded | £27.70bn (1.45) | £27.7bn | +2.96 (0.14) | +3.00 | +3.33 | +1.74 |
+
+Differences from exposure-proportional (bootstrap 95% intervals):
+
+| Rule | Cost | BHC poverty | AHC poverty | Gini |
+|---|---|---|---|---|
+| Junior | −£0.37bn [−0.42, −0.31] | −0.02 [−0.03, −0.01] | −0.02 [−0.03, −0.01] | −0.01 [−0.01, −0.00] |
+| Compression | +£4.03bn [3.57, 4.46] | +0.16 [0.11, 0.21] | +0.14 [0.09, 0.19] | −0.02 [−0.04, +0.01] |
+| Uniform | −£5.57bn [−6.17, −5.01] | +0.00 [−0.05, +0.06] | −0.08 [−0.14, −0.03] | +0.07 [0.05, 0.10] |
+| Top-loaded | +£20.44bn [19.33, 21.45] | +0.49 [0.39, 0.61] | +0.71 [0.61, 0.84] | −0.04 [−0.09, +0.02] |
+
+Further consequences for the paper:
+
+5. **The junior tilt is distinguishable from exposure-proportional incidence** once assignment noise is removed: a small but precise £0.37bn lower cost. The paper's "interval includes zero" (results, junior tilt) was assignment noise; the substantive point, that a within-occupation age tilt changes little, stands.
+6. Costs order as top-loaded > compression > exposure > junior > uniform, all distinguishable. BHC poverty orders top-loaded > compression > {exposure, junior, uniform}; the last three are within 0.03pp of each other.
+7. The Gini moves little across rules (1.74 to 1.86). Only uniform differs clearly (+0.07pp); the high-earner tilts slightly *lower* the Gini rise relative to exposure, not significantly.
+8. Cost per displaced worker now follows exactly from the rule's earnings profile, with no OLS adjustment.
+
 ## Next steps (Phase 1 remainder, then Phase 2)
 
-- Extend the reweighting to the other three rules (junior, compression, top-loaded); they are probability vectors over the same states.
+- ~~Extend the reweighting to the other three rules~~ (done above).
 - Move state enumeration into `uk_ai_study/` as part of the Phase 2 rerun, when every result is regenerated.
 - Wage-margin and mixed-margin scenarios: use the expected survivor gradient bill (decision needed at implementation).
