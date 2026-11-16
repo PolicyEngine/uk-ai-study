@@ -4,72 +4,72 @@
     "description": "Central scenario; displaced workers keep 50% of baseline annual earnings, in-model, while carrying full-year unemployed status/hours (documented 50%-earnings-retention hybrid, NOT a six-month unemployment spell).",
     "results": {
       "exchequer_cost_bn": {
-        "mean": -9.2146581504,
-        "sd": 1.1558094822814566,
-        "min": -11.648073728,
-        "max": -7.51222784
+        "mean": -10.057429811199999,
+        "sd": 1.207130750357912,
+        "min": -12.617187328,
+        "max": -8.287551488
       },
       "poverty_change_bhc_pp": {
-        "mean": 0.10785814239141797,
-        "sd": 0.11999378010542351,
-        "min": -0.1584555433784898,
-        "max": 0.3954955077496117
+        "mean": 0.1270296236804966,
+        "sd": 0.11619136630286382,
+        "min": -0.1519469748349058,
+        "max": 0.4205643805760189
       },
       "gini_change_pp": {
-        "mean": 0.7733787350933868,
-        "sd": 0.05433828940597048,
-        "min": 0.6722539805537497,
-        "max": 0.8752491768799553
+        "mean": 0.7658531918023431,
+        "sd": 0.05451519486210078,
+        "min": 0.6644397467914009,
+        "max": 0.8668544746443407
       },
       "uc_change_bn": {
-        "mean": 0.23771367537353427,
-        "sd": 0.1370081488445953,
-        "min": -0.0280432250104354,
-        "max": 0.6776256245895809
+        "mean": 0.24032284986973376,
+        "sd": 0.1437528856616535,
+        "min": -0.046549250762311,
+        "max": 0.6980270275898448
       }
     },
     "convex_combination_comparator_0.5x_full_year": {
       "exchequer_cost_bn": {
-        "mean": 3.6913222451200003,
-        "sd": 0.9162916342229745
+        "mean": 3.6710767001600004,
+        "sd": 0.9573361237727332
       },
       "poverty_change_bhc_pp": {
-        "mean": 1.1681015724503871,
-        "sd": 0.10344941145512482
+        "mean": 1.2008068794299216,
+        "sd": 0.10433363932239839
       },
       "gini_change_pp": {
-        "mean": 0.8820700864867886,
-        "sd": 0.06094767326143463
+        "mean": 0.8807435676509363,
+        "sd": 0.060759855757614646
       }
     }
   },
   "takeup_70": {
     "description": "Central scenario under Bernoulli(0.70) UC take-up (would_claim_uc set identically in baseline and shocked simulations, redrawn per seed).",
-    "dataset_baseline_would_claim_uc_person_weighted_mean": 0.46104608370585276,
+    "dataset_baseline_would_claim_uc_person_weighted_mean": 0.46104608346896603,
     "results": {
       "exchequer_cost_bn": {
-        "mean": 8.336619929600001,
-        "sd": 2.0063745128824633,
-        "min": 3.822813184,
-        "max": 11.447435264
+        "mean": 8.322970419199999,
+        "sd": 2.096500743850901,
+        "min": 3.581313024,
+        "max": 11.562745856
       },
       "poverty_change_bhc_pp": {
-        "mean": 2.1583373937559505,
-        "sd": 0.16389036406256333,
-        "min": 1.818652273674901,
-        "max": 2.433992418030689
+        "mean": 2.253251592956216,
+        "sd": 0.17162605765545091,
+        "min": 1.900032855398204,
+        "max": 2.5567724762775024
       },
       "gini_change_pp": {
-        "mean": 1.6650840024586835,
-        "sd": 0.11031404664329143,
-        "min": 1.4473856852214029,
-        "max": 1.893029413278402
+        "mean": 1.6621893461519845,
+        "sd": 0.11044391773443227,
+        "min": 1.4441936746493966,
+        "max": 1.889996810529704
       },
       "uc_change_bn": {
-        "mean": 3.3531292415404876,
-        "sd": 0.4337604303318191,
-        "min": 2.544818893578366,
-        "max": 4.0795945730698975
+        "mean": 3.451315133439927,
+        "sd": 0.45077491324550223,
+        "min": 2.6058218631318937,
+        "max": 4.22572698287334
       }
     }
   }
