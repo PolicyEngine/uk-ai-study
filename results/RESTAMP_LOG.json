@@ -1,14 +1,14 @@
 {
-  "old_ref": "02956bdbf68638221a9af5e14d5989f58c56d95c",
-  "new_head_at_restamp": "02956bdbf68638221a9af5e14d5989f58c56d95c",
-  "restamped_utc": "2026-11-15T21:29:03Z",
+  "old_ref": "3e1ff77",
+  "new_head_at_restamp": "5308144204ff7a0ac3579a3a97e33f9c9d3cdca8",
+  "restamped_utc": "2026-11-16T09:53:05Z",
   "rule": "Verified restamp of committed draw checkpoints after non-behavioural edits.",
   "files": {
     "results/jr16/grid.csv": {
       "script": "analysis/replicate_jr16.py",
       "rows": 66,
-      "old_fingerprint": "cad37dba73b0af85c",
-      "new_fingerprint": "c5160d8c572aeede6",
+      "old_fingerprint": "c9c79455415fde160",
+      "new_fingerprint": "c9cd23ceab590bdb4",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [],
       "covered_files": [
@@ -24,8 +24,8 @@
     "results/appendix/grid_deciles_capital.csv": {
       "script": "analysis/appendix.py",
       "rows": 132,
-      "old_fingerprint": "c1fece246770b94fa",
-      "new_fingerprint": "c959b48829fd264eb",
+      "old_fingerprint": "ccfe44f131c5f43f2",
+      "new_fingerprint": "c0d371129dfc1d256",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
@@ -47,21 +47,21 @@
     "results/robustness/incidence_draws_five.csv": {
       "script": "analysis/monte_carlo_families.py",
       "rows": 250,
-      "old_fingerprint": "ce3848c9b196713d6",
-      "new_fingerprint": "cee86c326edea7a2b",
+      "old_fingerprint": "c39cc3a23989d66e0",
+      "new_fingerprint": "c4c4c8d99729b100d",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
           "file": "analysis/incidence_scenarios.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/measured_incidence.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/policy_counterfactuals.py",
-          "last_changed": "827451e01"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -80,21 +80,21 @@
     "results/robustness/policy_draws.csv": {
       "script": "analysis/monte_carlo_families.py",
       "rows": 250,
-      "old_fingerprint": "ce3848c9b196713d6",
-      "new_fingerprint": "cee86c326edea7a2b",
+      "old_fingerprint": "c39cc3a23989d66e0",
+      "new_fingerprint": "c4c4c8d99729b100d",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
           "file": "analysis/incidence_scenarios.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/measured_incidence.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/policy_counterfactuals.py",
-          "last_changed": "827451e01"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -113,21 +113,21 @@
     "results/robustness/central_cost_components_draws.csv": {
       "script": "analysis/monte_carlo_families.py",
       "rows": 50,
-      "old_fingerprint": "ce3848c9b196713d6",
-      "new_fingerprint": "cee86c326edea7a2b",
+      "old_fingerprint": "c39cc3a23989d66e0",
+      "new_fingerprint": "c4c4c8d99729b100d",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
           "file": "analysis/incidence_scenarios.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/measured_incidence.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/policy_counterfactuals.py",
-          "last_changed": "827451e01"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -146,17 +146,17 @@
     "results/robustness/duration_takeup_draws.csv": {
       "script": "analysis/sensitivity_duration_takeup.py",
       "rows": 40,
-      "old_fingerprint": "cf272233f24a218d1",
-      "new_fingerprint": "c1ab001504cb9fc57",
+      "old_fingerprint": "c213a12b527016e44",
+      "new_fingerprint": "c0cf8d158f95a43a7",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
           "file": "analysis/incidence_scenarios.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/policy_counterfactuals.py",
-          "last_changed": "827451e01"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -174,17 +174,17 @@
     "results/robustness/duration_reform_draws.csv": {
       "script": "analysis/sensitivity_duration_reforms.py",
       "rows": 5,
-      "old_fingerprint": "c092205238d2e3ccd",
-      "new_fingerprint": "ced0b9987c482dcc1",
+      "old_fingerprint": "cde8711b66d6b0296",
+      "new_fingerprint": "ca676caf5e9c9fcb5",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
           "file": "analysis/incidence_scenarios.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/policy_counterfactuals.py",
-          "last_changed": "827451e01"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -202,21 +202,21 @@
     "results/robustness/measured_wage_tier_draws.csv": {
       "script": "analysis/sensitivity_wage_tier.py",
       "rows": 60,
-      "old_fingerprint": "ce26edb1b9bd9e873",
-      "new_fingerprint": "cdc9b50632f074a83",
+      "old_fingerprint": "c7304fc95e32cd037",
+      "new_fingerprint": "c7d554f9fe49a43ce",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
           "file": "analysis/incidence_scenarios.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/measured_incidence.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         },
         {
           "file": "analysis/policy_counterfactuals.py",
-          "last_changed": "827451e01"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -235,8 +235,8 @@
     "results/robustness/dividend_coverage_draws.csv": {
       "script": "analysis/sensitivity_dividend_coverage.py",
       "rows": 124,
-      "old_fingerprint": "cdb9f576b251059a8",
-      "new_fingerprint": "c97251e6be2b0c134",
+      "old_fingerprint": "c773a9b7e7cf3df3e",
+      "new_fingerprint": "c05c144c9c7aaea01",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [],
       "covered_files": [
@@ -252,8 +252,8 @@
     "results/tax_composition/composition_sims.csv": {
       "script": "analysis/tax_composition.py",
       "rows": 10,
-      "old_fingerprint": "c46b23567b45a10be",
-      "new_fingerprint": "c60b3ad23be6bfec6",
+      "old_fingerprint": "c032e02ac86ecabcd",
+      "new_fingerprint": "cbf48a1ab5472da5a",
       "csv_last_written": "9166f9eb5",
       "newly_covered_helpers": [
         {
@@ -262,7 +262,7 @@
         },
         {
           "file": "analysis/replicate_jr16.py",
-          "last_changed": "09e4d68bb"
+          "last_changed": "af0a939f9"
         }
       ],
       "covered_files": [
@@ -280,8 +280,8 @@
     "results/next_runs/obr_benchmark_draws.csv": {
       "script": "analysis/next_runs.py",
       "rows": 20,
-      "old_fingerprint": "c9238d21c7e41d0ae",
-      "new_fingerprint": "c464e1b44b6539fb0",
+      "old_fingerprint": "c6ef99e36816e6d07",
+      "new_fingerprint": "cd633c68f84347089",
       "csv_last_written": "b861bd1e8",
       "newly_covered_helpers": [],
       "covered_files": [
@@ -297,8 +297,8 @@
     "results/next_runs/capital_variants_draws.csv": {
       "script": "analysis/next_runs.py",
       "rows": 160,
-      "old_fingerprint": "c9238d21c7e41d0ae",
-      "new_fingerprint": "c464e1b44b6539fb0",
+      "old_fingerprint": "c6ef99e36816e6d07",
+      "new_fingerprint": "cd633c68f84347089",
       "csv_last_written": "b3201d0e6",
       "newly_covered_helpers": [],
       "covered_files": [
@@ -314,8 +314,8 @@
     "results/takeup/takeup_draws.csv": {
       "script": "analysis/displaced_takeup_runs.py",
       "rows": 82,
-      "old_fingerprint": "c70f608c927b74375",
-      "new_fingerprint": "c0d86077a93472ac0",
+      "old_fingerprint": "c4a83008828f81cde",
+      "new_fingerprint": "cf42de86e7f8a3942",
       "csv_last_written": "89430febf",
       "newly_covered_helpers": [],
       "covered_files": [
@@ -331,8 +331,8 @@
     "results/wage_cut/wage_cut_draws.csv": {
       "script": "analysis/wage_cut_household.py",
       "rows": 40,
-      "old_fingerprint": "c46b802263e4ffb79",
-      "new_fingerprint": "c05ffaeafe9e8d275",
+      "old_fingerprint": "c68ef58b03624ee21",
+      "new_fingerprint": "c31c2088f87331d13",
       "csv_last_written": "b3201d0e6",
       "newly_covered_helpers": [],
       "covered_files": [
@@ -369,5 +369,24 @@
     "analysis/next_runs.py": "equivalent",
     "analysis/displaced_takeup_runs.py": "equivalent",
     "analysis/wage_cut_household.py": "equivalent"
-  }
+  },
+  "other_changed_files": {
+    "analysis/_tmp_restamp.py": "new file",
+    "analysis/caseloads.py": "equivalent",
+    "analysis/emit_tex_values.py": "NOT equivalent: behavioural change between the old ref and now",
+    "analysis/figures.py": "NOT equivalent: behavioural change between the old ref and now",
+    "analysis/gender.py": "equivalent",
+    "analysis/index_sensitivity.py": "equivalent",
+    "analysis/paper_scenarios.py": "equivalent",
+    "analysis/post_next_runs.py": "NOT equivalent: behavioural change between the old ref and now",
+    "analysis/post_takeup_runs.py": "equivalent",
+    "analysis/poverty_decomposition.py": "equivalent",
+    "analysis/rebuild.py": "NOT equivalent: behavioural change between the old ref and now",
+    "analysis/recession_backcast.py": "equivalent",
+    "analysis/restamp_checkpoints.py": "new file",
+    "analysis/revision_accounting.py": "equivalent",
+    "analysis/run_all.py": "equivalent",
+    "analysis/sensitivity_mixed_wage_adjustment.py": "equivalent"
+  },
+  "note_2027_merge": "Draws are the 2027-28 overnight rerun, produced in a clean checkout at 3e1ff77 (BUILD_MANIFEST of that run), then merged onto the updated PR branch. Proofs 1 and 2 hold for every stamped CSV against 3e1ff77. Proof 3 was skipped with the author's approval: its git-history test looks for the commit that wrote each CSV inside 3e1ff77, but these draws were committed after it (fc8fda7). The newly covered helpers are identical or equivalent between 3e1ff77 and now (proof 2), so the helper code the run used is the code at 3e1ff77."
 }
