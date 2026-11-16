@@ -1,40 +1,40 @@
 {
   "scenario": "hosseini_lichtinger_2026",
-  "displaced_weighted_total": 104723.21875,
-  "share_of_employed_displaced": 0.0045477282255887985,
-  "exchequer_cost_bn": 1.250328576,
-  "poverty_change_bhc_pp": 0.10853262791860885,
-  "gini_change_pp": 0.04145935350222674,
+  "displaced_weighted_total": 201288.640625,
+  "share_of_employed_displaced": 0.006933350581675768,
+  "exchequer_cost_bn": 1.728741376,
+  "poverty_change_bhc_pp": 0.2493080221835739,
+  "gini_change_pp": 0.08083986520890374,
   "age_bands": {
     "16-24": {
-      "displaced_weighted": 42827.125,
-      "displacement_rate_of_employed": 0.029011497274041176,
-      "mean_per_capita_income_change": -170.36942507274242
+      "displaced_weighted": 103746.5078125,
+      "displacement_rate_of_employed": 0.03269675001502037,
+      "mean_per_capita_income_change": -158.84761430662448
     },
     "25-34": {
-      "displaced_weighted": 61896.10546875,
-      "displacement_rate_of_employed": 0.012945369817316532,
-      "mean_per_capita_income_change": -154.51700637142378
+      "displaced_weighted": 97542.1015625,
+      "displacement_rate_of_employed": 0.014234492555260658,
+      "mean_per_capita_income_change": -215.98603348336277
     },
     "35-44": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -4.944125686539886
+      "mean_per_capita_income_change": -13.93518764620788
     },
     "45-54": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -30.137955988976795
+      "mean_per_capita_income_change": -45.238209045100426
     },
     "55-64": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -31.379726736526806
+      "mean_per_capita_income_change": -27.823434668622657
     },
     "65-+": {
       "displaced_weighted": 0.0,
       "displacement_rate_of_employed": 0.0,
-      "mean_per_capita_income_change": -2.508010395950634
+      "mean_per_capita_income_change": -8.766015892984878
     }
   }
 }

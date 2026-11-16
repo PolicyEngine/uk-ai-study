@@ -1,29 +1,25 @@
-"""Download the FRS microdata from PolicyEngine's Hugging Face repo.
+"""Fetch the certified Microcosm UK 2024-25 dataset into data/.
 
-Requires HUGGING_FACE_TOKEN in the environment (token with access to
-policyengine/policyengine-uk-data). Files land in data/ (gitignored).
+The dataset is the one pinned by the policyengine.py release bundle
+(``policyengine[uk]`` in pyproject.toml). It lives in a private Hugging Face
+repository (policyengine/populace-uk-private), so a token with access must be
+available as HUGGING_FACE_TOKEN or through a saved ``huggingface-cli login``.
+The file lands in data/ (gitignored) and its sha256 is checked against the
+bundle; every analysis script then resolves it through
+``uk_ai_study.data.microsimulation()``. Running this first is optional (the
+first simulation fetches the file too); it just front-loads the download.
 """
 
-import os
-import zipfile
-from pathlib import Path
+from policyengine.provenance.dataset_materialization import materialize_dataset
 
-from huggingface_hub import hf_hub_download
-
-REPO = "policyengine/policyengine-uk-data"
-FILES = ("frs_2024_25.h5", "frs_2024_25.zip")
+from uk_ai_study.data import _ensure_token
 
 
 def main() -> None:
-    token = os.environ["HUGGING_FACE_TOKEN"]
-    data = Path("data")
-    data.mkdir(exist_ok=True)
-    for name in FILES:
-        path = hf_hub_download(REPO, name, token=token, local_dir=data)
-        print(path)
-    with zipfile.ZipFile(data / "frs_2024_25.zip") as zf:
-        zf.extractall(data / "frs_2024_25")
-    print("extracted adult.tab:", (data / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab").exists())
+    _ensure_token()
+    source = materialize_dataset("uk")
+    print(source.path)
+    print(source.source_uri)
 
 
 if __name__ == "__main__":

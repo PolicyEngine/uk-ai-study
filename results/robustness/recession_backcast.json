@@ -14,72 +14,72 @@
     ]
   },
   "baseline_levels_pct": {
-    "poverty_bhc": 14.607251204109343,
-    "poverty_ahc": 18.690132778805474,
-    "relative_poverty_bhc": 18.45820824682482,
-    "gini": 30.908967456288927
+    "poverty_bhc": 12.030797746142422,
+    "poverty_ahc": 17.655917037238417,
+    "relative_poverty_bhc": 13.441054507543445,
+    "gini": 30.267000157362347
   },
   "draws": [
     {
       "seed": 0,
-      "displaced_weighted_m": 0.5949339866638184,
-      "poverty_change_bhc_pp": 0.7616143923213192,
-      "poverty_change_ahc_pp": 0.8533308797314537,
-      "relative_poverty_change_bhc_pp": 0.2491320447106926,
-      "gini_change_pp": 0.3871214242073928
+      "displaced_weighted_m": 0.7550898194313049,
+      "poverty_change_bhc_pp": 0.9782712868561902,
+      "poverty_change_ahc_pp": 1.194304761796311,
+      "relative_poverty_change_bhc_pp": -0.21620890504918389,
+      "gini_change_pp": 0.34679026001857016
     },
     {
       "seed": 1,
-      "displaced_weighted_m": 0.6010416150093079,
-      "poverty_change_bhc_pp": 0.7197101363526415,
-      "poverty_change_ahc_pp": 0.8237975432200173,
-      "relative_poverty_change_bhc_pp": 0.19607930349508362,
-      "gini_change_pp": 0.35589843739360916
+      "displaced_weighted_m": 0.7687205672264099,
+      "poverty_change_bhc_pp": 0.8809377601839266,
+      "poverty_change_ahc_pp": 0.9712193320060902,
+      "relative_poverty_change_bhc_pp": -0.15879431219165685,
+      "gini_change_pp": 0.26183405438449103
     },
     {
       "seed": 2,
-      "displaced_weighted_m": 0.5740764737129211,
-      "poverty_change_bhc_pp": 0.8392962258722936,
-      "poverty_change_ahc_pp": 0.9256269102973724,
-      "relative_poverty_change_bhc_pp": 0.31558486620280324,
-      "gini_change_pp": 0.35560923825278534
+      "displaced_weighted_m": 0.7541853785514832,
+      "poverty_change_bhc_pp": 0.9634076643896081,
+      "poverty_change_ahc_pp": 1.2484011779891029,
+      "relative_poverty_change_bhc_pp": -0.0673130777784331,
+      "gini_change_pp": 0.3287574688395023
     },
     {
       "seed": 3,
-      "displaced_weighted_m": 0.6257177591323853,
-      "poverty_change_bhc_pp": 0.9022218611869054,
-      "poverty_change_ahc_pp": 0.9785443588946952,
-      "relative_poverty_change_bhc_pp": 0.44270366642649994,
-      "gini_change_pp": 0.4392991377510924
+      "displaced_weighted_m": 0.6866344213485718,
+      "poverty_change_bhc_pp": 1.0346760629752192,
+      "poverty_change_ahc_pp": 1.4357263211950022,
+      "relative_poverty_change_bhc_pp": -0.15475084596105193,
+      "gini_change_pp": 0.31541821562887096
     },
     {
       "seed": 4,
-      "displaced_weighted_m": 0.5910415649414062,
-      "poverty_change_bhc_pp": 0.807978353486638,
-      "poverty_change_ahc_pp": 0.7433616039782986,
-      "relative_poverty_change_bhc_pp": 0.23452723351660432,
-      "gini_change_pp": 0.3383938992271962
+      "displaced_weighted_m": 0.7650175094604492,
+      "poverty_change_bhc_pp": 1.11770593931695,
+      "poverty_change_ahc_pp": 1.161204100106103,
+      "relative_poverty_change_bhc_pp": 0.0824341503751519,
+      "gini_change_pp": 0.4082219395142861
     }
   ],
   "mean": {
-    "displaced_weighted_m": 0.5973622798919678,
-    "poverty_change_bhc_pp": 0.8061641938439597,
-    "poverty_change_ahc_pp": 0.8649322592243675,
-    "relative_poverty_change_bhc_pp": 0.28760542287033675,
-    "gini_change_pp": 0.3752644273664152
+    "displaced_weighted_m": 0.7459295392036438,
+    "poverty_change_bhc_pp": 0.9949997427443786,
+    "poverty_change_ahc_pp": 1.2021711386185217,
+    "relative_poverty_change_bhc_pp": -0.10292659812103477,
+    "gini_change_pp": 0.3322043876771441
   },
   "sd_across_seeds": {
-    "displaced_weighted_m": 0.018745983068084834,
-    "poverty_change_bhc_pp": 0.07033329056947801,
-    "poverty_change_ahc_pp": 0.09110108526278647,
-    "relative_poverty_change_bhc_pp": 0.09684115853212977,
-    "gini_change_pp": 0.0398805603650474
+    "displaced_weighted_m": 0.03373337436980138,
+    "poverty_change_bhc_pp": 0.08791907867630981,
+    "poverty_change_ahc_pp": 0.16715573199480147,
+    "relative_poverty_change_bhc_pp": 0.11647614038600691,
+    "gini_change_pp": 0.05300249165958979
   },
   "per_pp_of_displacement": {
-    "poverty_change_bhc_pp": 0.310063151478446,
-    "poverty_change_ahc_pp": 0.33266625354783363,
-    "relative_poverty_change_bhc_pp": 0.1106174703347449,
-    "gini_change_pp": 0.14433247206400585
+    "poverty_change_bhc_pp": 0.38269220874783794,
+    "poverty_change_ahc_pp": 0.46237351485327755,
+    "relative_poverty_change_bhc_pp": -0.03958715312347491,
+    "gini_change_pp": 0.12777091833736312
   },
   "observed_hbai_2007_08_to_2010_11": {
     "absolute_poverty_bhc_pp": -1.0,

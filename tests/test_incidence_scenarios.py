@@ -22,9 +22,9 @@ from incidence_scenarios import (
 
 def make_persons(n=4000, seed=1):
     rng = np.random.default_rng(seed)
-    group = rng.integers(1, 10, n) * 1000.0
-    exposure_by_group = {g * 1000.0: x for g, x in zip(range(1, 10), np.linspace(-0.7, 0.7, 9))}
-    theta_by_group = {g * 1000.0: x for g, x in zip(range(1, 10), np.linspace(0.3, 0.9, 9))}
+    group = rng.integers(1, 10, n).astype(float)
+    exposure_by_group = {float(g): x for g, x in zip(range(1, 10), np.linspace(-0.7, 0.7, 9))}
+    theta_by_group = {float(g): x for g, x in zip(range(1, 10), np.linspace(0.3, 0.9, 9))}
     employment = np.where(rng.random(n) < 0.75, rng.lognormal(10.1, 0.6, n), 0.0)
     return pd.DataFrame(
         {

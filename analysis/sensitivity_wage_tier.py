@@ -4,12 +4,14 @@ Reruns the measured family with (high, low) wage-tier displacement multipliers
 (3, 0.8) and (6, 0.7) alongside the baseline (9.6, 0.6), holding the junior
 (5.8/4.5) and London (1.5) tilts and the central aggregate shock fixed.
 20 draws (seeds 0-19) per variant; each draw checkpointed to
-results/robustness/measured_wage_tier_draws.csv (rerun resumes); summary to
+results/robustness/measured_wage_tier_draws.csv (stamped; continued only
+with --resume); summary to
 results/robustness/measured_wage_tier_sensitivity.json.
 """
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -26,9 +28,7 @@ from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES  # noqa: E40
 from measured_incidence import LONDON_MULT_CENTRAL, measured_table  # noqa: E402
 from policy_counterfactuals import PERIOD, build_sim, person_calc, hh_calc  # noqa: E402
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 20
 VARIANTS = {"3_0.8": (3.0, 0.8), "6_0.7": (6.0, 0.7), "9.6_0.6": (9.6, 0.6)}
 CSV = OUT / "measured_wage_tier_draws.csv"
@@ -48,15 +48,12 @@ def sim_metrics(s):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
 
-    persons = build_person_table(
-        baseline, PERIOD, ADULT, extra_variables=("region",)
+    persons = build_person_table(baseline, PERIOD, extra_variables=("region",)
     )
     w = persons["weight"].to_numpy()
 
@@ -67,10 +64,10 @@ def main():
     base_arrays["employment_status"] = person_calc(baseline, "employment_status").astype(object)
     del baseline
 
-    done = set()
-    if CSV.exists():
-        d = pd.read_csv(CSV)
-        done = set(zip(d["variant"], d["seed"]))
+    from uk_ai_study.checkpoint import Checkpoint
+
+    ckpt = Checkpoint(CSV, ("variant", "seed"), script=__file__)
+    done = ckpt.done
 
     scenario = PRESETS["central"]
     for seed in range(N_DRAWS):
@@ -81,9 +78,10 @@ def main():
                 persons, scenario, LONDON_MULT_CENTRAL, seed=seed,
                 high_wage_mult=hi, low_wage_mult=lo,
             )
-            sim = build_sim(ds, base_arrays, table)
+            sim = build_sim(base_arrays, table)
             m = sim_metrics(sim)
             del sim
+            gc.collect()
             displaced = table["displaced"].to_numpy()
             row = {
                 "variant": variant,
@@ -93,10 +91,13 @@ def main():
                 "gini_change_pp": 100 * (m["gini"] - b["gini"]),
                 "displaced_weighted_m": float(w[displaced].sum() / 1e6),
             }
-            pd.DataFrame([row]).to_csv(CSV, mode="a", header=not CSV.exists(), index=False)
+            ckpt.append(row)
             print(f"wage-tier {variant} seed {seed} done", flush=True)
 
-    d = pd.read_csv(CSV)
+    d = ckpt.read()
+    if set(zip(d["variant"], d["seed"])) != {(v, s) for v in VARIANTS for s in range(N_DRAWS)} \
+            or d.duplicated(["variant", "seed"]).any():
+        raise ValueError("wage-tier checkpoint is incomplete or duplicated")
     summary = {
         "description": "Measured family (Klein Teeselink) with alternative "
                        "high/low wage-tier displacement multipliers; junior "

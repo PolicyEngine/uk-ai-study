@@ -28,6 +28,7 @@ summary to results/robustness/duration_takeup_sensitivity.json.
 
 from __future__ import annotations
 
+import gc
 import json
 import sys
 from pathlib import Path
@@ -43,9 +44,7 @@ from uk_ai_study.runner import build_person_table, gini  # noqa: E402
 from uk_ai_study.shocks import PRESETS, TRANSITION_ZEROED_VARIABLES, apply_shocks  # noqa: E402
 from policy_counterfactuals import PERIOD, build_sim, person_calc, hh_calc  # noqa: E402
 
-DATA = ROOT / "data"
 OUT = ROOT / "results" / "robustness"
-ADULT = DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab"
 N_DRAWS = 20
 EARNINGS_RETENTION = 0.5   # 50% earnings retention (full-year unemployed status)
 UC_TAKEUP = 0.70
@@ -67,14 +66,12 @@ def sim_metrics(s):
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
 
-    persons = build_person_table(baseline, PERIOD, ADULT)
+    persons = build_person_table(baseline, PERIOD)
     w = persons["weight"].to_numpy()
     base_emp = persons["employment_income"].to_numpy(dtype=float)
 
@@ -95,10 +92,10 @@ def main():
     )
     del baseline
 
-    done = set()
-    if CSV.exists():
-        d = pd.read_csv(CSV)
-        done = set(zip(d["variant"], d["seed"]))
+    from uk_ai_study.checkpoint import Checkpoint
+
+    ckpt = Checkpoint(CSV, ("variant", "seed"), script=__file__)
+    done = ckpt.done
 
     scenario = PRESETS["central"]
     for seed in range(N_DRAWS):
@@ -119,22 +116,25 @@ def main():
                 t["employment_income"] = np.where(
                     displaced, EARNINGS_RETENTION * base_emp, emp
                 )
-                sim = build_sim(ds, base_arrays, t)
+                sim = build_sim(base_arrays, t)
                 m = sim_metrics(sim)
                 del sim
+                gc.collect()
                 row_b = b
             else:
                 rng = np.random.default_rng(10_000 + seed)
                 claim = rng.random(n_benunits) < UC_TAKEUP
                 # same take-up draw in baseline and shocked worlds
-                sim0 = Microsimulation(dataset=ds)
+                sim0 = microsimulation()
                 sim0.set_input("would_claim_uc", PERIOD, claim)
                 row_b = sim_metrics(sim0)
                 del sim0
-                sim = build_sim(ds, base_arrays, table)
+                gc.collect()
+                sim = build_sim(base_arrays, table)
                 sim.set_input("would_claim_uc", PERIOD, claim)
                 m = sim_metrics(sim)
                 del sim
+                gc.collect()
 
             row = {
                 "variant": variant,
@@ -146,10 +146,14 @@ def main():
                 "baseline_pov_bhc": row_b["pov_bhc"],
                 "displaced_weighted_m": float(w[displaced].sum() / 1e6),
             }
-            pd.DataFrame([row]).to_csv(CSV, mode="a", header=not CSV.exists(), index=False)
+            ckpt.append(row)
             print(f"{variant} seed {seed} done", flush=True)
 
-    d = pd.read_csv(CSV)
+    d = ckpt.read()
+    if set(zip(d["variant"], d["seed"])) != {
+        (v, s) for v in ("half_earnings_retention", "takeup_70") for s in range(N_DRAWS)
+    } or d.duplicated(["variant", "seed"]).any():
+        raise ValueError("duration/take-up checkpoint is incomplete or duplicated")
     summary = {
         "n_draws": N_DRAWS,
         "half_earnings_retention": {
@@ -177,7 +181,10 @@ def main():
     # convex-combination comparator: 0.5 x full-year central MC
     mc_path = OUT / "incidence_draws_five.csv"
     if mc_path.exists():
-        mc = pd.read_csv(mc_path)
+        from uk_ai_study.checkpoint import certified_data_build_id, read_stamped_csv, verify_stamp
+
+        mc = read_stamped_csv(mc_path)
+        verify_stamp(mc, {"certified_data_build_id": certified_data_build_id()}, mc_path)
         mc = mc[mc.family == "exposure"]
         summary["half_earnings_retention"]["convex_combination_comparator_0.5x_full_year"] = {
             c: {"mean": float(0.5 * mc[c].mean()), "sd": float(0.5 * mc[c].std(ddof=1))}

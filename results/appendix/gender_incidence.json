@@ -1,10 +1,10 @@
 {
-  "female_mean_exposure": 0.32587502817933,
-  "male_mean_exposure": 0.18006004058204528,
-  "female_share_of_displaced_mean": 0.5543895959854126,
-  "female_displacement_rate_mean": 0.07510758936405182,
-  "male_displacement_rate_mean": 0.06479481607675552,
-  "female_share_of_employment": 0.5177513957023621,
-  "female_income_change_pct": -2.909332036972046,
-  "male_income_change_pct": -2.8807051181793213
+  "female_mean_exposure": 0.3328414181846693,
+  "male_mean_exposure": 0.22000103758343473,
+  "female_share_of_displaced_mean": 0.5337038040161133,
+  "female_displacement_rate_mean": 0.07563716918230057,
+  "male_displacement_rate_mean": 0.06376378238201141,
+  "female_share_of_employment": 0.491226464509964,
+  "female_income_change_pct": -1.5299957990646362,
+  "male_income_change_pct": -1.4853272438049316
 }

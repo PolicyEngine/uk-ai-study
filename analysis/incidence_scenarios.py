@@ -10,7 +10,7 @@ AI displacement:
                   Canaries school): draws tilted toward ages 16-24 by the
                   KT junior/total ratio 5.8/4.5
   compression   — expertise-compression (Autor school, stylised): AI erodes
-                  elite expertise rents, so displacement draws are tilted
+                  the expertise premia of high earners, so displacement draws are tilted
                   toward the top weighted-earnings tertile of workers in
                   above-median-exposure occupations (multiplier
                   ``compression_multiplier``, default 2). An author-designed
@@ -34,6 +34,8 @@ Outputs results/incidence/<family>.json plus a combined summary CSV.
 
 from __future__ import annotations
 
+import gc
+
 import json
 from pathlib import Path
 
@@ -47,13 +49,13 @@ from uk_ai_study.shocks import (
     build_shocked_simulation,
     draw_displaced,
     prescribed_systematic_sample,
+    realised_displacement_rate,
 )
 
-DATA = Path("data")
 OUT = Path("results/incidence")
-PERIOD = 2026
+from uk_ai_study.data import PERIOD  # noqa: E402  (single model year)
 SEED = 0
-#: Default draw tilt toward the elite (top-earnings x high-exposure) group in
+#: Default draw tilt toward the top-tier (top-earnings x high-exposure) group in
 #: the compression family. Parameterised for sensitivity runs (R2-6a):
 #: 1.5 / 2.0 / 3.0.
 COMPRESSION_TOP_TERTILE_MULTIPLIER = 2.0
@@ -75,7 +77,7 @@ def compression_mask(
 ) -> np.ndarray:
     """Boolean displaced mask for the expertise-compression family.
 
-    Draws are tilted toward the elite group — top weighted-earnings tertile
+    Draws are tilted toward the top-tier group — top weighted-earnings tertile
     within above-median-exposure occupations — by ``multiplier`` (>= 1),
     with the eq 3.4 quota filled at the all-employee level.
     """
@@ -86,7 +88,7 @@ def compression_mask(
 
     med_exp = _weighted_tertile_threshold(exposure[employed], w[employed], 0.5)
     top_earn = _weighted_tertile_threshold(earnings[employed], w[employed], 2 / 3)
-    elite = employed & (exposure > med_exp) & (earnings >= top_earn)
+    top_tier = employed & (exposure > med_exp) & (earnings >= top_earn)
 
     quota = scenario.displacement_rate * float(w[employed].sum())
     members = np.flatnonzero(employed)
@@ -94,7 +96,7 @@ def compression_mask(
     displaced[members] = prescribed_systematic_sample(
         w[members],
         quota,
-        np.where(elite[members], float(multiplier), 1.0),
+        np.where(top_tier[members], float(multiplier), 1.0),
         np.random.default_rng(seed),
     )
     return displaced
@@ -186,7 +188,7 @@ def shocked_table_for(
     "compression_compound". "exposure" and "junior" are identical under
     either axis.
 
-    ``compression_multiplier`` (R2-6a): the elite draw tilt in the
+    ``compression_multiplier`` (R2-6a): the top-tier draw tilt in the
     compression family, default 2.0; 1.5 / 3.0 for sensitivity runs.
     """
     if family.endswith("_compound"):
@@ -230,18 +232,12 @@ def compression_table(
 
 
 def main():
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    from uk_ai_study.data import microsimulation
 
     OUT.mkdir(parents=True, exist_ok=True)
-    ds = UKSingleYearDataset(file_path=str(DATA / "frs_2024_25.h5"))
-    baseline = Microsimulation(dataset=ds)
+    baseline = microsimulation()
     calc = lambda v: baseline.calculate(v, period=PERIOD, map_to="person").values
-    persons = build_person_table(
-        baseline,
-        PERIOD,
-        DATA / "frs_2024_25" / "UKDA-9563-tab" / "tab" / "adult.tab",
-    )
+    persons = build_person_table(baseline, PERIOD)
 
     equiv = calc("equiv_hbai_household_net_income")
     w = persons["weight"].to_numpy()
@@ -272,13 +268,16 @@ def main():
     # reported on their own clearly named axis
     for family in DEFAULT_FAMILIES + ("compression_compound", "uniform_compound"):
         table = shocked_table_for(family, persons)
-        sim = build_shocked_simulation(ds, baseline, table, PERIOD)
+        sim = build_shocked_simulation(baseline, table, PERIOD)
         m = metrics(sim)
         displaced = table["displaced"].to_numpy()
         delta = m["hni"] - b["hni"]
         rec = {
             "family": family,
             "displaced_weighted_m": float(w[displaced].sum() / 1e6),
+            # one draw realises the 7 per cent quota only up to sampling
+            # noise; report the realised rate beside every seed-0 figure
+            "realised_displacement_rate": realised_displacement_rate(persons, displaced),
             "exchequer_cost_bn": (b["gov"] - m["gov"]) / 1e9,
             "poverty_change_bhc_pp": 100 * (m["pov_bhc"] - b["pov_bhc"]),
             "poverty_change_ahc_pp": 100 * (m["pov_ahc"] - b["pov_ahc"]),
@@ -296,6 +295,8 @@ def main():
         (OUT / f"{family}.json").write_text(json.dumps(rec, indent=2))
         summary.append({k: v for k, v in rec.items() if not isinstance(v, dict)})
         print(family, {k: round(v, 2) for k, v in summary[-1].items() if k != "family"}, flush=True)
+        del sim
+        gc.collect()
     pd.DataFrame(summary).to_csv(OUT / "summary.csv", index=False)
 
 

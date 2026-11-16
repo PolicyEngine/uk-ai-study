@@ -11,13 +11,18 @@ Modes
                                            DAG, per-stage commands, declared
                                            outputs and dependencies. No work.
   python analysis/rebuild.py --check       Verify the current results/ tree
-                                           against the manifest (and, if
-                                           present, against
-                                           results/BUILD_MANIFEST.json
-                                           hashes). Exits non-zero and lists
-                                           every missing, empty, unmapped
-                                           (tracked-but-not-in-manifest) and
-                                           stale file.
+                                           against the manifest and against
+                                           results/BUILD_MANIFEST.json: the
+                                           per-file hashes of results/ and
+                                           the hashes of the presentation
+                                           files (paper/values_generated.tex,
+                                           paper/main.pdf). Exits non-zero
+                                           and lists every missing, empty,
+                                           unmapped (tracked-but-not-in-
+                                           manifest) and stale file. It also
+                                           prints, as a note, the stages
+                                           whose current outputs did not
+                                           come out of a clean-room build.
   python analysis/rebuild.py               Full clean-room rebuild:
                                            1. `git worktree add --detach` a
                                               pristine checkout of HEAD into
@@ -58,8 +63,14 @@ Design notes
   scenario internals.
 * Stage stdout/stderr is teed to results/robustness/sensitivity_run.log in
   the build root (that tracked log file is thereby regenerated too).
-* results/EXTENSIONS_SUMMARY.md is hand-written documentation, not a build
-  product; it is declared NON_GENERATED and carried through publish.
+* results/RESTAMP_LOG.json records the verified restamp of the draw
+  checkpoints (analysis/restamp_checkpoints.py); it is not a stage output,
+  so it is declared NON_GENERATED and carried through publish.
+* Household arrays of runs 15 and 16 and of the wage-cut run are written
+  outside results/ (``../ai-study-household-arrays``,
+  ``../ai-study-wage-cut-arrays`` relative to the checkout). In a clean-room
+  build "the checkout" is the temporary worktree, so the obr_benchmark stage
+  writes them beside it and obr_household_deciles reads them from there.
 """
 
 from __future__ import annotations
@@ -85,20 +96,33 @@ IGNORED_RESULT_FILES = {".DS_Store"}
 
 # Tracked files under results/ that no analysis script produces (documentation
 # etc.). Preserved verbatim across an atomic publish.
-NON_GENERATED = []
+NON_GENERATED = ["RESTAMP_LOG.json"]
 
 PY = sys.executable or "python3"
+
+# latexmk where installed, otherwise tectonic (both build paper/main.pdf)
+LATEX_CMD = (
+    ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
+     "-cd", "paper/main.tex"]
+    if shutil.which("latexmk")
+    else ["tectonic", "--keep-logs", "paper/main.tex"]
+)
 
 # ---------------------------------------------------------------------------
 # Manifest: stage -> command, declared outputs (relative to results/),
 # declared data inputs (relative to repo root), and upstream stage deps
 # ("after" = stages whose outputs this stage reads or overwrites).
+# "resumable": the stage checkpoints its draws/cells (stamped with the
+# certified data build and code fingerprint) and accepts --resume; the
+# clean-room build never passes it, the stage-by-stage driver may.
 # NOTE: the preset list mirrors uk_ai_study.shocks.PRESETS at the time of
 # writing; run_all.py iterates PRESETS at runtime, and --check will flag any
 # divergence (missing or extra tracked files), so a PRESETS change surfaces
 # loudly rather than silently.
 # ---------------------------------------------------------------------------
-FRS_INPUTS = ["data/frs_2024_25.h5", "data/frs_2024_25/UKDA-9563-tab/tab/adult.tab"]
+# Certified Microcosm UK 2024-25 build pinned by policyengine[uk] (see
+# uk_ai_study/data.py); its sha256 is checked by policyengine.py on load.
+MICROCOSM_INPUTS = ["data/microcosm_uk_2024_25.h5"]
 
 MANIFEST = [
     {
@@ -111,7 +135,7 @@ MANIFEST = [
             "central_ripple_high.json",
             "wage_margin_central.json", "wage_margin_pss.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -123,15 +147,16 @@ MANIFEST = [
             "jr16/fig4_3_capital_by_decile.csv",
             "jr16/fig4_4_decomposition.csv",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "jr16_grid",
         "cmd": [PY, "analysis/replicate_jr16.py", "grid"],
         "outputs": ["jr16/grid.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
+        "resumable": True,
     },
     {
         "stage": "incidence",
@@ -143,14 +168,14 @@ MANIFEST = [
             "incidence/compression_compound.json",
             "incidence/summary.csv",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "measured_incidence",
         "cmd": [PY, "analysis/measured_incidence.py"],
         "outputs": ["incidence/klein_top_loaded.json", "incidence/summary_five.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": ["incidence"],  # extends the four-family summary to five
     },
     {
@@ -171,36 +196,36 @@ MANIFEST = [
             "appendix/b8_alternative_index_decile.csv",
             "appendix/b8_alternative_index_decile.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "appendix_decomp",
         "cmd": [PY, "analysis/appendix.py", "decomp"],
-        "outputs": ["appendix/decomposition_ci.csv"],
-        "inputs": FRS_INPUTS,
+        "outputs": ["appendix/decomposition_ci.csv",
+                    "appendix/decile_ranking_sensitivity.csv"],
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "appendix_grids",
         "cmd": [PY, "analysis/appendix.py", "grids"],
         "outputs": ["appendix/grid_deciles_capital.csv"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
+        "resumable": True,
     },
     {
         "stage": "robustness",
-        "cmd": [PY, "analysis/robustness.py", "all"],
+        "cmd": [PY, "analysis/robustness.py", "fast"],
         "outputs": [
-            "robustness/central_draws.csv",
             "robustness/exposure_sensitivity.json",
             "robustness/uniform_comparator.json",
             "robustness/age_exposure_moments.csv",
-            "robustness/frs_vs_ashe_occupation.csv",
-            # also writes robustness/central_monte_carlo.json, which the
-            # monte_carlo stage recomputes and owns (declared there).
+            "robustness/occupation_vs_ashe.csv",
+            "robustness/occupation_coverage.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
@@ -213,10 +238,13 @@ MANIFEST = [
             "robustness/incidence_monte_carlo.json",
             "robustness/policy_monte_carlo.json",
             "robustness/central_monte_carlo.json",
+            "robustness/central_cost_components_draws.csv",
+            "robustness/central_cost_decomposition.json",
         ],
-        "inputs": FRS_INPUTS,
-        "after": ["robustness"],  # supersedes robustness' central_monte_carlo.json
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "index_sensitivity",
@@ -225,7 +253,7 @@ MANIFEST = [
             "robustness/index_sensitivity_full.json",
             "robustness/index_sensitivity.png",
         ],
-        "inputs": FRS_INPUTS + ["data/raw"],
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
@@ -236,9 +264,10 @@ MANIFEST = [
             "robustness/duration_takeup_draws.csv",
             "robustness/duration_takeup_sensitivity.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": ["monte_carlo"],  # reads robustness/incidence_draws_five.csv
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "duration_reforms",
@@ -247,9 +276,10 @@ MANIFEST = [
             "robustness/duration_reform_draws.csv",
             "robustness/duration_reform_ranking.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "wage_tier",
@@ -258,9 +288,10 @@ MANIFEST = [
             "robustness/measured_wage_tier_draws.csv",
             "robustness/measured_wage_tier_sensitivity.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "mixed_wage_adjustment",
@@ -270,20 +301,21 @@ MANIFEST = [
             "robustness/survivor_wage_grid.csv",
             "robustness/mixed_wage_adjustment.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
         "log": True,
     },
     {
-        "stage": "enhanced_dataset",
-        "cmd": [PY, "analysis/sensitivity_enhanced_dataset.py"],
+        "stage": "dividend_coverage",
+        "cmd": [PY, "analysis/sensitivity_dividend_coverage.py"],
         "outputs": [
-            "robustness/enhanced_dataset_cells.csv",
-            "robustness/enhanced_dataset_central.json",
+            "robustness/dividend_coverage_draws.csv",
+            "robustness/dividend_coverage.json",
         ],
-        "inputs": FRS_INPUTS + ["data/enhanced_frs_2023_24.h5"],
-        "after": ["presets"],  # reads results/central.json
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
         "log": True,
+        "resumable": True,
     },
     {
         "stage": "paper_scenarios",
@@ -294,7 +326,7 @@ MANIFEST = [
             "paper_scenarios/hosseini_lichtinger_2026_adopter_scaled.json",
             "paper_scenarios/klein_teeselink_2025.json",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -307,9 +339,8 @@ MANIFEST = [
             "policy/R2_uc_circuit_breaker_exposure.json",
             "policy/R3_cap_suspension_taper_cut_exposure.json",
             "policy/summary.csv",
-            "policy/policy_reforms.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -321,7 +352,7 @@ MANIFEST = [
             "caseloads/incidence_uniform.json", "caseloads/incidence_compression.json",
             "caseloads/summary.csv", "caseloads/caseloads.png",
         ],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
@@ -329,56 +360,35 @@ MANIFEST = [
         "cmd": [PY, "analysis/tax_composition.py"],
         "outputs": [
             "tax_composition/composition_grid.csv",
+            "tax_composition/composition_sims.csv",
             "tax_composition/recycling_case.json",
             "tax_composition/revenue_shortfall_phi.png",
         ],
-        "inputs": FRS_INPUTS,
-        "after": ["jr16_grid"],  # reads results/jr16/grid.csv
+        "inputs": MICROCOSM_INPUTS,
+        # own capital-off simulations; no longer reads results/jr16/grid.csv
+        "after": [],
+        "resumable": True,
     },
     {
         "stage": "gender",
         "cmd": [PY, "analysis/gender.py"],
         "outputs": ["appendix/gender_incidence.json"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "poverty_decomposition",
         "cmd": [PY, "analysis/poverty_decomposition.py"],
         "outputs": ["robustness/poverty_decomposition.json"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
     },
     {
         "stage": "recession_backcast",
         "cmd": [PY, "analysis/recession_backcast.py"],
         "outputs": ["robustness/recession_backcast.json"],
-        "inputs": FRS_INPUTS,
+        "inputs": MICROCOSM_INPUTS,
         "after": [],
-    },
-    {
-        "stage": "geo_impact",
-        "cmd": [PY, "analysis/geo_impact.py"],
-        "outputs": [
-            "geo/constituency_impacts.csv",
-            "geo/region_summary.csv",
-            "geo/hexmap_income_change.png",
-            "geo/hexmap_displacement.png",
-            "geo/imputation_notes.json",
-        ],
-        "inputs": FRS_INPUTS + [
-            "data/enhanced_frs_2023_24.h5",
-            "data/parliamentary_constituency_weights.h5",
-            "data/constituencies_2024.csv",
-        ],
-        "after": [],
-    },
-    {
-        "stage": "geo_choropleth",
-        "cmd": [PY, "analysis/geo_choropleth.py"],
-        "outputs": ["geo/map_income_change.png", "geo/map_displacement.png"],
-        "inputs": ["data/uk_constituencies_2024.geojson"],
-        "after": ["geo_impact"],  # reads results/geo/constituency_impacts.csv
     },
     {
         "stage": "figures",
@@ -392,32 +402,100 @@ MANIFEST = [
             "appendix/b11_grid_no_capital.png",
             "appendix/decomposition_ci.png",
             "incidence/incidence_families.png",
+            "policy/policy_reforms.png",
         ],
         "inputs": [],
-        # presentation layer: reads jr16 CSVs, appendix CSVs, incidence JSONs
-        "after": ["jr16_figs", "jr16_grid", "appendix_decomp",
-                  "appendix_grids", "incidence", "measured_incidence"],
+        # presentation layer: reads jr16 CSVs, appendix CSVs, incidence JSONs,
+        # the 50-draw policy draws and the seed-0 policy JSONs
+        # appendix_fast: appendix_restyle() redraws its B.1-B.5, B.7 and B.8
+        # PNGs from its CSVs, so it must run after that stage
+        "after": ["jr16_figs", "jr16_grid", "appendix_fast", "appendix_decomp",
+                  "appendix_grids", "incidence", "measured_incidence",
+                  "monte_carlo", "policy"],
+    },
+    # Runs 15 and 16 (Fiscal Studies revision, run 13 Nov 2026)
+    {
+        "stage": "obr_benchmark",
+        # labour force: Microcosm's own 16+ active population (see next_runs.py)
+        "cmd": [PY, "analysis/next_runs.py", "obr"],
+        "outputs": ["next_runs/obr_benchmark_draws.csv", "next_runs/obr_benchmark_deciles.csv",
+                    "next_runs/obr_benchmark_decile_family.csv", "next_runs/obr_benchmark.json"],
+        "inputs": MICROCOSM_INPUTS,
+        "after": [],
+        "resumable": True,
+    },
+    {
+        "stage": "capital_variants",
+        "cmd": [PY, "analysis/next_runs.py", "capital"],
+        "outputs": ["next_runs/capital_variants_draws.csv", "next_runs/capital_variants_deciles.csv",
+                    "next_runs/capital_variants_decile_family.csv", "next_runs/capital_variants.json"],
+        "inputs": MICROCOSM_INPUTS,
+        "after": ["dividend_coverage"],  # pairs with its central draws
+        "resumable": True,
+    },
+    {
+        "stage": "obr_household_deciles",
+        # no simulation: run 15's household arrays -> flows by decile,
+        # cross-checked against obr_benchmark_deciles.csv
+        "cmd": [PY, "analysis/post_next_runs.py"],
+        "outputs": ["next_runs/obr_household_deciles.csv"],
+        "inputs": [],
+        "after": ["obr_benchmark"],
+    },
+    {
+        "stage": "takeup",
+        "cmd": [PY, "analysis/displaced_takeup_runs.py"],
+        "outputs": ["takeup/takeup_draws.csv", "takeup/takeup_deciles.csv",
+                    "takeup/takeup_runs.json"],
+        "inputs": MICROCOSM_INPUTS,
+        # pairs with run 15 and the central dividend-coverage draws; reads
+        # the u = 7 wage bill from the tax-composition grid
+        "after": ["obr_benchmark", "dividend_coverage", "tax_composition"],
+        "log": True,
+        "resumable": True,
+    },
+    {
+        "stage": "wage_cut",
+        "cmd": [PY, "analysis/wage_cut_household.py"],
+        "outputs": ["wage_cut/wage_cut_draws.csv", "wage_cut/wage_cut_deciles.csv",
+                    "wage_cut/wage_cut_decile_family.csv", "wage_cut/wage_cut.json"],
+        "inputs": MICROCOSM_INPUTS,
+        # each draw removes the wage bill of the central draw of the same
+        # seed (asserted inside apply_wage_margin_shock); paired with the
+        # dividend-coverage central draws in post_wage_cut.py
+        "after": [],
+        "log": True,
+        "resumable": True,
     },
     {
         "stage": "tex_values",
-        "cmd": [PY, "analysis/emit_tex_values.py"],
+        # --strict: a stale or incomplete source fails the build instead of
+        # printing \GENPENDING; post_takeup_runs.py and post_wage_cut.py are
+        # libraries the emitter imports, not stages
+        "cmd": [PY, "analysis/emit_tex_values.py", "--strict"],
         "outputs": [],
         "repo_outputs": ["paper/values_generated.tex"],
         "inputs": [],
+        # every stage whose outputs the emitter reads
         "after": [
             "presets", "jr16_figs", "jr16_grid", "incidence",
-            "measured_incidence", "monte_carlo", "policy", "caseloads",
-            "tax_composition", "enhanced_dataset", "figures",
+            "measured_incidence", "appendix_fast", "appendix_decomp",
+            "appendix_grids", "robustness", "monte_carlo",
+            "index_sensitivity", "duration_takeup", "duration_reforms",
+            "wage_tier", "mixed_wage_adjustment", "dividend_coverage",
+            "paper_scenarios", "policy", "caseloads", "tax_composition",
+            "gender", "poverty_decomposition", "recession_backcast",
+            "figures", "obr_benchmark", "capital_variants",
+            "obr_household_deciles", "takeup", "wage_cut",
         ],
     },
     {
         "stage": "paper_pdf",
-        "cmd": ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
-                "-cd", "paper/main.tex"],
+        "cmd": LATEX_CMD,
         "outputs": [],
         "repo_outputs": ["paper/main.pdf"],
         "inputs": [],
-        "after": ["tex_values", "geo_choropleth"],
+        "after": ["tex_values"],
     },
 ]
 
@@ -472,6 +550,12 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def portable_cmd(cmd: list[str]) -> list[str]:
+    """A stage command as recorded in the attestation: the interpreter by
+    name, so no machine-specific (or temporary) path enters the repository."""
+    return [Path(c).name if c == PY else c for c in cmd]
+
+
 def package_versions(names) -> dict[str, str | None]:
     """Installed distribution versions, with explicit nulls for source-only deps."""
     versions = {}
@@ -516,7 +600,7 @@ def dry_run(manifest):
 def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> int:
     outputs = all_outputs(manifest)
     tracked = tracked_results_files()
-    problems = []
+    problems, notes = [], []
 
     for rel in outputs:
         p = results_dir / rel
@@ -559,29 +643,84 @@ def check(manifest, results_dir: Path = RESULTS, verify_hashes: bool = True) -> 
             for rel, digest in att.get("inputs", {}).items():
                 p = ROOT / rel
                 if not p.exists():
-                    problems.append(f"INPUT-MISSING {rel}")
+                    # the dataset is private and untracked: its absence (CI,
+                    # a fresh clone) leaves the input unverified, not stale
+                    notes.append(f"input {rel} not present; its attested hash was not verified")
                 elif sha256(p) != digest:
                     problems.append(f"INPUT-STALE {rel}  (hash != attestation)")
+            # presentation layer: the committed macros and PDF must be the
+            # attested ones
+            presentation = att.get("presentation_files", {})
+            for stage in manifest:
+                for rel in stage.get("repo_outputs", []):
+                    p = ROOT / rel
+                    if rel not in presentation:
+                        problems.append(f"UNATTESTED {rel}  (presentation file not in attestation)")
+                    elif not p.exists():
+                        problems.append(f"MISSING   {rel}  (attested presentation file absent)")
+                    elif sha256(p) != presentation[rel]:
+                        problems.append(f"STALE     {rel}  (presentation hash != attestation)")
+            # the code that produced the attested tree must be the code in
+            # the checkout: every attested script hash must still match
+            for rel, digest in att.get("script_sha256", {}).items():
+                p = ROOT / rel
+                if not p.exists():
+                    problems.append(f"SCRIPT-DELETED {rel}  (attested script absent)")
+                elif sha256(p) != digest:
+                    problems.append(f"SCRIPT-STALE {rel}  (code changed since the attestation; "
+                                    "re-attest or rebuild)")
+            for p in sorted(list((ROOT / "analysis").glob("*.py")) + list((ROOT / "uk_ai_study").glob("*.py"))):
+                rel = str(p.relative_to(ROOT))
+                if att.get("script_sha256") and rel not in att["script_sha256"]:
+                    problems.append(f"SCRIPT-UNATTESTED {rel}  (not in attestation)")
+            if att.get("git_dirty_at_build"):
+                problems.append("DIRTY     attestation was written from a checkout with uncommitted "
+                                "changes to tracked files")
+            outside = att.get("outside_clean_room", {})
+            if outside:
+                notes.append("attestation lists stages whose current outputs did not come out of a clean-room build "
+                             "(hashes attest the committed files, not a rebuild): "
+                             + ", ".join(sorted(outside)))
 
+    for n in notes:
+        print("NOTE " + n)
     if problems:
         print(f"CHECK FAILED: {len(problems)} problem(s)")
         for p in problems:
             print("  " + p)
         return 1
     print(f"CHECK OK: {len(outputs)} manifest outputs present and non-empty; "
-          f"{len(tracked)} tracked files all accounted for")
+          f"{len(tracked)} tracked files all accounted for"
+          + ("; results/ and presentation hashes match the attestation" if verify_hashes else ""))
     return 0
 
 
-def attest_existing(results_dir: Path, source_root: Path) -> None:
-    """Attest an already completed, manifest-valid isolated build.
+def attest_existing(results_dir: Path, source_root: Path, note: str | None = None,
+                    outside_clean_room: dict | None = None) -> None:
+    """Attest an already completed, manifest-valid results tree.
 
-    This recovery mode is intentionally validation-heavy: it is for a build
-    whose final presentation stage was repaired in place after all simulation
-    stages completed. It never runs simulations or publishes files itself.
+    This recovery mode is intentionally validation-heavy: it is for a tree
+    whose stages did not all run in one clean-room build (a presentation
+    stage repaired in place, or stages run separately and committed). It
+    never runs simulations or publishes files itself. ``outside_clean_room``
+    maps each stage whose current outputs did not come out of a clean-room
+    build to a short
+    provenance note; --check prints those stages on every run.
     """
     if check(MANIFEST, results_dir=results_dir, verify_hashes=False):
         raise SystemExit("cannot attest an invalid or incomplete build tree")
+    # tracked files other than the attestation itself must be committed, so
+    # git_commit and the recorded hashes describe the same code
+    dirty = [
+        line for line in subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=source_root, capture_output=True, text=True, check=True,
+        ).stdout.splitlines()
+        if not line.endswith(f"results/{ATTESTATION}")
+    ]
+    if dirty:
+        raise SystemExit("refusing to attest: tracked files have uncommitted changes:\n"
+                         + "\n".join(dirty))
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=source_root,
@@ -606,34 +745,35 @@ def attest_existing(results_dir: Path, source_root: Path) -> None:
     )
     attestation = {
         "git_commit": commit,
-        "git_dirty_at_build": False,
-        "invoking_checkout_dirty_at_start": False,
+        "git_dirty_at_build": bool(dirty),  # refused above, so always False
+        "invoking_checkout_dirty_at_start": bool(dirty),
         "started_utc": None,
         "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "recovery_note": (
+        "recovery_note": note or (
             "Attested existing results tree without a full clean-room rerun; "
             "see git history for which stages were added or repaired since "
             "the last full attested build."
         ),
+        "outside_clean_room": outside_clean_room or {},
         "python": {
             "version": platform.python_version(),
             "implementation": platform.python_implementation(),
-            "executable": PY,
+            # name only: the absolute path of a temporary venv is noise
+            "executable": Path(PY).name,
         },
         "package_versions": package_versions(
             (
                 "uk-ai-study",
+                "policyengine",
                 "policyengine-uk",
                 "policyengine-core",
-                "policyengine-uk-data",
                 "numpy",
                 "pandas",
                 "matplotlib",
-                "geopandas",
             )
         ),
         "stages": [
-            {"stage": s["stage"], "cmd": s["cmd"]} for s in topo_order(MANIFEST)
+            {"stage": s["stage"], "cmd": portable_cmd(s["cmd"])} for s in topo_order(MANIFEST)
         ],
         "script_sha256": {
             str(f.relative_to(source_root)): sha256(f)
@@ -716,7 +856,8 @@ def build(manifest, keep_build=False, only_stages=None):
         if build_results.exists():
             shutil.rmtree(build_results)
         for sub in ["jr16", "appendix", "robustness", "incidence", "policy",
-                    "caseloads", "paper_scenarios", "tax_composition", "geo"]:
+                    "caseloads", "paper_scenarios", "tax_composition",
+                    "next_runs", "takeup", "wage_cut"]:
             (build_results / sub).mkdir(parents=True, exist_ok=True)
 
         log_path = build_results / BUILD_LOG
@@ -791,21 +932,19 @@ def build(manifest, keep_build=False, only_stages=None):
             "python": {
                 "version": platform.python_version(),
                 "implementation": platform.python_implementation(),
-                "executable": PY,
+                "executable": Path(PY).name,
             },
             "package_versions": package_versions(
                 (
                     "uk-ai-study",
                     "policyengine-uk",
                     "policyengine-core",
-                    "policyengine-uk-data",
-                    "numpy",
+                        "numpy",
                     "pandas",
                     "matplotlib",
-                    "geopandas",
-                )
+                    )
             ),
-            "stages": [{"stage": s["stage"], "cmd": s["cmd"]} for s in ordered],
+            "stages": [{"stage": s["stage"], "cmd": portable_cmd(s["cmd"])} for s in ordered],
             "script_sha256": {
                 str(f.relative_to(wt)): sha256(f)
                 for f in sorted((wt / "analysis").glob("*.py"))
@@ -874,10 +1013,19 @@ def main():
                     help="keep the temp worktree after a successful build")
     ap.add_argument("--attest-existing", type=Path,
                     help="validate and attest an existing completed results tree")
+    ap.add_argument("--note", help="with --attest-existing: the recovery note")
+    ap.add_argument("--outside-clean-room", type=Path,
+                    help="with --attest-existing: JSON file mapping each stage never "
+                         "run in a clean-room build to a provenance note")
     args = ap.parse_args()
 
     if args.attest_existing:
-        attest_existing(args.attest_existing.resolve(), ROOT)
+        outside = (json.loads(args.outside_clean_room.read_text())
+                   if args.outside_clean_room else None)
+        unknown = set(outside or {}) - {s["stage"] for s in MANIFEST}
+        if unknown:
+            raise SystemExit(f"--outside-clean-room names unknown stages: {sorted(unknown)}")
+        attest_existing(args.attest_existing.resolve(), ROOT, args.note, outside)
     elif args.dry_run:
         dry_run(MANIFEST)
     elif args.check:

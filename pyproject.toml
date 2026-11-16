@@ -1,16 +1,18 @@
 [project]
 name = "uk-ai-study"
 version = "0.1.0"
-description = "UK replication of ESRI JR16: AI exposure -> shock scenarios -> PolicyEngine UK microsimulation"
+description = "UK replication of ESRI JR16: AI exposure -> shock scenarios -> PolicyEngine UK microsimulation on Microcosm"
 requires-python = ">=3.13"
 dependencies = [
-    "policyengine-uk==2.89.2",
+    "policyengine[uk]==6.16.1",
     "huggingface_hub",
     "pandas",
     "numpy",
     "matplotlib",
-    "geopandas>=1.1.4",
 ]
+
+[dependency-groups]
+dev = ["pytest"]
 
 [build-system]
 requires = ["hatchling"]

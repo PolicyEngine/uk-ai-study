@@ -1,0 +1,987 @@
+{
+  "provenance": {
+    "bundle_id": "uk-6.16.1",
+    "policyengine_version": "6.16.1",
+    "model_version": "2.174.1",
+    "default_dataset": "microcosm_uk_2024_25",
+    "certified_data_build_id": "microcosm-uk-2024-25-national-20261107T020434Z-eeb6093e",
+    "certified_data_artifact_sha256": "0a9b77db1c0dee2693cb2d47bad68da34cb662916eee4829942bcd45de581f25"
+  },
+  "certified_data_build_id": "microcosm-uk-2024-25-national-20261107T020434Z-eeb6093e",
+  "period": 2027,
+  "draws": 20,
+  "seeds": [
+    0,
+    19
+  ],
+  "spi_source": "policyengine-uk-data policyengine_uk_data/storage/incomes_projection.csv @ fa4ebe9: HMRC SPI 2023-24 outturn projected to 2027, dividend_income_amount and savings_interest_income_amount by total income band, bands from 12570 (income tax payers)",
+  "basis": "SPI covers income tax payers (total income from \u00a312,570). Scaling factors use Microcosm capital income of people with baseline total income >= \u00a312,570 as the numerator and scale only their income; income below the threshold is left unchanged.",
+  "coverage": {
+    "dividend_income": {
+      "microcosm_all_bn": 95.87604901520503,
+      "microcosm_taxpayers_bn": 95.64881258076683,
+      "microcosm_below_threshold_bn": 0.22723643443820066,
+      "spi_bn": 82.552136032,
+      "holders_m": 4.888663326947413
+    },
+    "savings_interest_income": {
+      "microcosm_all_bn": 28.686695973588716,
+      "microcosm_taxpayers_bn": 27.730548898426154,
+      "microcosm_below_threshold_bn": 0.9561470751625553,
+      "spi_bn": 21.098701843,
+      "holders_m": 22.834641662188925
+    }
+  },
+  "spi_dividends_2026_bn": 82.552136032,
+  "microcosm_dividends_2026_bn": 95.87604901520503,
+  "microcosm_dividends_taxpayers_2026_bn": 95.64881258076683,
+  "microcosm_dividend_holders_m": 4.888663326947413,
+  "microcosm_to_spi_ratio": 1.1586473370439514,
+  "scale_factor": 0.8630753880221161,
+  "savings_scale_factor": 0.7608468884003033,
+  "baseline_dividend_tax_bn": 26.905309184,
+  "scaling": {
+    "div_uniform": {
+      "column": "dividend_income",
+      "method": "uniform",
+      "bands": [
+        {
+          "lower": 12570,
+          "upper": 15000,
+          "spi_bn": 0.201290564,
+          "microcosm_bn": 0.18510052452460588,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 15000,
+          "upper": 20000,
+          "spi_bn": 0.983448186,
+          "microcosm_bn": 1.0075996527531215,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 20000,
+          "upper": 30000,
+          "spi_bn": 3.830271882,
+          "microcosm_bn": 2.569501597517668,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 30000,
+          "upper": 40000,
+          "spi_bn": 5.406089443,
+          "microcosm_bn": 2.4258415500966333,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 40000,
+          "upper": 50000,
+          "spi_bn": 9.66194709,
+          "microcosm_bn": 5.592579984226235,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 50000,
+          "upper": 70000,
+          "spi_bn": 14.377897456,
+          "microcosm_bn": 16.729011132649855,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 70000,
+          "upper": 100000,
+          "spi_bn": 10.858188159,
+          "microcosm_bn": 14.436854492289536,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 100000,
+          "upper": 150000,
+          "spi_bn": 7.902092442,
+          "microcosm_bn": 10.809744705057321,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 150000,
+          "upper": 200000,
+          "spi_bn": 3.968299698,
+          "microcosm_bn": 3.6550225861546353,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 200000,
+          "upper": 300000,
+          "spi_bn": 4.255857647,
+          "microcosm_bn": 4.6965904618202785,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 300000,
+          "upper": 500000,
+          "spi_bn": 3.945295062,
+          "microcosm_bn": 3.587486101117395,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 500000,
+          "upper": 1000000,
+          "spi_bn": 4.393885462,
+          "microcosm_bn": 5.207342584080166,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        },
+        {
+          "lower": 1000000,
+          "upper": Infinity,
+          "spi_bn": 12.767572941,
+          "microcosm_bn": 24.746137208479386,
+          "factor": 0.8630753880221161,
+          "empty_band": false
+        }
+      ],
+      "scaled_total_bn": 82.7793724664382,
+      "scaled_taxpayers_bn": 82.552136032,
+      "baseline_dividend_tax_bn": 22.455476224,
+      "baseline_gov_balance_change_bn": -4.644143104
+    },
+    "div_banded": {
+      "column": "dividend_income",
+      "method": "banded",
+      "bands": [
+        {
+          "lower": 12570,
+          "upper": 15000,
+          "spi_bn": 0.201290564,
+          "microcosm_bn": 0.18510052452460588,
+          "factor": 1.087466199876932,
+          "empty_band": false
+        },
+        {
+          "lower": 15000,
+          "upper": 20000,
+          "spi_bn": 0.983448186,
+          "microcosm_bn": 1.0075996527531215,
+          "factor": 0.9760306916669422,
+          "empty_band": false
+        },
+        {
+          "lower": 20000,
+          "upper": 30000,
+          "spi_bn": 3.830271882,
+          "microcosm_bn": 2.569501597517668,
+          "factor": 1.4906672506840746,
+          "empty_band": false
+        },
+        {
+          "lower": 30000,
+          "upper": 40000,
+          "spi_bn": 5.406089443,
+          "microcosm_bn": 2.4258415500966333,
+          "factor": 2.2285418611881918,
+          "empty_band": false
+        },
+        {
+          "lower": 40000,
+          "upper": 50000,
+          "spi_bn": 9.66194709,
+          "microcosm_bn": 5.592579984226235,
+          "factor": 1.727636818293406,
+          "empty_band": false
+        },
+        {
+          "lower": 50000,
+          "upper": 70000,
+          "spi_bn": 14.377897456,
+          "microcosm_bn": 16.729011132649855,
+          "factor": 0.8594588970019148,
+          "empty_band": false
+        },
+        {
+          "lower": 70000,
+          "upper": 100000,
+          "spi_bn": 10.858188159,
+          "microcosm_bn": 14.436854492289536,
+          "factor": 0.7521159241993581,
+          "empty_band": false
+        },
+        {
+          "lower": 100000,
+          "upper": 150000,
+          "spi_bn": 7.902092442,
+          "microcosm_bn": 10.809744705057321,
+          "factor": 0.7310156398331052,
+          "empty_band": false
+        },
+        {
+          "lower": 150000,
+          "upper": 200000,
+          "spi_bn": 3.968299698,
+          "microcosm_bn": 3.6550225861546353,
+          "factor": 1.0857114024498973,
+          "empty_band": false
+        },
+        {
+          "lower": 200000,
+          "upper": 300000,
+          "spi_bn": 4.255857647,
+          "microcosm_bn": 4.6965904618202785,
+          "factor": 0.9061589852461904,
+          "empty_band": false
+        },
+        {
+          "lower": 300000,
+          "upper": 500000,
+          "spi_bn": 3.945295062,
+          "microcosm_bn": 3.587486101117395,
+          "factor": 1.0997380758551674,
+          "empty_band": false
+        },
+        {
+          "lower": 500000,
+          "upper": 1000000,
+          "spi_bn": 4.393885462,
+          "microcosm_bn": 5.207342584080166,
+          "factor": 0.8437865170294233,
+          "empty_band": false
+        },
+        {
+          "lower": 1000000,
+          "upper": Infinity,
+          "spi_bn": 12.767572941,
+          "microcosm_bn": 24.746137208479386,
+          "factor": 0.5159420572769284,
+          "empty_band": false
+        }
+      ],
+      "scaled_total_bn": 82.7793724664382,
+      "scaled_taxpayers_bn": 82.552136032,
+      "baseline_dividend_tax_bn": 20.513349632,
+      "baseline_gov_balance_change_bn": -6.645547008
+    },
+    "savings_uniform": {
+      "column": "savings_interest_income",
+      "method": "uniform",
+      "bands": [
+        {
+          "lower": 12570,
+          "upper": 15000,
+          "spi_bn": 0.315163512,
+          "microcosm_bn": 0.39560954859522496,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 15000,
+          "upper": 20000,
+          "spi_bn": 1.575817561,
+          "microcosm_bn": 1.38790046565471,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 20000,
+          "upper": 30000,
+          "spi_bn": 3.600225523,
+          "microcosm_bn": 4.908378394610087,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 30000,
+          "upper": 40000,
+          "spi_bn": 2.910086445,
+          "microcosm_bn": 3.4266618170407934,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 40000,
+          "upper": 50000,
+          "spi_bn": 2.150933459,
+          "microcosm_bn": 2.682989821749905,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 50000,
+          "upper": 70000,
+          "spi_bn": 2.691542404,
+          "microcosm_bn": 4.058751154589594,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 70000,
+          "upper": 100000,
+          "spi_bn": 1.86337551,
+          "microcosm_bn": 2.321925888859001,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 100000,
+          "upper": 150000,
+          "spi_bn": 1.449292064,
+          "microcosm_bn": 1.9381857830931215,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 150000,
+          "upper": 200000,
+          "spi_bn": 0.747650668,
+          "microcosm_bn": 1.0479640073478316,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 200000,
+          "upper": 300000,
+          "spi_bn": 0.843119907,
+          "microcosm_bn": 0.9476500000327627,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 300000,
+          "upper": 500000,
+          "spi_bn": 0.774105999,
+          "microcosm_bn": 1.095662735920282,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 500000,
+          "upper": 1000000,
+          "spi_bn": 0.751101363,
+          "microcosm_bn": 1.0268115338918742,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        },
+        {
+          "lower": 1000000,
+          "upper": Infinity,
+          "spi_bn": 1.426287428,
+          "microcosm_bn": 2.4920577470409735,
+          "factor": 0.7608468884003033,
+          "empty_band": false
+        }
+      ],
+      "scaled_total_bn": 22.054848918162556,
+      "scaled_taxpayers_bn": 21.098701843000004,
+      "baseline_dividend_tax_bn": 26.852831232,
+      "baseline_gov_balance_change_bn": -2.170748928
+    }
+  },
+  "central": {
+    "exchequer_cost_bn": {
+      "mean": 7.1784415232,
+      "sd": 2.039001375727327,
+      "min": 2.676260864,
+      "max": 10.213064704
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 2.37854399897247,
+      "sd": 0.19083789506988502,
+      "min": 1.9903142956669992,
+      "max": 2.7772006712584245
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 2.5542744026488515,
+      "sd": 0.24288796533362236,
+      "min": 2.095070032554078,
+      "max": 2.932291531309214
+    },
+    "gini_change_pp": {
+      "mean": 1.7311287186779918,
+      "sd": 0.10941527146530473,
+      "min": 1.496160367473931,
+      "max": 1.925257237813871
+    },
+    "dividend_tax_change_bn": {
+      "mean": 13.197831167999999,
+      "sd": 0.13777614347480294,
+      "min": 13.008560128,
+      "max": 13.453258752
+    },
+    "savings_tax_change_bn": {
+      "mean": 3.5121482239999997,
+      "sd": 0.04608069902126175,
+      "min": 3.404419072,
+      "max": 3.576035328
+    },
+    "displaced_weighted_m": {
+      "mean": 2.0205160988968442,
+      "sd": 0.07965962222964844,
+      "min": 1.852365275788784,
+      "max": 2.1459362254750496
+    }
+  },
+  "channels": {
+    "displacement": {
+      "exchequer_cost_bn": {
+        "mean": 42.49487687680001,
+        "sd": 1.9635385885668408,
+        "min": 38.259949568,
+        "max": 45.558972416
+      },
+      "poverty_change_bhc_pp": {
+        "mean": 2.8844478569567684,
+        "sd": 0.19107399763036956,
+        "min": 2.463395406279119,
+        "max": 3.2465403279636833
+      },
+      "poverty_change_ahc_pp": {
+        "mean": 3.422415042441621,
+        "sd": 0.27982601892583225,
+        "min": 2.8784637617880664,
+        "max": 4.01433645330791
+      },
+      "gini_change_pp": {
+        "mean": 0.8705612218343178,
+        "sd": 0.1109189435360461,
+        "min": 0.6285717441666283,
+        "max": 1.0640222204908345
+      },
+      "dividend_tax_change_bn": {
+        "mean": -0.4055404544,
+        "sd": 0.10598258812886871,
+        "min": -0.58001408,
+        "max": -0.212750336
+      },
+      "savings_tax_change_bn": {
+        "mean": -0.132073728,
+        "sd": 0.035699921310286056,
+        "min": -0.22304256,
+        "max": -0.086096896
+      },
+      "displaced_weighted_m": {
+        "mean": 2.0205160988968442,
+        "sd": 0.07965962222964844,
+        "min": 1.852365275788784,
+        "max": 2.1459362254750496
+      }
+    },
+    "wage": {
+      "exchequer_cost_bn": {
+        "mean": -17.517182976,
+        "sd": 0.06394559218247783,
+        "min": -17.670701056,
+        "max": -17.432051712
+      },
+      "poverty_change_bhc_pp": {
+        "mean": -0.15207391843453014,
+        "sd": 0.005776887467848857,
+        "min": -0.1588905275193466,
+        "max": -0.1400609085985923
+      },
+      "poverty_change_ahc_pp": {
+        "mean": -0.45298471176200944,
+        "sd": 0.021620862645254837,
+        "min": -0.4693611943313303,
+        "max": -0.3732550327620265
+      },
+      "gini_change_pp": {
+        "mean": 0.15569661856601466,
+        "sd": 0.0027697316542765376,
+        "min": 0.1492983393998947,
+        "max": 0.1594363824869549
+      },
+      "dividend_tax_change_bn": {
+        "mean": 0.10597079040000001,
+        "sd": 0.0031145553345897233,
+        "min": 0.100767744,
+        "max": 0.111632384
+      },
+      "savings_tax_change_bn": {
+        "mean": 0.034812569599999996,
+        "sd": 0.0012761315952115179,
+        "min": 0.032149504,
+        "max": 0.037008384
+      },
+      "displaced_weighted_m": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      }
+    },
+    "capital": {
+      "exchequer_cost_bn": {
+        "mean": -17.910530048,
+        "sd": 0.0
+      },
+      "poverty_change_bhc_pp": {
+        "mean": -0.2394132298032938,
+        "sd": 0.0
+      },
+      "poverty_change_ahc_pp": {
+        "mean": -0.2346435172281696,
+        "sd": 0.0
+      },
+      "gini_change_pp": {
+        "mean": 0.6968817083217504,
+        "sd": 0.0
+      },
+      "dividend_tax_change_bn": {
+        "mean": 13.595189248,
+        "sd": 0.0
+      },
+      "savings_tax_change_bn": {
+        "mean": 3.648685056,
+        "sd": 0.0
+      },
+      "displaced_weighted_m": {
+        "mean": 0.0,
+        "sd": 0.0
+      }
+    }
+  },
+  "channels_sum": {
+    "exchequer_cost_bn": 7.067163852800007,
+    "poverty_change_bhc_pp": 2.4929607087189445,
+    "poverty_change_ahc_pp": 2.734786813451442,
+    "gini_change_pp": 1.7231395487220829,
+    "dividend_tax_change_bn": 13.295619584,
+    "savings_tax_change_bn": 3.5514238976000003,
+    "displaced_weighted_m": 2.0205160988968442
+  },
+  "channels_interaction": {
+    "exchequer_cost_bn": 0.1112776703999927,
+    "poverty_change_bhc_pp": -0.11441670974647433,
+    "poverty_change_ahc_pp": -0.1805124108025904,
+    "gini_change_pp": 0.007989169955908926,
+    "dividend_tax_change_bn": -0.09778841600000199,
+    "savings_tax_change_bn": -0.039275673600000616,
+    "displaced_weighted_m": 0.0
+  },
+  "channels_seed0": {
+    "displacement": {
+      "exchequer_cost_bn": 42.73045504,
+      "poverty_change_bhc_pp": 2.463395406279119,
+      "poverty_change_ahc_pp": 3.0412574815833566,
+      "gini_change_pp": 0.6285717441666283,
+      "dividend_tax_change_bn": -0.212750336,
+      "savings_tax_change_bn": -0.112387072,
+      "displaced_weighted_m": 1.9620327368081716
+    },
+    "wage": {
+      "exchequer_cost_bn": -17.514954752,
+      "poverty_change_bhc_pp": -0.150425688884763,
+      "poverty_change_ahc_pp": -0.4669309457696474,
+      "gini_change_pp": 0.1492983393998947,
+      "dividend_tax_change_bn": 0.111632384,
+      "savings_tax_change_bn": 0.03523584,
+      "displaced_weighted_m": 0.0
+    },
+    "capital": {
+      "exchequer_cost_bn": -17.910530048,
+      "poverty_change_bhc_pp": -0.2394132298032938,
+      "poverty_change_ahc_pp": -0.2346435172281696,
+      "gini_change_pp": 0.6968817083217504,
+      "dividend_tax_change_bn": 13.595189248,
+      "savings_tax_change_bn": 3.648685056,
+      "displaced_weighted_m": 0.0
+    }
+  },
+  "channels_seed0_sum_cost_bn": 7.304970240000003,
+  "div_uniform": {
+    "exchequer_cost_bn": {
+      "mean": 9.343460966399999,
+      "sd": 2.0317440478733535,
+      "min": 4.896784384,
+      "max": 12.416221184
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 2.4608340884358446,
+      "sd": 0.1856199089378944,
+      "min": 2.0903294158207784,
+      "max": 2.7914809441060435
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 2.6564486460904946,
+      "sd": 0.24061335192299838,
+      "min": 2.218884924848996,
+      "max": 3.036902272673328
+    },
+    "gini_change_pp": {
+      "mean": 1.6201886488840795,
+      "sd": 0.11011875062905685,
+      "min": 1.3807899159501202,
+      "max": 1.815105989146082
+    },
+    "dividend_tax_change_bn": {
+      "mean": 11.1268798464,
+      "sd": 0.12257632545680652,
+      "min": 10.957770752,
+      "max": 11.362500608
+    },
+    "savings_tax_change_bn": {
+      "mean": 3.5087322624,
+      "sd": 0.04593519426267747,
+      "min": 3.40106752,
+      "max": 3.572596736
+    },
+    "displaced_weighted_m": {
+      "mean": 2.0205160988968442,
+      "sd": 0.07965962222964844,
+      "min": 1.852365275788784,
+      "max": 2.1459362254750496
+    }
+  },
+  "paired_difference_div_uniform_minus_central": {
+    "exchequer_cost_bn": {
+      "mean": 2.1650194431999994,
+      "sd": 0.030054532805887046,
+      "min": 2.11533824,
+      "max": 2.22052352
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 0.0822900894633744,
+      "sd": 0.02842009432910002,
+      "min": 0.014280272847619013,
+      "max": 0.11388515572737523
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 0.10217424344164325,
+      "sd": 0.04063021049923549,
+      "min": -0.039421092600797625,
+      "max": 0.13231251760780527
+    },
+    "gini_change_pp": {
+      "mean": -0.11094006979391222,
+      "sd": 0.0037783446752689626,
+      "min": -0.11965615759265114,
+      "max": -0.10485529313495334
+    },
+    "dividend_tax_change_bn": {
+      "mean": -2.0709513216,
+      "sd": 0.024954970376687657,
+      "min": -2.1124157439999998,
+      "max": -2.022451200000001
+    },
+    "savings_tax_change_bn": {
+      "mean": -0.003415961600000084,
+      "sd": 0.0003633732248685506,
+      "min": -0.004158464000000084,
+      "max": -0.002680832000000244
+    },
+    "displaced_weighted_m": {
+      "mean": 0.0,
+      "sd": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "div_uniform_channel_capital": {
+    "exchequer_cost_bn": -15.69570816,
+    "poverty_change_bhc_pp": -0.1623249341630953,
+    "poverty_change_ahc_pp": -0.1712872160292672,
+    "gini_change_pp": 0.5886963681153823,
+    "dividend_tax_change_bn": 11.482763264,
+    "savings_tax_change_bn": 3.64504576,
+    "displaced_weighted_m": 0.0
+  },
+  "div_banded": {
+    "exchequer_cost_bn": {
+      "mean": 9.212864102400001,
+      "sd": 2.0313614174710595,
+      "min": 4.76184576,
+      "max": 12.277121024
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 2.4545481967080525,
+      "sd": 0.18052369131302626,
+      "min": 2.089745055903484,
+      "max": 2.783415139875632
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 2.6802396103692083,
+      "sd": 0.2435813761114679,
+      "min": 2.242376633781795,
+      "max": 3.081056419569736
+    },
+    "gini_change_pp": {
+      "mean": 1.5770661185242396,
+      "sd": 0.10668453592698475,
+      "min": 1.3416006164663874,
+      "max": 1.7671907149930388
+    },
+    "dividend_tax_change_bn": {
+      "mean": 11.269409484799999,
+      "sd": 0.1340374100239019,
+      "min": 11.056478208,
+      "max": 11.53773568
+    },
+    "savings_tax_change_bn": {
+      "mean": 3.5066043392000004,
+      "sd": 0.04585525807416894,
+      "min": 3.39874816,
+      "max": 3.570306048
+    },
+    "displaced_weighted_m": {
+      "mean": 2.0205160988968442,
+      "sd": 0.07965962222964844,
+      "min": 1.852365275788784,
+      "max": 2.1459362254750496
+    }
+  },
+  "paired_difference_div_banded_minus_central": {
+    "exchequer_cost_bn": {
+      "mean": 2.0344225792,
+      "sd": 0.04303130137726556,
+      "min": 1.9394396159999996,
+      "max": 2.107179008
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 0.0760041977355824,
+      "sd": 0.04005051872605374,
+      "min": -0.040686044472868055,
+      "max": 0.10475547426251319
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 0.12596520772035702,
+      "sd": 0.049769195537100394,
+      "min": -0.004978622955812195,
+      "max": 0.1667160064990596
+    },
+    "gini_change_pp": {
+      "mean": -0.15406260015375206,
+      "sd": 0.004800085356323139,
+      "min": -0.16045374947751823,
+      "max": -0.14062944064082727
+    },
+    "dividend_tax_change_bn": {
+      "mean": -1.9284216831999998,
+      "sd": 0.03693581177232204,
+      "min": -1.998958592000001,
+      "max": -1.880610815999999
+    },
+    "savings_tax_change_bn": {
+      "mean": -0.005543884800000032,
+      "sd": 0.000471614972468154,
+      "min": -0.005891071999999831,
+      "max": -0.0037611520000000453
+    },
+    "displaced_weighted_m": {
+      "mean": 0.0,
+      "sd": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "div_banded_channel_capital": {
+    "exchequer_cost_bn": -15.828811776,
+    "poverty_change_bhc_pp": -0.1446161732632025,
+    "poverty_change_ahc_pp": -0.1633998220753191,
+    "gini_change_pp": 0.5520922570276032,
+    "dividend_tax_change_bn": 11.638966272,
+    "savings_tax_change_bn": 3.642990592,
+    "displaced_weighted_m": 0.0
+  },
+  "savings_uniform": {
+    "exchequer_cost_bn": {
+      "mean": 8.2392498176,
+      "sd": 2.0370906533154094,
+      "min": 3.75160832,
+      "max": 11.28464384
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 2.3619984718443163,
+      "sd": 0.19160818811522753,
+      "min": 1.9745798247246675,
+      "max": 2.7687715984124672
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 2.5538582825443252,
+      "sd": 0.24375738375878833,
+      "min": 2.086487382359387,
+      "max": 2.92228140617036
+    },
+    "gini_change_pp": {
+      "mean": 1.704871153010958,
+      "sd": 0.11029249281737219,
+      "min": 1.467948552599041,
+      "max": 1.8984372723379828
+    },
+    "dividend_tax_change_bn": {
+      "mean": 13.149276364799999,
+      "sd": 0.13780657818769032,
+      "min": 12.95865856,
+      "max": 13.405171712
+    },
+    "savings_tax_change_bn": {
+      "mean": 2.5220250112,
+      "sd": 0.03831200901794282,
+      "min": 2.425222656,
+      "max": 2.572299776
+    },
+    "displaced_weighted_m": {
+      "mean": 2.0205160988968442,
+      "sd": 0.07965962222964844,
+      "min": 1.852365275788784,
+      "max": 2.1459362254750496
+    }
+  },
+  "paired_difference_savings_uniform_minus_central": {
+    "exchequer_cost_bn": {
+      "mean": 1.0608082943999997,
+      "sd": 0.009757343909834815,
+      "min": 1.0466426879999995,
+      "max": 1.0759045120000001
+    },
+    "poverty_change_bhc_pp": {
+      "mean": -0.016545527128154124,
+      "sd": 0.003818703183811076,
+      "min": -0.022297326105068294,
+      "max": -0.008429072845957286
+    },
+    "poverty_change_ahc_pp": {
+      "mean": -0.00041612010452591887,
+      "sd": 0.010642137343513738,
+      "min": -0.011497002047577976,
+      "max": 0.020874780816087846
+    },
+    "gini_change_pp": {
+      "mean": -0.026257565667033834,
+      "sd": 0.0015591499406406616,
+      "min": -0.028975956567878214,
+      "max": -0.0232357939954686
+    },
+    "dividend_tax_change_bn": {
+      "mean": -0.04855480320000005,
+      "sd": 0.0024779207515252376,
+      "min": -0.05126553600000072,
+      "max": -0.04237721600000022
+    },
+    "savings_tax_change_bn": {
+      "mean": -0.9901232128,
+      "sd": 0.008677153569105497,
+      "min": -1.0037355520000002,
+      "max": -0.973280768
+    },
+    "displaced_weighted_m": {
+      "mean": 0.0,
+      "sd": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "savings_uniform_channel_capital": {
+    "exchequer_cost_bn": -16.820731904,
+    "poverty_change_bhc_pp": -0.2695001025750612,
+    "poverty_change_ahc_pp": -0.2533824033701559,
+    "gini_change_pp": 0.669270400009847,
+    "dividend_tax_change_bn": 13.5474176,
+    "savings_tax_change_bn": 2.625643008,
+    "displaced_weighted_m": 0.0
+  },
+  "spi_scaled": {
+    "exchequer_cost_bn": {
+      "mean": 9.343460966399999,
+      "sd": 2.0317440478733535,
+      "min": 4.896784384,
+      "max": 12.416221184
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 2.4608340884358446,
+      "sd": 0.1856199089378944,
+      "min": 2.0903294158207784,
+      "max": 2.7914809441060435
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 2.6564486460904946,
+      "sd": 0.24061335192299838,
+      "min": 2.218884924848996,
+      "max": 3.036902272673328
+    },
+    "gini_change_pp": {
+      "mean": 1.6201886488840795,
+      "sd": 0.11011875062905685,
+      "min": 1.3807899159501202,
+      "max": 1.815105989146082
+    },
+    "dividend_tax_change_bn": {
+      "mean": 11.1268798464,
+      "sd": 0.12257632545680652,
+      "min": 10.957770752,
+      "max": 11.362500608
+    },
+    "savings_tax_change_bn": {
+      "mean": 3.5087322624,
+      "sd": 0.04593519426267747,
+      "min": 3.40106752,
+      "max": 3.572596736
+    },
+    "displaced_weighted_m": {
+      "mean": 2.0205160988968442,
+      "sd": 0.07965962222964844,
+      "min": 1.852365275788784,
+      "max": 2.1459362254750496
+    }
+  },
+  "paired_difference_spi_minus_central": {
+    "exchequer_cost_bn": {
+      "mean": 2.1650194431999994,
+      "sd": 0.030054532805887046,
+      "min": 2.11533824,
+      "max": 2.22052352
+    },
+    "poverty_change_bhc_pp": {
+      "mean": 0.0822900894633744,
+      "sd": 0.02842009432910002,
+      "min": 0.014280272847619013,
+      "max": 0.11388515572737523
+    },
+    "poverty_change_ahc_pp": {
+      "mean": 0.10217424344164325,
+      "sd": 0.04063021049923549,
+      "min": -0.039421092600797625,
+      "max": 0.13231251760780527
+    },
+    "gini_change_pp": {
+      "mean": -0.11094006979391222,
+      "sd": 0.0037783446752689626,
+      "min": -0.11965615759265114,
+      "max": -0.10485529313495334
+    },
+    "dividend_tax_change_bn": {
+      "mean": -2.0709513216,
+      "sd": 0.024954970376687657,
+      "min": -2.1124157439999998,
+      "max": -2.022451200000001
+    },
+    "savings_tax_change_bn": {
+      "mean": -0.003415961600000084,
+      "sd": 0.0003633732248685506,
+      "min": -0.004158464000000084,
+      "max": -0.002680832000000244
+    },
+    "displaced_weighted_m": {
+      "mean": 0.0,
+      "sd": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "capital_channel_seed0_spi_scaled": {
+    "exchequer_cost_bn": -15.69570816,
+    "poverty_change_bhc_pp": -0.1623249341630953,
+    "poverty_change_ahc_pp": -0.1712872160292672,
+    "gini_change_pp": 0.5886963681153823,
+    "dividend_tax_change_bn": 11.482763264,
+    "savings_tax_change_bn": 3.64504576,
+    "displaced_weighted_m": 0.0
+  }
+}

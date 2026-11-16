@@ -1,0 +1,981 @@
+{
+  "jsa": {
+    "rate_25_plus_week": 95.55,
+    "rate_18_24_week": 75.65,
+    "weeks": 26,
+    "lower_earnings_limit_week": 133.41191670832856,
+    "earnings_condition_gbp": 6670.595835416428,
+    "ages": [
+      18,
+      65
+    ],
+    "taxed_by_model": true,
+    "counts_as_uc_unearned_income": true
+  },
+  "existing_unemployed": {
+    "persons_m": 1.1740665708135687,
+    "benunits_m": 1.159795998494255,
+    "uc_per_person_gbp": 6235.902724893817,
+    "entitled_share": 0.6882815382666762,
+    "flag_true_share_entitled": 0.8808308589204434
+  },
+  "capital_limit_gbp": 16000.0,
+  "obr_displacement_rate": 0.016724862807076194,
+  "disp_only_rate": 0.07,
+  "complete": true,
+  "results": {
+    "central": {
+      "jsa": {
+        "gov_balance_change_bn": {
+          "mean": -12.635896683938881,
+          "sd": 2.128398977814203,
+          "se": 0.4759244797633625,
+          "n": 20
+        },
+        "income_tax_change_bn": {
+          "mean": 5.719651641569006,
+          "sd": 1.2761899681018756,
+          "se": 0.2853647520879082,
+          "n": 20
+        },
+        "ni_employee_change_bn": {
+          "mean": -2.8367040679059476,
+          "sd": 0.1937680445196105,
+          "se": 0.043327851941305465,
+          "n": 20
+        },
+        "national_insurance_change_bn": {
+          "mean": -2.8297306857166618,
+          "sd": 0.19401022322855477,
+          "se": 0.043382004746895714,
+          "n": 20
+        },
+        "employer_ni_change_bn": {
+          "mean": -8.800414024150774,
+          "sd": 0.5861402144968969,
+          "se": 0.13106493639613692,
+          "n": 20
+        },
+        "uc_change_bn": {
+          "mean": 3.184947004837835,
+          "sd": 0.3388231254810399,
+          "se": 0.07576315409245463,
+          "n": 20
+        },
+        "benefits_change_bn": {
+          "mean": 6.722632819029876,
+          "sd": 0.44331062412758804,
+          "se": 0.09912726906971452,
+          "n": 20
+        },
+        "cash_benefits_change_bn": {
+          "mean": 8.035717658018738,
+          "sd": 0.4782817804017427,
+          "se": 0.10694705733779232,
+          "n": 20
+        },
+        "childcare_change_bn": {
+          "mean": -1.0614270902066085,
+          "sd": 0.09320469402843523,
+          "se": 0.02084120316696499,
+          "n": 20
+        },
+        "statutory_pay_change_bn": {
+          "mean": -0.2516577487822489,
+          "sd": 0.10987967535237572,
+          "se": 0.024569842343352025,
+          "n": 20
+        },
+        "jsa_change_bn": {
+          "mean": 4.708982844646284,
+          "sd": 0.19376887499298512,
+          "se": 0.04332803764079738,
+          "n": 20
+        },
+        "household_net_income_change_bn": {
+          "mean": -10.23265404878656,
+          "sd": 2.3923697348158277,
+          "se": 0.5349501354361336,
+          "n": 20
+        },
+        "poverty_change_bhc_pp": {
+          "mean": 1.989749315755208,
+          "sd": 0.16072607703300482,
+          "se": 0.03593944340026665,
+          "n": 20
+        },
+        "poverty_change_ahc_pp": {
+          "mean": 2.186175493388079,
+          "sd": 0.1922029665558429,
+          "se": 0.042977889869598336,
+          "n": 20
+        },
+        "relative_poverty_change_bhc_pp": {
+          "mean": 0.5374498050676396,
+          "sd": 0.22371708225714157,
+          "se": 0.05002466036548806,
+          "n": 20
+        },
+        "relative_poverty_change_ahc_pp": {
+          "mean": 0.8853117082137013,
+          "sd": 0.16524356058813805,
+          "se": 0.036949583431918176,
+          "n": 20
+        },
+        "gini_change_pp": {
+          "mean": 1.456632905985323,
+          "sd": 0.09808007363316514,
+          "se": 0.0219313711881942,
+          "n": 20
+        },
+        "exchequer_cost_bn": {
+          "mean": 12.635896683938881,
+          "sd": 2.128398977814203,
+          "se": 0.4759244797633625,
+          "n": 20
+        },
+        "household_basis_cost_bn": {
+          "mean": 3.8396852453668173,
+          "sd": 1.5576640062301335,
+          "se": 0.3483042604035234,
+          "n": 20
+        },
+        "household_basis_cash_cost_bn": {
+          "mean": 5.152770084355679,
+          "sd": 1.581333015059766,
+          "se": 0.3535968116738335,
+          "n": 20
+        },
+        "narrow_cash_change_bn": {
+          "mean": -3.832711863177532,
+          "sd": 1.5576038411418833,
+          "se": 0.34829080708080346,
+          "n": 20
+        },
+        "displaced_weighted_m": {
+          "mean": 2.0205160988968442,
+          "sd": 0.07965962222964844,
+          "se": 0.017812433036744728,
+          "n": 20
+        },
+        "wage_bill_lost_bn": {
+          "mean": 100.73689884333815,
+          "sd": 4.004961571279852,
+          "se": 0.8955366320656117,
+          "n": 20
+        },
+        "jsa_eligible_m": {
+          "mean": 1.9293624491643449,
+          "sd": 0.08011743680586289,
+          "se": 0.017914803488095304,
+          "n": 20
+        },
+        "jsa_award_input_bn": {
+          "mean": 4.708982754409006,
+          "sd": 0.19376887131650683,
+          "se": 0.04332803681871184,
+          "n": 20
+        }
+      },
+      "takeup1": {
+        "gov_balance_change_bn": {
+          "mean": -9.935695329418763,
+          "sd": 2.047785497192489,
+          "se": 0.457898757506061,
+          "n": 20
+        },
+        "income_tax_change_bn": {
+          "mean": 5.611657538202356,
+          "sd": 1.2823209169551828,
+          "se": 0.2867356739281651,
+          "n": 20
+        },
+        "ni_employee_change_bn": {
+          "mean": -2.8367040679059476,
+          "sd": 0.1937680445196105,
+          "se": 0.043327851941305465,
+          "n": 20
+        },
+        "national_insurance_change_bn": {
+          "mean": -2.8297306857166618,
+          "sd": 0.19401022322855477,
+          "se": 0.043382004746895714,
+          "n": 20
+        },
+        "employer_ni_change_bn": {
+          "mean": -8.800414024150774,
+          "sd": 0.5861402144968969,
+          "se": 0.13106493639613692,
+          "n": 20
+        },
+        "uc_change_bn": {
+          "mean": 5.035814336061311,
+          "sd": 0.43728741100706864,
+          "se": 0.09778043767166952,
+          "n": 20
+        },
+        "benefits_change_bn": {
+          "mean": 3.914137963482098,
+          "sd": 0.4269295896113441,
+          "se": 0.09546435839770534,
+          "n": 20
+        },
+        "cash_benefits_change_bn": {
+          "mean": 5.227222802470978,
+          "sd": 0.45983040706980316,
+          "se": 0.10282120483294797,
+          "n": 20
+        },
+        "childcare_change_bn": {
+          "mean": -1.0614270902066085,
+          "sd": 0.09320469402843523,
+          "se": 0.02084120316696499,
+          "n": 20
+        },
+        "statutory_pay_change_bn": {
+          "mean": -0.2516577487822489,
+          "sd": 0.10987967535237572,
+          "se": 0.024569842343352025,
+          "n": 20
+        },
+        "jsa_change_bn": {
+          "mean": 0.0,
+          "sd": 0.0,
+          "se": 0.0,
+          "n": 20
+        },
+        "household_net_income_change_bn": {
+          "mean": -12.849396970673936,
+          "sd": 2.502540650335941,
+          "se": 0.5595851010607695,
+          "n": 20
+        },
+        "poverty_change_bhc_pp": {
+          "mean": 2.1823011316059273,
+          "sd": 0.18472729288752635,
+          "se": 0.04130627841960223,
+          "n": 20
+        },
+        "poverty_change_ahc_pp": {
+          "mean": 2.4198316042413386,
+          "sd": 0.20061177559779783,
+          "se": 0.044858156732360946,
+          "n": 20
+        },
+        "relative_poverty_change_bhc_pp": {
+          "mean": 0.6406010004683582,
+          "sd": 0.2421438352154749,
+          "se": 0.054145007587430925,
+          "n": 20
+        },
+        "relative_poverty_change_ahc_pp": {
+          "mean": 0.9976800212417573,
+          "sd": 0.18724060677818072,
+          "se": 0.041868272490432,
+          "n": 20
+        },
+        "gini_change_pp": {
+          "mean": 1.5548095291047725,
+          "sd": 0.10253402511469716,
+          "se": 0.02292730501631335,
+          "n": 20
+        },
+        "exchequer_cost_bn": {
+          "mean": 9.935695329418763,
+          "sd": 2.047785497192489,
+          "se": 0.457898757506061,
+          "n": 20
+        },
+        "household_basis_cost_bn": {
+          "mean": 1.1391844931856903,
+          "sd": 1.4837628071087408,
+          "se": 0.33177944991810526,
+          "n": 20
+        },
+        "household_basis_cash_cost_bn": {
+          "mean": 2.45226933217457,
+          "sd": 1.5079315063245056,
+          "se": 0.3371837353555248,
+          "n": 20
+        },
+        "narrow_cash_change_bn": {
+          "mean": -1.132211110996404,
+          "sd": 1.4837242722413637,
+          "se": 0.33177083325980933,
+          "n": 20
+        },
+        "displaced_weighted_m": {
+          "mean": 2.0205160988968442,
+          "sd": 0.07965962222964844,
+          "se": 0.017812433036744728,
+          "n": 20
+        },
+        "wage_bill_lost_bn": {
+          "mean": 100.73689884333815,
+          "sd": 4.004961571279852,
+          "se": 0.8955366320656117,
+          "n": 20
+        },
+        "jsa_eligible_m": {
+          "mean": 0.0,
+          "sd": 0.0,
+          "se": 0.0,
+          "n": 20
+        },
+        "jsa_award_input_bn": {
+          "mean": 0.0,
+          "sd": 0.0,
+          "se": 0.0,
+          "n": 20
+        }
+      }
+    },
+    "disp_only": {
+      "jsa": {
+        "gov_balance_change_bn": {
+          "mean": -47.77946155469452,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "income_tax_change_bn": {
+          "mean": -22.98215489466907,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "ni_employee_change_bn": {
+          "mean": -4.236510332158813,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "national_insurance_change_bn": {
+          "mean": -4.229740562076599,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "employer_ni_change_bn": {
+          "mean": -13.470762148388886,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "uc_change_bn": {
+          "mean": 3.4944765957171326,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "benefits_change_bn": {
+          "mean": 7.079264061363281,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "cash_benefits_change_bn": {
+          "mean": 8.231906615976929,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "childcare_change_bn": {
+          "mean": -0.9454109340467528,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "statutory_pay_change_bn": {
+          "mean": -0.2072316205668754,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "jsa_change_bn": {
+          "mean": 4.57368660607076,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "household_net_income_change_bn": {
+          "mean": -61.016510950367184,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "poverty_change_bhc_pp": {
+          "mean": 2.183207508992856,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "poverty_change_ahc_pp": {
+          "mean": 2.750108375801078,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "relative_poverty_change_bhc_pp": {
+          "mean": 0.1302940041715522,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "relative_poverty_change_ahc_pp": {
+          "mean": 0.517475763721395,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "gini_change_pp": {
+          "mean": 0.3932733421810108,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "exchequer_cost_bn": {
+          "mean": 47.77946155469452,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "household_basis_cost_bn": {
+          "mean": 34.29792928819116,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "household_basis_cash_cost_bn": {
+          "mean": 35.450571842804806,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "narrow_cash_change_bn": {
+          "mean": -34.29115951810895,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "displaced_weighted_m": {
+          "mean": 1.9620327368081716,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "wage_bill_lost_bn": {
+          "mean": 100.16086147064983,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "jsa_eligible_m": {
+          "mean": 1.87318982590756,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "jsa_award_input_bn": {
+          "mean": 4.5736865183755855,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        }
+      },
+      "takeup1": {
+        "gov_balance_change_bn": {
+          "mean": -45.24562372564264,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "income_tax_change_bn": {
+          "mean": -23.052326159006103,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "ni_employee_change_bn": {
+          "mean": -4.236510332158813,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "national_insurance_change_bn": {
+          "mean": -4.229740562076599,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "employer_ni_change_bn": {
+          "mean": -13.470762148388886,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "uc_change_bn": {
+          "mean": 5.415423585229004,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "benefits_change_bn": {
+          "mean": 4.475020119010864,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "cash_benefits_change_bn": {
+          "mean": 5.627662673624267,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "childcare_change_bn": {
+          "mean": -0.9454109340467528,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "statutory_pay_change_bn": {
+          "mean": -0.2072316205668754,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "jsa_change_bn": {
+          "mean": 0.0,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "household_net_income_change_bn": {
+          "mean": -63.461358753523925,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "poverty_change_bhc_pp": {
+          "mean": 2.29658567055483,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "poverty_change_ahc_pp": {
+          "mean": 2.9379225304851264,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "relative_poverty_change_bhc_pp": {
+          "mean": 0.0956700637496421,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "relative_poverty_change_ahc_pp": {
+          "mean": 0.5255961376583324,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "gini_change_pp": {
+          "mean": 0.4875905717112161,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "exchequer_cost_bn": {
+          "mean": 45.24562372564264,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "household_basis_cost_bn": {
+          "mean": 31.76385661017578,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "household_basis_cash_cost_bn": {
+          "mean": 32.91649916478918,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "narrow_cash_change_bn": {
+          "mean": -31.757086840093567,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "displaced_weighted_m": {
+          "mean": 1.9620327368081716,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "wage_bill_lost_bn": {
+          "mean": 100.16086147064983,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "jsa_eligible_m": {
+          "mean": 0.0,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        },
+        "jsa_award_input_bn": {
+          "mean": 0.0,
+          "sd": NaN,
+          "se": NaN,
+          "n": 1
+        }
+      }
+    },
+    "obr": {
+      "jsa": {
+        "gov_balance_change_bn": {
+          "mean": -11.507038950905239,
+          "sd": 1.1557683441651765,
+          "se": 0.25843765837957067,
+          "n": 20
+        },
+        "income_tax_change_bn": {
+          "mean": -5.442771273922706,
+          "sd": 0.6419932844506746,
+          "se": 0.1435540625130067,
+          "n": 20
+        },
+        "ni_employee_change_bn": {
+          "mean": -1.0332635184329724,
+          "sd": 0.10219452863506419,
+          "se": 0.02285139129565523,
+          "n": 20
+        },
+        "national_insurance_change_bn": {
+          "mean": -1.030958425433647,
+          "sd": 0.1022054684784452,
+          "se": 0.022853837519001545,
+          "n": 20
+        },
+        "employer_ni_change_bn": {
+          "mean": -3.223560507751997,
+          "sd": 0.3267553827938396,
+          "se": 0.07306472479409905,
+          "n": 20
+        },
+        "uc_change_bn": {
+          "mean": 0.9270769965980667,
+          "sd": 0.19469358757925326,
+          "se": 0.0435348096610519,
+          "n": 20
+        },
+        "benefits_change_bn": {
+          "mean": 1.8067199714971127,
+          "sd": 0.2702374680766873,
+          "se": 0.06042693486869021,
+          "n": 20
+        },
+        "cash_benefits_change_bn": {
+          "mean": 2.097804872067151,
+          "sd": 0.30852115713535955,
+          "se": 0.06898742798515582,
+          "n": 20
+        },
+        "childcare_change_bn": {
+          "mean": -0.22702753264746112,
+          "sd": 0.06322393996325852,
+          "se": 0.014137302756321161,
+          "n": 20
+        },
+        "statutory_pay_change_bn": {
+          "mean": -0.06405736792260491,
+          "sd": 0.05881883355505961,
+          "se": 0.01315229101863589,
+          "n": 20
+        },
+        "jsa_change_bn": {
+          "mean": 1.1363502171762683,
+          "sd": 0.1267179323652733,
+          "se": 0.028334991073697177,
+          "n": 20
+        },
+        "household_net_income_change_bn": {
+          "mean": -14.45563416408923,
+          "sd": 1.3849925662470375,
+          "se": 0.30969375264602567,
+          "n": 20
+        },
+        "poverty_change_bhc_pp": {
+          "mean": 0.533912664481408,
+          "sd": 0.05802601535341353,
+          "se": 0.012975011479367913,
+          "n": 20
+        },
+        "poverty_change_ahc_pp": {
+          "mean": 0.6866035712420903,
+          "sd": 0.09000019169990876,
+          "se": 0.020124654662900834,
+          "n": 20
+        },
+        "relative_poverty_change_bhc_pp": {
+          "mean": -0.16757404479277033,
+          "sd": 0.14866301030194753,
+          "se": 0.033242059677490624,
+          "n": 20
+        },
+        "relative_poverty_change_ahc_pp": {
+          "mean": 0.013268450452571096,
+          "sd": 0.12078759086732745,
+          "se": 0.027008926401777694,
+          "n": 20
+        },
+        "gini_change_pp": {
+          "mean": 0.13696988891838952,
+          "sd": 0.04402908917213593,
+          "se": 0.009845203637629588,
+          "n": 20
+        },
+        "exchequer_cost_bn": {
+          "mean": 11.507038950905239,
+          "sd": 1.1557683441651765,
+          "se": 0.25843765837957067,
+          "n": 20
+        },
+        "household_basis_cost_bn": {
+          "mean": 8.28275476385279,
+          "sd": 0.8357669422613864,
+          "se": 0.18688316962436016,
+          "n": 20
+        },
+        "household_basis_cash_cost_bn": {
+          "mean": 8.57383966442283,
+          "sd": 0.8719740264552731,
+          "se": 0.19497931977681907,
+          "n": 20
+        },
+        "narrow_cash_change_bn": {
+          "mean": -8.280449670853468,
+          "sd": 0.8354713029686236,
+          "se": 0.18681706266881642,
+          "n": 20
+        },
+        "displaced_weighted_m": {
+          "mean": 0.48530162630398943,
+          "sd": 0.05280439777918587,
+          "se": 0.011807422294519853,
+          "n": 20
+        },
+        "wage_bill_lost_bn": {
+          "mean": 24.034696435914526,
+          "sd": 2.3270789876114737,
+          "se": 0.5203506805310646,
+          "n": 20
+        },
+        "jsa_eligible_m": {
+          "mean": 0.46487591915034826,
+          "sd": 0.051671244441074016,
+          "se": 0.011554041505224962,
+          "n": 20
+        },
+        "jsa_award_input_bn": {
+          "mean": 1.1363501953521273,
+          "sd": 0.12671792991512487,
+          "se": 0.028334990525827334,
+          "n": 20
+        }
+      },
+      "takeup1": {
+        "gov_balance_change_bn": {
+          "mean": -10.84171455961304,
+          "sd": 1.099145068225513,
+          "se": 0.24577630896858912,
+          "n": 20
+        },
+        "income_tax_change_bn": {
+          "mean": -5.466132380484436,
+          "sd": 0.6444505288321845,
+          "se": 0.14410351906044525,
+          "n": 20
+        },
+        "ni_employee_change_bn": {
+          "mean": -1.0332635184329724,
+          "sd": 0.10219452863506419,
+          "se": 0.02285139129565523,
+          "n": 20
+        },
+        "national_insurance_change_bn": {
+          "mean": -1.030958425433647,
+          "sd": 0.1022054684784452,
+          "se": 0.022853837519001545,
+          "n": 20
+        },
+        "employer_ni_change_bn": {
+          "mean": -3.223560507751997,
+          "sd": 0.3267553827938396,
+          "se": 0.07306472479409905,
+          "n": 20
+        },
+        "uc_change_bn": {
+          "mean": 1.3624755262255264,
+          "sd": 0.2850678677339047,
+          "se": 0.06374311304539299,
+          "n": 20
+        },
+        "benefits_change_bn": {
+          "mean": 1.117951623496277,
+          "sd": 0.26036166428078134,
+          "se": 0.05821863800668059,
+          "n": 20
+        },
+        "cash_benefits_change_bn": {
+          "mean": 1.4090365240663267,
+          "sd": 0.29629283287822,
+          "se": 0.06625309155616846,
+          "n": 20
+        },
+        "childcare_change_bn": {
+          "mean": -0.22702753264746112,
+          "sd": 0.06322393996325852,
+          "se": 0.014137302756321161,
+          "n": 20
+        },
+        "statutory_pay_change_bn": {
+          "mean": -0.06405736792260491,
+          "sd": 0.05881883355505961,
+          "se": 0.01315229101863589,
+          "n": 20
+        },
+        "jsa_change_bn": {
+          "mean": 0.0,
+          "sd": 0.0,
+          "se": 0.0,
+          "n": 20
+        },
+        "household_net_income_change_bn": {
+          "mean": -15.102634273686707,
+          "sd": 1.4511146918614954,
+          "se": 0.32447910941509645,
+          "n": 20
+        },
+        "poverty_change_bhc_pp": {
+          "mean": 0.5895973206695436,
+          "sd": 0.06816610113928381,
+          "se": 0.015242403590856445,
+          "n": 20
+        },
+        "poverty_change_ahc_pp": {
+          "mean": 0.756103626217479,
+          "sd": 0.09635953178953875,
+          "se": 0.021546646336146058,
+          "n": 20
+        },
+        "relative_poverty_change_bhc_pp": {
+          "mean": -0.1508207230268295,
+          "sd": 0.13605943507111332,
+          "se": 0.03042381457992283,
+          "n": 20
+        },
+        "relative_poverty_change_ahc_pp": {
+          "mean": 0.04862982077144943,
+          "sd": 0.11513065635903082,
+          "se": 0.025743997391296132,
+          "n": 20
+        },
+        "gini_change_pp": {
+          "mean": 0.16123624543576404,
+          "sd": 0.045254686874607264,
+          "se": 0.010119255615208933,
+          "n": 20
+        },
+        "exchequer_cost_bn": {
+          "mean": 10.84171455961304,
+          "sd": 1.099145068225513,
+          "se": 0.24577630896858912,
+          "n": 20
+        },
+        "household_basis_cost_bn": {
+          "mean": 7.617347522413685,
+          "sd": 0.7824979604593181,
+          "se": 0.17497186318419777,
+          "n": 20
+        },
+        "household_basis_cash_cost_bn": {
+          "mean": 7.908432422983735,
+          "sd": 0.8196675536489001,
+          "se": 0.18328323689098963,
+          "n": 20
+        },
+        "narrow_cash_change_bn": {
+          "mean": -7.615042429414361,
+          "sd": 0.7821576696906227,
+          "se": 0.17489577185510594,
+          "n": 20
+        },
+        "displaced_weighted_m": {
+          "mean": 0.48530162630398943,
+          "sd": 0.05280439777918587,
+          "se": 0.011807422294519853,
+          "n": 20
+        },
+        "wage_bill_lost_bn": {
+          "mean": 24.034696435914526,
+          "sd": 2.3270789876114737,
+          "se": 0.5203506805310646,
+          "n": 20
+        },
+        "jsa_eligible_m": {
+          "mean": 0.0,
+          "sd": 0.0,
+          "se": 0.0,
+          "n": 20
+        },
+        "jsa_award_input_bn": {
+          "mean": 0.0,
+          "sd": 0.0,
+          "se": 0.0,
+          "n": 20
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "central": {
+      "displaced_benunits_m": 1.977506220473894,
+      "flag_true_share": 0.47623558982298747,
+      "entitled_after_share": 0.4105226069390945,
+      "flag_true_share_entitled_after": 0.5290120342167148,
+      "flag_true_share_newly_entitled": 0.48654009562735806,
+      "over_capital_limit_share": 0.41552637548333865,
+      "other_earner_share": 0.5650312602863695,
+      "owner_share": 0.7104215138841337,
+      "mean_lost_earnings_gbp": 49885.491593909726
+    },
+    "disp_only": {
+      "displaced_benunits_m": 1.9172309602538609,
+      "flag_true_share": 0.485480089602912,
+      "entitled_after_share": 0.4341564912406737,
+      "flag_true_share_entitled_after": 0.5462822941027522,
+      "flag_true_share_newly_entitled": 0.5245973361032562,
+      "over_capital_limit_share": 0.3787539227254632,
+      "other_earner_share": 0.5549682974914577,
+      "owner_share": 0.7015507841315533,
+      "mean_lost_earnings_gbp": 51049.53632608149
+    },
+    "obr": {
+      "displaced_benunits_m": 0.48284195807912605,
+      "flag_true_share": 0.4793668566781443,
+      "entitled_after_share": 0.40099284634750304,
+      "flag_true_share_entitled_after": 0.5303343544738984,
+      "flag_true_share_newly_entitled": 0.5049748024208269,
+      "over_capital_limit_share": 0.4238500845923844,
+      "other_earner_share": 0.5932792360644283,
+      "owner_share": 0.7029798676293668,
+      "mean_lost_earnings_gbp": 49662.6409336599
+    }
+  }
+}
