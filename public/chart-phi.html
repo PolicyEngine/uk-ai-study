@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Roboto',sans-serif;background:#fff}#chart{width:100%;height:460px}.figcaption{text-align:center;font-weight:600;font-size:15px;color:#5A5A5A;font-family:'Roboto',-apple-system,sans-serif;padding:6px 16px 8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<div class="figcaption">Figure 10: Net revenue change by displacement rate and the share of the displaced wage bill reappearing as taxed profits (φ)</div>
+<script>
+fetch('./data/composition_grid.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const rows=csv.trim().split('\n').slice(1).map(l=>l.split(',').map(Number));
+  const phis=[...new Set(rows.map(r=>r[1]))].sort((a,b)=>a-b);
+  const colors=['#616161','#4FD1C5','#319795','#234E52'];
+  const traces=phis.map((phi,i)=>{
+    const d=rows.filter(r=>r[1]===phi).sort((a,b)=>a[0]-b[0]);
+    return{
+      x:d.map(r=>r[0]),y:d.map(r=>r[6]),
+      name:'φ = '+phi,type:'scatter',mode:'lines+markers',
+      line:{color:colors[i%colors.length],width:2.5},
+      hovertemplate:'Displacement %{x}%, φ='+phi+': £%{y:.1f}bn<extra></extra>'
+    };
+  });
+  const zero=rows.filter(r=>r[1]===phis[0]).sort((a,b)=>a[0]-b[0]);
+  traces.unshift({
+    x:zero.map(r=>r[0]),y:zero.map(r=>r[7]),
+    name:'φ = 0 (microsimulation)',type:'scatter',mode:'lines+markers',
+    line:{color:'#C53030',width:2.5,dash:'dot'},
+    hovertemplate:'Displacement %{x}%, φ=0: £%{y:.1f}bn<extra></extra>'
+  });
+  Plotly.newPlot('chart',traces,{
+    xaxis:{title:'Displacement rate (%)',dtick:1},
+    yaxis:{title:'Net revenue change (£bn/yr)'},
+    legend:{orientation:'h',y:-0.22,x:0.5,xanchor:'center'},
+    margin:{t:20,r:20,b:100,l:80},font:{family:'Roboto, sans-serif'},plot_bgcolor:'#fff',paper_bgcolor:'#fff'
+  },{displayModeBar:false,responsive:true});
+});
+</script>
+</body>
+</html>

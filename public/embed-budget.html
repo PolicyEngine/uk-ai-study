@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;font-size:18px;line-height:1.6;padding:0}
+#content>:first-child{margin-top:0}
+#content>:last-child{margin-bottom:0}
+p{margin:16px 0}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+fetch('./data/scenarios.csv')
+.then(r=>r.text())
+.then(csv=>{
+  const lines=csv.trim().split('\n').slice(1);
+  const rows={};
+  lines.forEach(l=>{
+    const c=l.match(/(".*?"|[^,]+)/g);
+    rows[c[0]]={cost:parseFloat(c[5]),displaced:parseInt(c[4])};
+  });
+  const c=rows['central'],lo=rows['low'],hi=rows['high'];
+  const fmtM=v=>(v/1e6).toFixed(1);
+  document.getElementById('content').innerHTML=
+    `<p>In the central scenario, PolicyEngine estimates that the AI shock would displace ${fmtM(c.displaced)} million workers and cost the Exchequer £${c.cost.toFixed(1)} billion a year, as lost income tax and National Insurance combine with higher benefit spending. The cost ranges from £${lo.cost.toFixed(1)} billion in the low scenario (${(lo.displaced/1e3).toFixed(0)},000 workers displaced) to £${hi.cost.toFixed(1)} billion in the high scenario (${fmtM(hi.displaced)} million displaced).</p>`;
+});
+</script>
+</body>
+</html>

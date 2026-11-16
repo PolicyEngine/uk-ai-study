@@ -1,0 +1,5 @@
+scenario,label,displacement_rate,wage_uplift,displaced_workers,exchequer_cost_bn,poverty_change_bhc_pp,poverty_change_ahc_pp,gini_baseline,gini_shocked
+low,"Low (1% displacement, no wage uplift)",0.01,0.0,243805,4.26,0.33,0.26,0.3091,0.3112
+central,"Central (7% displacement, +2.6% wages)",0.07,0.026,1557257,18.21,1.81,1.85,0.3091,0.3195
+central_youth_tilted,"Central, youth-tilted",0.07,0.026,1545665,15.9,1.91,2.15,0.3091,0.3202
+high,"High (13% displacement, +2.6% wages)",0.13,0.026,3041944,46.91,4.05,4.68,0.3091,0.3298
