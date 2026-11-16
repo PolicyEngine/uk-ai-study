@@ -1,6 +1,6 @@
 # Phase 2 calibration: spells and re-employment (16 November 2026)
 
-Status: **proposal for the author's sign-off** before the overnight run.
+Status: **approved by the author (16 November 2026)**: 2025-average spells central (latest-12-month and 12-month as sensitivities); 10 per cent re-employment penalty (0 and 20 per cent as sensitivities).
 
 ## Spell distribution
 
@@ -33,4 +33,4 @@ The current paper's break-even spell length for the central cost is about 9.5 mo
 
 ## Take-up target
 
-To be measured from Microcosm before the run: UC take-up among entitled benefit units containing an unemployed adult (the referee quotes about 88 per cent).
+Measured from Microcosm (`results/takeup/takeup_runs.json`, macro `genTkUnempFlagEntitledPct`): **88 per cent** of entitled benefit units containing an existing unemployed adult carry the UC claim flag, against 53 per cent of entitled displaced benefit units under the survey flags (`genTkFlagTrueEntitledPct`, OBR-sized run). The mixing weight for an unflagged displaced benefit unit is therefore q' = (0.88 − 0.53)/(1 − 0.53) ≈ 0.75. It is recomputed for the central displaced set in the Phase 2 run.
