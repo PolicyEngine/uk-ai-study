@@ -25,7 +25,7 @@ fetch('./data/scenarios.csv')
   const c=rows['central'],lo=rows['low'],hi=rows['high'];
   const fmtM=v=>(v/1e6).toFixed(1);
   document.getElementById('content').innerHTML=
-    `<p>In the central scenario, PolicyEngine estimates that the AI shock would displace ${fmtM(c.displaced)} million workers and cost the Exchequer £${c.cost.toFixed(1)} billion a year, as lost income tax and National Insurance combine with higher benefit spending. The cost ranges from £${lo.cost.toFixed(1)} billion in the low scenario (${(lo.displaced/1e3).toFixed(0)},000 workers displaced) to £${hi.cost.toFixed(1)} billion in the high scenario (${fmtM(hi.displaced)} million displaced).</p>`;
+    `<p>In the central scenario, PolicyEngine estimates that the AI shock would displace ${fmtM(c.displaced)} million workers and cost the Exchequer £${c.cost.toFixed(1)} billion a year: lost income tax and National Insurance and higher benefit spending, net of tax on survivors' wage gains and on higher capital income. The low scenario (${(lo.displaced/1e3).toFixed(0)},000 workers displaced) is ${lo.cost<0?'a net gain to the Exchequer of':'a cost of'} £${Math.abs(lo.cost).toFixed(1)} billion, and the high scenario (${fmtM(hi.displaced)} million displaced) costs £${hi.cost.toFixed(1)} billion. Single allocation draw; the 50-draw mean central cost is in the text.</p>`;
 });
 </script>
 </body>

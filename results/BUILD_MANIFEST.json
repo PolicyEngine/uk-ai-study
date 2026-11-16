@@ -1,9 +1,9 @@
 {
-  "git_commit": "39dc9908889a8af19307988a5d72d1534a5fa1ed",
+  "git_commit": "101a31b7860be843595b54619cfd5be99fee99d4",
   "git_dirty_at_build": false,
   "invoking_checkout_dirty_at_start": false,
   "started_utc": null,
-  "finished_utc": "2026-11-16T11:21:57Z",
+  "finished_utc": "2026-11-16T11:52:24Z",
   "recovery_note": "Attested existing results tree without a full clean-room rerun; see git history for which stages were added or repaired since the last full attested build.",
   "outside_clean_room": {},
   "python": {
@@ -257,6 +257,7 @@
     "analysis/displaced_takeup_runs.py": "1aedb52b6ee3176471d85548b55568c37aea7ee8b9f349e54e14b7960cffdc7a",
     "analysis/download_data.py": "efc08ad770a0beadeb97ca9ee9f4fec95474d02f7565255ec5cf93ca539ee050",
     "analysis/emit_tex_values.py": "05beb90e43f6cbe1512fed5f84efa20997174c9747f7d0e3271c60159ce0ff67",
+    "analysis/export_site_data.py": "d623a09b84b9878c99a14b9ae280565629d9fa4a181b89e0e0669cf5b819af27",
     "analysis/figstyle.py": "2993ad5510b9573c9d8661d6dddf1359b1ae996c5d76b5cad17712674294dccc",
     "analysis/figures.py": "051c7ad97dcb33536c1b45322cfeb1cb8302d568a92bc4f000914849c820d3cd",
     "analysis/gender.py": "394ab867e96e7adac358c4ada014ae2594e2cf29330a2cbc264ab50f091fe192",

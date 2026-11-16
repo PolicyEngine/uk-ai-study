@@ -20,27 +20,27 @@ p{margin:16px 0}
 <div id="content"></div>
 <script>
 const LABELS={
-  R1_wage_insurance:'R1: Wage insurance (50% of lost earnings, £15k cap)',
-  R2_uc_circuit_breaker:'R2: Universal Credit standard allowance +20%',
-  R3_cap_suspension_taper_cut:'R3: Benefit cap suspension + UC taper 55% → 45%'
+  R1:'R1: Wage insurance (50% of lost earnings, £15k cap)',
+  R2:'R2: Universal Credit standard allowance +20%',
+  R3:'R3: Benefit cap suspension + UC taper 55% → 45%'
 };
-fetch('./data/policy.csv')
+fetch('./data/policy_mc.csv')
 .then(r=>r.text())
 .then(csv=>{
   const rows=csv.trim().split('\n').slice(1).map(l=>{
-    const c=l.match(/(".*?"|[^,]+)/g);
-    return{reform:c[0],family:c[1],cost:parseFloat(c[2]),povBhc:parseFloat(c[3]),povAhc:parseFloat(c[4]),gini:parseFloat(c[5]),perBhc:parseFloat(c[6]),perAhc:parseFloat(c[7])};
-  }).filter(r=>r.family==='exposure');
-  const r1=rows.find(r=>r.reform==='R1_wage_insurance');
-  const r2=rows.find(r=>r.reform==='R2_uc_circuit_breaker');
-  let html=`<p>Wage insurance produces roughly twice the total poverty reduction of either Universal Credit reform, but at roughly three-and-a-half to four times the cost: because the exposure-proportional shock displaces workers concentrated in the upper half of the distribution, most wage-insurance pounds flow to households in the top three baseline deciles, while the UC-side instruments concentrate spending in the bottom half.</p>`;
-    html+=`<table><tr><th>Reform</th><th>Annual cost (£bn)</th><th>Poverty change, BHC (pp)</th><th>Gini change (pp)</th><th>Cost per pp averted, AHC (£bn)</th></tr>`;
+    const c=l.split(',');
+    return{reform:c[0],cost:+c[2],costSd:+c[3],pov:+c[4],povSd:+c[5],gini:+c[6],per:+c[7]};
+  });
+  const r1=rows.find(r=>r.reform==='R1'), r2=rows.find(r=>r.reform==='R2'), r3=rows.find(r=>r.reform==='R3');
+  const povRatio=(r1.pov/r2.pov).toFixed(1), costRatio=(r1.cost/r2.cost).toFixed(1);
+  let html=`<p>Wage insurance reduces BHC poverty by about ${povRatio} times as much as the Universal Credit standard-allowance reform, at about ${costRatio} times the cost: because the exposure-proportional shock displaces workers concentrated in the upper half of the distribution, most wage-insurance pounds flow to households in the top three baseline deciles, while the UC-side instruments concentrate spending in the bottom half.</p>`;
+  html+=`<table><tr><th>Reform</th><th>Annual cost (£bn)</th><th>Poverty change, BHC (pp)</th><th>Gini change (pp)</th><th>Cost per pp averted, BHC (£bn)</th></tr>`;
   rows.forEach(r=>{
-    html+=`<tr><td>${LABELS[r.reform]||r.reform}</td><td>£${r.cost.toFixed(1)}</td><td>${r.povBhc.toFixed(2)}</td><td>${r.gini.toFixed(2)}</td><td>£${r.perAhc.toFixed(1)}</td></tr>`;
+    html+=`<tr><td>${LABELS[r.reform]||r.reform}</td><td>£${r.cost.toFixed(1)} ± ${r.costSd.toFixed(1)}</td><td>${r.pov.toFixed(2)} ± ${r.povSd.toFixed(2)}</td><td>${r.gini.toFixed(2)}</td><td>£${r.per.toFixed(1)}</td></tr>`;
   });
   html+=`</table>`;
-  html+=`<p class="caption">Table 6: Policy reforms on top of the central shock, 2026</p>`;
-  html+=`<p>Using poverty averted per pound as the sole criterion, the UC-side reforms avert a percentage point of AHC poverty for £${r2.perAhc.toFixed(1)} billion, against £${r1.perAhc.toFixed(1)} billion for this wage-insurance design. Wage insurance serves different aims — earnings-loss compensation and consumption smoothing — so this is not a complete instrument ranking.</p>`;
+  html+=`<p class="caption">Table 5: Policy reforms on top of the central shock, 2027–28 (50-draw means ± standard deviation; cost per point is mean cost over mean poverty reduction)</p>`;
+  html+=`<p>Using poverty averted per pound as the sole criterion, R3 averts a percentage point of BHC poverty for £${r3.per.toFixed(1)} billion and R2 for £${r2.per.toFixed(1)} billion, against £${r1.per.toFixed(1)} billion for this wage-insurance design. Wage insurance serves different aims — earnings-loss compensation and consumption smoothing — so this is not a complete instrument ranking.</p>`;
   document.getElementById('content').innerHTML=html;
 });
 </script>

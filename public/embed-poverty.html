@@ -27,10 +27,10 @@ fetch('./data/scenarios.csv')
     return{scenario:c[0],label:c[1].replace(/"/g,''),bhc:parseFloat(c[6]),ahc:parseFloat(c[7])};
   });
   const central=rows.find(r=>r.scenario==='central');
-  let html=`<p>The AI shock would raise poverty in every scenario. In the central scenario, the poverty rate rises by ${central.bhc.toFixed(1)} percentage points before housing costs (BHC) and ${central.ahc.toFixed(1)} percentage points after housing costs (AHC).</p>`;
+  let html=`<p>In the central scenario, the absolute poverty rate rises by ${central.bhc.toFixed(2)} percentage points before housing costs (BHC) and ${central.ahc.toFixed(2)} percentage points after housing costs (AHC) in a single allocation draw; the 50-draw means are in the text.</p>`;
     html+=`<table><tr><th>Scenario</th><th>Change, BHC (pp)</th><th>Change, AHC (pp)</th></tr>`;
   rows.forEach(r=>{
-    html+=`<tr><td>${r.label}</td><td>+${r.bhc.toFixed(1)}</td><td>+${r.ahc.toFixed(1)}</td></tr>`;
+    html+=`<tr><td>${r.label}</td><td>${r.bhc<0?'−':'+'}${Math.abs(r.bhc).toFixed(2)}</td><td>${r.ahc<0?'−':'+'}${Math.abs(r.ahc).toFixed(2)}</td></tr>`;
   });
   html+=`</table>`;
   html+=`<p class="caption">Table 4: Change in poverty rates by scenario</p>`;
