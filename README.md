@@ -16,7 +16,7 @@ The pipeline is `C-AIOE exposure → employment/wage/capital shocks (JR16 eqs
 | SILC microdata | **Microcosm UK 2024-25** (PolicyEngine's calibrated FRS-based dataset, pinned by `policyengine[uk]==6.16.1`) |
 | SWITCH microsimulation | **PolicyEngine UK** 2.174.1, via `policyengine.uk.managed_microsimulation()` |
 | ISCO occupations | SOC2020 major groups from Microcosm's `soc2020_major_group` |
-| C-AIOE (Pizzinelli et al. 2023) | Same measure, via the populace PR #325 UK crosswalk |
+| C-AIOE (Pizzinelli et al. 2023) | Same measure, via the microcosm PR #325 UK crosswalk |
 
 ### 1. Exposure (`uk_ai_study/exposure.py`, `uk_ai_study/data.py`)
 
@@ -29,7 +29,7 @@ key as the exposure table, so no join to raw survey files is needed
 **C-AIOE** score (Felten AIOE × Pizzinelli complementarity adjustment) and
 complementarity **θ** from the packaged crosswalk
 (`uk_ai_study/data/uk_soc2020_major_group_ai_exposure.csv`, derived in
-[populace PR #325](https://github.com/PolicyEngine/populace/pull/325)
+[microcosm PR #325](https://github.com/PolicyEngine/microcosm/pull/325)
 from open-licensed sources: Felten et al. 2021, O*NET-reconstructed θ per IMF
 WP/23/216, ASHE 2025 Table 14 employment weights; OGL v3 / CC BY 4.0 / MIT).
 Persons without a major group receive the employment-weighted mean score;
