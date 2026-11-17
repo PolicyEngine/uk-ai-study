@@ -131,6 +131,15 @@ def main(out_dir: str, cfg: dict) -> None:
             table = shocks.apply_shocks(persons, scen, seed=0)
         finally:
             shocks.draw_displaced = original
+        if cfg.get("uplift_universe", "all") == "private":
+            # survivor uplift for private-sector employees only, theta_bar
+            # renormalised over private baseline workers (private average 2.6%)
+            th = persons["complementarity"].to_numpy(float)
+            th_bar = float((th * weight)[eligible].sum() / weight[eligible].sum())
+            upl = cfg.get("wage_uplift", 0.026) * th / th_bar * earnings
+            new_pay = np.where(eligible & ~mask, earnings + upl, np.where(mask, 0.0, earnings))
+            new_pay = np.where(employed, new_pay, table["employment_income"].to_numpy(float))
+            table["employment_income"] = new_pay
         table["dividend_income"] = persons["dividend_income"].to_numpy(float) * div_f
         table["savings_interest_income"] = persons["savings_interest_income"].to_numpy(float) * int_f
         surv_pay = table["employment_income"].to_numpy(float)

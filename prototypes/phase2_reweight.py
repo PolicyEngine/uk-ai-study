@@ -64,7 +64,11 @@ def outcome(d, b, m, spec, spells):
     acc = None
     for s, ws in spells.items():
         s = int(s)
-        if spec.get("mix"):
+        if spec.get("mix") and s == 0:
+            # re-employed for the whole year: the re run is both tax and benefit source
+            t = household_level(d, f"s{b:02d}_{m}_re")
+            gov, hbai = t["gov_balance"], t["hbai_household_net_income"]
+        elif spec.get("mix"):
             t = household_level(d, f"s{b:02d}_{m}_tax{s}")
             bj, bo, br = (household_level(d, f"s{b:02d}_{m}_{k}")["household_benefits"]
                           for k in ("out_jsa", "out", "re"))
