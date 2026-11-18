@@ -35,9 +35,9 @@ _CENTRAL = {"universe": "private", "uplift_universe": "private", "modes": ["flag
             "interest_factor": 1.0}
 #: settings, in run order (docs/referee/phase2-stage-inventory.md)
 SETTINGS = {
-    "central_f100": {**_CENTRAL, "K": 5, "spells": [3, 6, 9, 12], "dividend_factor": 1.0,
+    "central_f100": {**_CENTRAL, "K": 4, "spells": [3, 6, 9, 12], "dividend_factor": 1.0,
                      "run_types": ["out_jsa", "out", "re", "tax"]},
-    "central_f115": {**_CENTRAL, "K": 5, "spells": [3, 6, 9, 12], "dividend_factor": 1.15,
+    "central_f115": {**_CENTRAL, "K": 4, "spells": [3, 6, 9, 12], "dividend_factor": 1.15,
                      "run_types": ["out_jsa", "out", "re", "tax"]},
     "nochannels": {**_CENTRAL, "K": 4, "spells": [12], "wage_uplift": 0.0, "dividend_factor": 1.0,
                    "run_types": ["tax"]},
