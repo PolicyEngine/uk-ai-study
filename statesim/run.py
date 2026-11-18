@@ -33,18 +33,24 @@ PERSON_TAX = ("income_tax", "national_insurance", "ni_employer")
 _CENTRAL = {"universe": "private", "uplift_universe": "private", "modes": ["flag", "claim"],
             "penalty": engine.REEMPLOYMENT_PENALTY, "wage_uplift": 0.026, "jsa": True,
             "interest_factor": 1.0}
-#: settings, in run order (docs/referee/phase2-stage-inventory.md)
+#: settings, in run order (docs/referee/phase2-stage-inventory.md, revised with
+#: the delegated decisions in docs/referee/round-4-decisions.md):
+#: central at dividend factors 1.00 and 1.15 (closed account by interpolation);
+#: survivor uplift 0% and 5% at calibrated spells (K=3) for the uplift range,
+#: the rate-scaling table and the channel-free comparison; open capital at 12
+#: months for the reconciliation with the published method.
 SETTINGS = {
     "central_f100": {**_CENTRAL, "K": 4, "spells": [3, 6, 9, 12], "dividend_factor": 1.0,
                      "run_types": ["out_jsa", "out", "re", "tax"]},
     "central_f115": {**_CENTRAL, "K": 4, "spells": [3, 6, 9, 12], "dividend_factor": 1.15,
                      "run_types": ["out_jsa", "out", "re", "tax"]},
-    "nochannels": {**_CENTRAL, "K": 4, "spells": [12], "wage_uplift": 0.0, "dividend_factor": 1.0,
-                   "run_types": ["tax"]},
-    "opencap": {**_CENTRAL, "K": 4, "spells": [12], "dividend_factor": 1.0 + 0.004 / 0.01005,
+    "uplift_u0": {**_CENTRAL, "K": 3, "spells": [3, 6, 9, 12], "wage_uplift": 0.0, "dividend_factor": 1.0,
+                  "run_types": ["out_jsa", "out", "re", "tax"]},
+    "uplift_u5": {**_CENTRAL, "K": 3, "spells": [3, 6, 9, 12], "wage_uplift": 0.05, "dividend_factor": 1.0,
+                  "run_types": ["out_jsa", "out", "re", "tax"]},
+    "opencap": {**_CENTRAL, "universe": "all", "uplift_universe": "all", "modes": ["flag"], "jsa": False,
+                "K": 4, "spells": [12], "dividend_factor": 1.0 + 0.004 / 0.01005,
                 "interest_factor": 1.0 + 0.004 / 0.01005, "run_types": ["tax"]},
-    **{f"grid_u{u}": {**_CENTRAL, "K": 4, "spells": [12], "wage_uplift": u / 100, "dividend_factor": 1.0,
-                      "run_types": ["tax"]} for u in range(6)},
 }
 
 
