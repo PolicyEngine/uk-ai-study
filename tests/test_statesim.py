@@ -68,6 +68,7 @@ def test_spell_weights_and_lost_pay():
     assert mean == pytest.approx(4.48, abs=0.01)
     assert engine.lost_pay_share({12: 1.0}, 0.1) == 1.0
     assert engine.lost_pay_share({0: 1.0}, 0.1) == pytest.approx(0.1)
+    assert engine.lost_pay_share({"6": 1.0}, 0.0) == pytest.approx(0.5)  # JSON keys
 
 
 def test_benefit_mix_endpoints():

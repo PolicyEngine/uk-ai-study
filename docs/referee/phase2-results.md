@@ -52,3 +52,25 @@ The household outcomes at the dividend factor are interpolated between runs at �
 4. Regenerate macros and re-attest.
 
 Then Phases 3–7: margin contribution, exposure rules, validation, policy and text.
+
+## Package run, K = 4 (19 November 2026): corrected central case
+
+From `statesim/results.py` on the `central_f100` and `central_f115` state runs (448 simulations, 99.8 per cent of expected displaced workers covered; the residual is 4,600 of 2.03 million). This includes the fix for the prototype's averaging error: poverty and the Gini are now taken over the joint distribution of displacement state, take-up mode and spell length. Raw output: `docs/referee/data/central_k4_2026-11-19.json`. Bootstrap SEs are still to run.
+
+| Rule / variant | Cost | BHC poverty | AHC poverty | Gini |
+|---|---|---|---|---|
+| **Exposure-proportional (new central)** | **£2.94bn** | **+0.52** | **+0.46** | **+0.18** |
+| Age tilt within occupation | £2.85bn | +0.52 | +0.46 | +0.18 |
+| High-earner tilt | £3.63bn | +0.55 | +0.49 | +0.16 |
+| Uniform | £1.86bn | +0.54 | +0.47 | +0.24 |
+| Top-loaded stress case | £6.63bn | +0.51 | +0.56 | +0.07 |
+| Stress test: 12-month spells (all else central) | £5.50bn | +2.35 | +2.55 | +1.04 |
+| Survey-flag take-up (q' = 0) | £2.26bn | +0.62 | +0.55 | +0.22 |
+| No closed account (no capital channel, no corporation tax) | £10.72bn | +0.53 | +0.47 | +0.11 |
+
+Closed account (exposure, calibrated spells): labour cost saved £53.4bn, survivor uplift paid £29.0bn, profit £24.5bn, corporation tax £6.1bn, UK-household payout £4.6bn (dividend factor 1.048).
+
+Notes:
+- The prototype's +0.36pp and +0.05pp were biased low, as flagged in round-4-decisions.md. The corrected central case is +0.52pp BHC and +0.18pp Gini.
+- The top-loaded case now costs £6.6bn, not £27.7bn. Under the closed account, high earners' lost wages return largely as profit taxed at 25 per cent, so the rule mostly shifts the incidence of the tax base, not its size.
+- The 12-month stress test recovers a poverty rise close to the published +2.4pp, while the cost (£5.5bn) stays below the published £7.3bn because the closed account adds corporation tax.

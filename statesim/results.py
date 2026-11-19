@@ -245,6 +245,10 @@ def main(out_path: str, boot: int = 100) -> None:  # pragma: no cover - needs th
             e = evaluate(f100, f115, r, sw, q, mult=mult)
             draws[r].append([e["cost_bn"], e["pov_bhc_pp"], e["pov_ahc_pp"], e["gini_change_pp"]])
     names = ["cost_bn", "pov_bhc_pp", "pov_ahc_pp", "gini_change_pp"]
+    if boot < 2:
+        Path(out_path).write_text(json.dumps(res, indent=2))
+        print("wrote", out_path, "(no bootstrap)")
+        return
     for r, d in draws.items():
         a = np.array(d)
         res["bootstrap"][r] = {nm: float(a[:, i].std(ddof=1)) for i, nm in enumerate(names)}

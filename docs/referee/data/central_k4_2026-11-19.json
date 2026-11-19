@@ -1,0 +1,209 @@
+{
+  "central": {
+    "exposure": {
+      "rule": "exposure",
+      "q": 0.75,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.032236052393082,
+      "coverage_gap_m": 0.004628597081600909,
+      "closed_account_bn": {
+        "profit": 24.473237948265012,
+        "corporation_tax": 6.118309487066253,
+        "uk_household_payout": 4.588732115299689,
+        "labour_cost_saved": 53.42542699665354,
+        "survivor_uplift_paid": 28.95218904838853,
+        "lost_pay_share": 0.4359231,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.0478610890043243
+      },
+      "cost_bn": 2.9439656727792327,
+      "pov_bhc_pp": 0.5242711491337435,
+      "pov_ahc_pp": 0.4605875882469566,
+      "gini_change_pp": 0.18371688838842992
+    },
+    "junior": {
+      "rule": "junior",
+      "q": 0.75,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.0322360523930825,
+      "coverage_gap_m": 0.004684494503142858,
+      "closed_account_bn": {
+        "profit": 24.05058904047687,
+        "corporation_tax": 6.012647260119217,
+        "uk_household_payout": 4.509485445089413,
+        "labour_cost_saved": 53.024370023990095,
+        "survivor_uplift_paid": 28.97378098351323,
+        "lost_pay_share": 0.4359231,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.0470345356468982
+      },
+      "cost_bn": 2.850393433916003,
+      "pov_bhc_pp": 0.519322974349383,
+      "pov_ahc_pp": 0.4572334552946386,
+      "gini_change_pp": 0.18318974825110024
+    },
+    "compression": {
+      "rule": "compression",
+      "q": 0.75,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.0322360523930825,
+      "coverage_gap_m": 0.0058390633715480825,
+      "closed_account_bn": {
+        "profit": 27.81550739202143,
+        "corporation_tax": 6.953876848005358,
+        "uk_household_payout": 5.215407636004019,
+        "labour_cost_saved": 56.578761945493994,
+        "survivor_uplift_paid": 28.763254553472564,
+        "lost_pay_share": 0.4359231,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.0543973984073636
+      },
+      "cost_bn": 3.625804507490896,
+      "pov_bhc_pp": 0.5470946780070569,
+      "pov_ahc_pp": 0.49375225616680096,
+      "gini_change_pp": 0.1637667392765052
+    },
+    "uniform": {
+      "rule": "uniform",
+      "q": 0.75,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.0322360523930825,
+      "coverage_gap_m": 0.007204105382716813,
+      "closed_account_bn": {
+        "profit": 17.99576881794543,
+        "corporation_tax": 4.498942204486357,
+        "uk_household_payout": 3.3742066533647677,
+        "labour_cost_saved": 47.33527633662502,
+        "survivor_uplift_paid": 29.339507518679596,
+        "lost_pay_share": 0.4359231,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.0351934261791456
+      },
+      "cost_bn": 1.8590215855764711,
+      "pov_bhc_pp": 0.5432975907433969,
+      "pov_ahc_pp": 0.4716265927923959,
+      "gini_change_pp": 0.240467401934219
+    },
+    "top_loaded": {
+      "rule": "top_loaded",
+      "q": 0.75,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.032236052393082,
+      "coverage_gap_m": 0.0025536847206889244,
+      "closed_account_bn": {
+        "profit": 46.54290795255176,
+        "corporation_tax": 11.63572698813794,
+        "uk_household_payout": 8.726795241103455,
+        "labour_cost_saved": 74.22764002060188,
+        "survivor_uplift_paid": 27.684732068050128,
+        "lost_pay_share": 0.4359231,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.0910216402400923
+      },
+      "cost_bn": 6.629008207749209,
+      "pov_bhc_pp": 0.5142585761257097,
+      "pov_ahc_pp": 0.5568511028024602,
+      "gini_change_pp": 0.06567563741657345
+    }
+  },
+  "variants": {
+    "stress_12m": {
+      "rule": "exposure",
+      "q": 0.75,
+      "spells": {
+        "12": 1.0
+      },
+      "expected_displaced_m": 2.032236052393082,
+      "coverage_gap_m": 0.004628597081600909,
+      "closed_account_bn": {
+        "profit": 93.60481010273134,
+        "corporation_tax": 23.401202525682834,
+        "uk_household_payout": 17.550901894262125,
+        "labour_cost_saved": 122.55699915111987,
+        "survivor_uplift_paid": 28.95218904838853,
+        "lost_pay_share": 1.0,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.1830582515084525
+      },
+      "cost_bn": 5.5016857059837925,
+      "pov_bhc_pp": 2.3519761597745124,
+      "pov_ahc_pp": 2.5476046510407673,
+      "gini_change_pp": 1.035173599171424
+    },
+    "survey_takeup": {
+      "rule": "exposure",
+      "q": 0.0,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.032236052393082,
+      "coverage_gap_m": 0.004628597081600909,
+      "closed_account_bn": {
+        "profit": 24.473237948265012,
+        "corporation_tax": 6.118309487066253,
+        "uk_household_payout": 4.588732115299689,
+        "labour_cost_saved": 53.42542699665354,
+        "survivor_uplift_paid": 28.95218904838853,
+        "lost_pay_share": 0.4359231,
+        "baseline_dividends": 95.87604901520503,
+        "dividend_factor": 1.0478610890043243
+      },
+      "cost_bn": 2.262786422524429,
+      "pov_bhc_pp": 0.6153971468778217,
+      "pov_ahc_pp": 0.5525056022841961,
+      "gini_change_pp": 0.22458663044970795
+    },
+    "no_closure": {
+      "rule": "exposure",
+      "q": 0.75,
+      "spells": {
+        "0": 0.254087,
+        "3": 0.343849,
+        "6": 0.181202,
+        "9": 0.096705,
+        "12": 0.124156
+      },
+      "expected_displaced_m": 2.032236052393082,
+      "coverage_gap_m": 0.004628597081600909,
+      "cost_bn": 10.719823723342921,
+      "pov_bhc_pp": 0.5268868200348173,
+      "pov_ahc_pp": 0.4741269500665855,
+      "gini_change_pp": 0.11155223359948785
+    }
+  },
+  "bootstrap": {}
+}

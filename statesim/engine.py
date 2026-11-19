@@ -80,7 +80,7 @@ def takeup_mix(q, base_flag, y_flag, base_claim, y_claim):
 
 def lost_pay_share(spells: dict = SPELL_WEIGHTS, penalty: float = REEMPLOYMENT_PENALTY) -> float:
     """Expected share of annual pay a displaced worker loses in year one."""
-    return float(sum(w * (s / 12 + (12 - s) / 12 * penalty) for s, w in spells.items()))
+    return float(sum(w * (int(s) / 12 + (12 - int(s)) / 12 * penalty) for s, w in spells.items()))
 
 
 def closed_account(saved_cost: float, survivor_cost: float) -> dict:
