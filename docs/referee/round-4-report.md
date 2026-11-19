@@ -1,0 +1,30 @@
+# Referee report (Fable 5.2): "Who bears the AI shock?"
+
+Recommendation: **major revision** at a field journal (JPubE / AEJ: Policy); reject at a general-interest journal. Arithmetic, cross-references and build checked clean.
+
+## Strengths
+Candid simulation paper (failed backcast, sign-reversing break-evens, decile-1 artefact and draw basis all reported); the two organising comparisons (who loses the job; job loss vs wage cuts) are the right questions; per-pound coefficients are useful; the closure exercise is the right instinct.
+
+## Major comments (T = text-only, A = new analysis)
+1. **M1 Headline level is a residual** (T/A): £7.3bn = 42.5 − 17.5 − 17.9; sign flips at 3.7% wages / 55% capital / 9.5-month spells. Lead with channel-free quantities (pence per pound, £21,100 per displaced worker, differences across rules and margins); levels only as ranges; "I estimate" → "I simulate"; rebuild or drop low/high presets.
+2. **M2 Capital channel not UK-calibrated or tied to the labour shock** (A): 39.8% from an Irish base return, applied to interest too; £12.6bn of dividend uplift has no labour counterpart. Make the closed account central; report implied GDP/labour share; SPI-scaled dividends as baseline or shown throughout.
+3. **M3 Assignment noise and seed 0** (A, most valuable): replace random assignment with record splitting (displaced copy weight p·w, retained copy (1−p)·w) for exact expectations; removes seed-0 dependence (grid, presets, mixed margin, break-even, closure, decomposition, index, ripple, caseloads) and the index "adjustment".
+4. **M4 No sampling uncertainty** (A/T): bootstrap/replicate-weight SEs for main contrasts; demote "cost and poverty do not move together" (rests on +0.12pp BHC, AHC opposite) or support with a mechanism decomposition; relabel intervals "Monte Carlo (assignment only)".
+5. **M5 Margin result = average vs marginal tax rate** (A small): 2×2 {uniform, exposure-graded} × {job loss, wage cut} without channels; Dolls-style replication; PTR/EMTR distributions; state wage-cut size by group and NLW floor handling.
+6. **M6 Abstract uses the confounded channels-on comparison** (T): lead with channel-free 0.92 vs 2.88pp and 55p vs 42p.
+7. **M7 Benefit side biased down** (re-base): make JSA on + observed take-up (~88%) central; current setting as lower bound; sign redundancy pay, council tax reduction.
+8. **M8 Full-year spells / stock-for-flow** (A): simulate part-year spells (monthly UC, annual tax), calibrated spell distribution; present a steady-state flow alongside; carry "upper bound" into abstract.
+9. **M9 Public-sector displacement** (A small): £26.6bn pay bill not netted; employer NI intra-government. Report: public sector excluded; consolidated; current. Restrict φ to private wage bill.
+10. **M10 Missing fiscal lines** (T + simple calc): signed bias table (VAT, CT, CGT, debt interest, pension relief); add indirect taxes; one incidence identity for £1 of labour cost that sums to 100.
+11. **M11 Exposure measure** (A/T): signed-index complementarity scale; min-shift drives quotas; alternative normalisations; SPI/imputed-occupation share; within-group variation; rerun index table without noise.
+12. **M12 Stylised rules vs hypotheses** (T/optional A): rename by what they do; cite papers not press releases; implement expertise compression as wage compression and the junior margin as non-entry; or a continuous earnings-gradient family.
+13. **M13 External validity** (A): backcast with 2008-10 policy or call it illustration; OBR on a common basis (composition check failed); quantitative Irish comparison or drop; baseline-vs-official-aggregates table (Gini 0.303, poverty 12.0/13.4%).
+14. **M14 Policy section** (A small/T): baseline vs shock increments; insurance metric; rename R1, taxed variant; consider contributory benefit; or cut to a paragraph.
+15. **M15 Positioning** (T): one-sentence contribution with a number; position against Dolls et al.; wider literature (EUROMOD/UKMOD stress tests, displaced-worker losses, UK PTR/EMTR, wage insurance, self-employed, UK think-tank AI scenarios).
+16. **M16 Data access and decile-1 artefact** (T/A small): replicator access route, data appendix; fix/exclude the 333 high-pension-contribution households or rank on pre-contribution income by default.
+
+## Minor comments (28, mostly text)
+Abstract wording ("simulate", "upper bound", confounded £12.0bn); poverty-line definition consistency; Gini units (30.3 vs 0.303); rounding mismatches (9.3 vs 9.4; £21,100 vs £21,000); one name for the incidence rules ("four"/"five", rule/allocation); Tables 1, 6, 7, 8 mix seed-0 and multi-draw rows, label each; Table 4 header in plain language and pension-contribution caveat; Figure 3 left panel to 50-draw means, ±1 sd labelled; Figure 2 sign convention and weighting; intervals labelled assignment-only; "100% of entrants live with a displaced worker" true by construction; JSA rate held at 2026-27 (explain/uprate); cut conjecture on two routes; drop OLS index adjustment after M3; ripple appendix rewrite or cut; capital-only cell in "rises in every cell"; report realised wage-bill growth; unassigned/SPI occupation shares; capital receipts without announced-not-legislated rates; mean baseline earnings beside £49,500; R1 label and 5-draw ranking; conclusion's third result qualified; move UK Dolls figure to literature; regional/devolved note; forward definition of the OBR-sized run; self-employed share and bias direction.
+
+## Priority for acceptance
+1. Deterministic assignment + sampling SEs (M3, M4). 2. New headline: channel-free incidence; levels as ranges (M1, M6). 3. UK-calibrated closure as central case; public-sector and omitted-lines accounting (M2, M9, M10). 4. Benefit and duration baseline: JSA, observed take-up, part-year spells (M7, M8). 5. Margin result as the public-finance contribution (M5, M15). 6. Exposure-rule robustness; relabelled rules (M11, M12). 7. Validation table, OBR common basis, Irish quantitative or removed, decile-1 fix (M13, M16). 8. Policy section rebuilt or cut (M14).
